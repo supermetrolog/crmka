@@ -14,6 +14,7 @@ $config = [
     'components' => [
         'request' => [
             'enableCsrfValidation' => false,
+            'cookieValidationKey' => 'p6xr64xCH9KxL1zQ7zgdZ6BzV6IH2yZl',
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ]
@@ -55,8 +56,8 @@ $config = [
                     //     'PATCH /update/' => 'fuck',
                     // ],
                     'extraPatterns' => [
-                        'GET fuck' => 'fuck',
-                        'PATCH update' => 'fuck',
+                        'POST login' => 'login',
+                        'GET logout' => 'logout',
                     ],
                 ],
             ],

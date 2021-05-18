@@ -60,9 +60,12 @@ class Login extends Model
     public function login()
     {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
+            $user = $this->getUser();
+            $user->generateAccessToken();
+            $user->save(false);
+            return $user->access_token;
         }
-        return false;
+        return $this->getErrors();
     }
 
     /**

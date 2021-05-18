@@ -15,7 +15,7 @@ use yii\filters\auth\HttpBearerAuth;
  * @property string $password_hash
  * @property string|null $password_reset_token
  * @property string $email
- * @property string|null $verification_token
+ * @property string|null $access_token
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
@@ -42,7 +42,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return [
             [['username', 'auth_key', 'password_hash', 'email', 'created_at', 'updated_at'], 'required'],
             [['status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'verification_token'], 'string', 'max' => 255],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'access_token'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
             [['email'], 'unique'],
@@ -62,7 +62,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'password_hash' => 'Password Hash',
             'password_reset_token' => 'Password Reset Token',
             'email' => 'Email',
-            'verification_token' => 'Verification Token',
+            'access_token' => 'Verification Token',
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -130,7 +130,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public static function findByVerificationToken($token) {
         return static::findOne([
             'verification_token' => $token,
-            'status' => self::STATUS_INACTIVE
+            'status' => self::STATUS_ACTIVE
         ]);
     }
 
@@ -217,9 +217,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function generateEmailVerificationToken()
     {
-        $this->verification_token = Yii::$app->security->generateRandomString() . '_' . time();
+        $this->access_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
-
+/**
+     * Generates new token for email verification
+     */
+    public function generateAccessToken()
+    {
+        $this->access_token = Yii::$app->security->generateRandomString() . '_' . time();
+    }
     /**
      * Removes password reset token
      */
