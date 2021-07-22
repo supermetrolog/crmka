@@ -1,7 +1,9 @@
 <?php
+
 namespace app\controllers;
 
 use app\models\SignUp;
+use yii\filters\Cors;
 use app\models\Login;
 use app\models\User;
 use yii\rest\ActiveController;
@@ -17,7 +19,15 @@ class UserController extends ActiveController
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::className(),
-            'except' => ['login'],
+            'except' => ['login', 'index'],
+        ];
+        $behaviors['corsFilter'] = [
+            'class' => Cors::className(),
+            'cors' => [
+                'Origin' => ['*'],
+                'Access-Control-Request-Method' => ['*'],
+                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
+            ]
         ];
         return $behaviors;
     }
@@ -25,17 +35,17 @@ class UserController extends ActiveController
     public function actions()
     {
         $actions = parent::actions();
-        unset($actions['create']);
+        // unset($actions['create']);
         return $actions;
     }
-    public function actionCreate()
-    {
-        $model = new SignUp();
-        if ($model->load(Yii::$app->request->post(), '')) {
-            return $model->signUp();
-        }
-        return $model->getErrors();
-    }
+    // public function actionCreate()
+    // {
+    //     $model = new SignUp();
+    //     if ($model->load(Yii::$app->request->post(), '')) {
+    //         return $model->signUp();
+    //     }
+    //     return $model->getErrors();
+    // }
     public function actionLogin()
     {
         $model = new Login();

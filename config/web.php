@@ -2,7 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
-
+$urlRules = require __DIR__ . '/url_rules.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
@@ -48,19 +48,7 @@ $config = [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
-            'rules' => [
-                [   'class' => 'yii\rest\UrlRule', 
-                    'controller' => 'user',
-                    'except' => [],
-                    // 'patterns' => [
-                    //     'PATCH /update/' => 'fuck',
-                    // ],
-                    'extraPatterns' => [
-                        'POST login' => 'login',
-                        'GET logout' => 'logout',
-                    ],
-                ],
-            ],
+            'rules' => $urlRules
         ],
     ],
     'params' => $params,

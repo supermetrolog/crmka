@@ -76,6 +76,39 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         ];
         return $behaviors;
     }
+
+
+    public function fields()
+    {
+        $fields = parent::fields();
+        unset($fields['auth_key'], $fields['password_hash'], $fields['password_reset_token'], $fields['access_token']);
+        return $fields;
+    }
+
+    public function extraFields()
+    {
+        return ['auth_key'];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -127,7 +160,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      * @param string $token verify email token
      * @return static|null
      */
-    public static function findByVerificationToken($token) {
+    public static function findByVerificationToken($token)
+    {
         return static::findOne([
             'verification_token' => $token,
             'status' => self::STATUS_ACTIVE
@@ -219,7 +253,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         $this->access_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
-/**
+    /**
      * Generates new token for email verification
      */
     public function generateAccessToken()
