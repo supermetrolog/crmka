@@ -30,7 +30,7 @@ class m210702_092949_create_contact_comment_table extends Migration
             'contact_comment',
             'contact_id',
             'contact',
-            'id',
+            'id'
         );
         $this->createIndex(
             'idx-author-contact_id',
@@ -43,7 +43,7 @@ class m210702_092949_create_contact_comment_table extends Migration
             'contact_comment',
             'author_id',
             'user',
-            'id',
+            'id'
         );
     }
 

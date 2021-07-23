@@ -28,7 +28,7 @@ class m210716_130220_create_request_direction_table extends Migration
             'request_direction',
             'request_id',
             'request',
-            'id',
+            'id'
         );
     }
 

@@ -28,7 +28,7 @@ class m210702_092936_create_phone_table extends Migration
             'phone',
             'contact_id',
             'contact',
-            'id',
+            'id'
         );
     }
 

@@ -49,7 +49,7 @@ class m210716_104656_create_request_table extends Migration
             'request',
             'company_id',
             'company',
-            'id',
+            'id'
         );
         $this->createIndex(
             'idx-request-consultant_id',
@@ -62,7 +62,7 @@ class m210716_104656_create_request_table extends Migration
             'request',
             'consultant_id',
             'user',
-            'id',
+            'id'
         );
     }
 

@@ -28,7 +28,7 @@ class m210716_130119_create_request_object_class_table extends Migration
             'request_object_class',
             'request_id',
             'request',
-            'id',
+            'id'
         );
     }
 

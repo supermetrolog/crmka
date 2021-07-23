@@ -28,7 +28,7 @@ class m210709_090151_create_website_table extends Migration
             'website',
             'contact_id',
             'contact',
-            'id',
+            'id'
         );
     }
 

@@ -28,7 +28,7 @@ class m210709_110151_create_category_table extends Migration
             'category',
             'company_id',
             'company',
-            'id',
+            'id'
         );
     }
 

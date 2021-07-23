@@ -28,7 +28,7 @@ class m210702_092927_create_email_table extends Migration
             'email',
             'contact_id',
             'contact',
-            'id',
+            'id'
         );
     }
 

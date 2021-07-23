@@ -38,7 +38,7 @@ class m210629_134443_create_contact_table extends Migration
             'contact',
             'company_id',
             'company',
-            'id',
+            'id'
         );
     }
 

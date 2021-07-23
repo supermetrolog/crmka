@@ -35,4 +35,13 @@ return
                 'GET search' => 'search',
             ],
         ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'timeline',
+            'except' => [],
+            'extraPatterns' => [
+                'GET <id>' => 'index',
+                'GET search' => 'search',
+            ],
+        ],
     ];

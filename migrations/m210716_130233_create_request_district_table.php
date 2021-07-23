@@ -28,7 +28,7 @@ class m210716_130233_create_request_district_table extends Migration
             'request_district',
             'request_id',
             'request',
-            'id',
+            'id'
         );
     }
 

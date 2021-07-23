@@ -28,7 +28,7 @@ class m210716_130139_create_request_gate_type_table extends Migration
             'request_gate_type',
             'request_id',
             'request',
-            'id',
+            'id'
         );
     }
 

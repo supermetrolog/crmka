@@ -28,7 +28,7 @@ class m210716_130059_create_request_region_table extends Migration
             'request_region',
             'request_id',
             'request',
-            'id',
+            'id'
         );
     }
 

@@ -56,7 +56,7 @@ class m210629_092525_create_company_table extends Migration
             'company',
             'companyGroup_id',
             'companyGroup',
-            'id',
+            'id'
         );
         $this->createIndex(
             'idx-company-consultant_id',
@@ -69,7 +69,7 @@ class m210629_092525_create_company_table extends Migration
             'company',
             'consultant_id',
             'user',
-            'id',
+            'id'
         );
         $this->createIndex(
             'idx-company-broker_id',
@@ -82,7 +82,7 @@ class m210629_092525_create_company_table extends Migration
             'company',
             'broker_id',
             'user',
-            'id',
+            'id'
         );
     }
 

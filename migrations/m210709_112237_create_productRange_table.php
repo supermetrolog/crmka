@@ -28,7 +28,7 @@ class m210709_112237_create_productRange_table extends Migration
             'productRange',
             'company_id',
             'company',
-            'id',
+            'id'
         );
     }
 
