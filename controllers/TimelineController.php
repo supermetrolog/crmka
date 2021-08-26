@@ -7,6 +7,7 @@ use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\Cors;
+use Yii;
 
 /**
  * RequestController implements the CRUD actions for Request model.
@@ -18,19 +19,18 @@ class TimelineController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => [
-                'index', 'view'
-            ]
-        ];
+        unset($behaviors['authenticator']);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
                 'Origin' => ['*'],
                 'Access-Control-Request-Method' => ['*'],
                 'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-            ]
+            ],
+        ];
+        $behaviors['authenticator'] = [
+            'class' => HttpBearerAuth::className(),
+            'except' => ['view', 'index', 'options'],
         ];
         return $behaviors;
     }
@@ -42,13 +42,11 @@ class TimelineController extends ActiveController
         unset($actions['view']);
         return $actions;
     }
-    public function actionIndex($id)
+    public function actionIndex()
     {
-        return $id;
-    }
-    public function actionTimeline()
-    {
-        return 3;
+        $consultant_id = Yii::$app->request->getQueryParam('consultant_id');
+        $request_id = Yii::$app->request->getQueryParam('request_id');
+        return Timeline::getTimeline($consultant_id, $request_id);
     }
     protected function findModel($id)
     {

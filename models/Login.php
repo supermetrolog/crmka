@@ -2,7 +2,9 @@
 
 namespace app\models;
 
+use app\exceptions\ValidationErrorHttpException;
 use Yii;
+use yii\web\UnauthorizedHttpException;
 use yii\base\Model;
 
 /**
@@ -34,7 +36,13 @@ class Login extends Model
             ['password', 'validatePassword'],
         ];
     }
-
+    public function attributeLabels()
+    {
+        return [
+            'username' => 'Логин',
+            'password' => 'Пароль'
+        ];
+    }
     /**
      * Validates the password.
      * This method serves as the inline validation for password.
@@ -48,7 +56,7 @@ class Login extends Model
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Неверный юзернейм или пароль.');
+                $this->addError($attribute, 'Неверный логин или пароль.');
             }
         }
     }
@@ -63,9 +71,9 @@ class Login extends Model
             $user = $this->getUser();
             $user->generateAccessToken();
             $user->save(false);
-            return $user->access_token;
+            return ['message' => "Аутентификация прошла успешно", 'data' => ['user' => $user, 'access_token' => $user->access_token]];
         }
-        return $this->getErrors();
+        throw new ValidationErrorHttpException($this->getErrorSummary(false));
     }
 
     /**

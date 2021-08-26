@@ -16,19 +16,18 @@ class CompanyController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => [
-                'index', 'search', 'view'
-            ]
-        ];
+        unset($behaviors['authenticator']);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
                 'Origin' => ['*'],
                 'Access-Control-Request-Method' => ['*'],
                 'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-            ]
+            ],
+        ];
+        $behaviors['authenticator'] = [
+            'class' => HttpBearerAuth::className(),
+            'except' => ['search', 'view', 'index', 'options'],
         ];
         return $behaviors;
     }

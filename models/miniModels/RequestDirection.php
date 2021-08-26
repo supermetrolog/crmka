@@ -3,6 +3,9 @@
 namespace app\models\miniModels;
 
 use Yii;
+use app\models\Request;
+use app\exceptions\ValidationErrorHttpException;
+use ReflectionClass;
 
 /**
  * This is the model class for table "request_direction".
@@ -15,6 +18,7 @@ use Yii;
  */
 class RequestDirection extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'direction';
     /**
      * {@inheritdoc}
      */
@@ -46,7 +50,11 @@ class RequestDirection extends \yii\db\ActiveRecord
             'direction' => 'Direction',
         ];
     }
-
+    public function fields()
+    {
+        $fields = parent::fields();
+        return $fields;
+    }
     /**
      * Gets query for [[Request]].
      *

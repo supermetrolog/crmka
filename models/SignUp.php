@@ -15,7 +15,6 @@ class SignUp extends Model
 {
     public $username;
     public $password;
-    public $email;
 
     private $_user = false;
 
@@ -27,11 +26,9 @@ class SignUp extends Model
     {
         return [
             // username and password are both required
-            [['username', 'password', 'email'], 'required'],
+            [['username', 'password'], 'required'],
             ['password', 'string', 'min' => 8],
             ['username', 'string', 'min' => 4],
-            [['email'], 'email'],
-            // rememberMe must be a boolean value
             // password is validated by validatePassword()
             ['username', 'validateUsername'],
         ];
@@ -66,7 +63,6 @@ class SignUp extends Model
             $user->setPassword($this->password);
             $user->generateAuthKey();
             $user->username = $this->username;
-            $user->email = $this->email;
             $user->created_at = time();
             $user->updated_at = time();
             if ($user->validate() && $user->save()) return true;

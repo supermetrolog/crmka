@@ -17,8 +17,8 @@ class RequestSearch extends Request
     public function rules()
     {
         return [
-            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'antiDustOnly', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status'], 'integer'],
-            [['description', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'antiDustOnly', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate'], 'integer'],
+            [['description', 'created_at', 'updated_at', 'movingDate'], 'safe'],
         ];
     }
 
@@ -80,6 +80,8 @@ class RequestSearch extends Request
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'movingDate' => $this->movingDate,
+            'unknownMovingDate' => $this->unknownMovingDate,
         ]);
 
         $query->andFilterWhere(['like', 'description', $this->description]);

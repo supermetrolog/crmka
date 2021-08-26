@@ -9,7 +9,7 @@ return
             // 'PATCH /update/' => 'fuck',
             // ],
             'extraPatterns' => [
-                'POST login' => 'login',
+                'POST,OPTIONS login' => 'login',
                 'GET logout' => 'logout',
             ],
         ],
@@ -37,11 +37,21 @@ return
         ],
         [
             'class' => 'yii\rest\UrlRule',
-            'controller' => 'timeline',
+            'controller' => ['timeline' => 'timeline'],
+            'except' => [],
+            'extraPatterns' => [
+                'GET /' => 'index',
+                'GET search' => 'search',
+            ],
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'notification',
             'except' => [],
             'extraPatterns' => [
                 'GET <id>' => 'index',
-                'GET search' => 'search',
+                'GET new/<id>' => 'new',
+                'GET <id>/viewed' => 'viewed',
             ],
         ],
     ];

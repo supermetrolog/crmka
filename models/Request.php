@@ -2,14 +2,17 @@
 
 namespace app\models;
 
+use app\exceptions\ValidationErrorHttpException;
+use Yii;
+use yii\data\ActiveDataProvider;
 use app\models\miniModels\RequestDirection;
 use app\models\miniModels\RequestDistrict;
 use app\models\miniModels\RequestGateType;
 use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestRegion;
-use yii\data\ActiveDataProvider;
-use Yii;
+use yii\helpers\ArrayHelper;
+use ReflectionClass;
 
 /**
  * This is the model class for table "request".
@@ -26,7 +29,7 @@ use Yii;
  * @property int $maxCeilingHeight максимальная высота потолков
  * @property int|null $firstFloorOnly [флаг] Только 1 этаж
  * @property int $heated [флаг] Отапливаемый
- * @property int $antiDustOnly [флаг] Только антипыль
+ * @property int|null $antiDustOnly [флаг] Только антипыль
  * @property int|null $trainLine [флаг] Ж/Д ветка
  * @property int|null $trainLineLength Длина Ж/Д
  * @property int $consultant_id [связь] ID консультанта
@@ -37,9 +40,18 @@ use Yii;
  * @property int|null $status [флаг] Статус
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property string|null $movingDate Дата переезда
+ * @property int|null $unknownMovingDate [флаг] Нет конкретики по сроку переезда/рассматривает постоянно
  *
  * @property Company $company
  * @property User $consultant
+ * @property RequestDirection[] $requestDirections
+ * @property RequestDistrict[] $requestDistricts
+ * @property RequestGateType[] $requestGateTypes
+ * @property RequestObjectClass[] $requestObjectClasses
+ * @property RequestObjectType[] $requestObjectTypes
+ * @property RequestRegion[] $requestRegions
+ * @property Timeline[] $timelines
  */
 class Request extends \yii\db\ActiveRecord
 {
@@ -57,9 +69,10 @@ class Request extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'antiDustOnly', 'consultant_id'], 'required'],
-            [['company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'antiDustOnly', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'consultant_id'], 'required'],
+            [['antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
+            [['company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'integer'],
+            [['created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
             [['description'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
@@ -95,6 +108,8 @@ class Request extends \yii\db\ActiveRecord
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'movingDate' => 'Moving Date',
+            'unknownMovingDate' => 'Unknown Moving Date',
         ];
     }
     public static function getCompanyRequestsList($company_id)
@@ -102,7 +117,7 @@ class Request extends \yii\db\ActiveRecord
         $dataProvider = new ActiveDataProvider([
             'query' => self::find()->joinWith(['consultant', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions'])->where(['request.company_id' => $company_id]),
             'pagination' => [
-                'pageSize' => 100,
+                'pageSize' => 1000,
             ],
         ]);
         return $dataProvider;
@@ -114,6 +129,98 @@ class Request extends \yii\db\ActiveRecord
         ]);
 
         return $dataProvider;
+    }
+    //функция для создания сразу нескольких строк в связанных моделях
+    public  function createManyMiniModels($className, $data)
+    {
+        $columnName = $className::MAIN_COLUMN;
+
+        if (!$data || !$className || !$columnName) {
+            return false;
+        }
+        [];
+        $class = new ReflectionClass($className);
+
+        foreach ($data as $item) {
+            $model = $class->newInstance();
+            $array['request_id'] = $this->id;
+            $array[$columnName] = $item;
+            if ($model->load($array, '') && $model->save()) {
+                continue;
+            } else {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+        return true;
+    }
+    public static function createRequest($post_data)
+    {
+        $db = Yii::$app->db;
+        $request = new Request();
+        $transaction = $db->beginTransaction();
+        try {
+            if ($request->load($post_data, '') && $request->save()) {
+                $request->createManyMiniModels(RequestDirection::class,  $post_data['directions']);
+                $request->createManyMiniModels(RequestDistrict::class,  $post_data['districts']);
+                $request->createManyMiniModels(RequestGateType::class,  $post_data['gateTypes']);
+                $request->createManyMiniModels(RequestObjectClass::class,  $post_data['objectClasses']);
+                $request->createManyMiniModels(RequestObjectType::class,  $post_data['objectTypes']);
+                $request->createManyMiniModels(RequestRegion::class,  $post_data['regions']);
+                Timeline::createNewTimeline($request->id, $request->consultant_id);
+                // $transaction->rollBack();
+
+                $transaction->commit();
+                return ['message' => "Запрос создан", 'data' => $request->id];
+            }
+            throw new ValidationErrorHttpException($request->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
+    public function updateManyMiniModels($className, $data)
+    {
+        $className::deleteAll(['request_id' => $this->id]);
+        $this->createManyMiniModels($className, $data);
+    }
+    public static function updateRequest($request, $post_data)
+    {
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            if ($request->load($post_data, '') && $request->save()) {
+                $request->updateManyMiniModels(RequestDirection::class,  $post_data['directions']);
+                $request->updateManyMiniModels(RequestDistrict::class,  $post_data['districts']);
+                $request->updateManyMiniModels(RequestGateType::class,  $post_data['gateTypes']);
+                $request->updateManyMiniModels(RequestObjectClass::class,  $post_data['objectClasses']);
+                $request->updateManyMiniModels(RequestObjectType::class,  $post_data['objectTypes']);
+                $request->updateManyMiniModels(RequestRegion::class,  $post_data['regions']);
+                // $transaction->rollBack();
+
+                $transaction->commit();
+                return ['message' => "Запрос изменен", 'data' => $request->id];
+            }
+            throw new ValidationErrorHttpException($request->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields['movingDate'] = function ($fields) {
+            if ($fields['movingDate']) {
+                return date('Y-m-d', strtotime($fields['movingDate']));
+            }
+            return $fields['movingDate'];
+        };
+        return $fields;
+    }
+    public function extraFields()
+    {
+        $extraFields = parent::extraFields();
+        return $extraFields;
     }
     /**
      * Gets query for [[Company]].
@@ -136,7 +243,7 @@ class Request extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Direction]].
+     * Gets query for [[RequestDirections]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -146,7 +253,7 @@ class Request extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[District]].
+     * Gets query for [[RequestDistricts]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -156,7 +263,7 @@ class Request extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[GateType]].
+     * Gets query for [[RequestGateTypes]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -166,7 +273,7 @@ class Request extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[ObjectClass]].
+     * Gets query for [[RequestObjectClasses]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -176,7 +283,7 @@ class Request extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[ObjectType]].
+     * Gets query for [[RequestObjectTypes]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -186,12 +293,22 @@ class Request extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Region]].
+     * Gets query for [[RequestRegions]].
      *
      * @return \yii\db\ActiveQuery
      */
     public function getRegions()
     {
         return $this->hasMany(RequestRegion::className(), ['request_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Timelines]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTimelines()
+    {
+        return $this->hasMany(Timeline::className(), ['request_id' => 'id']);
     }
 }

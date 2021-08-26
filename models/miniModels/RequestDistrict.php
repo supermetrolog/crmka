@@ -2,6 +2,9 @@
 
 namespace app\models\miniModels;
 
+use app\models\Request;
+use app\exceptions\ValidationErrorHttpException;
+use ReflectionClass;
 use Yii;
 
 /**
@@ -15,6 +18,8 @@ use Yii;
  */
 class RequestDistrict extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'district';
+
     /**
      * {@inheritdoc}
      */
@@ -34,7 +39,6 @@ class RequestDistrict extends \yii\db\ActiveRecord
             [['request_id'], 'exist', 'skipOnError' => true, 'targetClass' => Request::className(), 'targetAttribute' => ['request_id' => 'id']],
         ];
     }
-
     /**
      * {@inheritdoc}
      */

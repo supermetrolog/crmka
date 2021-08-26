@@ -2,21 +2,24 @@
 
 namespace app\models;
 
-use app\models\miniModels\TimelineAction;
+use app\models\miniModels\TimelineStep;
+use yii\data\ActiveDataProvider;
+use app\exceptions\ValidationErrorHttpException;
 use Yii;
 
 /**
  * This is the model class for table "timeline".
  *
  * @property int $id
- * @property int $request_id
- * @property int $step
- * @property int $isBranch
- * @property int $branch
- * @property string|null $datetime
+ * @property int $request_id [связь] с запросами
+ * @property int $consultant_id [связь] с юзерами
+ * @property int|null $status
+ * @property string|null $created_at
+ * @property string|null $updated_at
  *
+ * @property User $consultant
  * @property Request $request
- * @property TimelineAction[] $timelineActions
+ * @property TimelineStep[] $timelineSteps
  */
 class Timeline extends \yii\db\ActiveRecord
 {
@@ -34,9 +37,10 @@ class Timeline extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['request_id', 'step', 'isBranch', 'branch'], 'required'],
-            [['request_id', 'step', 'isBranch', 'branch'], 'integer'],
-            [['datetime'], 'safe'],
+            [['request_id', 'consultant_id'], 'required'],
+            [['request_id', 'consultant_id', 'status'], 'integer'],
+            [['created_at', 'updated_at'], 'safe'],
+            [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
             [['request_id'], 'exist', 'skipOnError' => true, 'targetClass' => Request::className(), 'targetAttribute' => ['request_id' => 'id']],
         ];
     }
@@ -49,11 +53,55 @@ class Timeline extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'request_id' => 'Request ID',
-            'step' => 'Step',
-            'isBranch' => 'Is Branch',
-            'branch' => 'Branch',
-            'datetime' => 'Datetime',
+            'consultant_id' => 'Consultant ID',
+            'status' => 'Status',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ];
+    }
+
+    public static function getTimeline($consultant_id, $request_id)
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => self::find()->joinWith(['timelineSteps' => function ($query) {
+                $query->with(['timelineStepObjects']);
+            }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id]),
+            'pagination' => [
+                'pageSize' => 100,
+            ],
+        ]);
+
+        return $dataProvider;
+    }
+    public static function createNewTimeline($request_id, $consultant_id)
+    {
+        $data = [
+            'request_id' => $request_id,
+            'consultant_id' => $consultant_id,
+        ];
+        $timeline = new Timeline();
+        $timelineStep = new TimelineStep();
+
+        if ($timeline->load($data, '') && $timeline->save()) {
+            $data = [
+                'timeline_id' => $timeline->id,
+                'number' => TimelineStep::MEETING_STEP_NUMBER,
+            ];
+            if (!$timelineStep->load($data, '') || !$timelineStep->save()) {
+                throw new ValidationErrorHttpException($timelineStep->getErrorSummary(false));
+            }
+        } else {
+            throw new ValidationErrorHttpException($timeline->getErrorSummary(false));
+        }
+    }
+    /**
+     * Gets query for [[Consultant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getConsultant()
+    {
+        return $this->hasOne(User::className(), ['id' => 'consultant_id']);
     }
 
     /**
@@ -67,12 +115,12 @@ class Timeline extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[TimelineActions]].
+     * Gets query for [[TimelineSteps]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTimelineActions()
+    public function getTimelineSteps()
     {
-        return $this->hasMany(TimelineAction::className(), ['timeline_id' => 'id']);
+        return $this->hasMany(TimelineStep::className(), ['timeline_id' => 'id']);
     }
 }

@@ -3,6 +3,7 @@
 namespace app\models\miniModels;
 
 use Yii;
+use app\models\Request;
 
 /**
  * This is the model class for table "request_gate_type".
@@ -15,6 +16,8 @@ use Yii;
  */
 class RequestGateType extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'gate_type';
+
     /**
      * {@inheritdoc}
      */

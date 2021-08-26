@@ -3,6 +3,7 @@
 namespace app\models\miniModels;
 
 use Yii;
+use app\models\Request;
 
 /**
  * This is the model class for table "request_object_class".
@@ -15,6 +16,8 @@ use Yii;
  */
 class RequestObjectClass extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'object_class';
+
     /**
      * {@inheritdoc}
      */
