@@ -17,6 +17,8 @@ use Yii;
  */
 class Email extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'email';
+
     /**
      * {@inheritdoc}
      */

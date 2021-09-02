@@ -2,9 +2,10 @@
 
 namespace app\models\miniModels;
 
-use app\models\Contact;
-use app\models\User;
 use Yii;
+use app\models\User;
+use app\models\Contact;
+use app\exceptions\ValidationErrorHttpException;
 
 /**
  * This is the model class for table "contact_comment".
@@ -13,6 +14,7 @@ use Yii;
  * @property int|null $contact_id
  * @property int $author_id
  * @property string $comment
+ * @property string|null $created_at
  *
  * @property User $author
  * @property Contact $contact
@@ -35,6 +37,7 @@ class ContactComment extends \yii\db\ActiveRecord
         return [
             [['contact_id', 'author_id'], 'integer'],
             [['author_id', 'comment'], 'required'],
+            [['created_at'], 'safe'],
             [['comment'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['author_id' => 'id']],
             [['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
@@ -51,9 +54,19 @@ class ContactComment extends \yii\db\ActiveRecord
             'contact_id' => 'Contact ID',
             'author_id' => 'Author ID',
             'comment' => 'Comment',
+            'created_at' => 'Created At',
         ];
     }
 
+    public static function createComment($post_data)
+    {
+        $model = new ContactComment();
+        if ($model->load($post_data, '') && $model->save()) {
+            return ['message' => 'Комментарий добавлен', 'data' => self::find()->joinWith('author')->where(['contact_comment.id' => $model->id])->one()];
+        } else {
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        }
+    }
     /**
      * Gets query for [[Author]].
      *

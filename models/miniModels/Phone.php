@@ -16,6 +16,8 @@ use app\models\Contact;
  */
 class Phone extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'phone';
+
     /**
      * {@inheritdoc}
      */

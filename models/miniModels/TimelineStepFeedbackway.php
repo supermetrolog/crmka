@@ -17,6 +17,8 @@ use Yii;
  */
 class TimelineStepFeedbackway extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'way';
+
     /**
      * {@inheritdoc}
      */

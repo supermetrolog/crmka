@@ -3,6 +3,9 @@
 namespace app\models\miniModels;
 
 use app\models\Timeline;
+use yii\web\NotFoundHttpException;
+use app\exceptions\ValidationErrorHttpException;
+use ReflectionClass;
 use Yii;
 
 /**
@@ -26,6 +29,7 @@ use Yii;
 class TimelineStep extends \yii\db\ActiveRecord
 {
     public const MEETING_STEP_NUMBER = 0;
+    public const OFFER_STEP_NUMBER = 1;
     /**
      * {@inheritdoc}
      */
@@ -66,7 +70,66 @@ class TimelineStep extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
+    public static function findModel($id)
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
 
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+    public function createNewStep($stepNumber)
+    {
+        if (self::find()->where(['timeline_id' => $this->timeline_id])->andWhere(['number' => $stepNumber])->one()) return;
+        $model = new TimelineStep();
+        $data = [
+            'timeline_id' => $this->timeline_id,
+            'number' => $stepNumber,
+        ];
+        if (!$model->load($data, '') || !$model->save()) {
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        }
+    }
+    public function updateSpecificStep($post_data)
+    {
+        switch ($this->number) {
+            case self::MEETING_STEP_NUMBER:
+                return $this->updateMeetingStep();
+                break;
+            case self::OFFER_STEP_NUMBER:
+                return $this->updateOfferStep($post_data);
+                break;
+            default:
+                throw new NotFoundHttpException('The requested page does not exist.');
+                break;
+        }
+    }
+    public function updateMeetingStep()
+    {
+        if (!$this->done) return;
+        return $this->createNewStep(self::OFFER_STEP_NUMBER);
+    }
+    public function updateOfferStep($post_data)
+    {
+        return true;
+    }
+    public static function updateTimelineStep($id, $post_data)
+    {
+        $timelineStep = self::findModel($id);
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            if ($timelineStep->load($post_data, '') && $timelineStep->save()) {
+                $response = $timelineStep->updateSpecificStep($post_data);
+                $transaction->commit();
+                return ['message' => "Успех", 'data' => true];
+            }
+            throw new ValidationErrorHttpException($timelineStep->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
     /**
      * Gets query for [[Timeline]].
      *

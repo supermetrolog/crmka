@@ -37,10 +37,22 @@ return
         ],
         [
             'class' => 'yii\rest\UrlRule',
+            'controller' => 'contact',
+            'except' => [],
+            'extraPatterns' => [
+                'GET company-contacts/<id>' => 'company-contacts',
+                'POST create-comment' => 'create-comment',
+                'OPTIONS create-comment' => 'options',
+            ],
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
             'controller' => ['timeline' => 'timeline'],
             'except' => [],
             'extraPatterns' => [
                 'GET /' => 'index',
+                'PATCH update-step/<id>' => 'update-step',
+                'OPTIONS update-step/<id>' => 'options',
                 'GET search' => 'search',
             ],
         ],

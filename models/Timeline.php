@@ -64,7 +64,7 @@ class Timeline extends \yii\db\ActiveRecord
     {
         $dataProvider = new ActiveDataProvider([
             'query' => self::find()->joinWith(['timelineSteps' => function ($query) {
-                $query->with(['timelineStepObjects']);
+                $query->with(['timelineStepObjects', 'timelineStepFeedbackways']);
             }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id]),
             'pagination' => [
                 'pageSize' => 100,
@@ -81,17 +81,24 @@ class Timeline extends \yii\db\ActiveRecord
         ];
         $timeline = new Timeline();
         $timelineStep = new TimelineStep();
-
-        if ($timeline->load($data, '') && $timeline->save()) {
-            $data = [
-                'timeline_id' => $timeline->id,
-                'number' => TimelineStep::MEETING_STEP_NUMBER,
-            ];
-            if (!$timelineStep->load($data, '') || !$timelineStep->save()) {
-                throw new ValidationErrorHttpException($timelineStep->getErrorSummary(false));
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            if ($timeline->load($data, '') && $timeline->save()) {
+                $data = [
+                    'timeline_id' => $timeline->id,
+                    'number' => TimelineStep::MEETING_STEP_NUMBER,
+                ];
+                if (!$timelineStep->load($data, '') || !$timelineStep->save()) {
+                    throw new ValidationErrorHttpException($timelineStep->getErrorSummary(false));
+                }
+            } else {
+                throw new ValidationErrorHttpException($timeline->getErrorSummary(false));
             }
-        } else {
-            throw new ValidationErrorHttpException($timeline->getErrorSummary(false));
+            $transaction->commit();
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
         }
     }
     /**

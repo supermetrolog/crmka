@@ -3,10 +3,14 @@
 namespace app\models;
 
 use Yii;
-use app\models\miniModels\ContactComment;
+use yii\data\ActiveDataProvider;
+use app\models\miniModels\WayOfInforming;
 use app\models\miniModels\Email;
 use app\models\miniModels\Phone;
 use app\models\miniModels\Website;
+use app\models\miniModels\ContactComment;
+use app\exceptions\ValidationErrorHttpException;
+use ReflectionClass;
 
 /**
  * This is the model class for table "contact".
@@ -20,11 +24,19 @@ use app\models\miniModels\Website;
  * @property int|null $type
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property int|null $consultant_id [связь] с пользователями
+ * @property int|null $position Должность
+ * @property int|null $faceToFaceMeeting [флаг] Очная встреча
+ * @property int|null $warning [флаг] Внимание
+ * @property int|null $good [флаг] Хор. взаимоотношения
  *
  * @property Company $company
+ * @property User $consultant
  * @property ContactComment[] $contactComments
  * @property Email[] $emails
  * @property Phone[] $phones
+ * @property WayOfInforming[] $wayOfInformings
+ * @property Website[] $websites
  */
 class Contact extends \yii\db\ActiveRecord
 {
@@ -43,10 +55,11 @@ class Contact extends \yii\db\ActiveRecord
     {
         return [
             [['company_id', 'first_name'], 'required'],
-            [['company_id', 'status', 'type'], 'integer'],
+            [['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['first_name', 'middle_name', 'last_name'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
+            [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
         ];
     }
 
@@ -65,22 +78,94 @@ class Contact extends \yii\db\ActiveRecord
             'type' => 'Type',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'consultant_id' => 'Consultant ID',
+            'position' => 'Position',
+            'faceToFaceMeeting' => 'Face To Face Meeting',
+            'warning' => 'Warning',
+            'good' => 'Good',
         ];
     }
+    public static function getCompanyContactList($company_id)
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => self::find()->joinWith(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant', 'contactComments' => function ($query) {
+                $query->with(['author']);
+            }])->where(['contact.company_id' => $company_id]),
+            'pagination' => [
+                'pageSize' => 10000,
+            ],
+        ]);
+        return $dataProvider;
+    }
+    //функция для создания сразу нескольких строк в связанных моделях
+    public  function createManyMiniModels($className, $data)
+    {
+        $columnName = $className::MAIN_COLUMN;
 
-    // public function fields()
-    // {
-    //     $fields = parent::fields();
-    //     // unset($fields['nameEng']);
+        if (!$data || !$className || !$columnName) {
+            return false;
+        }
+        [];
+        $class = new ReflectionClass($className);
 
-    //     // var_dump($fields);
-    //     $fields['anal'] = function () {
-    //         return rand(10, 100);
-    //     };
-    //     return $fields;
-    // }
+        foreach ($data as $item) {
+            $model = $class->newInstance();
+            $array['contact_id'] = $this->id;
+            $array[$columnName] = $item;
+            if ($model->load($array, '') && $model->save()) {
+                continue;
+            } else {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+        return true;
+    }
+    public static function createContact($post_data)
+    {
+        $db = Yii::$app->db;
+        $model = new Contact();
+        $transaction = $db->beginTransaction();
+        try {
+            if ($model->load($post_data, '') && $model->save()) {
+                $model->createManyMiniModels(Email::class,  $post_data['emails']);
+                $model->createManyMiniModels(Phone::class,  $post_data['phones']);
+                $model->createManyMiniModels(WayOfInforming::class,  $post_data['wayOfInformings']);
+                // $transaction->rollBack();
 
+                $transaction->commit();
+                return ['message' => "Контакт создан", 'data' => $model->id];
+            }
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
+    public function updateManyMiniModels($className, $data)
+    {
+        $className::deleteAll(['contact_id' => $this->id]);
+        $this->createManyMiniModels($className, $data);
+    }
+    public static function updateContact($request, $post_data)
+    {
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            if ($request->load($post_data, '') && $request->save()) {
+                $request->updateManyMiniModels(Email::class,  $post_data['emails']);
+                $request->updateManyMiniModels(Phone::class,  $post_data['phones']);
+                $request->updateManyMiniModels(WayOfInforming::class,  $post_data['wayOfInformings']);
+                // $transaction->rollBack();
 
+                $transaction->commit();
+                return ['message' => "Запрос изменен", 'data' => $request->id];
+            }
+            throw new ValidationErrorHttpException($request->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
     /**
      * Gets query for [[Company]].
      *
@@ -89,6 +174,16 @@ class Contact extends \yii\db\ActiveRecord
     public function getCompany()
     {
         return $this->hasOne(Company::className(), ['id' => 'company_id']);
+    }
+
+    /**
+     * Gets query for [[Consultant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getConsultant()
+    {
+        return $this->hasOne(User::className(), ['id' => 'consultant_id']);
     }
 
     /**
@@ -120,6 +215,17 @@ class Contact extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Phone::className(), ['contact_id' => 'id']);
     }
+
+    /**
+     * Gets query for [[WayOfInformings]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWayOfInformings()
+    {
+        return $this->hasMany(WayOfInforming::className(), ['contact_id' => 'id']);
+    }
+
     /**
      * Gets query for [[Websites]].
      *
