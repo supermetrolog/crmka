@@ -17,7 +17,7 @@ Thumbs.db
 
 # composer itself is not needed
 composer.phar
-
+config/db.php
 # Mac DS_Store Files
 .DS_Store
 
