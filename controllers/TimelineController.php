@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Timeline;
 use app\models\miniModels\TimelineStep;
+use app\models\miniModels\TimelineStepObject;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use yii\filters\auth\HttpBearerAuth;
@@ -31,7 +32,7 @@ class TimelineController extends ActiveController
         ];
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::className(),
-            'except' => ['index', 'view', 'create', 'delete', 'update', 'update-step', 'options'],
+            'except' => ['index', 'view', 'create', 'delete', 'update', 'update-step', 'add-objects', 'options'],
         ];
         return $behaviors;
     }
@@ -51,6 +52,10 @@ class TimelineController extends ActiveController
     public function actionUpdateStep($id)
     {
         return TimelineStep::updateTimelineStep($id, Yii::$app->request->post());
+    }
+    public function actionAddObjects($id)
+    {
+        return TimelineStepObject::addObjects($id, Yii::$app->request->post());
     }
     public function actionIndex()
     {

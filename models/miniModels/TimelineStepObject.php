@@ -57,6 +57,9 @@ class TimelineStepObject extends \yii\db\ActiveRecord
             'type_id' => 'Type ID',
         ];
     }
+    public static function addObjects($id, $post_data)
+    {
+    }
 
     /**
      * Gets query for [[TimelineStep]].

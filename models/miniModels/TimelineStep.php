@@ -111,7 +111,13 @@ class TimelineStep extends \yii\db\ActiveRecord
     }
     public function updateOfferStep($post_data)
     {
-        return true;
+        $newObjects = $post_data['timelineStepObjects'];
+        foreach ($newObjects as $object) {
+            $model = new TimelineStepObject();
+            if (!$model->load($object, '') || !$model->save()) {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
     }
     public static function updateTimelineStep($id, $post_data)
     {
@@ -122,13 +128,34 @@ class TimelineStep extends \yii\db\ActiveRecord
             if ($timelineStep->load($post_data, '') && $timelineStep->save()) {
                 $response = $timelineStep->updateSpecificStep($post_data);
                 $transaction->commit();
-                return ['message' => "Успех", 'data' => true];
+                return ['message' => "Успешно изменено", 'data' => true];
             }
             throw new ValidationErrorHttpException($timelineStep->getErrorSummary(false));
         } catch (\Throwable $th) {
             $transaction->rollBack();
             throw $th;
         }
+    }
+    public function extraFields()
+    {
+        $extraFields = parent::extraFields();
+        $extraFields['timelineStepObjects'] = function ($extraFields) {
+            $count = array_count_values((array_map(function ($item) {
+                return $item['object_id'];
+            }, $extraFields['timelineStepObjects'])));
+            $newObjects = [];
+            foreach ($extraFields['timelineStepObjects'] as $object) {
+                $object = $object->attributes;
+                $object['duplicate_count'] = $count[$object['object_id']];
+                $newObjects[$object['object_id']] = $object;
+            }
+            $fuck = [];
+            foreach ($newObjects as $value) {
+                $fuck[] = $value;
+            }
+            return $fuck;
+        };
+        return $extraFields;
     }
     /**
      * Gets query for [[Timeline]].

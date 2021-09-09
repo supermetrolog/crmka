@@ -53,6 +53,7 @@ return
                 'GET /' => 'index',
                 'PATCH update-step/<id>' => 'update-step',
                 'OPTIONS update-step/<id>' => 'options',
+                'POST,OPTIONS add-objects/<id>' => 'add-objects',
                 'GET search' => 'search',
             ],
         ],
