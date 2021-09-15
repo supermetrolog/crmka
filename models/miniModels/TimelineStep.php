@@ -30,6 +30,9 @@ class TimelineStep extends \yii\db\ActiveRecord
 {
     public const MEETING_STEP_NUMBER = 0;
     public const OFFER_STEP_NUMBER = 1;
+    public const FEEDBACK_STEP_NUMBER = 2;
+    public const INSPECTION_STEP_NUMBER = 3;
+    public const VISIT_STEP_NUMBER = 4;
     /**
      * {@inheritdoc}
      */
@@ -99,6 +102,15 @@ class TimelineStep extends \yii\db\ActiveRecord
             case self::OFFER_STEP_NUMBER:
                 return $this->updateOfferStep($post_data);
                 break;
+            case self::FEEDBACK_STEP_NUMBER:
+                return $this->updateFeedbackStep($post_data);
+                break;
+            case self::INSPECTION_STEP_NUMBER:
+                return $this->updateInspectionStep($post_data);
+                break;
+            case self::VISIT_STEP_NUMBER:
+                return $this->updateVisitStep($post_data);
+                break;
             default:
                 throw new NotFoundHttpException('The requested page does not exist.');
                 break;
@@ -111,6 +123,8 @@ class TimelineStep extends \yii\db\ActiveRecord
     }
     public function updateOfferStep($post_data)
     {
+        if ($this->negative) return;
+
         $newObjects = $post_data['timelineStepObjects'];
         foreach ($newObjects as $object) {
             $model = new TimelineStepObject();
@@ -118,6 +132,56 @@ class TimelineStep extends \yii\db\ActiveRecord
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
             }
         }
+        return $this->createNewStep(self::FEEDBACK_STEP_NUMBER);
+    }
+    public function updateFeedbackStep($post_data)
+    {
+        if ($this->negative) return;
+
+        $newObjects = $post_data['timelineStepObjects'];
+        foreach ($newObjects as $object) {
+            $model = new TimelineStepObject();
+            if (!$model->load($object, '') || !$model->save()) {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+
+        TimelineStepFeedbackway::deleteAll(['timeline_step_id' => $this->id]);
+
+        $newFeedbackWays = $post_data['timelineStepFeedbackways'];
+        foreach ($newFeedbackWays as $way) {
+            $model = new TimelineStepFeedbackway();
+            if (!$model->load($way, '') || !$model->save()) {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+        return $this->createNewStep(self::INSPECTION_STEP_NUMBER);
+    }
+    public function updateInspectionStep($post_data)
+    {
+        if ($this->negative) return;
+
+        $newObjects = $post_data['timelineStepObjects'];
+        foreach ($newObjects as $object) {
+            $model = new TimelineStepObject();
+            if (!$model->load($object, '') || !$model->save()) {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+        return $this->createNewStep(self::VISIT_STEP_NUMBER);
+    }
+    public function updateVisitStep($post_data)
+    {
+        if ($this->negative) return;
+
+        $newObjects = $post_data['timelineStepObjects'];
+        foreach ($newObjects as $object) {
+            $model = new TimelineStepObject();
+            if (!$model->load($object, '') || !$model->save()) {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+        // return $this->createNewStep(self::FEEDBACK_STEP_NUMBER);
     }
     public static function updateTimelineStep($id, $post_data)
     {
