@@ -3,6 +3,8 @@
 namespace app\models;
 
 use app\exceptions\ValidationErrorHttpException;
+use yii\web\NotFoundHttpException;
+use app\models\miniModels\RequestDeal;
 use Yii;
 use yii\data\ActiveDataProvider;
 use app\models\miniModels\RequestDirection;
@@ -11,7 +13,6 @@ use app\models\miniModels\RequestGateType;
 use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestRegion;
-use yii\helpers\ArrayHelper;
 use ReflectionClass;
 
 /**
@@ -55,6 +56,9 @@ use ReflectionClass;
  */
 class Request extends \yii\db\ActiveRecord
 {
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_PASSIVE = 0;
+    public const STATUS_DONE = 2;
     /**
      * {@inheritdoc}
      */
@@ -112,10 +116,26 @@ class Request extends \yii\db\ActiveRecord
             'unknownMovingDate' => 'Unknown Moving Date',
         ];
     }
+    public static function findModel($id)
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+    public static function changeStatus($request_id, $status)
+    {
+        $request = self::findModel($request_id);
+        $request->status = $status;
+        return $request->save(false);
+    }
     public static function getCompanyRequestsList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['consultant', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions'])->where(['request.company_id' => $company_id]),
+            'query' => self::find()->joinWith(['consultant', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal' => function ($query) {
+                $query->with(['consultant']);
+            }])->where(['request.company_id' => $company_id]),
             'pagination' => [
                 'pageSize' => 1000,
             ],
@@ -206,6 +226,7 @@ class Request extends \yii\db\ActiveRecord
             throw $th;
         }
     }
+
     public function fields()
     {
         $fields = parent::fields();
@@ -240,6 +261,16 @@ class Request extends \yii\db\ActiveRecord
     public function getConsultant()
     {
         return $this->hasOne(User::className(), ['id' => 'consultant_id']);
+    }
+
+    /**
+     * Gets query for [[RequestDeal]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeal()
+    {
+        return $this->hasOne(RequestDeal::className(), ['request_id' => 'id']);
     }
 
     /**

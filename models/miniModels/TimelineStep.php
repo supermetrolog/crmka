@@ -5,8 +5,9 @@ namespace app\models\miniModels;
 use app\models\Timeline;
 use yii\web\NotFoundHttpException;
 use app\exceptions\ValidationErrorHttpException;
-use ReflectionClass;
+use app\models\Request;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "timeline_step".
@@ -33,6 +34,9 @@ class TimelineStep extends \yii\db\ActiveRecord
     public const FEEDBACK_STEP_NUMBER = 2;
     public const INSPECTION_STEP_NUMBER = 3;
     public const VISIT_STEP_NUMBER = 4;
+    public const INTEREST_STEP_NUMBER = 5;
+    public const TALK_STEP_NUMBER = 6;
+    public const DEAL_STEP_NUMBER = 7;
     /**
      * {@inheritdoc}
      */
@@ -81,6 +85,30 @@ class TimelineStep extends \yii\db\ActiveRecord
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+    private function hasTheArrayChanged($array1, $array2)
+    {
+        $count = [];
+        foreach ($array1 as $item) {
+            if (!key_exists($item, $count)) {
+                $count[$item] = 1;
+            } else {
+                $count[$item]++;
+            }
+        }
+        foreach ($array2 as $item) {
+            if (!key_exists($item, $count)) {
+                $count[$item] = 1;
+            } else {
+                $count[$item]++;
+            }
+        }
+        foreach ($count as $item) {
+            if ($item == 1) {
+                return true;
+            }
+        }
+        return false;
+    }
     public function createNewStep($stepNumber)
     {
         if (self::find()->where(['timeline_id' => $this->timeline_id])->andWhere(['number' => $stepNumber])->one()) return;
@@ -111,9 +139,29 @@ class TimelineStep extends \yii\db\ActiveRecord
             case self::VISIT_STEP_NUMBER:
                 return $this->updateVisitStep($post_data);
                 break;
+            case self::INTEREST_STEP_NUMBER:
+                return $this->updateInterestStep($post_data);
+                break;
+            case self::TALK_STEP_NUMBER:
+                return $this->updateTalkStep($post_data);
+                break;
+            case self::DEAL_STEP_NUMBER:
+                return $this->updateDealStep($post_data);
+                break;
             default:
                 throw new NotFoundHttpException('The requested page does not exist.');
                 break;
+        }
+    }
+    private function addTimelineStepObjects($post_data)
+    {
+        $newObjects = $post_data['timelineStepObjects'];
+        foreach ($newObjects as $object) {
+            $object['updated_at'] = date('Y-m-d H:i:s');
+            $model = new TimelineStepObject();
+            if (!$model->load($object, '') || !$model->save()) {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
         }
     }
     public function updateMeetingStep()
@@ -124,64 +172,70 @@ class TimelineStep extends \yii\db\ActiveRecord
     public function updateOfferStep($post_data)
     {
         if ($this->negative) return;
-
-        $newObjects = $post_data['timelineStepObjects'];
-        foreach ($newObjects as $object) {
-            $model = new TimelineStepObject();
-            if (!$model->load($object, '') || !$model->save()) {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
-            }
-        }
+        $this->addTimelineStepObjects($post_data);
         return $this->createNewStep(self::FEEDBACK_STEP_NUMBER);
     }
     public function updateFeedbackStep($post_data)
     {
-        if ($this->negative) return;
-
-        $newObjects = $post_data['timelineStepObjects'];
-        foreach ($newObjects as $object) {
-            $model = new TimelineStepObject();
-            if (!$model->load($object, '') || !$model->save()) {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
-            }
+        $currentFeedbackways = TimelineStepFeedbackway::find()->where(['timeline_step_id' => $this->id])->asArray()->all();
+        $array1 = ArrayHelper::getColumn($currentFeedbackways, 'way');
+        $array2 = ArrayHelper::getColumn($post_data['timelineStepFeedbackways'], 'way');
+        $hasTheArrayChangedFlag = $this->hasTheArrayChanged($array1, $array2);
+        if (!$this->negative && !$hasTheArrayChangedFlag) {
+            $this->addTimelineStepObjects($post_data);
+            $this->createNewStep(self::INSPECTION_STEP_NUMBER);
         }
 
-        TimelineStepFeedbackway::deleteAll(['timeline_step_id' => $this->id]);
+        if ($hasTheArrayChangedFlag) {
+            TimelineStepFeedbackway::deleteAll(['timeline_step_id' => $this->id]);
 
-        $newFeedbackWays = $post_data['timelineStepFeedbackways'];
-        foreach ($newFeedbackWays as $way) {
-            $model = new TimelineStepFeedbackway();
-            if (!$model->load($way, '') || !$model->save()) {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            $newFeedbackWays = $post_data['timelineStepFeedbackways'];
+            foreach ($newFeedbackWays as $way) {
+                $model = new TimelineStepFeedbackway();
+                if (!$model->load($way, '') || !$model->save()) {
+                    throw new ValidationErrorHttpException($model->getErrorSummary(false));
+                }
             }
         }
-        return $this->createNewStep(self::INSPECTION_STEP_NUMBER);
     }
     public function updateInspectionStep($post_data)
     {
         if ($this->negative) return;
-
-        $newObjects = $post_data['timelineStepObjects'];
-        foreach ($newObjects as $object) {
-            $model = new TimelineStepObject();
-            if (!$model->load($object, '') || !$model->save()) {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
-            }
-        }
+        $this->addTimelineStepObjects($post_data);
         return $this->createNewStep(self::VISIT_STEP_NUMBER);
     }
     public function updateVisitStep($post_data)
     {
         if ($this->negative) return;
+        $this->addTimelineStepObjects($post_data);
+        return $this->createNewStep(self::INTEREST_STEP_NUMBER);
+    }
+    public function updateInterestStep($post_data)
+    {
+        if ($this->negative) return;
+        $this->addTimelineStepObjects($post_data);
+        return $this->createNewStep(self::TALK_STEP_NUMBER);
+    }
+    public function updateTalkStep($post_data)
+    {
+        if ($this->negative) return;
+        $this->addTimelineStepObjects($post_data);
+        return $this->createNewStep(self::DEAL_STEP_NUMBER);
+    }
+    public function updateDealStep($post_data)
+    {
+        if ($this->negative) return;
+        if (ArrayHelper::keyExists('requestDealData', $post_data)) {
+            $requestDealData = $post_data['requestDealData'];
+            TimelineStepObject::deleteAll(['timeline_step_id' => $post_data['id']]);
+            $this->addTimelineStepObjects($post_data);
 
-        $newObjects = $post_data['timelineStepObjects'];
-        foreach ($newObjects as $object) {
-            $model = new TimelineStepObject();
-            if (!$model->load($object, '') || !$model->save()) {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            if (ArrayHelper::keyExists('id', $requestDealData)) {
+                return RequestDeal::updateDeal($requestDealData);
+            } else {
+                return RequestDeal::createDeal($requestDealData);
             }
         }
-        // return $this->createNewStep(self::FEEDBACK_STEP_NUMBER);
     }
     public static function updateTimelineStep($id, $post_data)
     {

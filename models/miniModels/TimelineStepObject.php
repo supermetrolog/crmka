@@ -10,7 +10,8 @@ use Yii;
  * @property int $id
  * @property int $timeline_step_id [связь] с конкретным шагом таймлайна
  * @property int $object_id ID объекта
- * @property int $offer_id ID объекта
+ * @property int $offer_id ID предложения
+ * @property int $complex_id ID комплекса
  * @property int|null $status
  * @property int|null $option Дополнительные флаги для объекта
  * @property string|null $created_at
@@ -36,7 +37,7 @@ class TimelineStepObject extends \yii\db\ActiveRecord
     {
         return [
             [['timeline_step_id', 'object_id', 'offer_id'], 'required'],
-            [['timeline_step_id', 'object_id', 'offer_id', 'status', 'option', 'type_id'], 'integer'],
+            [['timeline_step_id', 'object_id', 'offer_id', 'status', 'option', 'type_id', 'complex_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStep::className(), 'targetAttribute' => ['timeline_step_id' => 'id']],
         ];
@@ -52,6 +53,7 @@ class TimelineStepObject extends \yii\db\ActiveRecord
             'timeline_step_id' => 'Timeline Step ID',
             'object_id' => 'Object ID',
             'offer_id' => 'Offer ID',
+            'complex_id' => 'Complex ID',
             'status' => 'Status',
             'option' => 'Option',
             'created_at' => 'Created At',

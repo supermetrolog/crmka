@@ -51,6 +51,7 @@ class TimelineController extends ActiveController
     }
     public function actionUpdateStep($id)
     {
+        // return ['message' => "Успешно изменено", 'data' => Yii::$app->request->post()];
         return TimelineStep::updateTimelineStep($id, Yii::$app->request->post());
     }
     public function actionAddObjects($id)

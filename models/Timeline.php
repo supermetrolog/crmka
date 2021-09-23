@@ -70,7 +70,6 @@ class Timeline extends \yii\db\ActiveRecord
                 'pageSize' => 100,
             ],
         ]);
-
         return $dataProvider;
     }
     public static function createNewTimeline($request_id, $consultant_id)
