@@ -153,10 +153,26 @@ class TimelineStep extends \yii\db\ActiveRecord
                 break;
         }
     }
-    private function addTimelineStepObjects($post_data)
+    private function compareValueAndValueInArray($objects, $newObjectObjectId)
+    {
+        foreach ($objects as $object) {
+            if ($object->object_id == $newObjectObjectId) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private function addTimelineStepObjects($post_data, $noDuplicate = true)
     {
         $newObjects = $post_data['timelineStepObjects'];
+        if ($noDuplicate) {
+            $currentObjects = TimelineStepObject::find()->where(['timeline_step_id' => $this->id])->all();
+        }
         foreach ($newObjects as $object) {
+            if ($noDuplicate && $this->compareValueAndValueInArray($currentObjects, $object['object_id'])) {
+                continue;
+            }
+
             $object['updated_at'] = date('Y-m-d H:i:s');
             $model = new TimelineStepObject();
             if (!$model->load($object, '') || !$model->save()) {
@@ -172,7 +188,7 @@ class TimelineStep extends \yii\db\ActiveRecord
     public function updateOfferStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data);
+        $this->addTimelineStepObjects($post_data, false);
         return $this->createNewStep(self::FEEDBACK_STEP_NUMBER);
     }
     public function updateFeedbackStep($post_data)
@@ -244,7 +260,8 @@ class TimelineStep extends \yii\db\ActiveRecord
         $transaction = $db->beginTransaction();
         try {
             if ($timelineStep->load($post_data, '') && $timelineStep->save()) {
-                $response = $timelineStep->updateSpecificStep($post_data);
+                $timelineStep->updateSpecificStep($post_data);
+                TimelineActionComment::addActionComments($post_data);
                 $transaction->commit();
                 return ['message' => "Успешно изменено", 'data' => true];
             }
@@ -303,5 +320,14 @@ class TimelineStep extends \yii\db\ActiveRecord
     public function getTimelineStepObjects()
     {
         return $this->hasMany(TimelineStepObject::className(), ['timeline_step_id' => 'id']);
+    }
+    /**
+     * Gets query for [[TimelineActionComment]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTimelineActionComments()
+    {
+        return $this->hasMany(TimelineActionComment::className(), ['timeline_step_id' => 'id']);
     }
 }

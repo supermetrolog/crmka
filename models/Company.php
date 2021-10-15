@@ -3,6 +3,8 @@
 namespace app\models;
 
 use yii\data\ActiveDataProvider;
+use app\exceptions\ValidationErrorHttpException;
+use ReflectionClass;
 use Yii;
 
 /**
@@ -45,6 +47,7 @@ use Yii;
  */
 class Company extends \yii\db\ActiveRecord
 {
+    private const GENERAL_CONTACT_TYPE = 1;
     /**
      * {@inheritdoc}
      */
@@ -169,6 +172,91 @@ class Company extends \yii\db\ActiveRecord
         ]);
 
         return $dataProvider;
+    }
+
+    //функция для создания сразу нескольких строк в связанных моделях
+    public  function createManyMiniModels($className, $data)
+    {
+        $columnName = $className::MAIN_COLUMN;
+
+        if (!$data || !$className || !$columnName) {
+            return false;
+        }
+        [];
+        $class = new ReflectionClass($className);
+
+        foreach ($data as $item) {
+            $model = $class->newInstance();
+            $array['company_id'] = $this->id;
+            $array[$columnName] = $item;
+            if ($model->load($array, '') && $model->save()) {
+                continue;
+            } else {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+        return true;
+    }
+    private function createGeneralContact($post_data)
+    {
+        if (!count($post_data['contacts']['phones']) && !count($post_data['contacts']['emails']) && !count($post_data['contacts']['websites'])) {
+            return;
+        }
+        $contactData = $post_data['contacts'];
+        $contactData['company_id'] = $this->id;
+        $contactData['type'] = Contact::GENERAL_CONTACT_TYPE;
+        return Contact::createGeneralContact($contactData);
+    }
+    private function updateGeneralContact($post_data)
+    {
+        Contact::deleteAll(['company_id' => $this->id, 'type' => Contact::GENERAL_CONTACT_TYPE]);
+        return $this->createGeneralContact($post_data);
+    }
+    public static function createCompany($post_data)
+    {
+        $db = Yii::$app->db;
+        $model = new Company();
+        $transaction = $db->beginTransaction();
+        try {
+            if ($model->load($post_data, '') && $model->save()) {
+                $model->createManyMiniModels(Category::class,  $post_data['categories']);
+                $model->createManyMiniModels(Productrange::class,  $post_data['productRanges']);
+                $model->updateGeneralContact($post_data);
+                // $transaction->rollBack();
+
+                $transaction->commit();
+                return ['message' => "Компания создана", 'data' => $model->id];
+            }
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
+    public function updateManyMiniModels($className, $data)
+    {
+        $className::deleteAll(['company_id' => $this->id]);
+        $this->createManyMiniModels($className, $data);
+    }
+    public static function updateCompany($model, $post_data)
+    {
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            if ($model->load($post_data, '') && $model->save()) {
+                $model->updateManyMiniModels(Category::class,  $post_data['categories']);
+                $model->updateManyMiniModels(Productrange::class,  $post_data['productRanges']);
+                $model->updateGeneralContact($post_data);
+                // $transaction->rollBack();
+
+                $transaction->commit();
+                return ['message' => "Компания изменена", 'data' => $model->id];
+            }
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
     }
 
     /**

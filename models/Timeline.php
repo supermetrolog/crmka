@@ -64,7 +64,7 @@ class Timeline extends \yii\db\ActiveRecord
     {
         $dataProvider = new ActiveDataProvider([
             'query' => self::find()->joinWith(['timelineSteps' => function ($query) {
-                $query->joinWith(['timelineStepObjects', 'timelineStepFeedbackways']);
+                $query->joinWith(['timelineStepObjects', 'timelineStepFeedbackways', 'timelineActionComments']);
             }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id]),
             'pagination' => [
                 'pageSize' => 100,

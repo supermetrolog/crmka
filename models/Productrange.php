@@ -15,6 +15,8 @@ use Yii;
  */
 class Productrange extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'product';
+
     /**
      * {@inheritdoc}
      */

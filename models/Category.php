@@ -15,6 +15,7 @@ use Yii;
  */
 class Category extends \yii\db\ActiveRecord
 {
+    public const MAIN_COLUMN = 'category';
     /**
      * {@inheritdoc}
      */

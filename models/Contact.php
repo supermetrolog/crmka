@@ -40,6 +40,8 @@ use ReflectionClass;
  */
 class Contact extends \yii\db\ActiveRecord
 {
+    public const GENERAL_CONTACT_TYPE = 1;
+    public const LIST_CONTACT_TYPE = 0;
     /**
      * {@inheritdoc}
      */
@@ -54,7 +56,7 @@ class Contact extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'first_name'], 'required'],
+            [['company_id'], 'required'],
             [['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['first_name', 'middle_name', 'last_name'], 'string', 'max' => 255],
@@ -132,6 +134,25 @@ class Contact extends \yii\db\ActiveRecord
                 $model->createManyMiniModels(WayOfInforming::class,  $post_data['wayOfInformings']);
                 // $transaction->rollBack();
 
+                $transaction->commit();
+                return ['message' => "Контакт создан", 'data' => $model->id];
+            }
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
+    public static function createGeneralContact($post_data)
+    {
+        $db = Yii::$app->db;
+        $model = new Contact();
+        $transaction = $db->beginTransaction();
+        try {
+            if ($model->load($post_data, '') && $model->save()) {
+                $model->createManyMiniModels(Email::class,  $post_data['emails']);
+                $model->createManyMiniModels(Phone::class,  $post_data['phones']);
+                $model->createManyMiniModels(Website::class,  $post_data['websites']);
                 $transaction->commit();
                 return ['message' => "Контакт создан", 'data' => $model->id];
             }
