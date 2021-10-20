@@ -25,15 +25,12 @@ jobs:
         server: billypro.beget.tech
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
-    - name: scp ssh pipelines
-      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
-      env:
-        LASTSSH: "Doing something after copying"
-      with:
-        host: billypro.beget.tech
-        user: ${{ secrets.username }}
-        pass: ${{ secrets.password }}
-        first_ssh: |
-          php yii migrate
-        last_ssh: |
-          yes
+    - name: execute ssh command via using private key
+        uses: appleboy/ssh-action@master
+        with:
+          host: billypro.beget.tech
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+          script:
+            php yii migrate
+            yes
