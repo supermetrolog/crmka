@@ -32,5 +32,5 @@ jobs:
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
         script: |
-          whoami
-          ls -al
+          php yii migrate
+          yes
