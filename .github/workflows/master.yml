@@ -25,3 +25,6 @@ jobs:
         server: billypro.beget.tech
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
+    
+    - name: Yii2 migrate
+      run: php yii migrate
