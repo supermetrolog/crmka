@@ -25,12 +25,12 @@ jobs:
         server: billypro.beget.tech
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
-    - name: execute ssh command via using private key
-        uses: appleboy/ssh-action@master
-        with:
-          host: billypro.beget.tech
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          script:
-            php yii migrate
-            yes
+    - name: multiple command
+      uses: appleboy/ssh-action@master
+      with:
+        host: billypro.beget.tech
+        username: ${{ secrets.username }}
+        password: ${{ secrets.password }}
+        script: |
+          whoami
+          ls -al
