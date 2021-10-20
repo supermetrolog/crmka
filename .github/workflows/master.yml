@@ -25,4 +25,13 @@ jobs:
         server: billypro.beget.tech
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
-        run: php yii migrate
+    - name: scp ssh pipelines
+      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+      env:
+        LASTSSH: "Doing something after copying"
+      with:
+        host: billypro.beget.tech
+        user: ${{ secrets.username }}
+        pass: ${{ secrets.password }}
+        scp: |
+          php yii migrate
