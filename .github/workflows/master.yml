@@ -33,5 +33,7 @@ jobs:
         host: billypro.beget.tech
         user: ${{ secrets.username }}
         pass: ${{ secrets.password }}
-        scp: |
+        first_ssh: |
           php yii migrate
+        last_ssh: |
+          yes
