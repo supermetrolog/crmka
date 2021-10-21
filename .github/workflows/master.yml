@@ -31,4 +31,6 @@ jobs:
         host: billypro.beget.tech
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
-        script: php7.4 yii migrate
+        script: |
+          php7.4 yii migrate
+          yes
