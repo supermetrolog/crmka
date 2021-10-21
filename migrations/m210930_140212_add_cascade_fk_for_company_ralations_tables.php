@@ -15,7 +15,7 @@ class m210930_140212_add_cascade_fk_for_company_ralations_tables extends Migrati
         $this->dropForeignKey('fk-productRange-company_id', 'productrange');
         $this->addForeignKey(
             'fk-productRange-company_id',
-            'productRange',
+            'productrange',
             'company_id',
             'company',
             'id',
