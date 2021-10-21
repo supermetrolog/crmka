@@ -12,7 +12,6 @@ class m211013_123606_create_timeline_action_comment_table extends Migration
      */
     public function safeUp()
     {
-        $this->dropTable('timeline_action_comment');
         $this->createTable('{{%timeline_action_comment}}', [
             'id' => $this->primaryKey(),
             'timeline_step_id' => $this->integer()->notNull()->comment('[связь]'),
