@@ -20,6 +20,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $negative [флаг] ОТРИЦАНИЕ - используется для любого шага
  * @property int|null $additional [флаг] ДОПОЛНИТЕЛЬНЫЙ ФЛАГ - используется для любого шага
  * @property string|null $date ДАТА используется для любого шага
+ * @property int|null $status [флаг]
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -52,7 +53,7 @@ class TimelineStep extends \yii\db\ActiveRecord
     {
         return [
             [['timeline_id', 'number'], 'required'],
-            [['timeline_id', 'number', 'done', 'negative', 'additional'], 'integer'],
+            [['timeline_id', 'number', 'done', 'negative', 'additional', 'status'], 'integer'],
             [['date', 'created_at', 'updated_at'], 'safe'],
             [['comment'], 'string', 'max' => 255],
             [['timeline_id'], 'exist', 'skipOnError' => true, 'targetClass' => Timeline::className(), 'targetAttribute' => ['timeline_id' => 'id']],
@@ -162,9 +163,13 @@ class TimelineStep extends \yii\db\ActiveRecord
         }
         return false;
     }
-    private function addTimelineStepObjects($post_data, $noDuplicate = true)
+    private function addTimelineStepObjects($post_data, $noDuplicate = true, $deleteAllBeforeAdd = true)
     {
         $newObjects = $post_data['timelineStepObjects'];
+        if ($deleteAllBeforeAdd) {
+            TimelineStepObject::deleteAll(['timeline_step_id' => $this->id]);
+            $noDuplicate = false;
+        }
         if ($noDuplicate) {
             $currentObjects = TimelineStepObject::find()->where(['timeline_step_id' => $this->id])->all();
         }
@@ -188,7 +193,7 @@ class TimelineStep extends \yii\db\ActiveRecord
     public function updateOfferStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data, false);
+        $this->addTimelineStepObjects($post_data, false, false);
         return $this->createNewStep(self::FEEDBACK_STEP_NUMBER);
     }
     public function updateFeedbackStep($post_data)

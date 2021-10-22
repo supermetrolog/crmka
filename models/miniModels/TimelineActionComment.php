@@ -36,7 +36,7 @@ class TimelineActionComment extends \yii\db\ActiveRecord
             [['timeline_step_id', 'comment'], 'required'],
             [['timeline_step_id'], 'integer'],
             [['created_at'], 'safe'],
-            [['comment', 'title'], 'string', 'max' => 255],
+            [['comment', 'title'], 'string'],
             [['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStep::className(), 'targetAttribute' => ['timeline_step_id' => 'id']],
         ];
     }
@@ -59,6 +59,7 @@ class TimelineActionComment extends \yii\db\ActiveRecord
         $newActions = $post_data['newActionComments'];
         foreach ($newActions as $action) {
             $model = new TimelineActionComment();
+            $action['comment'] = trim($action['comment']);
             if (!$model->load($action, '') || !$model->save()) {
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
             }
