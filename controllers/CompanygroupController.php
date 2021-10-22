@@ -8,7 +8,7 @@ use yii\filters\Cors;
 
 class CompanygroupController extends ActiveController
 {
-    public $modelClass = 'app\models\CompanyGroup';
+    public $modelClass = 'app\models\Companygroup';
 
     public function behaviors()
     {
