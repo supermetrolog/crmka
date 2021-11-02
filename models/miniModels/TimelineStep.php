@@ -246,16 +246,16 @@ class TimelineStep extends \yii\db\ActiveRecord
     public function updateDealStep($post_data)
     {
         if ($this->negative) return;
+
         if (ArrayHelper::keyExists('requestDealData', $post_data)) {
             $requestDealData = $post_data['requestDealData'];
-            TimelineStepObject::deleteAll(['timeline_step_id' => $post_data['id']]);
-            $this->addTimelineStepObjects($post_data);
-
             if (ArrayHelper::keyExists('id', $requestDealData)) {
                 return RequestDeal::updateDeal($requestDealData);
             } else {
                 return RequestDeal::createDeal($requestDealData);
             }
+        } else {
+            $this->addTimelineStepObjects($post_data);
         }
     }
     public static function updateTimelineStep($id, $post_data)

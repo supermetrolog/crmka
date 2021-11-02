@@ -4,6 +4,7 @@ namespace app\models\miniModels;
 
 use app\exceptions\ValidationErrorHttpException;
 use IntlDateFormatter;
+use yii\helpers\ArrayHelper;
 use Yii;
 
 /**
@@ -56,6 +57,9 @@ class TimelineActionComment extends \yii\db\ActiveRecord
     }
     public static function addActionComments($post_data)
     {
+        if (!ArrayHelper::keyExists('newActionComments', $post_data)) {
+            return true;
+        }
         $newActions = $post_data['newActionComments'];
         foreach ($newActions as $action) {
             $model = new TimelineActionComment();
