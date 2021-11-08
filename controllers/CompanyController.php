@@ -56,11 +56,7 @@ class CompanyController extends ActiveController
     {
         $request = json_decode(Yii::$app->request->post('data'), true);
         $model = new UploadFile();
-
         $model->files = UploadedFile::getInstancesByName('files');
-        // return $model->validate();
-        return Yii::$app->request->post();
-
         return Company::createCompany($request, $model);
     }
     public function actionUpdate($id)
@@ -69,8 +65,7 @@ class CompanyController extends ActiveController
         $model = new UploadFile();
 
         $model->files = UploadedFile::getInstancesByName('files');
-        return Yii::$app->request->post();
-        return Company::updateCompany($this->findModel($id), $request);
+        return Company::updateCompany($this->findModel($id), $request, $model);
     }
     public function actionSearch()
     {

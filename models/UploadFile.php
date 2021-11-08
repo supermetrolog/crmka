@@ -27,9 +27,9 @@ class UploadFile extends Model
     {
         if ($this->validate()) {
             foreach ($this->files as $file) {
-                $this->filename = Yii::$app->getSecurity()->generateRandomString(15) . '.' . $file->extension;
-                $filepath = '@/app/public_html/uploads/' . $this->filename;
-                if (!$file->saveAs($filepath)) {
+                $this->filename = $this->generateFileName($file);
+                $filepath = $this->getFullPathForSave();
+                if (!$file->saveAs($filepath, false)) {
                     $this->addError('UploadFile', 'Ошибка загрузки файлов!');
                 }
             }
@@ -41,10 +41,8 @@ class UploadFile extends Model
     public function uploadOne($file)
     {
         if ($this->validate()) {
-            $this->filename = Yii::$app->getSecurity()->generateRandomString(15) . '.' . $file->extension;
-
-            $filepath = 'uploads/' . $this->filename;
-
+            $this->filename = $this->generateFileName($file);
+            $filepath = $this->getFullPathForSave();
             if (!$file->saveAs($filepath, false)) {
                 $this->addError('UploadFile', 'Ошибка загрузки файлов!');
             }
@@ -52,5 +50,13 @@ class UploadFile extends Model
         } else {
             return false;
         }
+    }
+    public function getFullPathForSave()
+    {
+        return 'uploads/' . $this->filename;
+    }
+    public function generateFileName($file)
+    {
+        return $file->name . '-' . Yii::$app->getSecurity()->generateRandomString(15) . '.' . $file->extension;
     }
 }

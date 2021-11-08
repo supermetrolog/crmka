@@ -269,7 +269,7 @@ class Company extends \yii\db\ActiveRecord
         $className::deleteAll(['company_id' => $this->id]);
         $this->createManyMiniModels($className, $data);
     }
-    public static function updateCompany($model, $post_data, $uploadFileModel = [])
+    public static function updateCompany(Company $model, $post_data, $uploadFileModel = [])
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
