@@ -19,8 +19,6 @@ Thumbs.db
 composer.phar
 config/db.php
 
-#uploads
-/public_html/uploads/*
 # Mac DS_Store Files
 .DS_Store
 
