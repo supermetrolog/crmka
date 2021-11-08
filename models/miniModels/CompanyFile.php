@@ -71,7 +71,7 @@ class CompanyFile extends \yii\db\ActiveRecord
     {
         $fields = parent::fields();
         $fields['src'] = function ($fields) {
-            return 'http://crmka/uploads/' . $fields['filename'];
+            return 'http://' . $_SERVER['HTTP_HOST'] . '/uploads/' . $fields['filename'];
         };
         return $fields;
     }
