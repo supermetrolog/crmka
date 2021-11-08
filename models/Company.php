@@ -4,6 +4,7 @@ namespace app\models;
 
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
+use app\models\miniModels\CompanyFile;
 use ReflectionClass;
 use Yii;
 
@@ -157,7 +158,7 @@ class Company extends \yii\db\ActiveRecord
                 $query->with(['phones', 'emails', 'contactComments']);
             }]),
             'pagination' => [
-                'pageSize' => 100,
+                'pageSize' => 200,
             ],
         ]);
 
@@ -166,7 +167,7 @@ class Company extends \yii\db\ActiveRecord
     public static function getCompanyInfo($id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant', 'contacts' => function ($query) {
+            'query' => self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant', 'files', 'contacts' => function ($query) {
                 $query->with(['phones', 'emails', 'contactComments', 'websites']);
             }])->where(['company.id' => $id]),
         ]);
@@ -212,7 +213,36 @@ class Company extends \yii\db\ActiveRecord
         Contact::deleteAll(['company_id' => $this->id, 'type' => Contact::GENERAL_CONTACT_TYPE]);
         return $this->createGeneralContact($post_data);
     }
-    public static function createCompany($post_data)
+    private function updateFiles($post_data, $uploadFileModel)
+    {
+        CompanyFile::deleteAll(['company_id' => $this->id]);
+        foreach ($post_data['files'] as $file) {
+            $model = new CompanyFile();
+            if (!$model->load($file, '') || !$model->save()) {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+        $this->uploadFiles($uploadFileModel);
+    }
+
+    private function uploadFiles($uploadFileModel)
+    {
+        foreach ($uploadFileModel->files as $file) {
+            if (!$uploadFileModel->uploadOne($file)) {
+                throw new ValidationErrorHttpException($uploadFileModel->getErrorSummary(false));
+            }
+            $companyFileModel = new CompanyFile();
+            $companyFileModel->company_id = $this->id;
+            $companyFileModel->name = $file->name;
+            $companyFileModel->type = $file->type;
+            $companyFileModel->filename = $uploadFileModel->filename;
+            $companyFileModel->size = (string)$file->size;
+            if (!$companyFileModel->save()) {
+                throw new ValidationErrorHttpException($companyFileModel->getErrorSummary(false));
+            }
+        }
+    }
+    public static function createCompany($post_data, $uploadFileModel)
     {
         $db = Yii::$app->db;
         $model = new Company();
@@ -222,6 +252,7 @@ class Company extends \yii\db\ActiveRecord
                 $model->createManyMiniModels(Category::class,  $post_data['categories']);
                 $model->createManyMiniModels(Productrange::class,  $post_data['productRanges']);
                 $model->updateGeneralContact($post_data);
+                $model->uploadFiles($uploadFileModel);
                 // $transaction->rollBack();
 
                 $transaction->commit();
@@ -238,7 +269,7 @@ class Company extends \yii\db\ActiveRecord
         $className::deleteAll(['company_id' => $this->id]);
         $this->createManyMiniModels($className, $data);
     }
-    public static function updateCompany($model, $post_data)
+    public static function updateCompany($model, $post_data, $uploadFileModel = [])
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
@@ -247,6 +278,7 @@ class Company extends \yii\db\ActiveRecord
                 $model->updateManyMiniModels(Category::class,  $post_data['categories']);
                 $model->updateManyMiniModels(Productrange::class,  $post_data['productRanges']);
                 $model->updateGeneralContact($post_data);
+                $model->updateFiles($post_data, $uploadFileModel);
                 // $transaction->rollBack();
 
                 $transaction->commit();
@@ -287,6 +319,15 @@ class Company extends \yii\db\ActiveRecord
     public function getConsultant()
     {
         return $this->hasOne(User::className(), ['id' => 'consultant_id']);
+    }
+    /**
+     * Gets query for [[Files]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFiles()
+    {
+        return $this->hasMany(CompanyFile::className(), ['company_id' => 'id']);
     }
     /**
      * Gets query for [[Contacts]].

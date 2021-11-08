@@ -8,6 +8,8 @@ use Yii;
 use yii\filters\auth\HttpBearerAuth;
 use app\models\Company;
 use app\models\CompanySearch;
+use app\models\UploadFile;
+use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 
 class CompanyController extends ActiveController
@@ -52,11 +54,23 @@ class CompanyController extends ActiveController
     }
     public function actionCreate()
     {
-        return Company::createCompany(Yii::$app->request->post());
+        $request = json_decode(Yii::$app->request->post('data'), true);
+        $model = new UploadFile();
+
+        $model->files = UploadedFile::getInstancesByName('files');
+        // return $model->validate();
+        return Yii::$app->request->post();
+
+        return Company::createCompany($request, $model);
     }
     public function actionUpdate($id)
     {
-        return Company::updateCompany($this->findModel($id), Yii::$app->request->post());
+        $request = json_decode(Yii::$app->request->post('data'), true);
+        $model = new UploadFile();
+
+        $model->files = UploadedFile::getInstancesByName('files');
+        return Yii::$app->request->post();
+        return Company::updateCompany($this->findModel($id), $request);
     }
     public function actionSearch()
     {
