@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use Exception;
 use yii\base\Model;
 use yii\web\UploadedFile;
 use Yii;
@@ -53,6 +54,12 @@ class UploadFile extends Model
     }
     public function getFullPathForSave()
     {
+        $dir = Yii::getAlias('@app') . '/public_html/uploads';
+        if (!is_dir($dir)) {
+            if (!mkdir($dir, 0700)) {
+                throw new Exception('Не удалось создать директорию');
+            }
+        }
         return 'uploads/' . $this->filename;
     }
     public function generateFileName($file)
