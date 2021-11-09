@@ -21,8 +21,7 @@ config/db.php
 
 #uploaded files
 
-/public_html/uploads/*
-# !/public_html/uploads/**/
+/public_html/uploads
 
 # Mac DS_Store Files
 .DS_Store
