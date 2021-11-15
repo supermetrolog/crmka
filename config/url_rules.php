@@ -19,6 +19,8 @@ return
             'except' => [],
             'extraPatterns' => [
                 'GET search' => 'search',
+                'GET product-range-list' => 'product-range-list',
+                'GET in-the-bank-list' => 'in-the-bank-list',
             ],
         ],
         [

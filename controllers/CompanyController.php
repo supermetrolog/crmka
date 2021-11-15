@@ -8,7 +8,9 @@ use Yii;
 use yii\filters\auth\HttpBearerAuth;
 use app\models\Company;
 use app\models\CompanySearch;
+use app\models\Productrange;
 use app\models\UploadFile;
+use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 
@@ -30,7 +32,7 @@ class CompanyController extends ActiveController
         ];
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::className(),
-            'except' => ['search', 'view', 'index', 'options', 'create', 'update'],
+            'except' => ['search', 'view', 'index', 'options', 'create', 'update', 'product-range-list', 'in-the-bank-list'],
         ];
         return $behaviors;
     }
@@ -73,12 +75,19 @@ class CompanyController extends ActiveController
         $searchByAttr['CompanySearch'] = Yii::$app->request->queryParams;
         return $search->search($searchByAttr);
     }
+    public function actionProductRangeList()
+    {
+        return ArrayHelper::getColumn(Productrange::find()->select('product')->asArray()->all(), 'product');
+    }
+    public function actionInTheBankList()
+    {
+        return ArrayHelper::getColumn(Company::find()->select('inTheBank')->where(['is not', 'inTheBank', new \yii\db\Expression('null')])->asArray()->all(), 'inTheBank');
+    }
     protected function findModel($id)
     {
         if (($model = Company::findOne($id)) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 }
