@@ -63,7 +63,7 @@ class Company extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile'], 'integer'],
+            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization'], 'integer'],
             [['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],

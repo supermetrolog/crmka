@@ -77,11 +77,11 @@ class CompanyController extends ActiveController
     }
     public function actionProductRangeList()
     {
-        return ArrayHelper::getColumn(Productrange::find()->select('product')->asArray()->all(), 'product');
+        return ArrayHelper::getColumn(Productrange::find()->select('product')->distinct()->asArray()->all(), 'product');
     }
     public function actionInTheBankList()
     {
-        return ArrayHelper::getColumn(Company::find()->select('inTheBank')->where(['is not', 'inTheBank', new \yii\db\Expression('null')])->asArray()->all(), 'inTheBank');
+        return ArrayHelper::getColumn(Company::find()->select('inTheBank')->where(['is not', 'inTheBank', new \yii\db\Expression('null')])->distinct()->asArray()->all(), 'inTheBank');
     }
     protected function findModel($id)
     {
