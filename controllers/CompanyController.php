@@ -48,6 +48,7 @@ class CompanyController extends ActiveController
     }
     public function actionIndex()
     {
+        file_put_contents(Yii::getAlias('@app') . '/exceptions/test.txt', 'fuck');
         return Company::getCompanyList();
     }
     public function actionView($id)
