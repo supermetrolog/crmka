@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link http://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
@@ -9,6 +10,7 @@ namespace app\commands;
 
 use yii\console\Controller;
 use yii\console\ExitCode;
+use app\models\User;
 
 /**
  * This command echoes the first argument that you have entered.
@@ -28,7 +30,13 @@ class HelloController extends Controller
     public function actionIndex($message = 'hello world')
     {
         echo $message . "\n";
-
+        // $password = 'admin';
+        // $username = 'admin';
+        // $user = new User();
+        // $user->setPassword($password);
+        // $user->generateAuthKey();
+        // $user->username = $username;
+        // print_r($user->attributes);
         return ExitCode::OK;
     }
 }
