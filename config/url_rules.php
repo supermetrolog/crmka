@@ -10,7 +10,7 @@ return
             // ],
             'extraPatterns' => [
                 'POST,OPTIONS login' => 'login',
-                'GET logout' => 'logout',
+                'POST,OPTIONS logout' => 'logout',
             ],
         ],
         [
@@ -65,7 +65,16 @@ return
             'except' => [],
             'extraPatterns' => [
                 'GET <id>' => 'index',
-                'GET new/<id>' => 'new',
+                'GET,OPTIONS new/<id>' => 'new',
+                'GET <id>/viewed' => 'viewed',
+            ],
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'calllist',
+            'except' => [],
+            'extraPatterns' => [
+                'GET <id>' => 'index',
                 'GET <id>/viewed' => 'viewed',
             ],
         ],

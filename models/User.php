@@ -19,6 +19,9 @@ use yii\filters\auth\HttpBearerAuth;
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
+ * 
+ * 
+ * @property UserProfile[] $userProfiles
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -85,12 +88,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $fields;
     }
 
-    public function extraFields()
+    /**
+     * Gets query for [[UserProfiles]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserProfile()
     {
-        return ['auth_key'];
+        return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
     }
-
-
 
 
 

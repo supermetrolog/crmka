@@ -32,7 +32,7 @@ class CompanyController extends ActiveController
         ];
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::className(),
-            'except' => ['search', 'view', 'index', 'options', 'create', 'update', 'product-range-list', 'in-the-bank-list'],
+            'except' => ['search', 'view', 'options', 'create', 'update', 'product-range-list', 'in-the-bank-list'],
         ];
         return $behaviors;
     }

@@ -59,6 +59,6 @@ class UserController extends ActiveController
     {
         $model = User::findIdentityByAccessToken(Yii::$app->user->identity->access_token);
         $model->generateAccessToken();
-        return $model->save(false);
+        return ['message' => 'Вы вышли из аккаунта', 'data' => $model->save(false)];
     }
 }
