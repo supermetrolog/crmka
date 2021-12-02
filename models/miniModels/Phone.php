@@ -4,6 +4,7 @@ namespace app\models\miniModels;
 
 use Yii;
 use app\models\Contact;
+use floor12\phone\PhoneFormatter;
 
 /**
  * This is the model class for table "phone".
@@ -50,7 +51,22 @@ class Phone extends \yii\db\ActiveRecord
             'phone' => 'Phone',
         ];
     }
+    public function beforeSave($insert)
+    {
+        parent::beforeSave($insert);
+        preg_match_all('!\d+!', $this->phone, $numbers);
+        $this->phone = implode('', $numbers[0]);
+        return true;
+    }
 
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields['phone'] = function ($fields) {
+            return PhoneFormatter::format($fields['phone']);
+        };
+        return $fields;
+    }
     /**
      * Gets query for [[Contact]].
      *

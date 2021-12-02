@@ -18,9 +18,9 @@ return
             'controller' => 'company',
             'except' => [],
             'extraPatterns' => [
-                'GET search' => 'search',
-                'GET product-range-list' => 'product-range-list',
-                'GET in-the-bank-list' => 'in-the-bank-list',
+                'GET,OPTIONS search' => 'search',
+                'GET,OPTIONS product-range-list' => 'product-range-list',
+                'GET,OPTIONS in-the-bank-list' => 'in-the-bank-list',
             ],
         ],
         [
@@ -33,8 +33,8 @@ return
             'controller' => 'request',
             'except' => [],
             'extraPatterns' => [
-                'GET company-requests/<id>' => 'company-requests',
-                'GET search' => 'search',
+                'GET,OPTIONS company-requests/<id>' => 'company-requests',
+                'GET,OPTIONS search' => 'search',
             ],
         ],
         [
@@ -42,7 +42,7 @@ return
             'controller' => 'contact',
             'except' => [],
             'extraPatterns' => [
-                'GET company-contacts/<id>' => 'company-contacts',
+                'GET,OPTIONS company-contacts/<id>' => 'company-contacts',
                 'POST create-comment' => 'create-comment',
                 'OPTIONS create-comment' => 'options',
             ],
@@ -56,7 +56,7 @@ return
                 'PATCH update-step/<id>' => 'update-step',
                 'OPTIONS update-step/<id>' => 'options',
                 'POST,OPTIONS add-objects/<id>' => 'add-objects',
-                'GET search' => 'search',
+                'GET,OPTIONS search' => 'search',
             ],
         ],
         [
@@ -75,7 +75,7 @@ return
             'except' => [],
             'extraPatterns' => [
                 'GET <id>' => 'index',
-                'GET <id>/viewed' => 'viewed',
+                'GET,OPTIONS <id>/viewed' => 'viewed',
             ],
         ],
     ];

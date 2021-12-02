@@ -38,7 +38,7 @@ class CalllistController extends ActiveController
         ];
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::className(),
-            'except' => ['index', 'options', 'viewed'],
+            // 'except' => ['index', 'options', 'viewed'],
         ];
         return $behaviors;
     }

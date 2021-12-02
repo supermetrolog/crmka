@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\miniModels\Phone;
 use Yii;
 use yii\data\ActiveDataProvider;
 
@@ -81,8 +82,17 @@ class CallList extends \yii\db\ActiveRecord
     }
     public static function getCallListForUser($id)
     {
+        // $contactColumns = ',contact.middle_name, contact.first_name, contact.company_id, contact.type, contact.position, contact.faceToFaceMeeting, contact.warning, contact.good, contact.status as cstatus';
+        // $dataProvider = new ActiveDataProvider([
+        //     'query' => self::find()->select('call_list.*, phone.phone, phone.contact_id' . $contactColumns)->joinWith(['caller'])->leftJoin('phone', 'phone.phone = call_list.from')->leftJoin('contact', 'contact.id = phone.contact_id')->where(['user_profile.user_id' => $id])->andWhere(['is not', 'call_list.status', new \yii\db\Expression('null')])->asArray(),
+        // ]);
+        // return $dataProvider;
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['caller'])->where(['user_profile.user_id' => $id])->andWhere(['is not', 'status', new \yii\db\Expression('null')]),
+            'query' => self::find()->joinWith(['caller', 'phoneFrom' => function ($query) {
+                $query->with(['contact']);
+            }, 'phoneTo' => function ($query) {
+                $query->with(['contact']);
+            }])->where(['user_profile.user_id' => $id])->andWhere(['is not', 'call_list.status', new \yii\db\Expression('null')]),
         ]);
         return $dataProvider;
     }
@@ -94,5 +104,13 @@ class CallList extends \yii\db\ActiveRecord
     public function getCaller()
     {
         return $this->hasOne(UserProfile::className(), ['caller_id' => 'caller_id']);
+    }
+    public function getPhoneFrom()
+    {
+        return $this->hasOne(Phone::className(), ['phone' => 'from']);
+    }
+    public function getPhoneTo()
+    {
+        return $this->hasOne(Phone::className(), ['phone' => 'to']);
     }
 }
