@@ -1,0 +1,153 @@
+div.page {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    page-break-before: always;
+}
+
+div.page:first-child {
+    page-break-before: avoid;
+}
+
+@page {
+    margin: 25px 20px;
+}
+
+tr {
+    padding: 0;
+    margin: 0;
+}
+
+td {
+    /* display: inline-block; */
+    padding: 0;
+    margin: 0;
+    background-color: green;
+}
+
+table {
+    background-color: orange;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.header td.logo {
+    width: 300px;
+}
+
+.header td.logo .image {
+    width: 300px;
+}
+
+.header td.logo .image img {
+    width: 300px;
+}
+
+.header td.consultant {
+    /* float: right; */
+    text-align: right;
+}
+
+
+/* *********** MAIN-INFO *************** */
+
+.main-info td.left {
+    width: 500px;
+}
+
+.main-info td.left .image {
+    width: 500px;
+}
+
+.main-info td.left .image img {
+    width: 500px;
+}
+
+.main-info td.right {
+    width: 245px;
+    background-color: red;
+}
+
+.main-info td.right .image {
+    max-height: 375px;
+    width: 245px;
+}
+
+.main-info td.right .image img {
+    max-height: 375px;
+    width: 245px;
+}
+
+
+/* .row {
+    display: block;
+    margin-bottom: 30px;
+    background-color: aquamarine;
+}
+
+.image {
+    overflow: hidden;
+    background-color: red;
+}
+
+.image img {
+    max-width: 100%;
+}
+
+.header {
+    padding-top: 6px;
+    padding-bottom: 15px;
+}
+
+.header .logo {
+    width: 200px;
+    background-color: white;
+}
+
+.main-info {
+    height: 900px;
+}
+
+.main-info .col.map {
+    width: 245px;
+    margin-left: 4px;
+}
+
+.main-info .col:first-child {
+    width: 500px;
+    position: relative;
+}
+
+.main-info .image {
+    height: 100%;
+}
+
+.main-info .image img {
+    width: 100%;
+    height: 100%;
+}
+
+.main-info .map .image img {
+    height: 100%;
+}
+
+.main-info .extra-info {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, .1);
+    z-index: 2;
+}
+
+.main-info .extra-info h1,
+p,
+span {
+    color: white;
+} */

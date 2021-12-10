@@ -78,4 +78,12 @@ return
                 'GET,OPTIONS <id>/viewed' => 'viewed',
             ],
         ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'pdf',
+            'except' => [],
+            'extraPatterns' => [
+                'GET fuck' => 'fuck',
+            ],
+        ],
     ];
