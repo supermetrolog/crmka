@@ -10,6 +10,8 @@ use yii\rest\ActiveController;
 use Yii;
 use yii\filters\auth\HttpBearerAuth;
 use app\exceptions\ValidationErrorHttpException;
+use yii\web\UploadedFile;
+use app\models\UploadFile;
 
 class UserController extends ActiveController
 {
@@ -37,10 +39,19 @@ class UserController extends ActiveController
     {
         $actions = parent::actions();
         unset($actions['create']);
+        unset($actions['index']);
         return $actions;
+    }
+    public function actionIndex()
+    {
+        return User::getUsers();
     }
     public function actionCreate()
     {
+        $request = json_decode(Yii::$app->request->post('data'), true);
+        $model = new UploadFile();
+        $model->files = UploadedFile::getInstancesByName('files');
+        return User::createUser($request, $model);
         $model = new SignUp();
         if ($model->load(Yii::$app->request->post(), '')) {
             return $model->signUp();

@@ -20,7 +20,7 @@ class UploadFile extends Model
     public function rules()
     {
         return [
-            [['files'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, pdf, xls, xlsx, ppt, pptp, doc, docx, txt', 'maxFiles' => 10],
+            [['files'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg, pdf, xls, xlsx, ppt, pptp, doc, docx, txt', 'maxFiles' => 10],
         ];
     }
 

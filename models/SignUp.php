@@ -3,7 +3,7 @@
 namespace app\models;
 
 use yii\base\Model;
-use yii\web\BadRequestHttpException;
+use app\exceptions\ValidationErrorHttpException;
 
 /**
  * LoginForm is the model behind the login form.
@@ -27,7 +27,7 @@ class SignUp extends Model
         return [
             // username and password are both required
             [['username', 'password'], 'required'],
-            ['password', 'string', 'min' => 8],
+            ['password', 'string', 'min' => 4],
             ['username', 'string', 'min' => 4],
             // password is validated by validatePassword()
             ['username', 'validateUsername'],
@@ -65,10 +65,10 @@ class SignUp extends Model
             $user->username = $this->username;
             $user->created_at = time();
             $user->updated_at = time();
-            if ($user->validate() && $user->save()) return true;
-            return $user->getErrors();
+            if ($user->validate() && $user->save()) return $user->id;
+            throw new ValidationErrorHttpException($user->getErrorSummary(false));
         }
-        return $this->getErrors();
+        throw new ValidationErrorHttpException($this->getErrorSummary(false));
     }
 
     /**

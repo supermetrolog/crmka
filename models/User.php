@@ -5,6 +5,8 @@ namespace app\models;
 use Yii;
 use yii\web\IdentityInterface;
 use yii\filters\auth\HttpBearerAuth;
+use yii\data\ActiveDataProvider;
+use app\exceptions\ValidationErrorHttpException;
 
 /**
  * This is the model class for table "user".
@@ -81,10 +83,46 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
 
+    public static function getUsers()
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => self::find()->joinWith(['userProfile']),
+            'pagination' => [
+                'pageSize' => 200,
+            ],
+        ]);
+
+        return $dataProvider;
+    }
+
+    public static function createUser($post_data, $uploadFileModel)
+    {
+        $db = Yii::$app->db;
+        $model = new SignUp();
+        $transaction = $db->beginTransaction();
+        try {
+            if ($model->load($post_data, '') && $user_id = $model->signUp()) {
+                $post_data['userProfile']['user_id'] = $user_id;
+                UserProfile::createUserProfile($post_data['userProfile'], $uploadFileModel);
+                // $transaction->rollBack();
+                // return $post_data;
+
+                $transaction->commit();
+                return ['message' => "Пользователь создан", 'data' => $user_id];
+            }
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
     public function fields()
     {
         $fields = parent::fields();
         unset($fields['auth_key'], $fields['password_hash'], $fields['password_reset_token'], $fields['access_token']);
+        $fields['created_at'] = function ($fields) {
+            return date('Y-m-d H:i:s', $fields['created_at']);
+        };
         return $fields;
     }
 

@@ -24,9 +24,9 @@ class Notification extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    private const NO_FETCHED_STATUS = -1;
+    public const NO_FETCHED_STATUS = -1;
     private const FETCHED_STATUS = 0;
-    private const NO_VIEWED_STATUS = 0;
+    public const NO_VIEWED_STATUS = 0;
     private const VIEWED_STATUS = 1;
     private const PROCESSED_STATUS = 2;
 
@@ -94,7 +94,7 @@ class Notification extends \yii\db\ActiveRecord
         $dataProvider->models = $response;
         return $dataProvider;
     }
-    private static function array_copy($array)
+    public static function array_copy($array)
     {
         $newArray = [];
         foreach ($array as $item) {
@@ -102,7 +102,7 @@ class Notification extends \yii\db\ActiveRecord
         }
         return $newArray;
     }
-    private static function changeNoFetchedStatusToFetched($models)
+    public static function changeNoFetchedStatusToFetched($models)
     {
         foreach ($models as $model) {
             if ($model->status == self::NO_FETCHED_STATUS) {

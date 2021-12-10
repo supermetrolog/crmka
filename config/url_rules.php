@@ -66,7 +66,7 @@ return
             'extraPatterns' => [
                 'GET <id>' => 'index',
                 'GET,OPTIONS new/<id>' => 'new',
-                'GET <id>/viewed' => 'viewed',
+                'GET,OPTIONS <id>/viewed' => 'viewed',
             ],
         ],
         [

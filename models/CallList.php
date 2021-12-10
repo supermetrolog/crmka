@@ -96,6 +96,15 @@ class CallList extends \yii\db\ActiveRecord
         ]);
         return $dataProvider;
     }
+
+    public function changeViewed($flag)
+    {
+        if ($this->viewed == $flag) {
+            return true;
+        }
+        $this->viewed = $flag;
+        return $this->save();
+    }
     /**
      * Gets query for [[Caller]].
      *
