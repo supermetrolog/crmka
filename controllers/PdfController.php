@@ -33,7 +33,7 @@ class PdfController extends Controller
     public function actionIndex()
     {
         $options = new Options();
-        $options->set('defaultFont', 'Arial');
+        $options->set('defaultFont', 'helvetica');
         $options->set('isRemoteEnabled', true);
         $options->set('isJavascriptEnabled', true);
         $dompdf = new Dompdf($options);
