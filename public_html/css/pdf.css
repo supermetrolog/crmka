@@ -1,6 +1,7 @@
 body {
     padding-top: 1.5cm;
     padding-bottom: .8cm;
+    font-family: DejaVu Sans;
 }
 
 div.page {
@@ -44,11 +45,9 @@ tr {
 td {
     padding: 0;
     margin: 0;
-    /* background-color: green; */
 }
 
 table {
-    /* background-color: orange; */
     width: 100%;
     margin-bottom: 15px;
 }
@@ -56,7 +55,6 @@ table {
 .title {
     width: 100%;
     text-align: center;
-    /* margin-bottom: 20px; */
 }
 
 .title h3 {
@@ -66,7 +64,7 @@ table {
 }
 
 .title .one {
-    width: 200px;
+    width: 270px;
 }
 
 .title .two {
@@ -74,7 +72,7 @@ table {
 }
 
 .title .three {
-    width: 250px;
+    width: 300px;
 }
 
 
@@ -90,11 +88,11 @@ table {
 }
 
 #header table td.logo .image {
-    width: 250px;
+    width: 200px;
 }
 
 #header table td.logo .image img {
-    width: 250px;
+    width: 200px;
 }
 
 #header table td.consultant {
@@ -104,17 +102,20 @@ table {
 #header table td.consultant>div {
     border-right: 1px solid #982e06;
     padding-right: 10px;
-    min-height: 38px;
+    min-height: 35px;
+    height: 35px;
+    vertical-align: top;
 }
 
 #header table td.consultant>div p.name {
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 14px;
+    vertical-align: top;
 }
 
 #header table td.consultant>div p.position {
-    font-size: 11px;
-    line-height: 10px;
+    font-size: 9px;
+    vertical-align: top;
+    line-height: 2px;
 }
 
 
@@ -132,7 +133,7 @@ table {
 #footer table {
     border-top: 2px solid #982e06;
     margin-bottom: 0;
-    font-size: 11px;
+    font-size: 9.5px;
     max-height: 25px;
     padding-top: 10px;
 }
@@ -143,7 +144,7 @@ table {
 }
 
 #footer table td.contacts>div {
-    width: 600px;
+    width: 650px;
 }
 
 #footer table td.contacts>div ul {
@@ -154,19 +155,24 @@ table {
 #footer table td.contacts>div li {
     display: inline-block;
     position: relative;
-    margin-right: 2px;
+    margin-right: 4px;
 }
 
 #footer table td.contacts>div li i {
     position: absolute;
     font-size: 4px;
     color: #982e06;
-    top: 8px;
+    top: 9px;
     left: -5px;
 }
 
 #footer table td.contacts>div li p {
     color: rgb(160, 160, 160);
+    letter-spacing: 0px;
+}
+
+#footer table td.contacts>div li p a {
+    color: #6397da;
 }
 
 #footer table td.contacts>div li b {
@@ -179,7 +185,7 @@ table {
 }
 
 #footer table td.image>div .logo {
-    width: 145px;
+    width: 100px;
     max-height: 25px;
     height: 25px;
     margin-left: auto;
@@ -189,41 +195,6 @@ table {
     max-height: 25px;
     width: 100%;
 }
-
-
-/* #header,
-#footer {
-    position: fixed;
-    left: 0;
-    right: 0;
-    color: #aaa;
-    font-size: 0.9em;
-    z-index: 999;
-    background-color: red;
-}
-
-#header {
-    top: 0;
-    border-bottom: 0.1pt solid #aaa;
-}
-
-#footer {
-    bottom: 0;
-    border-top: 0.1pt solid #aaa;
-}
-
-#header table,
-#footer table {
-    width: 100%;
-    border-collapse: collapse;
-    border: none;
-}
-
-#header td,
-#footer td {
-    padding: 0;
-    width: 50%;
-} */
 
 .page-number {
     text-align: center;
@@ -286,18 +257,18 @@ table {
 .main-info td.left .image .extra-info .content p.district {
     color: white;
     font-weight: bold;
-    font-size: 48px;
+    font-size: 36px;
 }
 
 .main-info td.left .image .extra-info .content p.type {
     color: #c8d0fe;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: bold;
     margin-bottom: 20px;
 }
 
 .main-info td.left .image .extra-info .content p {
-    line-height: 20px;
+    line-height: 15px;
 }
 
 .btn-fake {
@@ -305,6 +276,7 @@ table {
     display: inline-block;
     padding: 8px;
     font-size: 14px;
+    vertical-align: middle;
 }
 
 .main-info td.left .image .extra-info .object_id {
@@ -315,20 +287,21 @@ table {
     /* height: 20px; */
     width: 80px;
     text-transform: uppercase;
-    font-size: 11px;
+    font-size: 10px;
     color: white;
     padding: 5px 10px 5px 15px;
+    vertical-align: middle;
 }
 
 .main-info td.left .image .extra-info .object_id::before {
     content: '';
     background: inherit;
-    /* background: black; */
-    width: 20px;
-    height: 20px;
+    /* background-color: black; */
+    width: 22px;
+    height: 22px;
     display: block;
     position: absolute;
-    right: -10px;
+    right: -12px;
     top: 3px;
     transform: rotate(45deg);
     border-radius: 0 0 0 2px;
@@ -337,86 +310,112 @@ table {
 
 /* *********** DIGITAL-INFO **************  */
 
+.digital-info-container .c_one {
+    width: 500px;
+    max-width: 500px;
+    min-width: 500px;
+}
+
+.digital-info-container .c_two {
+    width: 240px;
+    max-width: 240px;
+    min-width: 240px;
+}
+
+.digital-info td>div {
+    vertical-align: middle;
+}
+
 .digital-info td.one div {
-    width: 160px;
+    /* width: 160px; */
     height: 80px;
     background-color: #e6e6e6;
-    padding: 15px 20px;
+    padding: 10px 15px;
 }
 
 .digital-info td.two div {
-    width: 258px;
+    /* width: 300px; */
     height: 78px;
     outline: 1px solid #8b2e0a;
-    padding: 15px 20px;
+    padding: 10px 15px;
+    padding-right: 0!important;
+    margin-right: 4px;
 }
 
 .digital-info td.three>div {
-    width: 240px;
-    max-width: 240px;
-    /* outline: 1px solid #ccc; */
-    margin-left: 5px;
+    /* width: 227px; */
+    /* margin-left: 4px; */
     height: 108px;
 }
 
 .digital-info td.one div p {
     text-transform: uppercase;
     font-weight: bold;
-    font-size: 12px;
-    /* line-height: 5px; */
+    font-size: 11px;
 }
 
-.digital-info td.one div h1 {
-    line-height: 2px;
+.digital-info td.one div p.big {
+    text-transform: none;
+    font-size: 18px;
 }
 
-.digital-info td.one div small {
-    font-size: 12px;
+.digital-info td.one div p.small {
+    font-size: 9px;
     color: #353535;
+    font-weight: normal;
+    text-transform: none;
 }
 
 .digital-info td.two div p {
     text-transform: uppercase;
     font-weight: bold;
-    font-size: 12px;
-    /* line-height: 5px; */
-}
-
-.digital-info td.two div h1 {
-    line-height: 35px;
-}
-
-.digital-info td.two div small {
-    color: #353535;
     font-size: 11px;
 }
 
+.digital-info td.two div p b {
+    font-size: 9px
+}
+
+.digital-info td.two div p.big {
+    font-size: 18px;
+    text-transform: none;
+}
+
+.digital-info td.two div p.small {
+    font-weight: normal;
+    font-size: 9px;
+    text-transform: none;
+    color: #353535;
+}
+
+.digital-info td.three .items {
+    border-collapse: collapse;
+}
+
 .digital-info td.three .items td>div {
-    width: 77px;
+    width: 100%;
     height: 51px;
+    font-weight: normal;
     text-align: center;
 }
 
 .digital-info td.three .items {
-    border: 1px solid #ccc;
-    border-bottom: none;
     margin: 0;
     padding: 0;
 }
 
-.digital-info td.three .items2 {
-    margin-top: -4px;
-    border-bottom: 1px solid #ccc;
-    border-top: none;
+.digital-info td.three .items td {
+    border: 1px solid #ccc;
+    vertical-align: middle;
 }
 
 .digital-info td.three .items td>div>i {
-    margin-top: 5px;
+    margin-top: 4px;
 }
 
 .digital-info td.three .items td>div>p {
-    line-height: 20px;
-    font-size: 12px;
+    line-height: 10px;
+    font-size: 10px;
 }
 
 .br {
@@ -485,7 +484,8 @@ table {
 }
 
 .offer-description p {
-    font-size: 15px;
+    font-size: 13px;
+    line-height: 17px;
     color: rgb(129, 129, 129);
 }
 
@@ -509,8 +509,8 @@ table {
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0, 0, 0, .5);
-    padding: 30px 0;
+    background-color: rgba(0, 0, 0, .8);
+    padding: 15px 0;
 }
 
 .banner h3 {
@@ -562,13 +562,14 @@ table {
 
 .params-new td>div p {
     color: rgb(119, 119, 119);
-    font-size: 12px;
+    font-size: 11px;
+    vertical-align: middle;
 }
 
 .params-new td>div.params-title p {
     color: #a9b0d8;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 .params-new td>div p b {
@@ -591,205 +592,3 @@ table {
 .params-new .even td>div {
     background-color: #f0f0f0;
 }
-
-
-/* ************* PARAMS ************* */
-
-.params table {
-    border-collapse: collapse;
-}
-
-.params td {
-    vertical-align: top;
-    padding: 3px;
-}
-
-.params .one {
-    padding-right: 10px;
-}
-
-.params table tr:nth-child(even) td {
-    background-color: #f0f0f0;
-}
-
-.params td table td>div p {
-    color: rgb(119, 119, 119);
-    font-size: 12px;
-}
-
-.params td table td>div p b {
-    color: black;
-}
-
-.params td table td>div p.blue {
-    color: #6397da;
-    text-decoration: underline;
-}
-
-.params td table td>div p.blue b {
-    color: #6397da;
-}
-
-.params h5 {
-    margin: 0;
-    color: #a9b0d8;
-    margin-left: 3px;
-}
-
-
-/* ********** CUSTOM-TABLE */
-
-.custom-table {
-    display: block;
-}
-
-.row {
-    display: block;
-}
-
-.cell {
-    display: inline-block;
-}
-
-.params {
-    /* display: inline-block;
-    vertical-align: top; */
-    /* float: left; */
-    display: block;
-    margin-top: 10px;
-}
-
-.params-container {
-    vertical-align: top;
-    display: inline-block;
-}
-
-.params-title h5 {
-    margin: 0;
-    color: #a9b0d8;
-}
-
-.params p {
-    color: rgb(119, 119, 119);
-    font-size: 12px;
-}
-
-.params p b {
-    color: black;
-}
-
-.params p.blue {
-    color: #6397da;
-}
-
-
-/* .params .row.even {
-    background-color: #f0f0f0;
-} */
-
-.params .row.even .cell {
-    background-color: #f0f0f0;
-}
-
-.params .row .cell {
-    width: 174px;
-    /* width: 100px; */
-    /* height: 20px; */
-    margin-left: -4px;
-    padding: 3px;
-}
-
-.params .row .cell.right {
-    margin-left: 15px;
-}
-
-.params .row .cell.left {
-    margin-right: 15px;
-}
-
-.params-title {
-    /* padding: 0!important; */
-    background-color: white!important;
-}
-
-.params.pl {
-    padding-right: 15px;
-}
-
-.params.pr {
-    padding-left: 15px;
-}
-
-
-/* .division-options tr.odd {
-    background-color: #e6eaff;
-} */
-
-
-/* .row {
-    display: block;
-    margin-bottom: 30px;
-    background-color: aquamarine;
-}
-
-.image {
-    overflow: hidden;
-    background-color: red;
-}
-
-.image img {
-    max-width: 100%;
-}
-
-#header table {
-    padding-top: 6px;
-    padding-bottom: 15px;
-}
-
-#header table .logo {
-    width: 200px;
-    background-color: white;
-}
-
-.main-info {
-    height: 900px;
-}
-
-.main-info .col.map {
-    width: 245px;
-    margin-left: 4px;
-}
-
-.main-info .col:first-child {
-    width: 500px;
-    position: relative;
-}
-
-.main-info .image {
-    height: 100%;
-}
-
-.main-info .image img {
-    width: 100%;
-    height: 100%;
-}
-
-.main-info .map .image img {
-    height: 100%;
-}
-
-.main-info .extra-info {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, .1);
-    z-index: 2;
-}
-
-.main-info .extra-info h1,
-p,
-span {
-    color: white;
-} */

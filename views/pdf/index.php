@@ -1,3 +1,4 @@
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
     <link rel="stylesheet" href="http://crmka/css/null.css">
     <link rel="stylesheet" href="http://crmka/css/pdf.css">
@@ -12,8 +13,8 @@
                     </td>
                     <td class="consultant">
                         <div>
-                            <p class="name">Timur Abdurashidov</p>
-                            <p class="position"> <span class="danger">Vedushi consultant</span> </p>
+                            <p class="name">Тимур Абдурашидов</p>
+                            <p class="position"> <span class="danger">Ведущий консультант</span> </p>
                         </div>
 
                     </td>
@@ -29,19 +30,19 @@
                         <div>
                             <ul>
                                 <li>
-                                    <p><b>INDUSTRIAL BUILDING </b></p>
+                                    <p><b>ИНДУСТРИАЛЬНАЯ НЕДВИЖИМОСТЬ</b></p>
                                 </li>
                                 <li>
                                     <i class="fas fa-circle"></i>
-                                    <p>TEL: <b>+7 495 150-03-23 </b></p>
+                                    <p>ТЕЛ: <b>+7 495 150-03-23 </b></p>
                                 </li>
                                 <li>
                                     <i class="fas fa-circle"></i>
-                                    <p>SITE: <a href="https://industry.realtor.ru">INDUSTRY.REALTOR.RU</a></p>
+                                    <p>САЙТ: <a href="https://industry.realtor.ru">INDUSTRY.REALTOR.RU</a></p>
                                 </li>
                                 <li>
                                     <i class="fas fa-circle"></i>
-                                    <p>EMAIL: <a href="mailto:sklad@realtor.ru">SKLAD@REALTOR.RU</a></p>
+                                    <p>ПОЧТА: <a href="mailto:sklad@realtor.ru">SKLAD@REALTOR.RU</a></p>
                                 </li>
                             </ul>
                         </div>
@@ -67,15 +68,15 @@
                             <img src="https://pennylane.pro/uploads/objects/3334/10.jpg" alt="">
                             <div class="extra-info">
                                 <div class="object_id">
-                                    Object 2652
+                                    Объект 2652
                                 </div>
                                 <div class="content">
-                                    <p class="district">MLP-PODOLSK</p>
-                                    <p class="type">Proizvodsvenno-skladskoi komplex</p>
+                                    <p class="district">MLP-ПОДОЛЬСК</p>
+                                    <p class="type">Производственно-складской комплекс</p>
                                     <div>
-                                        <span class="btn-fake">Malie Vyazemui</span>
-                                        <span class="btn-fake">Minskoe Shosse</span>
-                                        <span class="btn-fake">25 km ot MKAD</span>
+                                        <span class="btn-fake">Малые Вяземы</span>
+                                        <span class="btn-fake">Минское шоссе</span>
+                                        <span class="btn-fake">25 км от МКАД</span>
                                     </div>
 
                                 </div>
@@ -91,69 +92,82 @@
                 </tr>
             </tbody>
         </table>
-        <table class="digital-info">
+        <table class="digital-info-container">
             <tbody>
                 <tr>
-                    <td class="one">
-                        <div>
-                            <p>PLOSHADI V ARENDU</p>
-                            <h1>18 250 m<sup>2</sup></h1>
-                            <small>Delenie <span class="danger">ot 8 000 m<sup>2</sup></span></small>
-                        </div>
+                    <td class="c_one">
+                        <table class="digital-info">
+                            <tbody>
+                                <tr>
+                                    <td class="one">
+                                        <div>
+                                            <p>ПЛОЩАДИ В АРЕНДУ</p>
+                                            <p class="big">18 250 м<sup>2</sup></p>
+                                            <p class="small">Деление <span class="danger">от 8 000 м<sup>2</sup></span></p>
+                                        </div>
+                                    </td>
+                                    <td class="two">
+                                        <div>
+                                            <p>СРЕДНЯЯ СТАВКА ЗА М<sup>2</sup>/ГОД, <span class="danger">БЕЗ НДС</span></p>
+                                            <p class="big"><span class="danger">4 200 руб.</span></p>
+                                            <p class="small">Не включает <b>KY (+250 руб.) </b> и <b>OPEX (+1 200 руб.)</b></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </td>
-                    <td class="two">
-                        <div>
-                            <p>SREDN99 STAVKA ZA M<sup>2</sup>/god, <span class="danger">BEZ NDS</span></p>
-                            <h1><span class="danger">4 200 rub.</span></h1>
-                            <small>Ne vklu4aet <b> KY (+250 rub.) </b> i <b>OPEX (+1 200 rub.)</b></small>
-                        </div>
-                    </td>
-                    <td class="three">
-                        <div>
-                            <table class="items">
-                                <tbody>
-                                    <tr>
-                                        <td class="item">
-                                            <div class="br bb">
-                                                <i class="fas fa-th-large"></i>
-                                                <p>1 etaj</p>
-                                            </div>
-                                        </td>
-                                        <td class="item">
-                                            <div class="bb br"><i class="fas fa-th-large"></i>
-                                                <p>8 vorot</p>
-                                            </div>
-                                        </td>
-                                        <td class="item">
-                                            <div class="bb"><i class="fas fa-th-large"></i>
-                                                <p>1 500 kWt</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <table class="items items2">
-                                <tbody>
-                                    <tr>
-                                        <td class="item">
-                                            <div class="br"><i class="fas fa-th-large"></i>
-                                                <p>1-15 metrov</p>
-                                            </div>
-                                        </td>
-                                        <td class="item">
-                                            <div class="br"><i class="fas fa-th-large"></i>
-                                                <p>Antipilb</p>
-                                            </div>
-                                        </td>
-                                        <td class="item">
-                                            <div><i class="fas fa-th-large"></i>
-                                                <p>2 - 400 tonn</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <td class="c_two">
+                        <table class="digital-info">
+                            <tbody>
+                                <tr>
+                                    <td class="three">
+                                        <div>
+                                            <table class="items">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="item">
+                                                            <div>
+                                                                <i class="fas fa-th-large"></i>
+                                                                <p>1-4 этажи</p>
+                                                            </div>
+                                                        </td>
+                                                        <td class="item">
+                                                            <div><i class="fas fa-th-large"></i>
+                                                                <p>8 ворот</p>
+                                                            </div>
+                                                        </td>
+                                                        <td class="item">
+                                                            <div><i class="fas fa-th-large"></i>
+                                                                <p>1 500 кВт</p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="item">
+                                                            <div>
+                                                                <i class="fas fa-th-large"></i>
+                                                                <p>1-15 метров</p>
+                                                            </div>
+                                                        </td>
+                                                        <td class="item">
+                                                            <div><i class="fas fa-th-large"></i>
+                                                                <p>Антипыль</p>
+                                                            </div>
+                                                        </td>
+                                                        <td class="item">
+                                                            <div><i class="fas fa-th-large"></i>
+                                                                <p>2-400 тонн</p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </td>
                 </tr>
             </tbody>
@@ -180,7 +194,7 @@
             </tbody>
         </table>
         <div class="title">
-            <h3 class="one">Varianti deleniya</h3>
+            <h3 class="one">Варианты деления</h3>
         </div>
         <table class="division-options">
             <thead>
@@ -318,39 +332,38 @@
             </tbody>
         </table>
         <div class="title">
-            <h3 class="two">Opisanie predlojeniya</h3>
+            <h3 class="two">Описание предложения</h3>
         </div>
         <div class="offer-description">
             <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione quae assumenda ullam neque minus laboriosam cum repellendus veniam reprehenderit? Voluptates fugit, eius quos placeat perspiciatis possimus voluptatem minima quia consequuntur.
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repudiandae cumque impedit totam corrupti, beatae cum! Commodi iusto alias natus, voluptatem aspernatur nemo dolorem officia, blanditiis, esse modi iure. Deleniti, odit.
+                Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец. Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец. Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец. Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец. Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец.
             </p>
         </div>
 
         <div class="banner">
             <img src="http://crmka/images/banner-bg.png" alt="">
             <div>
-                <h3>Uznaite pervim o novom, podhodyashem Vam predlojenii</h3>
-                <p>Nastroite parametri poiska podhodyashego vam object i kak tolko on poyavitsya na rinke, sistema avtomaticheski prishlet ego Vam na pochtu</p>
+                <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
+                <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>
                 <a href="https://industry.realtor.ru">industry.realtor.ru</a>
             </div>
         </div>
         <div class="title">
-            <h3 class="three">Podrobnie parametri</h3>
+            <h3 class="three">Подробные параметры</h3>
         </div>
         <table class="params-new">
             <tbody>
                 <tr>
                     <td class="one">
                         <div class="params-title">
-                            <p>Ploshadi k arende</p>
+                            <p>Площади к аренде</p>
                         </div>
                     </td>
                     <td class="two">
                     </td>
                     <td class="three">
                         <div class="params-title">
-                            <p>Kommunikacii</p>
+                            <p>Коммуникации</p>
                         </div>
                     </td>
                     <td class="four">
@@ -509,7 +522,7 @@
                 <tr>
                     <td class=" one">
             <div class="params-title">
-                <p>Harakteristiki</p>
+                <p>Характеристики</p>
             </div>
             </td>
             <td class="two">
@@ -614,7 +627,7 @@
             </td>
             <td class="three">
                 <div class="params-title">
-                    <p>J/D i kranovie ustroistva</p>
+                    <p>Ж/Д и крановые устр-ва</p>
                 </div>
             </td>
             <td class="four">
@@ -813,7 +826,7 @@
             </td>
             <td class="three">
                 <div class="params-title">
-                    <p>Infrastruktura</p>
+                    <p>Инфраструктура</p>
                 </div>
             </td>
             <td class="four">
@@ -898,7 +911,7 @@
                 <tr>
                     <td class=" one">
             <div class="params-title">
-                <p>Bezopasnostb</p>
+                <p>Безопасность</p>
             </div>
             </td>
             <td class="two">
