@@ -34,6 +34,10 @@ class Presentation extends Model
     {
         return Yii::$app->formatter->asInteger($number);
     }
+    public function getHost()
+    {
+        return $_SERVER['HTTP_HOST'];
+    }
     public function Request($url, $postdata = null)
     {
         $ch = curl_init($url);

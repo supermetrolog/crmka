@@ -1,14 +1,15 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
-    <link rel="stylesheet" href="http://crmka/css/null.css">
-    <link rel="stylesheet" href="http://crmka/css/pdf.css">
+    <link rel="stylesheet" href="http://<?= $model->getHost() ?>/css/null.css">
+    <link rel="stylesheet" href="http://<?= $model->getHost() ?>/css/pdf.css">
+    <title>Презентация</title>
     <div id="header">
         <table>
             <tbody>
                 <tr>
                     <td class="logo">
                         <div class="image">
-                            <img src="http://crmka/images/logo-plr.png" alt="">
+                            <img src="http://<?= $model->getHost() ?>/images/logo-plr.png" alt="">
                         </div>
                     </td>
                     <td class="consultant">
@@ -50,7 +51,7 @@
                     <td class="image">
                         <div>
                             <div class="logo">
-                                <img src="http://crmka/images/logo-footer.png" alt="">
+                                <img src="http://<?= $model->getHost() ?>/images/logo-footer.png" alt="">
                             </div>
 
                         </div>
@@ -132,7 +133,7 @@
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
-                                                                    <img src="http://crmka/images/floors-icon.png" alt="">
+                                                                    <img src="http://<?= $model->getHost() ?>/images/floors-icon.png" alt="">
                                                                 </div>
                                                                 <p><?= $data->general_stats->floors ?></p>
                                                             </div>
@@ -140,7 +141,7 @@
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
-                                                                    <img src="http://crmka/images/gates-icon.png" alt="">
+                                                                    <img src="http://<?= $model->getHost() ?>/images/gates-icon.png" alt="">
                                                                 </div>
                                                                 <p><?= $data->general_stats->gates ?></p>
                                                             </div>
@@ -148,7 +149,7 @@
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
-                                                                    <img src="http://crmka/images/power-icon.png" alt="">
+                                                                    <img src="http://<?= $model->getHost() ?>/images/power-icon.png" alt="">
                                                                 </div>
                                                                 <p><?= $data->general_stats->power ?></p>
                                                             </div>
@@ -158,7 +159,7 @@
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
-                                                                    <img src="http://crmka/images/ceiling-icon.png" alt="">
+                                                                    <img src="http://<?= $model->getHost() ?>/images/ceiling-icon.png" alt="">
                                                                 </div>
                                                                 <p><?= $data->general_stats->ceiling ?></p>
                                                             </div>
@@ -166,7 +167,7 @@
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
-                                                                    <img src="http://crmka/images/floor-icon.png" alt="">
+                                                                    <img src="http://<?= $model->getHost() ?>/images/floor-icon.png" alt="">
                                                                 </div>
                                                                 <p><?= $data->general_stats->floor ?></p>
                                                             </div>
@@ -174,7 +175,7 @@
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
-                                                                    <img src="http://crmka/images/crane-icon.png" alt="">
+                                                                    <img src="http://<?= $model->getHost() ?>/images/crane-icon.png" alt="">
                                                                 </div>
                                                                 <p><?= $data->general_stats->cranes ?></p>
                                                             </div>
@@ -362,7 +363,7 @@
         </div>
 
         <div class="banner">
-            <img src="http://crmka/images/banner-bg.png" alt="">
+            <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
             <div>
                 <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
                 <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>
