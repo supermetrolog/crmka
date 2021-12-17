@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\pdf\Presentation;
 use yii\filters\Cors;
 use yii\filters\auth\HttpBearerAuth;
 use yii\web\Controller;
@@ -32,12 +33,15 @@ class PdfController extends Controller
 
     public function actionIndex()
     {
+        $model = new Presentation();
+        $model->fetchData(Yii::$app->request->getQueryParam('original_id'), Yii::$app->request->getQueryParam('type_id'));
+        $data = $model->getResponse();
+
         $options = new Options();
-        // $options->set('defaultFont', 'helvetica');
         $options->set('isRemoteEnabled', true);
         $options->set('isJavascriptEnabled', true);
         $dompdf = new Dompdf($options);
-        $html = $this->renderPartial('index');
+        $html = $this->renderPartial('index', ['data' => $data, 'model' => $model]);
 
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4');
@@ -48,18 +52,11 @@ class PdfController extends Controller
     }
     public function actionFuck()
     {
-        $options = new Options();
-        $options->set('defaultFont', 'Arial');
-        $options->set('isRemoteEnabled', true);
-        $options->set('isJavascriptEnabled', true);
-        $dompdf = new Dompdf($options);
-        $html = $this->renderPartial('index');
-
-        // $dompdf->loadHtml($html);
-        // $dompdf->setPaper('A4');
-        // $dompdf->render();
-        // $dompdf->stream("pdf.pdf", ['Attachment' => false]);
-
-        return $html;
+        $model = new Presentation();
+        $model->fetchData(Yii::$app->request->getQueryParam('original_id'), Yii::$app->request->getQueryParam('type_id'));
+        $data = $model->getResponse();
+        return $this->renderPartial('suck', [
+            'data' => $data
+        ]);
     }
 }

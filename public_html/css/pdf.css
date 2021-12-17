@@ -55,6 +55,8 @@ table {
 .title {
     width: 100%;
     text-align: center;
+    margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .title h3 {
@@ -64,7 +66,7 @@ table {
 }
 
 .title .one {
-    width: 270px;
+    width: 235px;
 }
 
 .title .two {
@@ -72,7 +74,7 @@ table {
 }
 
 .title .three {
-    width: 300px;
+    width: 290px;
 }
 
 
@@ -258,6 +260,7 @@ table {
     color: white;
     font-weight: bold;
     font-size: 36px;
+    text-transform: uppercase;
 }
 
 .main-info td.left .image .extra-info .content p.type {
@@ -265,6 +268,7 @@ table {
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 20px;
+    text-transform: capitalize;
 }
 
 .main-info td.left .image .extra-info .content p {
@@ -277,6 +281,8 @@ table {
     padding: 8px;
     font-size: 14px;
     vertical-align: middle;
+    text-transform: capitalize;
+    white-space: nowrap;
 }
 
 .main-info td.left .image .extra-info .object_id {
@@ -409,13 +415,28 @@ table {
     vertical-align: middle;
 }
 
-.digital-info td.three .items td>div>i {
-    margin-top: 4px;
-}
-
 .digital-info td.three .items td>div>p {
     line-height: 10px;
     font-size: 10px;
+}
+
+.digital-info td.three .items .item>div {
+    width: 78px;
+    min-width: 78px;
+    max-width: 78px;
+}
+
+.digital-info td.three .items .item .icon {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+.digital-info td.three .items .item .icon img {
+    display: block;
+    margin: 0 auto;
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
 }
 
 .br {
@@ -560,6 +581,11 @@ table {
     padding-left: 20px;
 }
 
+.params-new tr td.two>div p {
+    font-weight: bold;
+    color: black;
+}
+
 .params-new td>div p {
     color: rgb(119, 119, 119);
     font-size: 11px;
@@ -570,6 +596,10 @@ table {
     color: #a9b0d8;
     font-weight: bold;
     font-size: 11px;
+}
+
+.params-new td>div.params-title {
+    background-color: white!important;
 }
 
 .params-new td>div p b {

@@ -13,7 +13,7 @@
                     </td>
                     <td class="consultant">
                         <div>
-                            <p class="name">Тимур Абдурашидов</p>
+                            <p class="name"><?= $data->agent_name ?></p>
                             <p class="position"> <span class="danger">Ведущий консультант</span> </p>
                         </div>
 
@@ -65,18 +65,18 @@
                 <tr>
                     <td class="left">
                         <div class="image">
-                            <img src="https://pennylane.pro/uploads/objects/3334/10.jpg" alt="">
+                            <img src="<?= $data->photos[0] ?>" alt="">
                             <div class="extra-info">
                                 <div class="object_id">
-                                    Объект 2652
+                                    Объект <?= $data->object_id ?>
                                 </div>
                                 <div class="content">
-                                    <p class="district">MLP-ПОДОЛЬСК</p>
-                                    <p class="type">Производственно-складской комплекс</p>
-                                    <div>
-                                        <span class="btn-fake">Малые Вяземы</span>
-                                        <span class="btn-fake">Минское шоссе</span>
-                                        <span class="btn-fake">25 км от МКАД</span>
+                                    <p class="district"><?= $data->district_name ?></p>
+                                    <p class="type"><?= $data->object_type_name ?></p>
+                                    <div class="items">
+                                        <span class="btn-fake"><?= $data->town_name ?></span>
+                                        <span class="btn-fake"><?= $data->highway_name ?></span>
+                                        <span class="btn-fake"><?= $data->from_mkad ?> от МКАД</span>
                                     </div>
 
                                 </div>
@@ -86,7 +86,7 @@
                     </td>
                     <td class="right">
                         <div class="image">
-                            <img src="https://static-maps.yandex.ru/1.x/?ll=37.522881,55.313157&size=290,450&z=9&l=map&pt=37.522881,55.313157,pm2ntm" alt="">
+                            <img src="https://static-maps.yandex.ru/1.x/?ll=<?= $data->longitude ?>,<?= $data->latitude ?>&size=290,450&z=9&l=map&pt=<?= $data->longitude ?>,<?= $data->latitude ?>,pm2ntm" alt="">
                         </div>
                     </td>
                 </tr>
@@ -102,15 +102,18 @@
                                     <td class="one">
                                         <div>
                                             <p>ПЛОЩАДИ В АРЕНДУ</p>
-                                            <p class="big">18 250 м<sup>2</sup></p>
-                                            <p class="small">Деление <span class="danger">от 8 000 м<sup>2</sup></span></p>
+                                            <p class="big"><?= $model->normalizeNumber($data->area_max) ?> м<sup>2</sup></p>
+                                            <? if ($data->area_max > $data->area_min) : ?>
+                                                <p class="small">Деление <span class="danger">от <?= $model->normalizeNumber($data->area_min) ?> м<sup>2</sup></span></p>
+                                            <? else : ?>
+                                                <p class="small">Деление не предполагается</p>
+                                            <? endif; ?>
                                         </div>
                                     </td>
                                     <td class="two">
                                         <div>
-                                            <p>СРЕДНЯЯ СТАВКА ЗА М<sup>2</sup>/ГОД, <span class="danger">БЕЗ НДС</span></p>
-                                            <p class="big"><span class="danger">4 200 руб.</span></p>
-                                            <p class="small">Не включает <b>KY (+250 руб.) </b> и <b>OPEX (+1 200 руб.)</b></p>
+                                            <p>СРЕДНЯЯ СТАВКА ЗА М<sup>2</sup>/ГОД, <span class="danger"><?= $data->tax_form ?> </span></p>
+                                            <p class="big"><span class="danger"><?= $model->normalizeNumber($data->price_sale_max) ?> руб.</span></p>
                                         </div>
                                     </td>
                                 </tr>
@@ -128,36 +131,52 @@
                                                     <tr>
                                                         <td class="item">
                                                             <div>
-                                                                <i class="fas fa-th-large"></i>
-                                                                <p>1-4 этажи</p>
+                                                                <div class="icon">
+                                                                    <img src="http://crmka/images/floors-icon.png" alt="">
+                                                                </div>
+                                                                <p><?= $data->general_stats->floors ?></p>
                                                             </div>
                                                         </td>
                                                         <td class="item">
-                                                            <div><i class="fas fa-th-large"></i>
-                                                                <p>8 ворот</p>
+                                                            <div>
+                                                                <div class="icon">
+                                                                    <img src="http://crmka/images/gates-icon.png" alt="">
+                                                                </div>
+                                                                <p><?= $data->general_stats->gates ?></p>
                                                             </div>
                                                         </td>
                                                         <td class="item">
-                                                            <div><i class="fas fa-th-large"></i>
-                                                                <p>1 500 кВт</p>
+                                                            <div>
+                                                                <div class="icon">
+                                                                    <img src="http://crmka/images/power-icon.png" alt="">
+                                                                </div>
+                                                                <p><?= $data->general_stats->power ?></p>
                                                             </div>
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td class="item">
                                                             <div>
-                                                                <i class="fas fa-th-large"></i>
-                                                                <p>1-15 метров</p>
+                                                                <div class="icon">
+                                                                    <img src="http://crmka/images/ceiling-icon.png" alt="">
+                                                                </div>
+                                                                <p><?= $data->general_stats->ceiling ?></p>
                                                             </div>
                                                         </td>
                                                         <td class="item">
-                                                            <div><i class="fas fa-th-large"></i>
-                                                                <p>Антипыль</p>
+                                                            <div>
+                                                                <div class="icon">
+                                                                    <img src="http://crmka/images/floor-icon.png" alt="">
+                                                                </div>
+                                                                <p><?= $data->general_stats->floor ?></p>
                                                             </div>
                                                         </td>
                                                         <td class="item">
-                                                            <div><i class="fas fa-th-large"></i>
-                                                                <p>2-400 тонн</p>
+                                                            <div>
+                                                                <div class="icon">
+                                                                    <img src="http://crmka/images/crane-icon.png" alt="">
+                                                                </div>
+                                                                <p><?= $data->general_stats->cranes ?></p>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -177,17 +196,17 @@
                 <tr>
                     <td class="one">
                         <div>
-                            <img src="https://pennylane.pro/uploads/objects/3334/10.jpg" alt="">
+                            <img src="<?= $data->photos[1] ?>" alt="">
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <img src="https://pennylane.pro/uploads/objects/3334/10.jpg" alt="">
+                            <img src="<?= $data->photos[2] ?>" alt="">
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <img src="https://pennylane.pro/uploads/objects/3334/10.jpg" alt="">
+                            <img src="<?= $data->photos[3] ?>" alt="">
                         </div>
                     </td>
                 </tr>
@@ -315,17 +334,17 @@
                 <tr>
                     <td class="one">
                         <div>
-                            <img src="https://pennylane.pro/uploads/objects/3334/10.jpg" alt="">
+                            <img src="<?= $data->photos[4] ?>" alt="">
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <img src="https://pennylane.pro/uploads/objects/3334/10.jpg" alt="">
+                            <img src="<?= $data->photos[5] ?>" alt="">
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <img src="https://pennylane.pro/uploads/objects/3334/10.jpg" alt="">
+                            <img src="<?= $data->photos[6] ?>" alt="">
                         </div>
                     </td>
                 </tr>
@@ -336,7 +355,9 @@
         </div>
         <div class="offer-description">
             <p>
-                Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец. Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец. Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец. Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец. Ебаный ты мудак блять ебаный стыд гавное дерьмо. Иди ты на хуй яйцесос ты ебаный ублюдок мать твою а ну иди сюда засранец.
+                Повседневная практика показывает, что сложившаяся структура организации влечет за собой процесс внедрения и модернизации направлений прогрессивного развития. Равным образом постоянный количественный рост и сфера нашей активности позволяет выполнять важные задания по разработке соответствующий условий активизации. Разнообразный и богатый опыт новая модель организационной деятельности позволяет оценить значение существенных финансовых и административных условий. Таким образом сложившаяся структура организации требуют определения и уточнения существенных финансовых и административных условий.
+
+                Равным образом дальнейшее развитие различных форм деятельности в значительной степени обуславливает создание систем массового участия. Задача организации, в особенности же сложившаяся структура организации позволяет оценить значение модели развития. С другой стороны рамки и место обучения кадров требуют определения и уточнения систем массового участия. Равным образом дальнейшее развитие различных форм деятельности способствует подготовки и реализации новых предложений. Товарищи! реализация намеченных плановых заданий в значительной степени обуславливает создание дальнейших направлений развития.
             </p>
         </div>
 
@@ -372,22 +393,22 @@
                 <tr class="even">
                     <td class="one">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Свободная площадь</p>
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->areas[1]->area[1]) ?></p>
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Электричество</p>
                         </div>
                     </td>
                     <td class="four">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->communications[1]->power[1]) ?></p>
                         </div>
                     </td>
                 </tr>
@@ -398,22 +419,23 @@
                 <tr>
                     <td class="one">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Из них мезонина</p>
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->areas[1]->area_mezzanine[1]) ?></p>
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Отопление</p>
                         </div>
                     </td>
                     <td class="four">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->communications[1]->heating[1]) ?></p>
+
                         </div>
                     </td>
                 </tr>
@@ -424,22 +446,23 @@
                 <tr>
                     <td class="one">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Из них офисов</p>
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->areas[1]->area_office[1]) ?></p>
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Водоснабжение</p>
                         </div>
                     </td>
                     <td class="four">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->communications[1]->water[1]) ?></p>
+
                         </div>
                     </td>
                 </tr>
@@ -450,22 +473,24 @@
                 <tr>
                     <td class="one">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Вместимость</p>
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->areas[1]->pallet_place[1]) ?></p>
+
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Канализация</p>
                         </div>
                     </td>
                     <td class="four">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->communications[1]->sewage_central[1]) ?></p>
+
                         </div>
                     </td>
                 </tr>
@@ -476,22 +501,23 @@
                 <tr>
                     <td class="one">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Уличное хранение</p>
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->areas[1]->area_field[1]) ?></p>
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Внтиляция</p>
                         </div>
                     </td>
                     <td class="four">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->communications[1]->ventilation[1]) ?></p>
+
                         </div>
                     </td>
                 </tr>
@@ -506,12 +532,13 @@
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Газ</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->communications[1]->gas[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -529,12 +556,13 @@
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Пар</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->communications[1]->steam[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -545,22 +573,23 @@
                 <tr>
                     <td class="one">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Этажность</p>
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->options[1]->floor[1]) ?></p>
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <p>Fuck the police</p>
+                            <p>Телефония</p>
                         </div>
                     </td>
                     <td class="four">
                         <div>
-                            <p>Fuck the police</p>
+                            <p><?= $model->normalizeText($data->stats->communications[1]->phone[1]) ?></p>
+
                         </div>
                     </td>
                 </tr>
@@ -571,22 +600,24 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Класс объекта</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->class_name[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Интернет</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->communications[1]->internet[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -597,12 +628,13 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Высота потолков</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->ceiling_height[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
@@ -617,12 +649,13 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Тип ворот</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->gate_type[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
@@ -640,22 +673,23 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Количество ворот</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->gate[1]) ?></p>
                 </div>
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Ж/Д ветка</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->cranes[1]->railway[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -666,22 +700,24 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Стеллажи</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->racks[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Козловые краны</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->cranes[1]->cranes_gantry[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -692,22 +728,24 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Нагрузка на пол</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->load_floor[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Ж/Д краны</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->cranes[1]->cranes_railway[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -718,22 +756,24 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Нагрузка на мезонин</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->load_mezzanine[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Мостовые краны</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->cranes[1]->cranes_overhead[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -744,22 +784,23 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Температура</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->temperature[1]) ?></p>
                 </div>
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Кран-балки</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->cranes[1]->cranes_cathead[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -770,22 +811,24 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Шаг колон</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->column_grid[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Тельферы</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->cranes[1]->telphers[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -796,12 +839,13 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Грузовые лифты</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->options[1]->elevators[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
@@ -815,14 +859,8 @@
             <tbody>
                 <tr>
                     <td class=" one">
-            <div>
-                <p>Fuck the police</p>
-            </div>
             </td>
             <td class="two">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
             </td>
             <td class="three">
                 <div class="params-title">
@@ -838,118 +876,21 @@
             <tbody>
                 <tr>
                     <td class=" one">
-            <div>
-                <p>Fuck the police</p>
-            </div>
-            </td>
-            <td class="two">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            <td class="three">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            <td class="four">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="params-new"">
-            <tbody>
-                <tr>
-                    <td class=" one">
-            <div>
-                <p>Fuck the police</p>
-            </div>
-            </td>
-            <td class="two">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            <td class="three">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            <td class="four">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="params-new even"">
-            <tbody>
-                <tr>
-                    <td class=" one">
-            </td>
-            <td class="two">
-            </td>
-            <td class="three">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            <td class="four">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="params-new"">
-            <tbody>
-                <tr>
-                    <td class=" one">
             <div class="params-title">
-                <p>Безопасность</p>
+                <p class="params-title">Безопасность</p>
             </div>
             </td>
             <td class="two">
             </td>
             <td class="three">
                 <div>
-                    <p>Fuck the police</p>
+                    <p>Въезд на территорию</p>
                 </div>
             </td>
             <td class="four">
                 <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="params-new even"">
-            <tbody>
-                <tr>
-                    <td class=" one">
-            <div>
-                <p>Fuck the police</p>
-            </div>
-            </td>
-            <td class="two">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            <td class="three">
-                <div>
-                    <p>Fuck the police</p>
-                </div>
-            </td>
-            <td class="four">
-                <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->infrastructure[1]->entry_territory[1]) ?></p>
+
                 </div>
             </td>
             </tr>
@@ -960,17 +901,25 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Охрана объекта</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->security[1]->guard[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
+                <div>
+                    <p>Парковка легковая</p>
+                </div>
             </td>
             <td class="four">
+                <div>
+                    <p><?= $model->normalizeText($data->stats->infrastructure[1]->parking_car[1]) ?></p>
+
+                </div>
             </td>
             </tr>
             </tbody>
@@ -980,17 +929,26 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Пожаротушение</p>
+
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->security[1]->firefighting[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
+                <div>
+                    <p>Парковка грузовая</p>
+                </div>
             </td>
             <td class="four">
+                <div>
+                    <p><?= $model->normalizeText($data->stats->infrastructure[1]->parking_truck[1]) ?></p>
+
+                </div>
             </td>
             </tr>
             </tbody>
@@ -1000,17 +958,24 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Видеонаблюдение</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->security[1]->video_control[1]) ?></p>
                 </div>
             </td>
             <td class="three">
+                <div>
+                    <p>Столовая/кафе</p>
+                </div>
             </td>
             <td class="four">
+                <div>
+                    <p><?= $model->normalizeText($data->stats->infrastructure[1]->canteen[1]) ?></p>
+
+                </div>
             </td>
             </tr>
             </tbody>
@@ -1020,17 +985,25 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Контроль доступа</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->security[1]->access_control[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
+                <div>
+                    <p>Общежитие</p>
+                </div>
             </td>
             <td class="four">
+                <div>
+                    <p><?= $model->normalizeText($data->stats->infrastructure[1]->hostel[1]) ?></p>
+
+                </div>
             </td>
             </tr>
             </tbody>
@@ -1040,12 +1013,13 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Охранная сигнализация</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->security[1]->security_alert[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">
@@ -1060,12 +1034,13 @@
                 <tr>
                     <td class=" one">
             <div>
-                <p>Fuck the police</p>
+                <p>Пожарная сигнализация</p>
             </div>
             </td>
             <td class="two">
                 <div>
-                    <p>Fuck the police</p>
+                    <p><?= $model->normalizeText($data->stats->security[1]->fire_alert[1]) ?></p>
+
                 </div>
             </td>
             <td class="three">

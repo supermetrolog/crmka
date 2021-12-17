@@ -14,6 +14,18 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'components' => [
+        'formatter' => [
+            'class' => \yii\i18n\Formatter::className(),
+            'dateFormat' => 'long',
+            'currencyCode' => 'RUB',
+            'decimalSeparator' => '.',
+            'thousandSeparator' => ' ',
+            'nullDisplay' => '',
+            'numberFormatterOptions' => [
+                NumberFormatter::MIN_FRACTION_DIGITS => 0,
+                NumberFormatter::MAX_FRACTION_DIGITS => 2,
+            ]
+        ],
         'request' => [
             'enableCsrfValidation' => false,
             'cookieValidationKey' => 'p6xr64xCH9KxL1zQ7zgdZ6BzV6IH2yZl',
