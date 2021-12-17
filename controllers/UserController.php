@@ -30,7 +30,7 @@ class UserController extends ActiveController
         ];
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::className(),
-            'except' => ['login', 'create', 'index', 'options'],
+            'except' => ['login', 'logout', 'create', 'index', 'options'],
         ];
         return $behaviors;
     }
