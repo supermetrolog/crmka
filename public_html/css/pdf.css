@@ -430,7 +430,7 @@ table.digital-info-container {
 }
 
 .digital-info td.three .items .item .icon {
-    padding-top: 5px;
+    padding-top: 10px;
     padding-left: 5px;
 }
 
@@ -586,6 +586,11 @@ table.digital-info-container {
 }
 
 .params-new tr td.two>div p {
+    font-weight: bold;
+    color: black;
+}
+
+.params-new tr td.four>div p {
     font-weight: bold;
     color: black;
 }
