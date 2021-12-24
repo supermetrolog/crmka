@@ -60,7 +60,7 @@
             </tbody>
         </table>
     </div>
-    <div class="page">
+    <div class="page-no-absolute">
         <table class="main-info">
             <tbody>
                 <tr>
@@ -134,24 +134,26 @@
                                                             <div>
                                                                 <div class="icon">
                                                                     <img src="http://<?= $model->getHost() ?>/images/floors-icon.png" alt="">
+                                                                    <p><?= $data->general_stats->floors ?></p>
                                                                 </div>
-                                                                <p><?= $data->general_stats->floors ?></p>
                                                             </div>
                                                         </td>
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
                                                                     <img src="http://<?= $model->getHost() ?>/images/gates-icon.png" alt="">
+                                                                    <p><?= $data->general_stats->gates ?></p>
+
                                                                 </div>
-                                                                <p><?= $data->general_stats->gates ?></p>
                                                             </div>
                                                         </td>
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
                                                                     <img src="http://<?= $model->getHost() ?>/images/power-icon.png" alt="">
+                                                                    <p><?= $data->general_stats->power ?></p>
+
                                                                 </div>
-                                                                <p><?= $data->general_stats->power ?></p>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -160,24 +162,27 @@
                                                             <div>
                                                                 <div class="icon">
                                                                     <img src="http://<?= $model->getHost() ?>/images/ceiling-icon.png" alt="">
+                                                                    <p><?= $data->general_stats->ceiling ?></p>
+
                                                                 </div>
-                                                                <p><?= $data->general_stats->ceiling ?></p>
                                                             </div>
                                                         </td>
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
                                                                     <img src="http://<?= $model->getHost() ?>/images/floor-icon.png" alt="">
+                                                                    <p><?= $data->general_stats->floor ?></p>
+
                                                                 </div>
-                                                                <p><?= $data->general_stats->floor ?></p>
                                                             </div>
                                                         </td>
                                                         <td class="item">
                                                             <div>
                                                                 <div class="icon">
                                                                     <img src="http://<?= $model->getHost() ?>/images/crane-icon.png" alt="">
+                                                                    <p><?= $data->general_stats->cranes ?></p>
+
                                                                 </div>
-                                                                <p><?= $data->general_stats->cranes ?></p>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -217,64 +222,51 @@
             <h3 class="one">Варианты деления</h3>
         </div>
         <table class="division-options">
-            <thead>
-                <tr>
-                    <th>ID block</th>
-                    <th>Etaj</th>
-                    <th>Ploshad</th>
-                    <th>Visota</th>
-                    <th>Type pola</th>
-                    <th>Vorota</th>
-                    <th>Temperatura hraneniya</th>
-                    <th>Stavka <b>bez NDS</b> m<sup>2</sup>/god</th>
-                    <th>Itogo cena v mesyac</th>
-                </tr>
-            </thead>
             <tbody>
                 <tr>
                     <td class="one">
                         <div>
-                            <p>2367-1</p>
+                            <p>ID блока</p>
                         </div>
                     </td>
                     <td class="two">
                         <div>
-                            <p>1</p>
+                            <p>Этаж</p>
                         </div>
                     </td>
                     <td class="three">
                         <div>
-                            <p><b>10 000-200 000</b> m<sup>2</sup></p>
+                            <p>Площадь</p>
                         </div>
                     </td>
                     <td class="four">
                         <div>
-                            <p>8-9 m.</p>
+                            <p>Высота</p>
                         </div>
                     </td>
                     <td class="five">
                         <div>
-                            <p>antipilb</p>
+                            <p>Тип пола</p>
                         </div>
                     </td>
                     <td class="six">
                         <div>
-                            <p>Na nule</p>
+                            <p>Ворота</p>
                         </div>
                     </td>
                     <td class="seven">
                         <div>
-                            <p>holodilnik +12 C, +14 C.</p>
+                            <p>Температура храниения</p>
                         </div>
                     </td>
                     <td class="eight">
                         <div>
-                            <p><b>5 500</b> rub. + OPEX + KY</p>
+                            <p>Ставка <b>без НДС</b> м<sup>2</sup>/г</p>
                         </div>
                     </td>
                     <td class="nine">
                         <div>
-                            <p>ot 1 000 854 000 rub.</p>
+                            <p>Итого цена в месяц</p>
                         </div>
                     </td>
                 </tr>
@@ -291,44 +283,816 @@
                     </td>
                     <td class="three">
                         <div>
-                            <p><b>10 000-200 000</b> m<sup>2</sup></p>
+                            <p><b>10 000-200 000</b> м<sup>2</sup></p>
                         </div>
                     </td>
                     <td class="four">
                         <div>
-                            <p>8-9 m.</p>
+                            <p>8-9 м.</p>
                         </div>
                     </td>
                     <td class="five">
                         <div>
-                            <p>antipilb</p>
+                            <p>антипыль</p>
                         </div>
                     </td>
                     <td class="six">
                         <div>
-                            <p>Na nule</p>
+                            <p>На нуле</p>
                         </div>
                     </td>
                     <td class="seven">
                         <div>
-                            <p>holodilnik +12 C, +14 C.</p>
+                            <p>холодильник +12 C, +14 C.</p>
                         </div>
                     </td>
                     <td class="eight">
                         <div>
-                            <p><b>5 500</b> rub. + OPEX + KY</p>
+                            <p><b>5 500 </b>руб.+OPEX+KY</p>
                         </div>
                     </td>
                     <td class="nine">
                         <div>
-                            <p>ot 1 000 854 000 rub.</p>
+                            <p>от 1 000 854 руб.</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="one">
+                        <div>
+                            <p>2367-1</p>
+                        </div>
+                    </td>
+                    <td class="two">
+                        <div>
+                            <p>1</p>
+                        </div>
+                    </td>
+                    <td class="three">
+                        <div>
+                            <p><b>10 000-200 000</b> м<sup>2</sup></p>
+                        </div>
+                    </td>
+                    <td class="four">
+                        <div>
+                            <p>8-9 м.</p>
+                        </div>
+                    </td>
+                    <td class="five">
+                        <div>
+                            <p>антипыль</p>
+                        </div>
+                    </td>
+                    <td class="six">
+                        <div>
+                            <p>На нуле</p>
+                        </div>
+                    </td>
+                    <td class="seven">
+                        <div>
+                            <p>холодильник +12 C, +14 C.</p>
+                        </div>
+                    </td>
+                    <td class="eight">
+                        <div>
+                            <p><b>5 500 </b>руб.+OPEX+KY</p>
+                        </div>
+                    </td>
+                    <td class="nine">
+                        <div>
+                            <p>от 1 000 854 руб.</p>
                         </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <? if ($model->devisionCount < 7) : ?>
+            <hr>
+        <? endif; ?>
+        <table class="photos">
+            <tbody>
+                <tr>
+                    <td class="one">
+                        <div>
+                            <img src="<?= $data->photos[4] ?>" alt="">
+                        </div>
+                    </td>
+                    <td class="two">
+                        <div>
+                            <img src="<?= $data->photos[5] ?>" alt="">
+                        </div>
+                    </td>
+                    <td class="three">
+                        <div>
+                            <img src="<?= $data->photos[6] ?>" alt="">
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="title">
+            <h3 class="three">Подробные параметры</h3>
+        </div>
+        <div class="div">
+            <table class="params-new">
+                <tbody>
+                    <tr>
+                        <td class="one">
+                            <div class="params-title">
+                                <p>Площади к аренде</p>
+                            </div>
+                        </td>
+                        <td class="two">
+                        </td>
+                        <td class="three">
+                            <div class="params-title">
+                                <p>Коммуникации</p>
+                            </div>
+                        </td>
+                        <td class="four">
+                        </td>
+                    </tr>
+                    <tr class="even">
+                        <td class="one">
+                            <div>
+                                <p>Свободная площадь</p>
+                            </div>
+                        </td>
+                        <td class="two">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->areas[1]->area[1]) ?></p>
+                            </div>
+                        </td>
+                        <td class="three">
+                            <div>
+                                <p>Электричество</p>
+                            </div>
+                        </td>
+                        <td class="four">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->communications[1]->power[1]) ?></p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="params-new">
+                <tbody>
+                    <tr>
+                        <td class="one">
+                            <div>
+                                <p>Из них мезонина</p>
+                            </div>
+                        </td>
+                        <td class="two">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->areas[1]->area_mezzanine[1]) ?></p>
+                            </div>
+                        </td>
+                        <td class="three">
+                            <div>
+                                <p>Отопление</p>
+                            </div>
+                        </td>
+                        <td class="four">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->communications[1]->heating[1]) ?></p>
+
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="params-new even">
+                <tbody>
+                    <tr>
+                        <td class="one">
+                            <div>
+                                <p>Из них офисов</p>
+                            </div>
+                        </td>
+                        <td class="two">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->areas[1]->area_office[1]) ?></p>
+                            </div>
+                        </td>
+                        <td class="three">
+                            <div>
+                                <p>Водоснабжение</p>
+                            </div>
+                        </td>
+                        <td class="four">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->communications[1]->water[1]) ?></p>
+
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="params-new">
+                <tbody>
+                    <tr>
+                        <td class="one">
+                            <div>
+                                <p>Вместимость</p>
+                            </div>
+                        </td>
+                        <td class="two">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->areas[1]->pallet_place[1]) ?></p>
+
+                            </div>
+                        </td>
+                        <td class="three">
+                            <div>
+                                <p>Канализация</p>
+                            </div>
+                        </td>
+                        <td class="four">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->communications[1]->sewage_central[1]) ?></p>
+
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="params-new even">
+                <tbody>
+                    <tr>
+                        <td class="one">
+                            <div>
+                                <p>Уличное хранение</p>
+                            </div>
+                        </td>
+                        <td class="two">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->areas[1]->area_field[1]) ?></p>
+                            </div>
+                        </td>
+                        <td class="three">
+                            <div>
+                                <p>Внтиляция</p>
+                            </div>
+                        </td>
+                        <td class="four">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->communications[1]->ventilation[1]) ?></p>
+
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                </td>
+                <td class="two">
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Газ</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->communications[1]->gas[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div class="params-title">
+                    <p>Характеристики</p>
+                </div>
+                </td>
+                <td class="two">
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Пар</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->communications[1]->steam[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even">
+                <tbody>
+                    <tr>
+                        <td class="one">
+                            <div>
+                                <p>Этажность</p>
+                            </div>
+                        </td>
+                        <td class="two">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->options[1]->floor[1]) ?></p>
+                            </div>
+                        </td>
+                        <td class="three">
+                            <div>
+                                <p>Телефония</p>
+                            </div>
+                        </td>
+                        <td class="four">
+                            <div>
+                                <p><?= $model->normalizeText($data->stats->communications[1]->phone[1]) ?></p>
+
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Класс объекта</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->class_name[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Интернет</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->communications[1]->internet[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Высота потолков</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->ceiling_height[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                </td>
+                <td class="four">
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Тип ворот</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->gate_type[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div class="params-title">
+                        <p>Ж/Д и крановые устр-ва</p>
+                    </div>
+                </td>
+                <td class="four">
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Количество ворот</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->gate[1]) ?></p>
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Ж/Д ветка</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->cranes[1]->railway[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Стеллажи</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->racks[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Козловые краны</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->cranes[1]->cranes_gantry[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Нагрузка на пол</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->load_floor[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Ж/Д краны</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->cranes[1]->cranes_railway[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Нагрузка на мезонин</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->load_mezzanine[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Мостовые краны</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->cranes[1]->cranes_overhead[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Температура</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->temperature[1]) ?></p>
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Кран-балки</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->cranes[1]->cranes_cathead[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Шаг колон</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->column_grid[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Тельферы</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->cranes[1]->telphers[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Грузовые лифты</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->options[1]->elevators[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                </td>
+                <td class="four">
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                </td>
+                <td class="two">
+                </td>
+                <td class="three">
+                    <div class="params-title">
+                        <p>Инфраструктура</p>
+                    </div>
+                </td>
+                <td class="four">
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div class="params-title">
+                    <p class="params-title">Безопасность</p>
+                </div>
+                </td>
+                <td class="two">
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Въезд на территорию</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->infrastructure[1]->entry_territory[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Охрана объекта</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->security[1]->guard[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Парковка легковая</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->infrastructure[1]->parking_car[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Пожаротушение</p>
+
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->security[1]->firefighting[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Парковка грузовая</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->infrastructure[1]->parking_truck[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Видеонаблюдение</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->security[1]->video_control[1]) ?></p>
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Столовая/кафе</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->infrastructure[1]->canteen[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Контроль доступа</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->security[1]->access_control[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                    <div>
+                        <p>Общежитие</p>
+                    </div>
+                </td>
+                <td class="four">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->infrastructure[1]->hostel[1]) ?></p>
+
+                    </div>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Охранная сигнализация</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->security[1]->security_alert[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                </td>
+                <td class="four">
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="params-new even"">
+            <tbody>
+                <tr>
+                    <td class=" one">
+                <div>
+                    <p>Пожарная сигнализация</p>
+                </div>
+                </td>
+                <td class="two">
+                    <div>
+                        <p><?= $model->normalizeText($data->stats->security[1]->fire_alert[1]) ?></p>
+
+                    </div>
+                </td>
+                <td class="three">
+                </td>
+                <td class="four">
+                </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="banner">
+            <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
+            <div>
+                <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
+                <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>
+                <a href="https://industry.realtor.ru">industry.realtor.ru</a>
+            </div>
+        </div>
+        <div class="title">
+            <h3 class="two">Описание предложения</h3>
+        </div>
+        <div class="offer-description">
+            <p>
+                Повседневная практика показывает, что сложившаяся структура организации влечет за собой процесс внедрения и модернизации направлений прогрессивного развития. Равным образом постоянный количественный рост и сфера нашей активности позволяет выполнять важные задания по разработке соответствующий условий активизации. Разнообразный и богатый опыт новая модель организационной деятельности позволяет оценить значение существенных финансовых и административных условий. Таким образом сложившаяся структура организации требуют определения и уточнения существенных финансовых и административных условий.
+
+                Равным образом дальнейшее развитие различных форм деятельности в значительной степени обуславливает создание систем массового участия. Задача организации, в особенности же сложившаяся структура организации позволяет оценить значение модели развития. С другой стороны рамки и место обучения кадров требуют определения и уточнения систем массового участия. Равным образом дальнейшее развитие различных форм деятельности способствует подготовки и реализации новых предложений. Товарищи! реализация намеченных плановых заданий в значительной степени обуславливает создание дальнейших направлений развития.
+            </p>
+        </div>
     </div>
-    <div class="page-no-absolute">
+    <!-- <div class="page-no-absolute">
 
         <table class="photos">
             <tbody>
@@ -1051,4 +1815,4 @@
             </tr>
             </tbody>
         </table>
-    </div>
+    </div> -->

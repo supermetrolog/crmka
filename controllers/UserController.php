@@ -12,6 +12,7 @@ use yii\filters\auth\HttpBearerAuth;
 use app\exceptions\ValidationErrorHttpException;
 use yii\web\UploadedFile;
 use app\models\UploadFile;
+use yii\web\NotFoundHttpException;
 
 class UserController extends ActiveController
 {
@@ -30,7 +31,7 @@ class UserController extends ActiveController
         ];
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::className(),
-            'except' => ['login', 'logout', 'create', 'index', 'options'],
+            'except' => ['login', 'logout', 'create', 'index', 'options', 'update'],
         ];
         return $behaviors;
     }
@@ -40,6 +41,8 @@ class UserController extends ActiveController
         $actions = parent::actions();
         unset($actions['create']);
         unset($actions['index']);
+        unset($actions['update']);
+        unset($actions['delete']);
         return $actions;
     }
     public function actionIndex()
@@ -52,17 +55,28 @@ class UserController extends ActiveController
         $model = new UploadFile();
         $model->files = UploadedFile::getInstancesByName('files');
         return User::createUser($request, $model);
-        $model = new SignUp();
-        if ($model->load(Yii::$app->request->post(), '')) {
-            return $model->signUp();
-        }
-        return $model->getErrors();
+    }
+    public function actionUpdate($id)
+    {
+        $request = json_decode(Yii::$app->request->post('data'), true);
+        $model = new UploadFile();
+        $model->files = UploadedFile::getInstancesByName('files');
+        return User::updateUser($this->findModel($id), $request, $model);
     }
     public function actionLogin()
     {
         $model = new Login();
         if ($model->load(Yii::$app->request->post(), '')) {
             return $model->login();
+        }
+        throw new ValidationErrorHttpException($model->getErrorSummary(false));
+    }
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $model->status = User::STATUS_DELETED;
+        if ($model->save()) {
+            return ['message' => "Пользователь удален", 'data' => $id];
         }
         throw new ValidationErrorHttpException($model->getErrorSummary(false));
     }
@@ -74,5 +88,12 @@ class UserController extends ActiveController
         $model = User::findIdentityByAccessToken(Yii::$app->user->identity->access_token);
         $model->generateAccessToken();
         return ['message' => 'Вы вышли из аккаунта', 'data' => $model->save(false)];
+    }
+    protected function findModel($id)
+    {
+        if (($model = User::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

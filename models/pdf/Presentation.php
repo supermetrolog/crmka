@@ -10,7 +10,7 @@ class Presentation extends Model
 {
     private const URL = 'https://pennylane.pro/api/v1/get/index/?';
     private $response;
-
+    public $devisionCount = 6;
     public function fetchData($id, $type_id)
     {
         if (is_null($id) || is_null($type_id)) {

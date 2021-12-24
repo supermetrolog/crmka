@@ -1,7 +1,17 @@
 body {
     padding-top: 1.5cm;
-    padding-bottom: .8cm;
+    padding-bottom: 0cm;
     font-family: DejaVu Sans;
+}
+
+hr {
+    page-break-before: always;
+    border: none;
+    height: 0;
+    width: 0;
+    background-color: none;
+    margin: 0;
+    padding: 0;
 }
 
 div.page {
@@ -26,6 +36,10 @@ div.page-no-absolute {
     page-break-before: always;
     /* padding-top: 1.5cm;
     padding-bottom: .8cm; */
+}
+
+div.page-no-absolute:first-child {
+    page-break-before: avoid;
 }
 
 @page {
@@ -340,6 +354,9 @@ table.digital-info-container {
     height: 80px;
     background-color: #e6e6e6;
     padding: 10px 15px;
+    max-width: 150px;
+    width: 150px;
+    min-width: 150px;
 }
 
 .digital-info td.two div {
@@ -349,6 +366,9 @@ table.digital-info-container {
     padding: 10px 15px;
     padding-right: 0!important;
     margin-right: 4px;
+    max-width: 300px;
+    width: 300px;
+    min-width: 300px;
 }
 
 .digital-info td.three>div {
@@ -365,7 +385,8 @@ table.digital-info-container {
 
 .digital-info td.one div p.big {
     text-transform: none;
-    font-size: 18px;
+    line-height: 10px;
+    font-size: 24px;
 }
 
 .digital-info td.one div p.small {
@@ -373,6 +394,7 @@ table.digital-info-container {
     color: #353535;
     font-weight: normal;
     text-transform: none;
+    margin-top: 15px;
 }
 
 .digital-info td.two div p {
@@ -386,7 +408,8 @@ table.digital-info-container {
 }
 
 .digital-info td.two div p.big {
-    font-size: 18px;
+    font-size: 24px;
+    line-height: 25px;
     text-transform: none;
 }
 
@@ -418,7 +441,7 @@ table.digital-info-container {
     vertical-align: middle;
 }
 
-.digital-info td.three .items td>div>p {
+.digital-info td.three .items td>div p {
     line-height: 10px;
     font-size: 10px;
 }
@@ -427,16 +450,20 @@ table.digital-info-container {
     width: 78px;
     min-width: 78px;
     max-width: 78px;
+    position: relative;
 }
 
 .digital-info td.three .items .item .icon {
-    padding-top: 10px;
-    padding-left: 5px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
 }
 
 .digital-info td.three .items .item .icon img {
-    display: block;
-    margin: 0 auto;
+    display: inline-block;
     width: 20px;
     min-width: 20px;
     height: 20px;
@@ -480,25 +507,52 @@ table.digital-info-container {
 
 .division-options th,
 .division-options td {
-    padding: 3px;
+    padding: 8px 3px;
     border: 1px solid #ccc;
 }
 
 .division-options tr th {
-    font-size: 11px;
+    font-size: 8px;
     font-weight: normal;
     text-align: left;
 }
 
 .division-options tr td>div>p {
-    font-size: 11px;
+    font-size: 9px;
     font-weight: normal;
+    line-height: 8px;
     text-align: left;
 }
 
-.division-options tr:nth-child(even) td {
+.division-options tr:nth-child(odd) td {
     background-color: #e6eaff;
 }
+
+.division-options tr td.two {
+    max-width: 22px;
+}
+
+.division-options tr td.four {
+    white-space: nowrap;
+    max-width: 30px;
+}
+
+.division-options tr td.one {
+    max-width: 32px;
+}
+
+.division-options tr td.five {
+    max-width: 42px;
+}
+
+.division-options tr td.six {
+    max-width: 35px;
+}
+
+
+/* .division-options tr td.eight {
+    max-width: 70px;
+} */
 
 
 /* *********** OFFER-DESCRPTION */
@@ -520,6 +574,7 @@ table.digital-info-container {
     height: 170px;
     position: relative;
     margin-bottom: 15px;
+    margin-top: 15px;
 }
 
 .banner img {

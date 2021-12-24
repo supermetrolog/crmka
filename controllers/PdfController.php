@@ -52,11 +52,27 @@ class PdfController extends Controller
     }
     public function actionFuck()
     {
+        // $model = new Presentation();
+        // $model->fetchData(Yii::$app->request->getQueryParam('original_id'), Yii::$app->request->getQueryParam('type_id'));
+        // $data = $model->getResponse();
+        // return $this->renderPartial('suck', [
+        //     'data' => $data
+        // ]);
         $model = new Presentation();
         $model->fetchData(Yii::$app->request->getQueryParam('original_id'), Yii::$app->request->getQueryParam('type_id'));
         $data = $model->getResponse();
-        return $this->renderPartial('suck', [
-            'data' => $data
-        ]);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('isJavascriptEnabled', true);
+        $dompdf = new Dompdf($options);
+        $html = $this->renderPartial('index', ['data' => $data, 'model' => $model]);
+
+        // $dompdf->loadHtml($html);
+        // $dompdf->setPaper('A4');
+        // $dompdf->render();
+        // $dompdf->stream("pdf.pdf", ['Attachment' => false]);
+
+        return $html;
     }
 }

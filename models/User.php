@@ -86,7 +86,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public static function getUsers()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['userProfile']),
+            'query' => self::find()->joinWith(['userProfile'])->where(['status' => self::STATUS_ACTIVE]),
             'pagination' => [
                 'pageSize' => 200,
             ],
@@ -116,12 +116,37 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             throw $th;
         }
     }
+    public static function updateUser(User $user, $post_data, $uploadFileModel)
+    {
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            $post_data['updated_at'] = time();
+            if ($user->load($post_data, '') && $user->save()) {
+                UserProfile::updateUserProfile($post_data['userProfile'], $uploadFileModel);
+                // $transaction->rollBack();
+                // return $post_data;
+
+                $transaction->commit();
+                return ['message' => "Пользователь изменен", 'data' => $user->id];
+            }
+            throw new ValidationErrorHttpException($user->getErrorSummary(false));
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
     public function fields()
     {
         $fields = parent::fields();
         unset($fields['auth_key'], $fields['password_hash'], $fields['password_reset_token'], $fields['access_token']);
         $fields['created_at'] = function ($fields) {
-            return date('Y-m-d H:i:s', $fields['created_at']);
+            // return date('Y-m-d H:i:s', $fields['created_at']);
+            return Yii::$app->formatter->format($fields['created_at'], 'datetime');
+        };
+        $fields['updated_at'] = function ($fields) {
+            // return date('Y-m-d H:i:s', $fields['created_at']);
+            return Yii::$app->formatter->format($fields['updated_at'], 'datetime');
         };
         return $fields;
     }

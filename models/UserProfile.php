@@ -15,6 +15,7 @@ use app\exceptions\ValidationErrorHttpException;
  * @property string|null $last_name
  * @property string|null $caller_id Номер в системе Asterisk
  * @property string|null $avatar
+ * @property string|null $contacts JSON телефон и email
  *
  * @property CallList[] $callLists
  * @property User $user
@@ -37,6 +38,7 @@ class UserProfile extends \yii\db\ActiveRecord
         return [
             [['user_id'], 'required'],
             [['user_id'], 'integer'],
+            [['contacts'], 'safe'],
             [['first_name', 'middle_name', 'last_name', 'caller_id', 'avatar'], 'string', 'max' => 255],
             [['caller_id'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -55,8 +57,8 @@ class UserProfile extends \yii\db\ActiveRecord
             'middle_name' => 'Middle Name',
             'last_name' => 'Last Name',
             'caller_id' => 'Caller ID',
-            'avatar' => "Avatar"
-
+            'avatar' => "Avatar",
+            'contacts' => 'Contacts',
         ];
     }
     public function uploadFiles($uploadFileModel, UserProfile $model)
@@ -72,6 +74,17 @@ class UserProfile extends \yii\db\ActiveRecord
     public static function createUserProfile($post_data, $uploadFileModel)
     {
         $model = new self();
+        if ($model->load($post_data, '')) {
+            $model = $model->uploadFiles($uploadFileModel, $model);
+            if ($model->save()) {
+                return true;
+            }
+        }
+        throw new ValidationErrorHttpException($model->getErrorSummary(false));
+    }
+    public static function updateUserProfile($post_data, $uploadFileModel)
+    {
+        $model = self::findOne($post_data['id']);
         if ($model->load($post_data, '')) {
             $model = $model->uploadFiles($uploadFileModel, $model);
             if ($model->save()) {
