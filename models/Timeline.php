@@ -100,6 +100,18 @@ class Timeline extends \yii\db\ActiveRecord
             throw $th;
         }
     }
+    public static function updateConsultant($request_id, $consultant_id)
+    {
+        $model = self::find()->where(['request_id' => $request_id])->andWhere(['consultant_id' => $consultant_id])->one();
+        if ($model) {
+            return true;
+        }
+        /**
+            todo: 
+                change all timeline status to INACTIVE before create new Timeline for user
+         */
+        return self::createNewTimeline($request_id, $consultant_id);
+    }
     /**
      * Gets query for [[Consultant]].
      *

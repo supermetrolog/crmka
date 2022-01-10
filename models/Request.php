@@ -215,6 +215,8 @@ class Request extends \yii\db\ActiveRecord
                 $request->updateManyMiniModels(RequestObjectClass::class,  $post_data['objectClasses']);
                 $request->updateManyMiniModels(RequestObjectType::class,  $post_data['objectTypes']);
                 $request->updateManyMiniModels(RequestRegion::class,  $post_data['regions']);
+                Timeline::updateConsultant($request->id, $request->consultant_id);
+
                 // $transaction->rollBack();
 
                 $transaction->commit();
