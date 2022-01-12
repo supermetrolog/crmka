@@ -23,6 +23,9 @@ use Yii;
  */
 class Timeline extends \yii\db\ActiveRecord
 {
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_INACTIVE = 0;
+    public const STATUS_INACTIVE_WHEN_TIMEOUT = -1;
     /**
      * {@inheritdoc}
      */
@@ -60,17 +63,33 @@ class Timeline extends \yii\db\ActiveRecord
         ];
     }
 
+    // public static function getTimeline($consultant_id, $request_id)
+    // {
+    //     $dataProvider = new ActiveDataProvider([
+    //         'query' => self::find()->joinWith(['timelineSteps' => function ($query) {
+    //             $query->joinWith(['timelineStepObjects', 'timelineStepFeedbackways', 'timelineActionComments']);
+    //         }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id]),
+    //         'pagination' => [
+    //             'pageSize' => 0,
+    //         ],
+    //     ]);
+    //     return $dataProvider;
+    // }
     public static function getTimeline($consultant_id, $request_id)
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['timelineSteps' => function ($query) {
-                $query->joinWith(['timelineStepObjects', 'timelineStepFeedbackways', 'timelineActionComments']);
-            }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id]),
-            'pagination' => [
-                'pageSize' => 100,
-            ],
-        ]);
-        return $dataProvider;
+        $data = [];
+        $data['timeline'] = self::find()->joinWith(['timelineSteps' => function ($query) {
+            $query->joinWith(['timelineStepObjects', 'timelineStepFeedbackways', 'timelineActionComments']);
+        }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id])->one();
+
+        $data['timelineList'] = self::getTimelineListInRequest($request_id);
+        return $data;
+    }
+    public static function getTimelineListInRequest($request_id)
+    {
+        return self::find()->joinWith(['consultant' => function ($query) {
+            $query->joinWith(['userProfile']);
+        }])->where(['timeline.request_id' => $request_id])->all();
     }
     public static function createNewTimeline($request_id, $consultant_id)
     {

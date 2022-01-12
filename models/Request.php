@@ -137,7 +137,7 @@ class Request extends \yii\db\ActiveRecord
                 $query->with(['consultant']);
             }])->where(['request.company_id' => $company_id]),
             'pagination' => [
-                'pageSize' => 1000,
+                'pageSize' => 0,
             ],
         ]);
         return $dataProvider;

@@ -86,6 +86,7 @@ class TimelineStep extends \yii\db\ActiveRecord
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+    // Сравнение массивов
     private function hasTheArrayChanged($array1, $array2)
     {
         $count = [];
