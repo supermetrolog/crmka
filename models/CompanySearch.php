@@ -18,8 +18,8 @@ class CompanySearch extends Company
     public function rules()
     {
         return [
-            [['id', 'noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile'], 'integer'],
-            [['nameEng', 'nameRu', 'formOfOrganization', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization'], 'integer'],
+            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -42,7 +42,7 @@ class CompanySearch extends Company
     public function search($params)
     {
         // $query = Company::find()->joinWith(['companyGroup', 'broker', 'consultant', 'contacts']);
-        $query = Company::find()->joinWith(['companyGroup', 'broker', 'consultant', 'contacts' => function ($query) {
+        $query = Company::find()->joinWith(['companyGroup', 'broker', 'consultant', 'productRanges', 'categories', 'contacts' => function ($query) {
             $query->joinWith(['phones', 'emails', 'contactComments']);
         }]);
 
@@ -51,6 +51,9 @@ class CompanySearch extends Company
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => 0,
+            ],
         ]);
 
         $this->load($params);
