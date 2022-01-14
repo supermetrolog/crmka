@@ -21,6 +21,7 @@ return
                 'GET,OPTIONS search' => 'search',
                 'GET,OPTIONS product-range-list' => 'product-range-list',
                 'GET,OPTIONS in-the-bank-list' => 'in-the-bank-list',
+                'GET,OPTIONS activity-profile-list' => 'activity-profile-list',
             ],
         ],
         [

@@ -32,7 +32,7 @@ class CompanyController extends ActiveController
         ];
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::className(),
-            'except' => ['search', 'view', 'options', 'create', 'update', 'product-range-list', 'in-the-bank-list'],
+            'except' => ['search', 'view', 'options', 'create', 'update', 'product-range-list', 'in-the-bank-list', 'index'],
         ];
         return $behaviors;
     }
@@ -83,6 +83,11 @@ class CompanyController extends ActiveController
     public function actionInTheBankList()
     {
         return ArrayHelper::getColumn(Company::find()->select('inTheBank')->where(['is not', 'inTheBank', new \yii\db\Expression('null')])->distinct()->asArray()->all(), 'inTheBank');
+    }
+    public function actionActivityProfileList()
+    {
+        $activityProfileList = Company::ACTIVITY_PROFILE_LIST;
+        return array_unique(ArrayHelper::merge($activityProfileList, ArrayHelper::getColumn(Company::find()->select('activityProfile')->distinct()->asArray()->all(), 'activityProfile')));
     }
     protected function findModel($id)
     {
