@@ -199,13 +199,15 @@ class Company extends \yii\db\ActiveRecord
     }
     public static function getCompanyInfo($id)
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant', 'files', 'contacts' => function ($query) {
-                $query->with(['phones', 'emails', 'contactComments', 'websites']);
-            }])->where(['company.id' => $id]),
-        ]);
+        // $dataProvider = new ActiveDataProvider([
+        //     'query' => self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant', 'files', 'contacts' => function ($query) {
+        //         $query->with(['phones', 'emails', 'contactComments', 'websites']);
+        //     }])->where(['company.id' => $id]),
+        // ]);
 
-        return $dataProvider;
+        return self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant', 'files', 'contacts' => function ($query) {
+            $query->with(['phones', 'emails', 'contactComments', 'websites']);
+        }])->where(['company.id' => $id])->one();
     }
 
     //функция для создания сразу нескольких строк в связанных моделях
