@@ -30,7 +30,7 @@ class Companygroup extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nameEng', 'nameRu'], 'required'],
+            [['nameRu'], 'required'],
             [['description'], 'string'],
             [['nameEng', 'nameRu'], 'string', 'max' => 255],
         ];
