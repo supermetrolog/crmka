@@ -38,6 +38,7 @@ use Yii;
  * @property string|null $documentNumber
  * @property int $activityGroup
  * @property int $activityProfile
+ * @property int/null $processed
  * @property string|null $description
  * @property string|null $created_at
  * @property string|null $updated_at
@@ -96,7 +97,7 @@ class Company extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'formOfOrganization'], 'integer'],
+            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'formOfOrganization', 'processed'], 'integer'],
             [['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
@@ -140,6 +141,7 @@ class Company extends \yii\db\ActiveRecord
             'documentNumber' => 'Document Number',
             'activityGroup' => 'Activity Group',
             'activityProfile' => 'Activity Profile',
+            'processed' => 'Processed',
             'description' => 'Description',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
