@@ -49,40 +49,6 @@ use Yii;
  */
 class Company extends \yii\db\ActiveRecord
 {
-    private const GENERAL_CONTACT_TYPE = 1;
-    public const ACTIVITY_PROFILE_LIST = [
-        "Продукты/Напитки",
-        "ТНП",
-        "Стройматериалы",
-        "Электротовары",
-        "Грузоперевозка/логистика",
-        "Алкоголь",
-        "Фармакология",
-        "Автозапчасти",
-        "Инструменты",
-        "Архив",
-        "Косметика",
-        "Бытовая/оргтехника",
-        "Мебель",
-        "Одежда/обувь",
-        "Климатич/вент. оборудование",
-        "Текстиль",
-        "Посуда/Керамика",
-        "Детские/спорт товары",
-        "Оборудование комплектующие",
-        "Досуг/развлечение",
-        "Опасные грузы/химия",
-        "Растения/цветы",
-        "Негабаритный товар",
-        "ПВХ/полимеры/минералы",
-        "Автоуслуги/клининг",
-        "Товары для животных",
-        "Транспорт/прицепная техник",
-        "Металлоизделия",
-        "Полиграфия/Бумага",
-        "ЖБИ/Камень",
-        "Садовая/складская техника",
-    ];
     /**
      * {@inheritdoc}
      */
@@ -97,11 +63,11 @@ class Company extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'formOfOrganization', 'processed'], 'integer'],
+            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed'], 'integer'],
             [['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'activityProfile'], 'string', 'max' => 255],
+            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber'], 'string', 'max' => 255],
             [['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['broker_id' => 'id']],
             [['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::className(), 'targetAttribute' => ['companyGroup_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],

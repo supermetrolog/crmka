@@ -84,11 +84,6 @@ class CompanyController extends ActiveController
     {
         return ArrayHelper::getColumn(Company::find()->select('inTheBank')->where(['is not', 'inTheBank', new \yii\db\Expression('null')])->distinct()->asArray()->all(), 'inTheBank');
     }
-    public function actionActivityProfileList()
-    {
-        $activityProfileList = Company::ACTIVITY_PROFILE_LIST;
-        return array_unique(ArrayHelper::merge($activityProfileList, ArrayHelper::getColumn(Company::find()->select('activityProfile')->distinct()->asArray()->all(), 'activityProfile')));
-    }
     protected function findModel($id)
     {
         if (($model = Company::findOne($id)) !== null) {
