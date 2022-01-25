@@ -86,4 +86,9 @@ return
                 'GET fuck' => 'fuck',
             ],
         ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'site',
+            'except' => [],
+        ],
     ];

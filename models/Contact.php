@@ -122,6 +122,25 @@ class Contact extends \yii\db\ActiveRecord
         }
         return true;
     }
+    public  function createManyMiniModelsNew($className, $data)
+    {
+        if (!$data || !$className) {
+            return false;
+        }
+        [];
+        $class = new ReflectionClass($className);
+
+        foreach ($data as $item) {
+            $model = $class->newInstance();
+            $item['contact_id'] = $this->id;
+            if ($model->load($item, '') && $model->save()) {
+                continue;
+            } else {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+        }
+        return true;
+    }
     public static function createContact($post_data)
     {
         $db = Yii::$app->db;
@@ -150,9 +169,9 @@ class Contact extends \yii\db\ActiveRecord
         $transaction = $db->beginTransaction();
         try {
             if ($model->load($post_data, '') && $model->save()) {
-                $model->createManyMiniModels(Email::class,  $post_data['emails']);
-                $model->createManyMiniModels(Phone::class,  $post_data['phones']);
-                $model->createManyMiniModels(Website::class,  $post_data['websites']);
+                $model->createManyMiniModelsNew(Email::class,  $post_data['emails']);
+                $model->createManyMiniModelsNew(Phone::class,  $post_data['phones']);
+                $model->createManyMiniModelsNew(Website::class,  $post_data['websites']);
                 $transaction->commit();
                 return ['message' => "Контакт создан", 'data' => $model->id];
             }
