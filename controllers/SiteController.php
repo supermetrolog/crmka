@@ -62,8 +62,8 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $models = Company::tableName();
-        var_dump($models);
+        $models = Company::find()->all();
+        var_dump($models[0]->getTableSchema());
         return $this->render('index');
     }
 

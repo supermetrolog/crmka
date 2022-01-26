@@ -169,54 +169,39 @@ class Company extends \yii\db\ActiveRecord
     }
     public static function getCompanyInfo($id)
     {
-        // $dataProvider = new ActiveDataProvider([
-        //     'query' => self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant', 'files', 'contacts' => function ($query) {
-        //         $query->with(['phones', 'emails', 'contactComments', 'websites']);
-        //     }])->where(['company.id' => $id]),
-        // ]);
-
         return self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant', 'files', 'contacts' => function ($query) {
             $query->with(['phones', 'emails', 'contactComments', 'websites']);
         }])->where(['company.id' => $id])->one();
     }
 
     //функция для создания сразу нескольких строк в связанных моделях
-    public  function createManyMiniModels($className, $data)
+    public  function createManyMiniModels(array $modelsData)
     {
-        $columnName = $className::MAIN_COLUMN;
-
-        if (!$data || !$className || !$columnName) {
-            return false;
-        }
-        [];
-        $class = new ReflectionClass($className);
-
-        foreach ($data as $item) {
-            $model = $class->newInstance();
-            $array['company_id'] = $this->id;
-            $array[$columnName] = $item;
-            if ($model->load($array, '') && $model->save()) {
-                continue;
-            } else {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        foreach ($modelsData as $className => $data) {
+            $class = new ReflectionClass($className);
+            foreach ($data as $item) {
+                $model = $class->newInstance();
+                $item['company_id'] = $this->id;
+                if (!$model->load($item, '') || !$model->save())
+                    throw new ValidationErrorHttpException($model->getErrorSummary(false));
             }
         }
         return true;
     }
     private function createGeneralContact($post_data)
     {
-        if (!count($post_data['contacts']['phones']) && !count($post_data['contacts']['emails']) && !count($post_data['contacts']['websites'])) {
-            return;
-        }
-        $contactData = $post_data['contacts'];
-        $contactData['company_id'] = $this->id;
-        $contactData['type'] = Contact::GENERAL_CONTACT_TYPE;
-        return Contact::createGeneralContact($contactData);
+        if (!count($post_data['phones']) && !count($post_data['emails']) && !count($post_data['websites'])) return;
+        $post_data['company_id'] = $this->id;
+        $post_data['type'] = Contact::GENERAL_CONTACT_TYPE;
+        return Contact::createContactNew($post_data);
     }
     private function updateGeneralContact($post_data)
     {
-        Contact::deleteAll(['company_id' => $this->id, 'type' => Contact::GENERAL_CONTACT_TYPE]);
-        return $this->createGeneralContact($post_data);
+        $model = Contact::find()->where(['company_id' => $this->id, 'type' => Contact::GENERAL_CONTACT_TYPE])->one();
+        if (!$model) {
+            return $this->createGeneralContact($post_data);
+        }
+        return Contact::updateContactNew($model, $post_data);
     }
     private function updateFiles($post_data, $uploadFileModel)
     {
@@ -254,9 +239,11 @@ class Company extends \yii\db\ActiveRecord
         $transaction = $db->beginTransaction();
         try {
             if ($model->load($post_data, '') && $model->save()) {
-                $model->createManyMiniModels(Category::class,  $post_data['categories']);
-                $model->createManyMiniModels(Productrange::class,  $post_data['productRanges']);
-                $model->updateGeneralContact($post_data);
+                $model->createanyMiniModels([
+                    Category::class =>  $post_data['categories'],
+                    Productrange::class => $post_data['productRanges'],
+                ]);
+                $model->createGeneralContact($post_data['contacts']);
                 $model->uploadFiles($uploadFileModel);
                 // $transaction->rollBack();
 
@@ -269,10 +256,12 @@ class Company extends \yii\db\ActiveRecord
             throw $th;
         }
     }
-    public function updateManyMiniModels($className, $data)
+    public function updateManyMiniModels($modelsData)
     {
-        $className::deleteAll(['company_id' => $this->id]);
-        $this->createManyMiniModels($className, $data);
+        foreach ($modelsData as $className => $item) {
+            $className::deleteAll(['company_id' => $this->id]);
+        }
+        $this->createManyMiniModels($modelsData);
     }
     public static function updateCompany(Company $model, $post_data, $uploadFileModel = [])
     {
@@ -280,9 +269,11 @@ class Company extends \yii\db\ActiveRecord
         $transaction = $db->beginTransaction();
         try {
             if ($model->load($post_data, '') && $model->save()) {
-                $model->updateManyMiniModels(Category::class,  $post_data['categories']);
-                $model->updateManyMiniModels(Productrange::class,  $post_data['productRanges']);
-                $model->updateGeneralContact($post_data);
+                $model->updateManyMiniModels([
+                    Category::class =>  $post_data['categories'],
+                    Productrange::class => $post_data['productRanges'],
+                ]);
+                $model->updateGeneralContact($post_data['contacts']);
                 $model->updateFiles($post_data, $uploadFileModel);
                 // $transaction->rollBack();
 
@@ -295,7 +286,6 @@ class Company extends \yii\db\ActiveRecord
             throw $th;
         }
     }
-
     /**
      * Gets query for [[Broker]].
      *

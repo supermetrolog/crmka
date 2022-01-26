@@ -122,21 +122,34 @@ class Contact extends \yii\db\ActiveRecord
         }
         return true;
     }
-    public  function createManyMiniModelsNew($className, $data)
-    {
-        if (!$data || !$className) {
-            return false;
-        }
-        [];
-        $class = new ReflectionClass($className);
+    // public  function createManyMiniModelsNew($className, $data)
+    // {
+    //     if (!$data || !$className) {
+    //         return false;
+    //     }
+    //     [];
+    //     $class = new ReflectionClass($className);
 
-        foreach ($data as $item) {
-            $model = $class->newInstance();
-            $item['contact_id'] = $this->id;
-            if ($model->load($item, '') && $model->save()) {
-                continue;
-            } else {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+    //     foreach ($data as $item) {
+    //         $model = $class->newInstance();
+    //         $item['contact_id'] = $this->id;
+    //         if ($model->load($item, '') && $model->save()) {
+    //             continue;
+    //         } else {
+    //             throw new ValidationErrorHttpException($model->getErrorSummary(false));
+    //         }
+    //     }
+    //     return true;
+    // }
+    public  function createManyMiniModelsNew(array $modelsData)
+    {
+        foreach ($modelsData as $className => $data) {
+            $class = new ReflectionClass($className);
+            foreach ($data as $item) {
+                $model = $class->newInstance();
+                $item['contact_id'] = $this->id;
+                if (!$model->load($item, '') || !$model->save())
+                    throw new ValidationErrorHttpException($model->getErrorSummary(false));
             }
         }
         return true;
@@ -162,45 +175,72 @@ class Contact extends \yii\db\ActiveRecord
             throw $th;
         }
     }
-    public static function createGeneralContact($post_data)
+    public static function createContactNew($post_data)
     {
-        $db = Yii::$app->db;
-        $model = new Contact();
-        $transaction = $db->beginTransaction();
+        $model = new static();
+        $transaction = Yii::$app->db->beginTransaction();
         try {
-            if ($model->load($post_data, '') && $model->save()) {
-                $model->createManyMiniModelsNew(Email::class,  $post_data['emails']);
-                $model->createManyMiniModelsNew(Phone::class,  $post_data['phones']);
-                $model->createManyMiniModelsNew(Website::class,  $post_data['websites']);
-                $transaction->commit();
-                return ['message' => "Контакт создан", 'data' => $model->id];
-            }
-            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            if (!$model->load($post_data, '') || !$model->save())
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+
+            $model->createManyMiniModelsNew([
+                Email::class =>  $post_data['emails'],
+                Phone::class => $post_data['phones'],
+                Website::class => $post_data['websites'],
+            ]);
+            $transaction->commit();
+            return ['message' => "Контакт создан", 'data' => $model->id];
         } catch (\Throwable $th) {
             $transaction->rollBack();
             throw $th;
         }
+    }
+    public static function updateContactNew($model, $post_data)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if (!$model->load($post_data, '') || !$model->save())
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+
+            $model->updateManyMiniModelsNew([
+                Email::class =>  $post_data['emails'],
+                Phone::class => $post_data['phones'],
+                Website::class => $post_data['websites'],
+            ]);
+            $transaction->commit();
+            return ['message' => "Контакт изменен", 'data' => $model->id];
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
+        }
+    }
+    public function updateManyMiniModelsNew($modelsData)
+    {
+        foreach ($modelsData as $className => $item) {
+            $className::deleteAll(['contact_id' => $this->id]);
+        }
+        $this->createManyMiniModelsNew($modelsData);
     }
     public function updateManyMiniModels($className, $data)
     {
         $className::deleteAll(['contact_id' => $this->id]);
         $this->createManyMiniModels($className, $data);
     }
-    public static function updateContact($request, $post_data)
+    public static function updateContact($model, $post_data)
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
         try {
-            if ($request->load($post_data, '') && $request->save()) {
-                $request->updateManyMiniModels(Email::class,  $post_data['emails']);
-                $request->updateManyMiniModels(Phone::class,  $post_data['phones']);
-                $request->updateManyMiniModels(WayOfInforming::class,  $post_data['wayOfInformings']);
+            if ($model->load($post_data, '') && $model->save()) {
+                $model->updateManyMiniModels(Email::class,  $post_data['emails']);
+                $model->updateManyMiniModels(Phone::class,  $post_data['phones']);
+                $model->updateManyMiniModels(WayOfInforming::class,  $post_data['wayOfInformings']);
                 // $transaction->rollBack();
 
                 $transaction->commit();
-                return ['message' => "Запрос изменен", 'data' => $request->id];
+                return ['message' => "Запрос изменен", 'data' => $model->id];
             }
-            throw new ValidationErrorHttpException($request->getErrorSummary(false));
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
         } catch (\Throwable $th) {
             $transaction->rollBack();
             throw $th;
