@@ -39,6 +39,7 @@ use Yii;
  * @property int $activityGroup
  * @property int $activityProfile
  * @property int/null $processed
+ * @property int $rating
  * @property string|null $description
  * @property int|null $passive_why
  * @property string|null $passive_why_comment
@@ -65,7 +66,7 @@ class Company extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why'], 'integer'],
+            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
             [['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
@@ -110,6 +111,7 @@ class Company extends \yii\db\ActiveRecord
             'activityGroup' => 'Activity Group',
             'activityProfile' => 'Activity Profile',
             'processed' => 'Processed',
+            'rating' => 'Rating',
             'description' => 'Description',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -188,6 +190,13 @@ class Company extends \yii\db\ActiveRecord
         }
         return true;
     }
+    public function updateManyMiniModels($modelsData)
+    {
+        foreach ($modelsData as $className => $item) {
+            $className::deleteAll(['company_id' => $this->id]);
+        }
+        $this->createManyMiniModels($modelsData);
+    }
     private function createGeneralContact($post_data)
     {
         if (!count($post_data['phones']) && !count($post_data['emails']) && !count($post_data['websites'])) return;
@@ -239,7 +248,7 @@ class Company extends \yii\db\ActiveRecord
         $transaction = $db->beginTransaction();
         try {
             if ($model->load($post_data, '') && $model->save()) {
-                $model->createanyMiniModels([
+                $model->createManyMiniModels([
                     Category::class =>  $post_data['categories'],
                     Productrange::class => $post_data['productRanges'],
                 ]);
@@ -256,13 +265,7 @@ class Company extends \yii\db\ActiveRecord
             throw $th;
         }
     }
-    public function updateManyMiniModels($modelsData)
-    {
-        foreach ($modelsData as $className => $item) {
-            $className::deleteAll(['company_id' => $this->id]);
-        }
-        $this->createManyMiniModels($modelsData);
-    }
+
     public static function updateCompany(Company $model, $post_data, $uploadFileModel = [])
     {
         $db = Yii::$app->db;
