@@ -155,6 +155,12 @@ class Company extends \yii\db\ActiveRecord
         $fields['category'] = function () {
             return rand(0, 5);
         };
+        $fields['created_at_format'] = function ($fields) {
+            return Yii::$app->formatter->format($fields['created_at'], 'datetime');
+        };
+        $fields['updated_at_format'] = function ($fields) {
+            return Yii::$app->formatter->format($fields['updated_at'], 'datetime');
+        };
         $fields['full_name'] = function ($fields) {
             $formOfOrganization = $fields['formOfOrganization'];
             $nameEng = $fields['nameEng'];
@@ -182,7 +188,6 @@ class Company extends \yii\db\ActiveRecord
                 }
             }
             return trim($name);
-            return $formOfOrganization;
         };
         return $fields;
     }
@@ -214,7 +219,9 @@ class Company extends \yii\db\ActiveRecord
     }
     public static function getCompanyInfo($id)
     {
-        return self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant', 'files', 'contacts' => function ($query) {
+        return self::find()->joinWith(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant' => function ($query) {
+            $query->with(['userProfile']);
+        }, 'files', 'contacts' => function ($query) {
             $query->with(['phones', 'emails', 'contactComments', 'websites']);
         }])->where(['company.id' => $id])->one();
     }

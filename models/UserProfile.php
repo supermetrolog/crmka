@@ -107,7 +107,7 @@ class UserProfile extends \yii\db\ActiveRecord
             if ($fields['last_name']) {
                 $full_name .= " {$fields['last_name']}";
             }
-            return $full_name;
+            return trim($full_name);
         };
         $fields['short_name'] = function ($fields) {
             $first_name = ucfirst(mb_substr($fields['first_name'], 0, 1)) . ".";
@@ -117,7 +117,7 @@ class UserProfile extends \yii\db\ActiveRecord
             }
             $short_name = "{$fields['middle_name']} $first_name $last_name";
 
-            return $short_name;
+            return trim($short_name);
         };
         return $fields;
     }

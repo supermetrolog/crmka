@@ -49,6 +49,20 @@ class Companygroup extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields['full_name'] = function ($fields) {
+            $nameEng = $fields['nameEng'];
+            $nameRu = $fields['nameRu'];
+            $name = $nameRu;
+            if ($nameEng) {
+                $name .= " - $nameEng";
+            }
+            return trim($name);
+        };
+        return $fields;
+    }
     /**
      * Gets query for [[Companies]].
      *
