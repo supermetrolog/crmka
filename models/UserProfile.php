@@ -102,6 +102,23 @@ class UserProfile extends \yii\db\ActiveRecord
             }
             return $fields['avatar'];
         };
+        $fields['full_name'] = function ($fields) {
+            $full_name = "{$fields['middle_name']} {$fields['first_name']}";
+            if ($fields['last_name']) {
+                $full_name .= " {$fields['last_name']}";
+            }
+            return $full_name;
+        };
+        $fields['short_name'] = function ($fields) {
+            $first_name = ucfirst(mb_substr($fields['first_name'], 0, 1)) . ".";
+            $last_name = "";
+            if ($fields['last_name']) {
+                $last_name = ucfirst(mb_substr($fields['last_name'], 0, 1)) . ".";
+            }
+            $short_name = "{$fields['middle_name']} $first_name $last_name";
+
+            return $short_name;
+        };
         return $fields;
     }
     /**

@@ -52,6 +52,20 @@ use Yii;
  */
 class Company extends \yii\db\ActiveRecord
 {
+    // public const FORM_OF_ORGANIZATION_LIST = { value: 0, label: 'ООО' },
+    //         { value: 1, label: 'ОАО' },
+    //         { value: 2, label: 'ЗАО' },
+    //         { value: 3, label: 'ПАО' },
+    //         { value: 4, label: 'АО' },
+    //         { value: 5, label: 'ИП' },
+    public const FORM_OF_ORGANIZATION_LIST = [
+        0 => 'ООО',
+        1 => 'ОАО',
+        2 => 'ЗАО',
+        3 => 'ПАО',
+        4 => 'АО',
+        5 => 'ИП',
+    ];
     /**
      * {@inheritdoc}
      */
@@ -141,6 +155,35 @@ class Company extends \yii\db\ActiveRecord
         $fields['category'] = function () {
             return rand(0, 5);
         };
+        $fields['full_name'] = function ($fields) {
+            $formOfOrganization = $fields['formOfOrganization'];
+            $nameEng = $fields['nameEng'];
+            $nameRu = $fields['nameRu'];
+            $noName = $fields['noName'];
+            if ($noName) {
+                if ($formOfOrganization !== null) {
+                    return self::FORM_OF_ORGANIZATION_LIST[$formOfOrganization];
+                }
+                return "-";
+            }
+            $name = "";
+            if ($formOfOrganization !== null) {
+                $name .= self::FORM_OF_ORGANIZATION_LIST[$formOfOrganization];
+            }
+
+            if ($nameRu) {
+                $name .= " $nameRu";
+            }
+            if ($nameEng) {
+                if ($nameRu) {
+                    $name .= " - $nameEng";
+                } else {
+                    $name .= " $nameEng";
+                }
+            }
+            return trim($name);
+            return $formOfOrganization;
+        };
         return $fields;
     }
 
@@ -163,7 +206,7 @@ class Company extends \yii\db\ActiveRecord
                 $query->with(['phones', 'emails', 'contactComments']);
             }]),
             'pagination' => [
-                'pageSize' => 200,
+                'pageSize' => 2000,
             ],
         ]);
 
@@ -202,7 +245,7 @@ class Company extends \yii\db\ActiveRecord
         if (!count($post_data['phones']) && !count($post_data['emails']) && !count($post_data['websites'])) return;
         $post_data['company_id'] = $this->id;
         $post_data['type'] = Contact::GENERAL_CONTACT_TYPE;
-        return Contact::createContactNew($post_data);
+        return Contact::createContact($post_data);
     }
     private function updateGeneralContact($post_data)
     {
@@ -210,7 +253,7 @@ class Company extends \yii\db\ActiveRecord
         if (!$model) {
             return $this->createGeneralContact($post_data);
         }
-        return Contact::updateContactNew($model, $post_data);
+        return Contact::updateContact($model, $post_data);
     }
     private function updateFiles($post_data, $uploadFileModel)
     {

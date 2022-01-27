@@ -11,6 +11,7 @@ use app\models\miniModels\Website;
 use app\models\miniModels\ContactComment;
 use app\exceptions\ValidationErrorHttpException;
 use ReflectionClass;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "contact".
@@ -29,7 +30,9 @@ use ReflectionClass;
  * @property int|null $faceToFaceMeeting [флаг] Очная встреча
  * @property int|null $warning [флаг] Внимание
  * @property int|null $good [флаг] Хор. взаимоотношения
- *
+ * @property int|null $passive_why
+ * @property string|null $passive_why_comment
+ * @property string|null $warning_why_comment
  * @property Company $company
  * @property User $consultant
  * @property ContactComment[] $contactComments
@@ -57,9 +60,9 @@ class Contact extends \yii\db\ActiveRecord
     {
         return [
             [['company_id'], 'required'],
-            [['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good'], 'integer'],
+            [['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'passive_why'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['first_name', 'middle_name', 'last_name'], 'string', 'max' => 255],
+            [['first_name', 'middle_name', 'last_name', 'passive_why_comment', 'warning_why_comment'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
         ];
@@ -85,13 +88,20 @@ class Contact extends \yii\db\ActiveRecord
             'faceToFaceMeeting' => 'Face To Face Meeting',
             'warning' => 'Warning',
             'good' => 'Good',
+            'passive_why' => 'PassiveWhy',
+            'passive_why_comment' => 'PassiveWhyComment',
+            'warning_why_comment' => 'WarningWhyComment',
         ];
     }
     public static function getCompanyContactList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant', 'contactComments' => function ($query) {
-                $query->with(['author']);
+            'query' => self::find()->joinWith(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant' => function ($query) {
+                $query->with(['userProfile']);
+            }, 'contactComments' => function ($query) {
+                $query->with(['author' => function ($query) {
+                    $query->with(['userProfile']);
+                }]);
             }])->where(['contact.company_id' => $company_id]),
             'pagination' => [
                 'pageSize' => 10000,
@@ -99,51 +109,10 @@ class Contact extends \yii\db\ActiveRecord
         ]);
         return $dataProvider;
     }
-    //функция для создания сразу нескольких строк в связанных моделях
-    public  function createManyMiniModels($className, $data)
-    {
-        $columnName = $className::MAIN_COLUMN;
-
-        if (!$data || !$className || !$columnName) {
-            return false;
-        }
-        [];
-        $class = new ReflectionClass($className);
-
-        foreach ($data as $item) {
-            $model = $class->newInstance();
-            $array['contact_id'] = $this->id;
-            $array[$columnName] = $item;
-            if ($model->load($array, '') && $model->save()) {
-                continue;
-            } else {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
-            }
-        }
-        return true;
-    }
-    // public  function createManyMiniModelsNew($className, $data)
-    // {
-    //     if (!$data || !$className) {
-    //         return false;
-    //     }
-    //     [];
-    //     $class = new ReflectionClass($className);
-
-    //     foreach ($data as $item) {
-    //         $model = $class->newInstance();
-    //         $item['contact_id'] = $this->id;
-    //         if ($model->load($item, '') && $model->save()) {
-    //             continue;
-    //         } else {
-    //             throw new ValidationErrorHttpException($model->getErrorSummary(false));
-    //         }
-    //     }
-    //     return true;
-    // }
-    public  function createManyMiniModelsNew(array $modelsData)
+    public  function createManyMiniModels(array $modelsData)
     {
         foreach ($modelsData as $className => $data) {
+            if (!$data) continue;
             $class = new ReflectionClass($className);
             foreach ($data as $item) {
                 $model = $class->newInstance();
@@ -156,37 +125,17 @@ class Contact extends \yii\db\ActiveRecord
     }
     public static function createContact($post_data)
     {
-        $db = Yii::$app->db;
-        $model = new Contact();
-        $transaction = $db->beginTransaction();
-        try {
-            if ($model->load($post_data, '') && $model->save()) {
-                $model->createManyMiniModels(Email::class,  $post_data['emails']);
-                $model->createManyMiniModels(Phone::class,  $post_data['phones']);
-                $model->createManyMiniModels(WayOfInforming::class,  $post_data['wayOfInformings']);
-                // $transaction->rollBack();
-
-                $transaction->commit();
-                return ['message' => "Контакт создан", 'data' => $model->id];
-            }
-            throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        } catch (\Throwable $th) {
-            $transaction->rollBack();
-            throw $th;
-        }
-    }
-    public static function createContactNew($post_data)
-    {
         $model = new static();
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$model->load($post_data, '') || !$model->save())
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
 
-            $model->createManyMiniModelsNew([
-                Email::class =>  $post_data['emails'],
-                Phone::class => $post_data['phones'],
-                Website::class => $post_data['websites'],
+            $model->createManyMiniModels([
+                Email::class =>  ArrayHelper::getValue($post_data, 'emails'),
+                Phone::class => ArrayHelper::getValue($post_data, 'phones'),
+                Website::class => ArrayHelper::getValue($post_data, 'websites'),
+                WayOfInforming::class => ArrayHelper::getValue($post_data, 'wayOfInformings'),
             ]);
             $transaction->commit();
             return ['message' => "Контакт создан", 'data' => $model->id];
@@ -195,17 +144,18 @@ class Contact extends \yii\db\ActiveRecord
             throw $th;
         }
     }
-    public static function updateContactNew($model, $post_data)
+    public static function updateContact($model, $post_data)
     {
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$model->load($post_data, '') || !$model->save())
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
 
-            $model->updateManyMiniModelsNew([
-                Email::class =>  $post_data['emails'],
-                Phone::class => $post_data['phones'],
-                Website::class => $post_data['websites'],
+            $model->updateManyMiniModels([
+                Email::class =>  ArrayHelper::getValue($post_data, 'emails'),
+                Phone::class => ArrayHelper::getValue($post_data, 'phones'),
+                Website::class => ArrayHelper::getValue($post_data, 'websites'),
+                WayOfInforming::class => ArrayHelper::getValue($post_data, 'wayOfInformings'),
             ]);
             $transaction->commit();
             return ['message' => "Контакт изменен", 'data' => $model->id];
@@ -214,37 +164,48 @@ class Contact extends \yii\db\ActiveRecord
             throw $th;
         }
     }
-    public function updateManyMiniModelsNew($modelsData)
+    public function updateManyMiniModels($modelsData)
     {
         foreach ($modelsData as $className => $item) {
             $className::deleteAll(['contact_id' => $this->id]);
         }
-        $this->createManyMiniModelsNew($modelsData);
+        $this->createManyMiniModels($modelsData);
     }
-    public function updateManyMiniModels($className, $data)
+    public function fields()
     {
-        $className::deleteAll(['contact_id' => $this->id]);
-        $this->createManyMiniModels($className, $data);
-    }
-    public static function updateContact($model, $post_data)
-    {
-        $db = Yii::$app->db;
-        $transaction = $db->beginTransaction();
-        try {
-            if ($model->load($post_data, '') && $model->save()) {
-                $model->updateManyMiniModels(Email::class,  $post_data['emails']);
-                $model->updateManyMiniModels(Phone::class,  $post_data['phones']);
-                $model->updateManyMiniModels(WayOfInforming::class,  $post_data['wayOfInformings']);
-                // $transaction->rollBack();
-
-                $transaction->commit();
-                return ['message' => "Запрос изменен", 'data' => $model->id];
+        $fields = parent::fields();
+        $fields['full_name'] = function ($fields) {
+            $full_name = $fields['first_name'];
+            if ($fields['middle_name']) {
+                $full_name .= " {$fields['middle_name']}";
             }
-            throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        } catch (\Throwable $th) {
-            $transaction->rollBack();
-            throw $th;
-        }
+            if ($fields['last_name']) {
+                $full_name .= " {$fields['last_name']}";
+            }
+            return $full_name;
+        };
+        $fields['short_name'] = function ($fields) {
+            $first_name = ucfirst(mb_substr($fields['first_name'], 0, 1)) . ".";
+            $last_name = "";
+            $middle_name = "";
+            if ($fields['middle_name']) {
+                $middle_name = ucfirst(mb_substr($fields['middle_name'], 0, 1)) . ".";
+            }
+            if ($fields['last_name']) {
+                $last_name = ucfirst(mb_substr($fields['last_name'], 0, 1)) . ".";
+            }
+            $short_name = "$middle_name $first_name $last_name";
+
+            return trim($short_name);
+        };
+        $fields['first_and_last_name'] = function ($fields) {
+            $full_name = $fields['first_name'];
+            if ($fields['last_name']) {
+                $full_name .= " {$fields['last_name']}";
+            }
+            return $full_name;
+        };
+        return $fields;
     }
     /**
      * Gets query for [[Company]].
