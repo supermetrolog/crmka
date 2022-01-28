@@ -39,6 +39,8 @@ use ReflectionClass;
  * @property int|null $electricity Электричество
  * @property int|null $haveCranes [флаг] Наличие кранов
  * @property int|null $status [флаг] Статус
+ * @property int|null $passive_why
+ * @property string|null $passive_why_comment
  * @property string|null $created_at
  * @property string|null $updated_at
  * @property string|null $movingDate Дата переезда
@@ -75,9 +77,9 @@ class Request extends \yii\db\ActiveRecord
         return [
             [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'consultant_id'], 'required'],
             [['antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
-            [['company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'integer'],
+            [['company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why'], 'integer'],
             [['created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
-            [['description'], 'string', 'max' => 255],
+            [['description', 'passive_why_comment'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
         ];
@@ -114,6 +116,8 @@ class Request extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
             'movingDate' => 'Moving Date',
             'unknownMovingDate' => 'Unknown Moving Date',
+            'passive_why' => 'PassiveWhy',
+            'passive_why_comment' => 'PassiveWhyComment',
         ];
     }
     public static function findModel($id)
@@ -133,8 +137,12 @@ class Request extends \yii\db\ActiveRecord
     public static function getCompanyRequestsList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['consultant', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal' => function ($query) {
-                $query->with(['consultant']);
+            'query' => self::find()->joinWith(['consultant' => function ($query) {
+                $query->with(['userProfile']);
+            }, 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal' => function ($query) {
+                $query->with(['consultant' => function ($query) {
+                    $query->with(['userProfile']);
+                }]);
             }])->where(['request.company_id' => $company_id]),
             'pagination' => [
                 'pageSize' => 0,
@@ -150,28 +158,26 @@ class Request extends \yii\db\ActiveRecord
 
         return $dataProvider;
     }
-    //функция для создания сразу нескольких строк в связанных моделях
-    public  function createManyMiniModels($className, $data)
+    public  function createManyMiniModels(array $modelsData)
     {
-        $columnName = $className::MAIN_COLUMN;
-
-        if (!$data || !$className || !$columnName) {
-            return false;
-        }
-        [];
-        $class = new ReflectionClass($className);
-
-        foreach ($data as $item) {
-            $model = $class->newInstance();
-            $array['request_id'] = $this->id;
-            $array[$columnName] = $item;
-            if ($model->load($array, '') && $model->save()) {
-                continue;
-            } else {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        foreach ($modelsData as $className => $data) {
+            if (!$data) continue;
+            $class = new ReflectionClass($className);
+            foreach ($data as $item) {
+                $model = $class->newInstance();
+                $item['request_id'] = $this->id;
+                if (!$model->load($item, '') || !$model->save())
+                    throw new ValidationErrorHttpException($model->getErrorSummary(false));
             }
         }
         return true;
+    }
+    public function updateManyMiniModels($modelsData)
+    {
+        foreach ($modelsData as $className => $item) {
+            $className::deleteAll(['request_id' => $this->id]);
+        }
+        $this->createManyMiniModels($modelsData);
     }
     public static function createRequest($post_data)
     {
@@ -180,12 +186,14 @@ class Request extends \yii\db\ActiveRecord
         $transaction = $db->beginTransaction();
         try {
             if ($request->load($post_data, '') && $request->save()) {
-                $request->createManyMiniModels(RequestDirection::class,  $post_data['directions']);
-                $request->createManyMiniModels(RequestDistrict::class,  $post_data['districts']);
-                $request->createManyMiniModels(RequestGateType::class,  $post_data['gateTypes']);
-                $request->createManyMiniModels(RequestObjectClass::class,  $post_data['objectClasses']);
-                $request->createManyMiniModels(RequestObjectType::class,  $post_data['objectTypes']);
-                $request->createManyMiniModels(RequestRegion::class,  $post_data['regions']);
+                $request->createManyMiniModels([
+                    RequestDirection::class =>  $post_data['directions'],
+                    RequestDistrict::class => $post_data['districts'],
+                    RequestGateType::class => $post_data['gateTypes'],
+                    RequestObjectClass::class => $post_data['objectClasses'],
+                    RequestObjectType::class => $post_data['objectTypes'],
+                    RequestRegion::class => $post_data['regions'],
+                ]);
                 Timeline::createNewTimeline($request->id, $request->consultant_id);
                 // $transaction->rollBack();
 
@@ -198,23 +206,20 @@ class Request extends \yii\db\ActiveRecord
             throw $th;
         }
     }
-    public function updateManyMiniModels($className, $data)
-    {
-        $className::deleteAll(['request_id' => $this->id]);
-        $this->createManyMiniModels($className, $data);
-    }
     public static function updateRequest($request, $post_data)
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
         try {
             if ($request->load($post_data, '') && $request->save()) {
-                $request->updateManyMiniModels(RequestDirection::class,  $post_data['directions']);
-                $request->updateManyMiniModels(RequestDistrict::class,  $post_data['districts']);
-                $request->updateManyMiniModels(RequestGateType::class,  $post_data['gateTypes']);
-                $request->updateManyMiniModels(RequestObjectClass::class,  $post_data['objectClasses']);
-                $request->updateManyMiniModels(RequestObjectType::class,  $post_data['objectTypes']);
-                $request->updateManyMiniModels(RequestRegion::class,  $post_data['regions']);
+                $request->updateManyMiniModels([
+                    RequestDirection::class =>  $post_data['directions'],
+                    RequestDistrict::class => $post_data['districts'],
+                    RequestGateType::class => $post_data['gateTypes'],
+                    RequestObjectClass::class => $post_data['objectClasses'],
+                    RequestObjectType::class => $post_data['objectTypes'],
+                    RequestRegion::class => $post_data['regions'],
+                ]);
                 Timeline::updateConsultant($request->id, $request->consultant_id);
 
                 // $transaction->rollBack();
@@ -237,6 +242,16 @@ class Request extends \yii\db\ActiveRecord
                 return date('Y-m-d', strtotime($fields['movingDate']));
             }
             return $fields['movingDate'];
+        };
+        $fields['movingDate_format'] = function ($fields) {
+            return Yii::$app->formatter->format($fields['movingDate'], 'date');
+        };
+
+        $fields['updated_at_format'] = function ($fields) {
+            return Yii::$app->formatter->format($fields['updated_at'], 'datetime');
+        };
+        $fields['created_at_format'] = function ($fields) {
+            return Yii::$app->formatter->format($fields['created_at'], 'datetime');
         };
         return $fields;
     }

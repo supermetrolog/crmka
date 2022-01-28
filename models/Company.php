@@ -129,6 +129,8 @@ class Company extends \yii\db\ActiveRecord
             'description' => 'Description',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'passive_why' => 'PassiveWhy',
+            'passive_why_comment' => 'PassiveWhyComment',
         ];
     }
     public function fields()
@@ -230,6 +232,7 @@ class Company extends \yii\db\ActiveRecord
     public  function createManyMiniModels(array $modelsData)
     {
         foreach ($modelsData as $className => $data) {
+            if (!$data) continue;
             $class = new ReflectionClass($className);
             foreach ($data as $item) {
                 $model = $class->newInstance();

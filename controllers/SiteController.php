@@ -10,6 +10,9 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\Login;
 use app\models\ContactForm;
+use app\models\miniModels\Phone;
+use app\models\miniModels\RequestRegion;
+use app\models\Request;
 
 class SiteController extends Controller
 {
@@ -62,8 +65,9 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $models = Company::find()->all();
-        var_dump($models[0]->getTableSchema());
+        $models = Request::tableName();
+        // var_dump($models->foreignKeys['fk-request_region-request_id']['request_id']);
+        var_dump($models);
         return $this->render('index');
     }
 
