@@ -134,10 +134,26 @@ class Request extends \yii\db\ActiveRecord
         $request->status = $status;
         return $request->save(false);
     }
+    // public static function getCompanyRequestsList($company_id)
+    // {
+    //     $dataProvider = new ActiveDataProvider([
+    //         'query' => self::find()->joinWith(['consultant' => function ($query) {
+    //             $query->with(['userProfile']);
+    //         }, 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal' => function ($query) {
+    //             $query->with(['consultant' => function ($query) {
+    //                 $query->with(['userProfile']);
+    //             }]);
+    //         }])->where(['request.company_id' => $company_id]),
+    //         'pagination' => [
+    //             'pageSize' => 0,
+    //         ],
+    //     ]);
+    //     return $dataProvider;
+    // }
     public static function getCompanyRequestsList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['consultant' => function ($query) {
+            'query' => self::find()->with(['consultant' => function ($query) {
                 $query->with(['userProfile']);
             }, 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal' => function ($query) {
                 $query->with(['consultant' => function ($query) {
