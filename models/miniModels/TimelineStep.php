@@ -204,7 +204,7 @@ class TimelineStep extends \yii\db\ActiveRecord
         $array2 = ArrayHelper::getColumn($post_data['timelineStepFeedbackways'], 'way');
         $hasTheArrayChangedFlag = $this->hasTheArrayChanged($array1, $array2);
         if (!$this->negative && !$hasTheArrayChangedFlag) {
-            $this->addTimelineStepObjects($post_data);
+            $this->addTimelineStepObjects($post_data, true, false);
             $this->createNewStep(self::INSPECTION_STEP_NUMBER);
         }
 
@@ -223,25 +223,25 @@ class TimelineStep extends \yii\db\ActiveRecord
     public function updateInspectionStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data);
+        $this->addTimelineStepObjects($post_data, true, false);
         return $this->createNewStep(self::VISIT_STEP_NUMBER);
     }
     public function updateVisitStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data);
+        $this->addTimelineStepObjects($post_data, true, false);
         return $this->createNewStep(self::INTEREST_STEP_NUMBER);
     }
     public function updateInterestStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data);
+        $this->addTimelineStepObjects($post_data, true, false);
         return $this->createNewStep(self::TALK_STEP_NUMBER);
     }
     public function updateTalkStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data);
+        $this->addTimelineStepObjects($post_data, true, false);
         return $this->createNewStep(self::DEAL_STEP_NUMBER);
     }
     public function updateDealStep($post_data)
