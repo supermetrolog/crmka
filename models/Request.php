@@ -13,7 +13,7 @@ use app\models\miniModels\RequestGateType;
 use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestRegion;
-use ReflectionClass;
+use app\behaviors\CreateManyMiniModelsBehaviors;
 
 /**
  * This is the model class for table "request".
@@ -61,6 +61,15 @@ class Request extends \yii\db\ActiveRecord
     public const STATUS_ACTIVE = 1;
     public const STATUS_PASSIVE = 0;
     public const STATUS_DONE = 2;
+
+    public function behaviors()
+    {
+        return [
+            CreateManyMiniModelsBehaviors::class
+        ];
+    }
+
+
     /**
      * {@inheritdoc}
      */
@@ -173,27 +182,6 @@ class Request extends \yii\db\ActiveRecord
         ]);
 
         return $dataProvider;
-    }
-    public  function createManyMiniModels(array $modelsData)
-    {
-        foreach ($modelsData as $className => $data) {
-            if (!$data) continue;
-            $class = new ReflectionClass($className);
-            foreach ($data as $item) {
-                $model = $class->newInstance();
-                $item['request_id'] = $this->id;
-                if (!$model->load($item, '') || !$model->save())
-                    throw new ValidationErrorHttpException($model->getErrorSummary(false));
-            }
-        }
-        return true;
-    }
-    public function updateManyMiniModels($modelsData)
-    {
-        foreach ($modelsData as $className => $item) {
-            $className::deleteAll(['request_id' => $this->id]);
-        }
-        $this->createManyMiniModels($modelsData);
     }
     public static function createRequest($post_data)
     {

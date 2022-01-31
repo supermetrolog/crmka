@@ -2,10 +2,10 @@
 
 namespace app\models;
 
+use app\behaviors\CreateManyMiniModelsBehaviors;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\CompanyFile;
-use ReflectionClass;
 use Yii;
 
 /**
@@ -52,12 +52,6 @@ use Yii;
  */
 class Company extends \yii\db\ActiveRecord
 {
-    // public const FORM_OF_ORGANIZATION_LIST = { value: 0, label: 'ООО' },
-    //         { value: 1, label: 'ОАО' },
-    //         { value: 2, label: 'ЗАО' },
-    //         { value: 3, label: 'ПАО' },
-    //         { value: 4, label: 'АО' },
-    //         { value: 5, label: 'ИП' },
     public const FORM_OF_ORGANIZATION_LIST = [
         0 => 'ООО',
         1 => 'ОАО',
@@ -66,6 +60,14 @@ class Company extends \yii\db\ActiveRecord
         4 => 'АО',
         5 => 'ИП',
     ];
+
+    public function behaviors()
+    {
+        return [
+            CreateManyMiniModelsBehaviors::class
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -241,28 +243,6 @@ class Company extends \yii\db\ActiveRecord
         }])->where(['company.id' => $id])->one();
     }
 
-    //функция для создания сразу нескольких строк в связанных моделях
-    public  function createManyMiniModels(array $modelsData)
-    {
-        foreach ($modelsData as $className => $data) {
-            if (!$data) continue;
-            $class = new ReflectionClass($className);
-            foreach ($data as $item) {
-                $model = $class->newInstance();
-                $item['company_id'] = $this->id;
-                if (!$model->load($item, '') || !$model->save())
-                    throw new ValidationErrorHttpException($model->getErrorSummary(false));
-            }
-        }
-        return true;
-    }
-    public function updateManyMiniModels($modelsData)
-    {
-        foreach ($modelsData as $className => $item) {
-            $className::deleteAll(['company_id' => $this->id]);
-        }
-        $this->createManyMiniModels($modelsData);
-    }
     private function createGeneralContact($post_data)
     {
         if (!count($post_data['phones']) && !count($post_data['emails']) && !count($post_data['websites'])) return;

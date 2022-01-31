@@ -10,8 +10,8 @@ use app\models\miniModels\Phone;
 use app\models\miniModels\Website;
 use app\models\miniModels\ContactComment;
 use app\exceptions\ValidationErrorHttpException;
-use ReflectionClass;
 use yii\helpers\ArrayHelper;
+use app\behaviors\CreateManyMiniModelsBehaviors;
 
 /**
  * This is the model class for table "contact".
@@ -45,6 +45,13 @@ class Contact extends \yii\db\ActiveRecord
 {
     public const GENERAL_CONTACT_TYPE = 1;
     public const LIST_CONTACT_TYPE = 0;
+
+    public function behaviors()
+    {
+        return [
+            CreateManyMiniModelsBehaviors::class
+        ];
+    }
     /**
      * {@inheritdoc}
      */
@@ -93,6 +100,45 @@ class Contact extends \yii\db\ActiveRecord
             'warning_why_comment' => 'WarningWhyComment',
         ];
     }
+
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields['full_name'] = function ($fields) {
+            $full_name = $fields['first_name'];
+            if ($fields['middle_name']) {
+                $full_name .= " {$fields['middle_name']}";
+            }
+            if ($fields['last_name']) {
+                $full_name .= " {$fields['last_name']}";
+            }
+            return $full_name;
+        };
+        $fields['short_name'] = function ($fields) {
+            $first_name = ucfirst(mb_substr($fields['first_name'], 0, 1)) . ".";
+            $last_name = "";
+            $middle_name = "";
+            if ($fields['middle_name']) {
+                $middle_name = ucfirst(mb_substr($fields['middle_name'], 0, 1)) . ".";
+            }
+            if ($fields['last_name']) {
+                $last_name = ucfirst(mb_substr($fields['last_name'], 0, 1)) . ".";
+            }
+            $short_name = "$middle_name $first_name $last_name";
+
+            return trim($short_name);
+        };
+        $fields['first_and_last_name'] = function ($fields) {
+            $full_name = $fields['first_name'];
+            if ($fields['last_name']) {
+                $full_name .= " {$fields['last_name']}";
+            }
+            return $full_name;
+        };
+        return $fields;
+    }
+
+
     public static function getCompanyContactList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
@@ -108,20 +154,6 @@ class Contact extends \yii\db\ActiveRecord
             ],
         ]);
         return $dataProvider;
-    }
-    public  function createManyMiniModels(array $modelsData)
-    {
-        foreach ($modelsData as $className => $data) {
-            if (!$data) continue;
-            $class = new ReflectionClass($className);
-            foreach ($data as $item) {
-                $model = $class->newInstance();
-                $item['contact_id'] = $this->id;
-                if (!$model->load($item, '') || !$model->save())
-                    throw new ValidationErrorHttpException($model->getErrorSummary(false));
-            }
-        }
-        return true;
     }
     public static function createContact($post_data)
     {
@@ -164,49 +196,7 @@ class Contact extends \yii\db\ActiveRecord
             throw $th;
         }
     }
-    public function updateManyMiniModels($modelsData)
-    {
-        foreach ($modelsData as $className => $item) {
-            $className::deleteAll(['contact_id' => $this->id]);
-        }
-        $this->createManyMiniModels($modelsData);
-    }
-    public function fields()
-    {
-        $fields = parent::fields();
-        $fields['full_name'] = function ($fields) {
-            $full_name = $fields['first_name'];
-            if ($fields['middle_name']) {
-                $full_name .= " {$fields['middle_name']}";
-            }
-            if ($fields['last_name']) {
-                $full_name .= " {$fields['last_name']}";
-            }
-            return $full_name;
-        };
-        $fields['short_name'] = function ($fields) {
-            $first_name = ucfirst(mb_substr($fields['first_name'], 0, 1)) . ".";
-            $last_name = "";
-            $middle_name = "";
-            if ($fields['middle_name']) {
-                $middle_name = ucfirst(mb_substr($fields['middle_name'], 0, 1)) . ".";
-            }
-            if ($fields['last_name']) {
-                $last_name = ucfirst(mb_substr($fields['last_name'], 0, 1)) . ".";
-            }
-            $short_name = "$middle_name $first_name $last_name";
 
-            return trim($short_name);
-        };
-        $fields['first_and_last_name'] = function ($fields) {
-            $full_name = $fields['first_name'];
-            if ($fields['last_name']) {
-                $full_name .= " {$fields['last_name']}";
-            }
-            return $full_name;
-        };
-        return $fields;
-    }
     /**
      * Gets query for [[Company]].
      *

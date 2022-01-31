@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Company;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -62,7 +63,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $models = Request::tableName();
+        $models = new Company;
         // var_dump($models->foreignKeys['fk-request_region-request_id']['request_id']);
         var_dump($models);
         $this->foo();
