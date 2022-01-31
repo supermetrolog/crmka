@@ -2,17 +2,15 @@
 
 namespace app\controllers;
 
-use app\models\SignUp;
-use yii\filters\Cors;
 use app\models\Login;
 use app\models\User;
 use yii\rest\ActiveController;
 use Yii;
-use yii\filters\auth\HttpBearerAuth;
 use app\exceptions\ValidationErrorHttpException;
 use yii\web\UploadedFile;
 use app\models\UploadFile;
 use yii\web\NotFoundHttpException;
+use app\behaviors\BaseControllerBehaviors;
 
 class UserController extends ActiveController
 {
@@ -20,20 +18,7 @@ class UserController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        unset($behaviors['authenticator']);
-        $behaviors['corsFilter'] = [
-            'class' => Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['*'],
-                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-            ],
-        ];
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => ['login', 'logout', 'create', 'index', 'options', 'update'],
-        ];
-        return $behaviors;
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
     }
 
     public function actions()

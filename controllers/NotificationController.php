@@ -7,7 +7,7 @@ use app\models\Notification;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use yii\filters\Cors;
-use yii\filters\auth\HttpBearerAuth;
+use app\behaviors\BaseControllerBehaviors;
 
 /**
  * NotificationController implements the CRUD actions for Notification model.
@@ -25,7 +25,7 @@ class NotificationController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        unset($behaviors['authenticator']);
+        $behaviors =  BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
@@ -34,10 +34,6 @@ class NotificationController extends ActiveController
                 'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
                 'Access-Control-Expose-Headers' => ['X-Pagination-Total-Count', 'X-Pagination-Page-Count', 'X-Pagination-Current-Page', 'X-Pagination-Per-Page', 'Link']
             ],
-        ];
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => ['index', 'options', 'viewed', 'new'],
         ];
         return $behaviors;
     }

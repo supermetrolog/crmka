@@ -2,13 +2,14 @@
 
 namespace app\controllers;
 
+use app\behaviors\BaseControllerBehaviors;
 use app\models\CallList;
 use Yii;
 use app\models\Notification;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use yii\filters\Cors;
-use yii\filters\auth\HttpBearerAuth;
+// use yii\filters\auth\HttpBearerAuth;
 
 /**
  * NotificationController implements the CRUD actions for Notification model.
@@ -26,7 +27,7 @@ class CalllistController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        unset($behaviors['authenticator']);
+        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
@@ -35,10 +36,6 @@ class CalllistController extends ActiveController
                 'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
                 'Access-Control-Expose-Headers' => ['X-Pagination-Total-Count', 'X-Pagination-Page-Count', 'X-Pagination-Current-Page', 'X-Pagination-Per-Page', 'Link']
             ],
-        ];
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            // 'except' => ['index', 'options', 'viewed'],
         ];
         return $behaviors;
     }

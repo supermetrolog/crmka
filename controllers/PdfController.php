@@ -3,32 +3,18 @@
 namespace app\controllers;
 
 use app\models\pdf\Presentation;
-use yii\filters\Cors;
-use yii\filters\auth\HttpBearerAuth;
 use yii\web\Controller;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Yii;
+use app\behaviors\BaseControllerBehaviors;
 // require_once 'dompdf/autoload.inc.php';
 class PdfController extends Controller
 {
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        unset($behaviors['authenticator']);
-        $behaviors['corsFilter'] = [
-            'class' => Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['*'],
-                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-            ],
-        ];
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => ['login', 'create', 'index', 'options', 'fuck'],
-        ];
-        return $behaviors;
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
     }
 
     public function actionIndex()

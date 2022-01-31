@@ -3,12 +3,11 @@
 namespace app\controllers;
 
 use yii\rest\ActiveController;
-use yii\filters\Cors;
 use Yii;
-use yii\filters\auth\HttpBearerAuth;
 use app\models\Contact;
 use app\models\miniModels\ContactComment;
 use yii\web\NotFoundHttpException;
+use app\behaviors\BaseControllerBehaviors;
 
 class ContactController extends ActiveController
 {
@@ -17,20 +16,7 @@ class ContactController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        unset($behaviors['authenticator']);
-        $behaviors['corsFilter'] = [
-            'class' => Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['*'],
-                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-            ],
-        ];
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => ['search', 'index', 'options', 'company-contacts', 'create', 'delete', 'update', 'create-comment'],
-        ];
-        return $behaviors;
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
     }
 
     public function actions()

@@ -7,8 +7,7 @@ use app\models\miniModels\TimelineStep;
 use app\models\miniModels\TimelineStepObject;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
-use yii\filters\auth\HttpBearerAuth;
-use yii\filters\Cors;
+use app\behaviors\BaseControllerBehaviors;
 use Yii;
 
 /**
@@ -21,20 +20,7 @@ class TimelineController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        unset($behaviors['authenticator']);
-        $behaviors['corsFilter'] = [
-            'class' => Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['*'],
-                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-            ],
-        ];
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => ['index', 'view', 'create', 'delete', 'update', 'update-step', 'add-objects', 'options'],
-        ];
-        return $behaviors;
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
     }
 
     public function actions()

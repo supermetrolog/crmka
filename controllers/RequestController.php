@@ -7,8 +7,7 @@ use app\models\Request;
 // use app\models\RequestSearch;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
-use yii\filters\auth\HttpBearerAuth;
-use yii\filters\Cors;
+use app\behaviors\BaseControllerBehaviors;
 
 /**
  * RequestController implements the CRUD actions for Request model.
@@ -20,20 +19,7 @@ class RequestController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        unset($behaviors['authenticator']);
-        $behaviors['corsFilter'] = [
-            'class' => Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['*'],
-                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-            ],
-        ];
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => ['search', 'company-requests', 'index', 'view', 'options', 'create', 'delete', 'update'],
-        ];
-        return $behaviors;
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
     }
 
     public function actions()

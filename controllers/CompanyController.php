@@ -2,10 +2,9 @@
 
 namespace app\controllers;
 
+use app\behaviors\BaseControllerBehaviors;
 use yii\rest\ActiveController;
-use yii\filters\Cors;
 use Yii;
-use yii\filters\auth\HttpBearerAuth;
 use app\models\Company;
 use app\models\CompanySearch;
 use app\models\Productrange;
@@ -21,20 +20,7 @@ class CompanyController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        unset($behaviors['authenticator']);
-        $behaviors['corsFilter'] = [
-            'class' => Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['*'],
-                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-            ],
-        ];
-        $behaviors['authenticator'] = [
-            'class' => HttpBearerAuth::className(),
-            'except' => ['search', 'view', 'options', 'create', 'update', 'product-range-list', 'in-the-bank-list', 'index'],
-        ];
-        return $behaviors;
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
     }
 
     public function actions()
