@@ -224,7 +224,7 @@ class Company extends \yii\db\ActiveRecord
     public static function getCompanyList()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['requests'])->with(['companyGroup', 'broker', 'consultant', 'productRanges', 'categories', 'contacts' => function ($query) {
+            'query' => self::find()->joinWith(['requests'])->with(['companyGroup', 'broker', 'deals', 'consultant', 'productRanges', 'categories', 'contacts' => function ($query) {
                 $query->with(['phones', 'emails', 'contactComments']);
             }])->orderBy(['company.created_at' => SORT_DESC, 'request.created_at' => SORT_DESC]),
             'pagination' => [
@@ -236,7 +236,7 @@ class Company extends \yii\db\ActiveRecord
     }
     public static function getCompanyInfo($id)
     {
-        return self::find()->with(['productRanges', 'categories', 'companyGroup', 'broker', 'consultant' => function ($query) {
+        return self::find()->with(['productRanges', 'categories', 'companyGroup', 'broker', 'deals', 'consultant' => function ($query) {
             $query->with(['userProfile']);
         }, 'files', 'contacts' => function ($query) {
             $query->with(['phones', 'emails', 'contactComments', 'websites']);
@@ -381,6 +381,15 @@ class Company extends \yii\db\ActiveRecord
     public function getContacts()
     {
         return $this->hasMany(Contact::className(), ['company_id' => 'id']);
+    }
+    /**
+     * Gets query for [[Deals]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeals()
+    {
+        return $this->hasMany(Deal::className(), ['company_id' => 'id']);
     }
     /**
      * Gets query for [[categories]].

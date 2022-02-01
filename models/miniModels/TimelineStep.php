@@ -5,6 +5,7 @@ namespace app\models\miniModels;
 use app\models\Timeline;
 use yii\web\NotFoundHttpException;
 use app\exceptions\ValidationErrorHttpException;
+use app\models\Deal;
 use app\models\Request;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -248,13 +249,8 @@ class TimelineStep extends \yii\db\ActiveRecord
     {
         if ($this->negative) return;
 
-        if (ArrayHelper::keyExists('requestDealData', $post_data)) {
-            $requestDealData = $post_data['requestDealData'];
-            if (ArrayHelper::keyExists('id', $requestDealData)) {
-                return RequestDeal::updateDeal($requestDealData);
-            } else {
-                return RequestDeal::createDeal($requestDealData);
-            }
+        if (ArrayHelper::keyExists('deal', $post_data)) {
+            Request::changeStatus($post_data['deal']['request_id'], Request::STATUS_DONE);
         } else {
             $this->addTimelineStepObjects($post_data);
         }

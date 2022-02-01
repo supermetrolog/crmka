@@ -273,7 +273,15 @@ class Request extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Company::className(), ['id' => 'company_id']);
     }
-
+    /**
+     * Gets query for [[Contacts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getContacts()
+    {
+        return $this->hasMany(Contact::className(), ['request_id' => 'id']);
+    }
     /**
      * Gets query for [[Consultant]].
      *
@@ -291,7 +299,7 @@ class Request extends \yii\db\ActiveRecord
      */
     public function getDeal()
     {
-        return $this->hasOne(RequestDeal::className(), ['request_id' => 'id']);
+        return $this->hasOne(Deal::className(), ['request_id' => 'id']);
     }
 
     /**

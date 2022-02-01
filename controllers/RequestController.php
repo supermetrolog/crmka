@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Request;
-// use app\models\RequestSearch;
+use app\models\RequestSearch;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
@@ -19,7 +19,7 @@ class RequestController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
     }
 
     public function actions()
@@ -57,12 +57,13 @@ class RequestController extends ActiveController
         $this->findModel($id)->delete();
         return ['message' => 'Запрос удален', 'data' => true];
     }
-    // public function actionSearch()
-    // {
-    //     $search = new RequestSearch();
-    //     $searchByAttr['CompanySearch'] = Yii::$app->request->queryParams;
-    //     return $search->search($searchByAttr);
-    // }
+    public function actionSearch()
+    {
+        $search = new RequestSearch();
+        $searchByAttr['CompanySearch'] = Yii::$app->request->queryParams;
+        return $search->search($searchByAttr);
+    }
+
     protected function findModel($id)
     {
         if (($model = Request::findOne($id)) !== null) {

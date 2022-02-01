@@ -91,4 +91,9 @@ return
             'controller' => 'site',
             'except' => [],
         ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'deal',
+            'except' => [],
+        ],
     ];

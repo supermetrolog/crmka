@@ -162,7 +162,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
 
 
-
+    /**
+     * Gets query for [[Contacts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getContacts()
+    {
+        return $this->hasMany(Contact::className(), ['user_id' => 'id']);
+    }
 
 
 
