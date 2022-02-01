@@ -3,12 +3,14 @@
 namespace app\models;
 
 use Yii;
+use app\exceptions\ValidationErrorHttpException;
 
 /**
  * This is the model class for table "deal".
  *
  * @property int $id
  * @property int $company_id [СВЯЗЬ] с компанией
+ * @property int $competitor_company_id [СВЯЗЬ] с компанией (компания конкурент)
  * @property int|null $request_id [СВЯЗЬ] с запросом
  * @property int $consultant_id [СВЯЗЬ] с юзером
  * @property int|null $area площадь сделки
@@ -45,12 +47,13 @@ class Deal extends \yii\db\ActiveRecord
     {
         return [
             [['company_id', 'consultant_id'], 'required'],
-            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'complex_id'], 'integer'],
+            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor'], 'integer'],
             [['startEventTime', 'endEventTime'], 'safe'],
             [['clientLegalEntity', 'description', 'name'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
             [['request_id'], 'exist', 'skipOnError' => true, 'targetClass' => Request::className(), 'targetAttribute' => ['request_id' => 'id']],
+            [['competitor_company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['competitor_company_id' => 'id']],
         ];
     }
 
@@ -73,7 +76,7 @@ class Deal extends \yii\db\ActiveRecord
             'name' => 'Name',
             'object_id' => 'Object ID',
             'complex_id' => 'Complex ID',
-            'competitor_name' => 'Competitor Name',
+            'competitor_company_id' => 'Competitor Company ID',
             'is_our' => 'Is Our',
             'is_competitor' => 'Is Competitor',
         ];
@@ -95,6 +98,23 @@ class Deal extends \yii\db\ActiveRecord
         };
         return $fields;
     }
+
+    public static function createDeal($post_data)
+    {
+        $model = new self();
+        if ($model->load($post_data, '') && $model->save()) {
+            return ['message' => "Сделка создана", 'data' => $model->id];
+        }
+        throw new ValidationErrorHttpException($model->getErrorSummary(false));
+    }
+
+    public static function updateDeal($model, $post_data)
+    {
+        if ($model->load($post_data, '') && $model->save()) {
+            return ['message' => "Сделка изменена", 'data' => $model->id];
+        }
+        throw new ValidationErrorHttpException($model->getErrorSummary(false));
+    }
     /**
      * Gets query for [[Company]].
      *
@@ -104,7 +124,15 @@ class Deal extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Company::className(), ['id' => 'company_id']);
     }
-
+    /**
+     * Gets query for [[Company]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompetitorCompany()
+    {
+        return $this->hasOne(Company::className(), ['id' => 'competitor_company_id']);
+    }
     /**
      * Gets query for [[Consultant]].
      *

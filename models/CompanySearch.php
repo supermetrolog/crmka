@@ -42,9 +42,9 @@ class CompanySearch extends Company
     public function search($params)
     {
         // $query = Company::find()->joinWith(['companyGroup', 'broker', 'consultant', 'contacts']);
-        $query = Company::find()->joinWith(['companyGroup', 'broker', 'consultant', 'productRanges', 'categories', 'contacts' => function ($query) {
+        $query = Company::find()->joinWith(['requests', 'companyGroup', 'broker', 'consultant', 'productRanges', 'categories', 'contacts' => function ($query) {
             $query->joinWith(['phones', 'emails', 'contactComments']);
-        }]);
+        }])->orderBy(['company.created_at' => SORT_DESC, 'request.created_at' => SORT_DESC]);
 
         // die;
         // add conditions that should always apply here
