@@ -25,6 +25,7 @@ use app\exceptions\ValidationErrorHttpException;
  * @property string|null $competitor_name Название компании конкурента
  * @property int|null $is_our принадлежит ли сделка нашей компании
  * @property int|null $is_competitor принадлежит ли сделка  конкурентам
+ * @property int $type_id
  *
  * @property Company $company
  * @property User $consultant
@@ -46,7 +47,7 @@ class Deal extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'consultant_id'], 'required'],
+            [['company_id', 'consultant_id', 'complex_id', 'object_id', 'type_id'], 'required'],
             [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor'], 'integer'],
             [['startEventTime', 'endEventTime'], 'safe'],
             [['clientLegalEntity', 'description', 'name'], 'string', 'max' => 255],
@@ -79,6 +80,7 @@ class Deal extends \yii\db\ActiveRecord
             'competitor_company_id' => 'Competitor Company ID',
             'is_our' => 'Is Our',
             'is_competitor' => 'Is Competitor',
+            'type_id' => 'Type ID',
         ];
     }
     public function fields()
@@ -101,6 +103,10 @@ class Deal extends \yii\db\ActiveRecord
 
     public static function createDeal($post_data)
     {
+        if ($model = self::find()->where(['company_id' => $post_data['company_id'], 'request_id' => $post_data['request_id']])->one()) {
+            $model->addError("request_id", 'Сделка для этого запроса уже существует!');
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        }
         $model = new self();
         if ($model->load($post_data, '') && $model->save()) {
             return ['message' => "Сделка создана", 'data' => $model->id];
