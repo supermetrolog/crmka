@@ -5,6 +5,7 @@ namespace app\models;
 use app\models\miniModels\TimelineStep;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
+use app\models\miniModels\TimelineActionComment;
 use Yii;
 
 /**
@@ -62,25 +63,14 @@ class Timeline extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
-
-    // public static function getTimeline($consultant_id, $request_id)
-    // {
-    //     $dataProvider = new ActiveDataProvider([
-    //         'query' => self::find()->joinWith(['timelineSteps' => function ($query) {
-    //             $query->joinWith(['timelineStepObjects', 'timelineStepFeedbackways', 'timelineActionComments']);
-    //         }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id]),
-    //         'pagination' => [
-    //             'pageSize' => 0,
-    //         ],
-    //     ]);
-    //     return $dataProvider;
-    // }
     public static function getTimeline($consultant_id, $request_id)
     {
         $data = [];
-        $data['timeline'] = self::find()->joinWith(['timelineSteps' => function ($query) {
-            $query->joinWith(['timelineStepObjects', 'timelineStepFeedbackways', 'timelineActionComments']);
-        }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id])->one();
+        $data['timeline'] = self::find()->with(['timelineSteps' => function ($query) {
+            $query->with(['timelineStepObjects', 'timelineStepFeedbackways', 'timelineActionComments']);
+        }, 'timelineActionComments' => function ($query) {
+            $query->orderBy(['timeline_action_comment.created_at' => SORT_DESC]);
+        }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id])->limit(1)->one();
 
         $data['timelineList'] = self::getTimelineListInRequest($request_id);
         return $data;
@@ -159,5 +149,14 @@ class Timeline extends \yii\db\ActiveRecord
     public function getTimelineSteps()
     {
         return $this->hasMany(TimelineStep::className(), ['timeline_id' => 'id']);
+    }
+    /**
+     * Gets query for [[TimelineSteps]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTimelineActionComments()
+    {
+        return $this->hasMany(TimelineActionComment::className(), ['timeline_id' => 'id']);
     }
 }

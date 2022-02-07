@@ -18,7 +18,7 @@ class UserController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['login']);
     }
 
     public function actions()

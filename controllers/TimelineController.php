@@ -8,6 +8,7 @@ use app\models\miniModels\TimelineStepObject;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
+use app\models\miniModels\TimelineActionComment;
 use Yii;
 
 /**
@@ -20,7 +21,7 @@ class TimelineController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
     }
 
     public function actions()
@@ -49,6 +50,10 @@ class TimelineController extends ActiveController
         $consultant_id = Yii::$app->request->getQueryParam('consultant_id');
         $request_id = Yii::$app->request->getQueryParam('request_id');
         return Timeline::getTimeline($consultant_id, $request_id);
+    }
+    public function actionActionComments($id)
+    {
+        return TimelineActionComment::getTimelineComments($id);
     }
     protected function findModel($id)
     {

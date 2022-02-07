@@ -57,6 +57,7 @@ return
                 'OPTIONS update-step/<id>' => 'options',
                 'POST,OPTIONS add-objects/<id>' => 'add-objects',
                 'GET,OPTIONS search' => 'search',
+                'GET,OPTIONS action-comments/<id>' => 'action-comments',
             ],
         ],
         [

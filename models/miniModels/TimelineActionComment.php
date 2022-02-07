@@ -3,15 +3,20 @@
 namespace app\models\miniModels;
 
 use app\exceptions\ValidationErrorHttpException;
+use app\models\Timeline;
 use IntlDateFormatter;
 use yii\helpers\ArrayHelper;
 use Yii;
+use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "timeline_action_comment".
  *
  * @property int $id
  * @property int $timeline_step_id [связь]
+ * @property int $timeline_id [связь]
+ * @property int $timeline_step_number номер степа
  * @property string $comment комментарий к действию
  * @property string $created_at
  * @property string|null $title
@@ -35,7 +40,7 @@ class TimelineActionComment extends \yii\db\ActiveRecord
     {
         return [
             [['timeline_step_id', 'comment'], 'required'],
-            [['timeline_step_id'], 'integer'],
+            [['timeline_step_id', 'timeline_id', 'timeline_step_number'], 'integer'],
             [['created_at'], 'safe'],
             [['comment', 'title'], 'string'],
             [['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStep::className(), 'targetAttribute' => ['timeline_step_id' => 'id']],
@@ -78,6 +83,17 @@ class TimelineActionComment extends \yii\db\ActiveRecord
         };
         return $fields;
     }
+
+    public static function getTimelineComments($timeline_id)
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => self::find()->where(['timeline_action_comment.timeline_id' => $timeline_id])->orderBy(['timeline_action_comment.created_at' => SORT_DESC]),
+            'pagination' => [
+                'pageSize' => 0
+            ]
+        ]);
+        return $dataProvider;
+    }
     /**
      * Gets query for [[TimelineStep]].
      *
@@ -86,5 +102,14 @@ class TimelineActionComment extends \yii\db\ActiveRecord
     public function getTimelineStep()
     {
         return $this->hasOne(TimelineStep::className(), ['id' => 'timeline_step_id']);
+    }
+    /**
+     * Gets query for [[TimelineStep]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTimeline()
+    {
+        return $this->hasOne(Timeline::className(), ['id' => 'timeline_id']);
     }
 }
