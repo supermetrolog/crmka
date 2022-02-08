@@ -61,7 +61,7 @@ class Request extends \yii\db\ActiveRecord
     public const STATUS_ACTIVE = 1;
     public const STATUS_PASSIVE = 0;
     public const STATUS_DONE = 2;
-
+    public const DEAL_TYPE_LIST = ['аренда', 'продажа', 'ответ-хранение', 'субаренда'];
     public function behaviors()
     {
         return [
@@ -256,6 +256,9 @@ class Request extends \yii\db\ActiveRecord
         };
         $fields['created_at_format'] = function ($fields) {
             return Yii::$app->formatter->format($fields['created_at'], 'datetime');
+        };
+        $fields['name'] = function ($fields) {
+            return self::DEAL_TYPE_LIST[$fields['dealType']] . " {$fields['minArea']} - {$fields['maxArea']} м";
         };
         return $fields;
     }

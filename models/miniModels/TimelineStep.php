@@ -252,6 +252,13 @@ class TimelineStep extends \yii\db\ActiveRecord
         if (ArrayHelper::keyExists('deal', $post_data)) {
             Request::changeStatus($post_data['deal']['request_id'], Request::STATUS_DONE);
         } else {
+            if ($dealModel = $this->timeline->request->deal) {
+                $dealModel->object_id =  $post_data['timelineStepObjects'][0]['object_id'];
+                $dealModel->complex_id =  $post_data['timelineStepObjects'][0]['complex_id'];
+                if (!$dealModel->save()) {
+                    throw new ValidationErrorHttpException($dealModel->getErrorSummary(false));
+                }
+            }
             $this->addTimelineStepObjects($post_data);
         }
     }

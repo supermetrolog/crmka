@@ -7,6 +7,7 @@ use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\CompanyFile;
 use Yii;
+use yii\data\Sort;
 
 /**
  * This is the model class for table "company".
@@ -145,7 +146,7 @@ class Company extends \yii\db\ActiveRecord
             return rand(10, 100);
         };
         $fields['deal_count'] = function () {
-            return rand(10, 100);
+            return count($this->deals);
         };
         $fields['request_count'] = function () {
             return rand(10, 100);
@@ -155,9 +156,6 @@ class Company extends \yii\db\ActiveRecord
         };
         $fields['object_count'] = function () {
             return rand(10, 100);
-        };
-        $fields['category'] = function () {
-            return rand(0, 5);
         };
         $fields['created_at_format'] = function ($fields) {
             return Yii::$app->formatter->format($fields['created_at'], 'datetime');
@@ -204,32 +202,42 @@ class Company extends \yii\db\ActiveRecord
         return $extraFields;
     }
 
-
-
-
-
-    // public static function getCompanyList()
-    // {
-    //     $dataProvider = new ActiveDataProvider([
-    //         'query' => self::find()->with(['companyGroup', 'broker', 'consultant', 'productRanges', 'categories', 'requests', 'contacts' => function ($query) {
-    //             $query->with(['phones', 'emails', 'contactComments']);
-    //         }]),
-    //         'pagination' => [
-    //             'pageSize' => 5,
-    //         ],
-    //     ]);
-
-    //     return $dataProvider;
-    // }
     public static function getCompanyList()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['requests'])->with(['companyGroup', 'broker', 'deals', 'consultant', 'productRanges', 'categories', 'contacts' => function ($query) {
-                $query->with(['phones', 'emails', 'contactComments']);
-            }])->orderBy(['company.created_at' => SORT_DESC, 'request.created_at' => SORT_DESC]),
+            'query' => self::find()->joinWith(['requests'])->with([
+                'requests' => function ($query) {
+                    $query->where(['status' => Request::STATUS_ACTIVE]);
+                },
+                'companyGroup', 'broker', 'deals', 'consultant' => function ($query) {
+                    $query->with('userProfile');
+                }, 'productRanges', 'categories', 'contacts' => function ($query) {
+                    $query->with(['phones', 'emails', 'contactComments']);
+                }
+            ]),
             'pagination' => [
                 'pageSize' => 0,
             ],
+            'sort' => [
+                'attributes' => [
+                    'default' => [
+                        'asc' => ['request.created_at' => SORT_ASC, 'company.rating' => SORT_ASC, 'company.created_at' => SORT_ASC],
+                        'desc' => ['request.created_at' => SORT_DESC, 'company.rating' => SORT_DESC, 'company.created_at' => SORT_DESC],
+                        'default' => SORT_DESC,
+                    ],
+                    'company.rating' => [
+                        'asc' => ['company.rating' => SORT_ASC],
+                        'desc' => ['company.rating' => SORT_DESC],
+                        'default' => SORT_DESC,
+                    ],
+                    'company.created_at' => [
+                        'asc' => ['company.created_at' => SORT_ASC],
+                        'desc' => ['company.created_at' => SORT_DESC],
+                        'default' => SORT_DESC,
+                    ],
+                ],
+
+            ]
         ]);
 
         return $dataProvider;
