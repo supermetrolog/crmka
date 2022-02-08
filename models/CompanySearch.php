@@ -41,12 +41,11 @@ class CompanySearch extends Company
      */
     public function search($params)
     {
-        // $query = Company::find()->joinWith(['companyGroup', 'broker', 'consultant', 'contacts']);
         $query = Company::find()->joinWith(['requests', 'contacts' => function ($query) {
             $query->joinWith(['phones', 'emails', 'contactComments']);
         }])->with([
             'requests' => function ($query) {
-                $query->where(['status' => Request::STATUS_ACTIVE]);
+                $query->where(['request.status' => Request::STATUS_ACTIVE]);
             },
             'companyGroup', 'broker', 'deals', 'consultant' => function ($query) {
                 $query->with('userProfile');
@@ -54,7 +53,6 @@ class CompanySearch extends Company
                 $query->with(['phones', 'emails', 'contactComments']);
             }
         ]);
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -63,8 +61,8 @@ class CompanySearch extends Company
             'sort' => [
                 'attributes' => [
                     'default' => [
-                        'asc' => ['request.created_at' => SORT_ASC, 'company.rating' => SORT_ASC, 'company.created_at' => SORT_ASC],
-                        'desc' => ['request.created_at' => SORT_DESC, 'company.rating' => SORT_DESC, 'company.created_at' => SORT_DESC],
+                        'asc' => [new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'), 'company.rating' => SORT_ASC, 'company.created_at' => SORT_ASC],
+                        'desc' => [new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'), new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'), 'company.rating' => SORT_DESC, 'company.created_at' => SORT_DESC],
                         'default' => SORT_DESC,
                     ],
                     'company.rating' => [
