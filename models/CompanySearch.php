@@ -18,8 +18,8 @@ class CompanySearch extends Company
     public function rules()
     {
         return [
-            [['id', 'noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization'], 'integer'],
-            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
+            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at', 'passive_why_comment'], 'safe'],
         ];
     }
 
@@ -42,21 +42,47 @@ class CompanySearch extends Company
     public function search($params)
     {
         // $query = Company::find()->joinWith(['companyGroup', 'broker', 'consultant', 'contacts']);
-        $query = Company::find()->joinWith(['requests', 'companyGroup', 'broker', 'consultant', 'productRanges', 'categories', 'contacts' => function ($query) {
+        $query = Company::find()->joinWith(['requests', 'contacts' => function ($query) {
             $query->joinWith(['phones', 'emails', 'contactComments']);
-        }])->orderBy(['company.created_at' => SORT_DESC, 'request.created_at' => SORT_DESC]);
-
-        // die;
-        // add conditions that should always apply here
+        }])->with([
+            'requests' => function ($query) {
+                $query->where(['status' => Request::STATUS_ACTIVE]);
+            },
+            'companyGroup', 'broker', 'deals', 'consultant' => function ($query) {
+                $query->with('userProfile');
+            }, 'productRanges', 'categories', 'contacts' => function ($query) {
+                $query->with(['phones', 'emails', 'contactComments']);
+            }
+        ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 0,
             ],
+            'sort' => [
+                'attributes' => [
+                    'default' => [
+                        'asc' => ['request.created_at' => SORT_ASC, 'company.rating' => SORT_ASC, 'company.created_at' => SORT_ASC],
+                        'desc' => ['request.created_at' => SORT_DESC, 'company.rating' => SORT_DESC, 'company.created_at' => SORT_DESC],
+                        'default' => SORT_DESC,
+                    ],
+                    'company.rating' => [
+                        'asc' => ['company.rating' => SORT_ASC],
+                        'desc' => ['company.rating' => SORT_DESC],
+                        'default' => SORT_DESC,
+                    ],
+                    'company.created_at' => [
+                        'asc' => ['company.created_at' => SORT_ASC],
+                        'desc' => ['company.created_at' => SORT_DESC],
+                        'default' => SORT_DESC,
+                    ],
+                ],
+
+            ]
         ]);
 
-        $this->load($params);
+        $this->load($params, '');
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -99,8 +125,8 @@ class CompanySearch extends Company
             ->andFilterWhere(['like', 'company.documentNumber', $this->documentNumber])
             ->andFilterWhere(['like', 'company.description', $this->description]);
 
-        if (ArrayHelper::keyExists('contact_phone', $params['CompanySearch'])) {
-            $query->orFilterWhere(['like', 'phone.phone', $params['CompanySearch']['contact_phone']]);
+        if (ArrayHelper::keyExists('contact_phone', $params)) {
+            $query->orFilterWhere(['like', 'phone.phone', $params['contact_phone']]);
         }
         return $dataProvider;
     }

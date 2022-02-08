@@ -34,7 +34,9 @@ class CompanyController extends ActiveController
     }
     public function actionIndex()
     {
-        return Company::getCompanyList();
+        $searchModel = new CompanySearch();
+        return $searchModel->search(Yii::$app->request->queryParams);
+        // return Company::getCompanyList();
     }
     public function actionView($id)
     {
