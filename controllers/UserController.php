@@ -48,14 +48,6 @@ class UserController extends ActiveController
         $model->files = UploadedFile::getInstancesByName('files');
         return User::updateUser($this->findModel($id), $request, $model);
     }
-    public function actionLogin()
-    {
-        $model = new Login();
-        if ($model->load(Yii::$app->request->post(), '')) {
-            return $model->login();
-        }
-        throw new ValidationErrorHttpException($model->getErrorSummary(false));
-    }
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
@@ -65,6 +57,15 @@ class UserController extends ActiveController
         }
         throw new ValidationErrorHttpException($model->getErrorSummary(false));
     }
+    public function actionLogin()
+    {
+        $model = new Login();
+        if ($model->load(Yii::$app->request->post(), '')) {
+            return $model->login();
+        }
+        throw new ValidationErrorHttpException($model->getErrorSummary(false));
+    }
+
     public function actionLogout()
     {
         if (Yii::$app->user->isGuest) {

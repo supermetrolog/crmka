@@ -71,7 +71,7 @@ class Login extends Model
             $user = $this->getUser();
             $user->generateAccessToken();
             $user->save(false);
-            return ['message' => "Аутентификация прошла успешно", 'data' => ['user' => User::find()->joinWith(['userProfile'])->where(['user.id' => $user->id])->asArray()->one(), 'access_token' => $user->access_token]];
+            return ['message' => "Аутентификация прошла успешно", 'data' => ['user' => User::find()->with(['userProfile'])->where(['user.id' => $user->id])->one(), 'access_token' => $user->access_token]];
         }
         throw new ValidationErrorHttpException($this->getErrorSummary(false));
     }
