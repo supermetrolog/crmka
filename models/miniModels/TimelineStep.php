@@ -165,7 +165,7 @@ class TimelineStep extends \yii\db\ActiveRecord
         }
         return false;
     }
-    private function addTimelineStepObjects($post_data, $noDuplicate = true, $deleteAllBeforeAdd = true)
+    private function addTimelineStepObjects($post_data, $noDuplicate = false, $deleteAllBeforeAdd = true)
     {
         $newObjects = $post_data['timelineStepObjects'];
         if ($deleteAllBeforeAdd) {
@@ -183,7 +183,16 @@ class TimelineStep extends \yii\db\ActiveRecord
             $object['updated_at'] = date('Y-m-d H:i:s');
             $model = new TimelineStepObject();
             if (!$model->load($object, '') || !$model->save()) {
+
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+            $commentModel = new TimelineStepObjectComment([
+                'timeline_step_id' => $model->timeline_step_id,
+                'object_id' => $model->object_id,
+                'comment' => $model->comment,
+            ]);
+            if (!$commentModel->save()) {
+                throw new ValidationErrorHttpException($commentModel->getErrorSummary(false));
             }
         }
     }
@@ -205,7 +214,7 @@ class TimelineStep extends \yii\db\ActiveRecord
         $array2 = ArrayHelper::getColumn($post_data['timelineStepFeedbackways'], 'way');
         $hasTheArrayChangedFlag = $this->hasTheArrayChanged($array1, $array2);
         if (!$this->negative && !$hasTheArrayChangedFlag) {
-            $this->addTimelineStepObjects($post_data, true, false);
+            $this->addTimelineStepObjects($post_data, false, false);
             $this->createNewStep(self::INSPECTION_STEP_NUMBER);
         }
 
@@ -224,25 +233,25 @@ class TimelineStep extends \yii\db\ActiveRecord
     public function updateInspectionStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data, true, false);
+        $this->addTimelineStepObjects($post_data, false, false);
         return $this->createNewStep(self::VISIT_STEP_NUMBER);
     }
     public function updateVisitStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data, true, false);
+        $this->addTimelineStepObjects($post_data, false, false);
         return $this->createNewStep(self::INTEREST_STEP_NUMBER);
     }
     public function updateInterestStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data, true, false);
+        $this->addTimelineStepObjects($post_data, false, false);
         return $this->createNewStep(self::TALK_STEP_NUMBER);
     }
     public function updateTalkStep($post_data)
     {
         if ($this->negative) return;
-        $this->addTimelineStepObjects($post_data, true, false);
+        $this->addTimelineStepObjects($post_data, false, false);
         return $this->createNewStep(self::DEAL_STEP_NUMBER);
     }
     public function updateDealStep($post_data)
@@ -288,8 +297,9 @@ class TimelineStep extends \yii\db\ActiveRecord
                 return $item['object_id'];
             }, $extraFields['timelineStepObjects'])));
             $newObjects = [];
-            foreach ($extraFields['timelineStepObjects'] as $object) {
-                $object = $object->attributes;
+            foreach ($extraFields['timelineStepObjects'] as $value) {
+                $object = $value->attributes;
+                $object['comments'] = $value->comments;
                 $object['duplicate_count'] = $count[$object['object_id']];
                 $newObjects[$object['object_id']] = $object;
             }

@@ -67,7 +67,9 @@ class Timeline extends \yii\db\ActiveRecord
     {
         $data = [];
         $data['timeline'] = self::find()->with(['timelineSteps' => function ($query) {
-            $query->with(['timelineStepObjects', 'timelineStepFeedbackways', 'timelineActionComments']);
+            $query->with(['timelineStepObjects' => function ($query) {
+                $query->with('comments');
+            }, 'timelineStepFeedbackways', 'timelineActionComments']);
         }, 'timelineActionComments' => function ($query) {
             $query->orderBy(['timeline_action_comment.created_at' => SORT_DESC]);
         }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id])->limit(1)->one();
