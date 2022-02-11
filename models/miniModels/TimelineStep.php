@@ -183,8 +183,10 @@ class TimelineStep extends \yii\db\ActiveRecord
             $object['updated_at'] = date('Y-m-d H:i:s');
             $model = new TimelineStepObject();
             if (!$model->load($object, '') || !$model->save()) {
-
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
+            if (!$model->comment) {
+                continue;
             }
             $commentModel = new TimelineStepObjectComment([
                 'timeline_step_id' => $model->timeline_step_id,
