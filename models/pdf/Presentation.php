@@ -11,6 +11,14 @@ class Presentation extends Model
     private const URL = 'https://pennylane.pro/api/v1/get/index/?';
     private $response;
     public $devisionCount = 6;
+    public $consultant;
+    public function __construct($consultant)
+    {
+        if (is_null($consultant)) {
+            throw new Exception('Consultant cannot be null!');
+        }
+        $this->consultant = $consultant;
+    }
     public function fetchData($id, $type_id)
     {
         if (is_null($id) || is_null($type_id)) {
@@ -18,6 +26,42 @@ class Presentation extends Model
         }
         $url = self::URL . "id=$id&type_id=$type_id";
         $this->response = json_decode($this->Request($url), false);
+        $this->devisionCount = count($this->response->blocks);
+        // echo "<pre>";
+        // print_r($this->response->description);
+        // die;
+    }
+    public function getPower($object)
+    {
+        if (property_exists($object, 'power')) {
+            return $object->power;
+        }
+        return '0 кВт';
+    }
+    public function getBlockArea($block)
+    {
+        if ($block->area_max != $block->area_min) {
+            return $this->normalizeNumber($block->area_min) . '-' . $this->normalizeNumber($block->area_max);
+        }
+        return $this->normalizeNumber($block->area_max);
+    }
+    public function getHeating($block)
+    {
+        return $block->heating . ' ' . $block->temperature_min . '-' . $block->temperature_max;
+    }
+    public function getPrice($block)
+    {
+        if ($block->price_floor_min != $block->price_floor_max) {
+            return $this->normalizeNumber($block->price_floor_min) . '-' . $this->normalizeNumber($block->price_floor_max);
+        }
+        return $this->normalizeNumber($block->price_floor_max);
+    }
+    public function getTotal($block)
+    {
+        if ($block->price_min_month_all != $block->price_max_month_all) {
+            return $this->normalizeNumber($block->price_min_month_all) . '-' . $this->normalizeNumber($block->price_max_month_all);
+        }
+        return $this->normalizeNumber($block->price_max_month_all);
     }
     public function getResponse()
     {

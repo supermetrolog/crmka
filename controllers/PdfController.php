@@ -14,12 +14,12 @@ class PdfController extends Controller
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
     }
 
     public function actionIndex()
     {
-        $model = new Presentation();
+        $model = new Presentation(Yii::$app->request->getQueryParam('consultant'));
         $model->fetchData(Yii::$app->request->getQueryParam('original_id'), Yii::$app->request->getQueryParam('type_id'));
         $data = $model->getResponse();
 
@@ -44,7 +44,7 @@ class PdfController extends Controller
         // return $this->renderPartial('suck', [
         //     'data' => $data
         // ]);
-        $model = new Presentation();
+        $model = new Presentation(Yii::$app->request->getQueryParam('consultant'));
         $model->fetchData(Yii::$app->request->getQueryParam('original_id'), Yii::$app->request->getQueryParam('type_id'));
         $data = $model->getResponse();
 

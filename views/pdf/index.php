@@ -14,7 +14,9 @@
                     </td>
                     <td class="consultant">
                         <div>
-                            <p class="name"><?= $data->agent_name ?></p>
+                            <!-- <p class="name"><? //= $data->agent_name 
+                                                    ?></p> -->
+                            <p class="name"><?= $model->consultant ?></p>
                             <p class="position"> <span class="danger">Ведущий консультант</span> </p>
                         </div>
 
@@ -114,7 +116,9 @@
                                     <td class="two">
                                         <div>
                                             <p>СРЕДНЯЯ СТАВКА ЗА М<sup>2</sup>/ГОД, <span class="danger"><?= $data->tax_form ?> </span></p>
-                                            <p class="big"><span class="danger"><?= $model->normalizeNumber($data->price_sale_max) ?> руб.</span></p>
+                                            <!-- <p class="big"><span class="danger"><? //= $model->normalizeNumber($data->price_sale_max) 
+                                                                                        ?> руб.</span></p> -->
+                                            <p class="big"><span class="danger"><?= $model->normalizeNumber($data->price_floor_max) ?> руб.</span></p>
                                         </div>
                                     </td>
                                 </tr>
@@ -151,7 +155,7 @@
                                                             <div>
                                                                 <div class="icon">
                                                                     <img src="http://<?= $model->getHost() ?>/images/power-icon.png" alt="">
-                                                                    <p><?= $data->general_stats->power ?></p>
+                                                                    <p><?= $model->getPower($data->general_stats) ?></p>
 
                                                                 </div>
                                                             </div>
@@ -218,154 +222,111 @@
                 </tr>
             </tbody>
         </table>
-        <div class="title">
-            <h3 class="one">Варианты деления</h3>
-        </div>
-        <table class="division-options">
-            <tbody>
-                <tr>
-                    <td class="one">
-                        <div>
-                            <p>ID блока</p>
-                        </div>
-                    </td>
-                    <td class="two">
-                        <div>
-                            <p>Этаж</p>
-                        </div>
-                    </td>
-                    <td class="three">
-                        <div>
-                            <p>Площадь</p>
-                        </div>
-                    </td>
-                    <td class="four">
-                        <div>
-                            <p>Высота</p>
-                        </div>
-                    </td>
-                    <td class="five">
-                        <div>
-                            <p>Тип пола</p>
-                        </div>
-                    </td>
-                    <td class="six">
-                        <div>
-                            <p>Ворота</p>
-                        </div>
-                    </td>
-                    <td class="seven">
-                        <div>
-                            <p>Температура храниения</p>
-                        </div>
-                    </td>
-                    <td class="eight">
-                        <div>
-                            <p>Ставка <b>без НДС</b> м<sup>2</sup>/г</p>
-                        </div>
-                    </td>
-                    <td class="nine">
-                        <div>
-                            <p>Итого цена в месяц</p>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="one">
-                        <div>
-                            <p>2367-1</p>
-                        </div>
-                    </td>
-                    <td class="two">
-                        <div>
-                            <p>1</p>
-                        </div>
-                    </td>
-                    <td class="three">
-                        <div>
-                            <p><b>10 000-200 000</b> м<sup>2</sup></p>
-                        </div>
-                    </td>
-                    <td class="four">
-                        <div>
-                            <p>8-9 м.</p>
-                        </div>
-                    </td>
-                    <td class="five">
-                        <div>
-                            <p>антипыль</p>
-                        </div>
-                    </td>
-                    <td class="six">
-                        <div>
-                            <p>На нуле</p>
-                        </div>
-                    </td>
-                    <td class="seven">
-                        <div>
-                            <p>холодильник +12 C, +14 C.</p>
-                        </div>
-                    </td>
-                    <td class="eight">
-                        <div>
-                            <p><b>5 500 </b>руб.+OPEX+KY</p>
-                        </div>
-                    </td>
-                    <td class="nine">
-                        <div>
-                            <p>от 1 000 854 руб.</p>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="one">
-                        <div>
-                            <p>2367-1</p>
-                        </div>
-                    </td>
-                    <td class="two">
-                        <div>
-                            <p>1</p>
-                        </div>
-                    </td>
-                    <td class="three">
-                        <div>
-                            <p><b>10 000-200 000</b> м<sup>2</sup></p>
-                        </div>
-                    </td>
-                    <td class="four">
-                        <div>
-                            <p>8-9 м.</p>
-                        </div>
-                    </td>
-                    <td class="five">
-                        <div>
-                            <p>антипыль</p>
-                        </div>
-                    </td>
-                    <td class="six">
-                        <div>
-                            <p>На нуле</p>
-                        </div>
-                    </td>
-                    <td class="seven">
-                        <div>
-                            <p>холодильник +12 C, +14 C.</p>
-                        </div>
-                    </td>
-                    <td class="eight">
-                        <div>
-                            <p><b>5 500 </b>руб.+OPEX+KY</p>
-                        </div>
-                    </td>
-                    <td class="nine">
-                        <div>
-                            <p>от 1 000 854 руб.</p>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <? if ($model->devisionCount) : ?>
+            <div class="title">
+                <h3 class="one">Варианты деления</h3>
+            </div>
+            <table class="division-options">
+                <tbody>
+                    <tr>
+                        <td class="one">
+                            <div>
+                                <p>ID блока</p>
+                            </div>
+                        </td>
+                        <td class="two">
+                            <div>
+                                <p>Этаж</p>
+                            </div>
+                        </td>
+                        <td class="three">
+                            <div>
+                                <p>Площадь</p>
+                            </div>
+                        </td>
+                        <td class="four">
+                            <div>
+                                <p>Высота</p>
+                            </div>
+                        </td>
+                        <td class="five">
+                            <div>
+                                <p>Тип пола</p>
+                            </div>
+                        </td>
+                        <td class="six">
+                            <div>
+                                <p>Ворота</p>
+                            </div>
+                        </td>
+                        <td class="seven">
+                            <div>
+                                <p>Температура храниения</p>
+                            </div>
+                        </td>
+                        <td class="eight">
+                            <div>
+                                <p>Ставка <b>без НДС</b> м<sup>2</sup>/г</p>
+                            </div>
+                        </td>
+                        <td class="nine">
+                            <div>
+                                <p>Итого цена в месяц</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <? foreach ($data->blocks as $block) : ?>
+                        <tr>
+                            <td class="one">
+                                <div>
+                                    <p><?= $block->object_id ?></p>
+                                </div>
+                            </td>
+                            <td class="two">
+                                <div>
+                                    <p><?= $block->floor_min ?></p>
+                                </div>
+                            </td>
+                            <td class="three">
+                                <div>
+                                    <p><b><?= $model->getBlockArea($block) ?></b> м<sup>2</sup></p>
+                                </div>
+                            </td>
+                            <td class="four">
+                                <div>
+                                    <p><?= $block->ceiling_height_min . '-' . $block->ceiling_height_max ?> м.</p>
+                                </div>
+                            </td>
+                            <td class="five">
+                                <div>
+                                    <p><?= $block->floor_type ?></p>
+                                </div>
+                            </td>
+                            <td class="six">
+                                <div>
+                                    <p><?= $block->gate_type ?></p>
+                                </div>
+                            </td>
+                            <td class="seven">
+                                <div>
+                                    <p><?= $model->getHeating($block) ?></p>
+                                </div>
+                            </td>
+                            <td class="eight">
+                                <div>
+                                    <p><b><?= $model->getPrice($block) ?></b> руб</p>
+                                </div>
+                            </td>
+                            <td class="nine">
+                                <div>
+                                    <p><?= $model->getTotal($block) ?> руб</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <? endforeach; ?>
+                </tbody>
+            </table>
+        <? endif; ?>
         <? if ($model->devisionCount < 7) : ?>
             <hr>
         <? endif; ?>
@@ -1086,9 +1047,7 @@
         </div>
         <div class="offer-description">
             <p>
-                Повседневная практика показывает, что сложившаяся структура организации влечет за собой процесс внедрения и модернизации направлений прогрессивного развития. Равным образом постоянный количественный рост и сфера нашей активности позволяет выполнять важные задания по разработке соответствующий условий активизации. Разнообразный и богатый опыт новая модель организационной деятельности позволяет оценить значение существенных финансовых и административных условий. Таким образом сложившаяся структура организации требуют определения и уточнения существенных финансовых и административных условий.
-
-                Равным образом дальнейшее развитие различных форм деятельности в значительной степени обуславливает создание систем массового участия. Задача организации, в особенности же сложившаяся структура организации позволяет оценить значение модели развития. С другой стороны рамки и место обучения кадров требуют определения и уточнения систем массового участия. Равным образом дальнейшее развитие различных форм деятельности способствует подготовки и реализации новых предложений. Товарищи! реализация намеченных плановых заданий в значительной степени обуславливает создание дальнейших направлений развития.
+                <?= $data->description ?>
             </p>
         </div>
     </div>
