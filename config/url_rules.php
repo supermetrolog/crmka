@@ -30,6 +30,11 @@ return
         ],
         [
             'class' => 'yii\rest\UrlRule',
+            'controller' => 'calendar',
+            'except' => [],
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
             'controller' => 'request',
             'except' => [],
             'extraPatterns' => [
