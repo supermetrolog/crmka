@@ -27,6 +27,7 @@ use app\behaviors\CreateManyMiniModelsBehaviors;
  * @property string|null $updated_at
  * @property int|null $consultant_id [связь] с пользователями
  * @property int|null $position Должность
+ * @property int| $position_unknown Должность неизвестна
  * @property int|null $faceToFaceMeeting [флаг] Очная встреча
  * @property int|null $warning [флаг] Внимание
  * @property int|null $good [флаг] Хор. взаимоотношения
@@ -67,7 +68,7 @@ class Contact extends \yii\db\ActiveRecord
     {
         return [
             [['company_id'], 'required'],
-            [['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'passive_why'], 'integer'],
+            [['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'passive_why', 'position_unknown'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['first_name', 'middle_name', 'last_name', 'passive_why_comment', 'warning_why_comment'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
@@ -98,6 +99,7 @@ class Contact extends \yii\db\ActiveRecord
             'passive_why' => 'PassiveWhy',
             'passive_why_comment' => 'PassiveWhyComment',
             'warning_why_comment' => 'WarningWhyComment',
+            'position_unknown' => 'PositionUnknown'
         ];
     }
 
