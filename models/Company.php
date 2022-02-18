@@ -169,9 +169,6 @@ class Company extends \yii\db\ActiveRecord
             $nameRu = $fields['nameRu'];
             $noName = $fields['noName'];
             if ($noName) {
-                if ($formOfOrganization !== null) {
-                    return self::FORM_OF_ORGANIZATION_LIST[$formOfOrganization];
-                }
                 return "-";
             }
             $name = "";

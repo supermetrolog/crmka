@@ -15,10 +15,10 @@ use app\exceptions\ValidationErrorHttpException;
  * @property int $consultant_id [СВЯЗЬ] с юзером
  * @property int|null $area площадь сделки
  * @property int|null $floorPrice цена пола
+ * @property int|null $contractTerm срок контракта
+ * @property string|null $dealDate дата сделки
  * @property string|null $clientLegalEntity юр. лицо клиента в сделке
  * @property string|null $description описание
- * @property string|null $startEventTime врменя начала события
- * @property string|null $endEventTime врменя конца события
  * @property string|null $name название сделки
  * @property int|null $object_id ID объекта из старой базы
  * @property int|null $complex_id ID комплекса из старой базы
@@ -26,6 +26,8 @@ use app\exceptions\ValidationErrorHttpException;
  * @property int|null $is_our принадлежит ли сделка нашей компании
  * @property int|null $is_competitor принадлежит ли сделка  конкурентам
  * @property int $type_id
+ * @property string $created_at
+ * @property string|null $updated_at
  *
  * @property Company $company
  * @property User $consultant
@@ -48,8 +50,8 @@ class Deal extends \yii\db\ActiveRecord
     {
         return [
             [['company_id', 'consultant_id', 'complex_id', 'object_id', 'type_id'], 'required'],
-            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor'], 'integer'],
-            [['startEventTime', 'endEventTime'], 'safe'],
+            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor', 'contractTerm'], 'integer'],
+            [['dealDate', 'created_at', 'updated_at'], 'safe'],
             [['clientLegalEntity', 'description', 'name'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
@@ -72,8 +74,8 @@ class Deal extends \yii\db\ActiveRecord
             'floorPrice' => 'Floor Price',
             'clientLegalEntity' => 'Client Legal Entity',
             'description' => 'Description',
-            'startEventTime' => 'Start Event Time',
-            'endEventTime' => 'End Event Time',
+            'dealDate' => 'DealDate',
+            'contaractTerm' => 'ContractTerm',
             'name' => 'Name',
             'object_id' => 'Object ID',
             'complex_id' => 'Complex ID',
@@ -86,17 +88,11 @@ class Deal extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        $fields['startEventTime'] = function ($fields) {
-            if ($fields['startEventTime']) {
-                return date('Y-m-d', strtotime($fields['startEventTime']));
+        $fields['dealDate'] = function ($fields) {
+            if ($fields['dealDate']) {
+                return date('Y-m-d', strtotime($fields['dealDate']));
             }
-            return $fields['startEventTime'];
-        };
-        $fields['endEventTime'] = function ($fields) {
-            if ($fields['endEventTime']) {
-                return date('Y-m-d', strtotime($fields['endEventTime']));
-            }
-            return $fields['endEventTime'];
+            return $fields['dealDate'];
         };
         return $fields;
     }
