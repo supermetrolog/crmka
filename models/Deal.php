@@ -28,6 +28,7 @@ use app\exceptions\ValidationErrorHttpException;
  * @property int $type_id
  * @property string $created_at
  * @property string|null $updated_at
+ * @property int|null  $formOfOrganization
  *
  * @property Company $company
  * @property User $consultant
@@ -50,7 +51,7 @@ class Deal extends \yii\db\ActiveRecord
     {
         return [
             [['company_id', 'consultant_id', 'complex_id', 'object_id', 'type_id'], 'required'],
-            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor', 'contractTerm'], 'integer'],
+            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor', 'contractTerm', 'formOfOrganization'], 'integer'],
             [['dealDate', 'created_at', 'updated_at'], 'safe'],
             [['clientLegalEntity', 'description', 'name'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
@@ -83,6 +84,7 @@ class Deal extends \yii\db\ActiveRecord
             'is_our' => 'Is Our',
             'is_competitor' => 'Is Competitor',
             'type_id' => 'Type ID',
+            'formOfOrganization' => 'FormOfOrganization',
         ];
     }
     public function fields()
@@ -93,6 +95,12 @@ class Deal extends \yii\db\ActiveRecord
                 return date('Y-m-d', strtotime($fields['dealDate']));
             }
             return $fields['dealDate'];
+        };
+        $fields['clientLegalEntity_full_name'] = function ($fields) {
+            if ($fields['formOfOrganization']) {
+                return Company::FORM_OF_ORGANIZATION_LIST[$fields['formOfOrganization']] . ' ' . $fields['clientLegalEntity'];
+            }
+            return $fields['clientLegalEntity'];
         };
         return $fields;
     }
