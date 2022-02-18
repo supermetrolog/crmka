@@ -5,13 +5,13 @@ namespace app\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Company;
-use yii\helpers\ArrayHelper;
 
 /**
  * CompanySearch represents the model behind the search form of `app\models\Company`.
  */
 class CompanySearch extends Company
 {
+    public $all;
     /**
      * {@inheritdoc}
      */
@@ -19,7 +19,7 @@ class CompanySearch extends Company
     {
         return [
             [['id', 'noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
-            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at', 'passive_why_comment'], 'safe'],
+            [['all', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at', 'passive_why_comment'], 'safe'],
         ];
     }
 
@@ -41,9 +41,9 @@ class CompanySearch extends Company
      */
     public function search($params)
     {
-        $query = Company::find()->joinWith(['requests', 'contacts' => function ($query) {
+        $query = Company::find()->distinct()->joinWith(['requests', 'contacts' => function ($query) {
             $query->joinWith(['phones', 'emails', 'contactComments']);
-        }])->with([
+        }, 'categories'])->with([
             'requests' => function ($query) {
                 $query->where(['request.status' => Request::STATUS_ACTIVE]);
             },
@@ -56,23 +56,27 @@ class CompanySearch extends Company
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 0,
+                'pageSize' => 20,
             ],
             'sort' => [
+                'enableMultiSort' => true,
                 'attributes' => [
+                    'request.id',
+                    'created_at',
+                    'status',
                     'default' => [
-                        'asc' => [new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'), 'company.rating' => SORT_ASC, 'company.created_at' => SORT_ASC],
+                        'asc' => [new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'), new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'), 'company.rating' => SORT_ASC, 'company.created_at' => SORT_ASC],
                         'desc' => [new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'), new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'), 'company.rating' => SORT_DESC, 'company.created_at' => SORT_DESC],
                         'default' => SORT_DESC,
                     ],
-                    'company.rating' => [
-                        'asc' => ['company.rating' => SORT_ASC],
-                        'desc' => ['company.rating' => SORT_DESC],
+                    'status' => [
+                        'asc' => ['company.status' => SORT_ASC],
+                        'desc' => ['company.status' => SORT_DESC],
                         'default' => SORT_DESC,
                     ],
-                    'company.created_at' => [
-                        'asc' => ['company.created_at' => SORT_ASC],
-                        'desc' => ['company.created_at' => SORT_DESC],
+                    'categories' => [
+                        'asc' => ['category.category' => SORT_ASC],
+                        'desc' => ['category.category' => SORT_DESC],
                         'default' => SORT_DESC,
                     ],
                 ],
@@ -102,11 +106,11 @@ class CompanySearch extends Company
             'company.updated_at' => $this->updated_at,
         ]);
 
-        $query->orFilterWhere(['like', 'company.nameEng', $this->nameEng])
-            ->orFilterWhere(['like', 'company.nameRu', $this->nameRu])
+        $query->andFilterWhere(['like', 'company.nameEng', $this->nameEng])
+            ->andFilterWhere(['like', 'company.nameRu', $this->nameRu])
             ->andFilterWhere(['like', 'company.formOfOrganization', $this->formOfOrganization])
-            ->orFilterWhere(['like', 'company.officeAdress', $this->officeAdress])
-            ->orFilterWhere(['like', 'company.legalAddress', $this->legalAddress])
+            ->andFilterWhere(['like', 'company.officeAdress', $this->officeAdress])
+            ->andFilterWhere(['like', 'company.legalAddress', $this->legalAddress])
             ->andFilterWhere(['like', 'company.ogrn', $this->ogrn])
             ->andFilterWhere(['like', 'company.inn', $this->inn])
             ->andFilterWhere(['like', 'company.kpp', $this->kpp])
@@ -123,9 +127,14 @@ class CompanySearch extends Company
             ->andFilterWhere(['like', 'company.documentNumber', $this->documentNumber])
             ->andFilterWhere(['like', 'company.description', $this->description]);
 
-        if (ArrayHelper::keyExists('contact_phone', $params)) {
-            $query->orFilterWhere(['like', 'phone.phone', $params['contact_phone']]);
-        }
+        $query->orFilterWhere(['like', 'company.nameEng', $this->all])
+            ->orFilterWhere(['like', 'company.nameRu', $this->all])
+            ->orFilterWhere(['like', 'company.officeAdress', $this->all])
+            ->orFilterWhere(['like', 'company.legalAddress', $this->all])
+            ->orFilterWhere(['like', 'company.ogrn', $this->all])
+            ->orFilterWhere(['like', 'company.inn', $this->all])
+            ->orFilterWhere(['like', 'phone.phone', $this->all]);
+
         return $dataProvider;
     }
 }
