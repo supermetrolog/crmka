@@ -56,17 +56,31 @@ class CompanySearch extends Company
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 20,
+                'pageSize' => 50,
             ],
             'sort' => [
                 'enableMultiSort' => true,
+                'defaultOrder' => [
+                    'default' => SORT_DESC
+                ],
                 'attributes' => [
                     'request.id',
                     'created_at',
+                    'rating',
                     'status',
                     'default' => [
-                        'asc' => [new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'), new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'), 'company.rating' => SORT_ASC, 'company.created_at' => SORT_ASC],
-                        'desc' => [new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'), new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'), 'company.rating' => SORT_DESC, 'company.created_at' => SORT_DESC],
+                        'asc' => [
+                            new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'),
+                            new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
+                            'company.rating' => SORT_ASC,
+                            'company.created_at' => SORT_ASC
+                        ],
+                        'desc' => [
+                            new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'),
+                            new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
+                            'company.rating' => SORT_DESC,
+                            'company.created_at' => SORT_DESC
+                        ],
                         'default' => SORT_DESC,
                     ],
                     'status' => [
@@ -80,6 +94,7 @@ class CompanySearch extends Company
                         'default' => SORT_DESC,
                     ],
                 ],
+
 
             ]
         ]);

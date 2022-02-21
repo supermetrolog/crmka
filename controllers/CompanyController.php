@@ -12,6 +12,7 @@ use app\models\UploadFile;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
+use yii\filters\Cors;
 
 class CompanyController extends ActiveController
 {
@@ -20,7 +21,17 @@ class CompanyController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
+        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
+        $behaviors['corsFilter'] = [
+            'class' => Cors::className(),
+            'cors' => [
+                'Origin' => ['*'],
+                'Access-Control-Request-Method' => ['*'],
+                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
+                'Access-Control-Expose-Headers' => ['X-Pagination-Total-Count', 'X-Pagination-Page-Count', 'X-Pagination-Current-Page', 'X-Pagination-Per-Page', 'Link']
+            ],
+        ];
+        return $behaviors;
     }
 
     public function actions()
