@@ -66,8 +66,13 @@ class CompanySearch extends Company
                 'attributes' => [
                     'request.id',
                     'created_at',
+                    'nameRu',
                     'rating',
                     'status',
+                    'requests' => [
+                        'asc' => new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
+                        'desc' => new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
+                    ],
                     'default' => [
                         'asc' => [
                             new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'),
