@@ -139,14 +139,9 @@ class Company extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        // unset($fields['nameEng']);
 
-        // var_dump($fields);
         $fields['progress_percent'] = function () {
             return rand(10, 100);
-        };
-        $fields['deal_count'] = function () {
-            return count($this->deals);
         };
         $fields['request_count'] = function () {
             return rand(10, 100);

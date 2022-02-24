@@ -12,6 +12,9 @@ use app\models\Company;
 class CompanySearch extends Company
 {
     public $all;
+    public $categories;
+    public $dateStart;
+    public $dateEnd;
     /**
      * {@inheritdoc}
      */
@@ -19,7 +22,7 @@ class CompanySearch extends Company
     {
         return [
             [['id', 'noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
-            [['all', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at', 'passive_why_comment'], 'safe'],
+            [['all', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at', 'passive_why_comment', 'categories', 'dateStart', 'dateEnd'], 'safe'],
         ];
     }
 
@@ -41,18 +44,17 @@ class CompanySearch extends Company
      */
     public function search($params)
     {
-        $query = Company::find()->distinct()->joinWith(['requests', 'contacts' => function ($query) {
-            $query->joinWith(['phones', 'emails', 'contactComments']);
+        $query = Company::find()->distinct()->joinWith(['requests', 'categories', 'contacts' => function ($query) {
+            $query->joinWith(['phones'])->with(['emails', 'contactComments']);
         }, 'categories'])->with([
             'requests' => function ($query) {
                 $query->where(['request.status' => Request::STATUS_ACTIVE]);
             },
             'companyGroup', 'broker', 'deals', 'consultant' => function ($query) {
                 $query->with('userProfile');
-            }, 'productRanges', 'categories', 'contacts' => function ($query) {
-                $query->with(['phones', 'emails', 'contactComments']);
-            }
+            }, 'productRanges'
         ]);
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -64,7 +66,6 @@ class CompanySearch extends Company
                     'default' => SORT_DESC
                 ],
                 'attributes' => [
-                    'request.id',
                     'created_at',
                     'nameRu',
                     'rating',
@@ -88,16 +89,6 @@ class CompanySearch extends Company
                         ],
                         'default' => SORT_DESC,
                     ],
-                    'status' => [
-                        'asc' => ['company.status' => SORT_ASC],
-                        'desc' => ['company.status' => SORT_DESC],
-                        'default' => SORT_DESC,
-                    ],
-                    'categories' => [
-                        'asc' => ['category.category' => SORT_ASC],
-                        'desc' => ['category.category' => SORT_DESC],
-                        'default' => SORT_DESC,
-                    ],
                 ],
 
 
@@ -112,6 +103,7 @@ class CompanySearch extends Company
             return $dataProvider;
         }
 
+        // return explode(",", $this->categories);
         // grid filtering conditions
         $query->andFilterWhere([
             'company.id' => $this->id,
@@ -124,10 +116,11 @@ class CompanySearch extends Company
             'company.activityProfile' => $this->activityProfile,
             'company.created_at' => $this->created_at,
             'company.updated_at' => $this->updated_at,
+            'category.category' => $this->categories ? explode(",", $this->categories) : null
         ]);
-
         $query->andFilterWhere(['like', 'company.nameEng', $this->nameEng])
             ->andFilterWhere(['like', 'company.nameRu', $this->nameRu])
+            ->andFilterWhere(['between', 'company.created_at', $this->dateStart, $this->dateEnd ?? date('Y-m-d')])
             ->andFilterWhere(['like', 'company.formOfOrganization', $this->formOfOrganization])
             ->andFilterWhere(['like', 'company.officeAdress', $this->officeAdress])
             ->andFilterWhere(['like', 'company.legalAddress', $this->legalAddress])
@@ -147,13 +140,14 @@ class CompanySearch extends Company
             ->andFilterWhere(['like', 'company.documentNumber', $this->documentNumber])
             ->andFilterWhere(['like', 'company.description', $this->description]);
 
-        $query->orFilterWhere(['like', 'company.nameEng', $this->all])
-            ->orFilterWhere(['like', 'company.nameRu', $this->all])
-            ->orFilterWhere(['like', 'company.officeAdress', $this->all])
-            ->orFilterWhere(['like', 'company.legalAddress', $this->all])
-            ->orFilterWhere(['like', 'company.ogrn', $this->all])
-            ->orFilterWhere(['like', 'company.inn', $this->all])
-            ->orFilterWhere(['like', 'phone.phone', $this->all]);
+
+        $query->orFilterWhere(['company.id' => $this->all])
+            ->orFilterWhere(['like', 'contact.first_name', $this->all])
+            ->orFilterWhere(['like', 'contact.middle_name', $this->all])
+            ->orFilterWhere(['like', 'contact.last_name', $this->all])
+            ->orFilterWhere(['like', 'phone.phone', $this->all])
+            ->orFilterWhere(['like', 'company.nameEng', $this->all])
+            ->orFilterWhere(['like', 'company.nameRu', $this->all]);
 
         return $dataProvider;
     }
