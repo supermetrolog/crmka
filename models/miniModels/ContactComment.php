@@ -62,7 +62,9 @@ class ContactComment extends \yii\db\ActiveRecord
     {
         $model = new ContactComment();
         if ($model->load($post_data, '') && $model->save()) {
-            return ['message' => 'Комментарий добавлен', 'data' => self::find()->joinWith('author')->where(['contact_comment.id' => $model->id])->one()];
+            return ['message' => 'Комментарий добавлен', 'data' => self::find()->with(['author' => function ($query) {
+                $query->with('userProfile');
+            }])->where(['contact_comment.id' => $model->id])->limit(1)->one()];
         } else {
             throw new ValidationErrorHttpException($model->getErrorSummary(false));
         }
