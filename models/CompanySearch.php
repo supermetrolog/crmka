@@ -44,6 +44,7 @@ class CompanySearch extends Company
      */
     public function search($params)
     {
+        // SELECT * FROM (SELECT DISTINCT company.id, company.nameRu, category.category FROM `company` LEFT JOIN `request` ON `company`.`id` = `request`.`company_id` LEFT JOIN `category` ON `company`.`id` = `category`.`company_id` LEFT JOIN `contact` ON `company`.`id` = `contact`.`company_id` LEFT JOIN `phone` ON `contact`.`id` = `phone`.`contact_id` WHERE category.category IN (1,0)) as fuck GROUP BY id HAVING COUNT(*) > 1
         $query = Company::find()->distinct()->joinWith(['requests', 'categories', 'contacts' => function ($query) {
             $query->joinWith(['phones'])->with(['emails', 'contactComments']);
         }, 'categories'])->with([
@@ -116,8 +117,15 @@ class CompanySearch extends Company
             'company.activityProfile' => $this->activityProfile,
             'company.created_at' => $this->created_at,
             'company.updated_at' => $this->updated_at,
-            'category.category' => $this->categories ? explode(",", $this->categories) : null
+            'category.category' => $this->categories !== null ? explode(",", $this->categories) : null
         ]);
+        if ($this->categories && count(explode(",", $this->categories)) > 1) {
+            $query->groupBy(
+                'company.id'
+            );
+            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT category.category)'), count(explode(",", $this->categories)) - 1]);
+        }
+
         $query->andFilterWhere(['like', 'company.nameEng', $this->nameEng])
             ->andFilterWhere(['like', 'company.nameRu', $this->nameRu])
             ->andFilterWhere(['between', 'company.created_at', $this->dateStart, $this->dateEnd ?? date('Y-m-d')])
