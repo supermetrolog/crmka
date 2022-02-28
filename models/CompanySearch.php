@@ -35,6 +35,13 @@ class CompanySearch extends Company
         return Model::scenarios();
     }
 
+    public function stringToArray($value)
+    {
+        if (is_string($value)) {
+            return explode(",", $value);
+        }
+        return $value;
+    }
     /**
      * Creates data provider instance with search query applied
      *
@@ -97,7 +104,7 @@ class CompanySearch extends Company
         ]);
 
         $this->load($params, '');
-
+        $this->categories = $this->stringToArray($this->categories);
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
@@ -117,18 +124,16 @@ class CompanySearch extends Company
             'company.activityProfile' => $this->activityProfile,
             'company.created_at' => $this->created_at,
             'company.updated_at' => $this->updated_at,
-            'category.category' => $this->categories !== null ? explode(",", $this->categories) : null
+            'category.category' => $this->categories
         ]);
-        if ($this->categories && count(explode(",", $this->categories)) > 1) {
-            $query->groupBy(
-                'company.id'
-            );
-            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT category.category)'), count(explode(",", $this->categories)) - 1]);
+        if ($this->categories && count($this->categories) > 1) {
+            $query->groupBy('company.id');
+            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT category.category)'), count($this->categories) - 1]);
         }
 
         $query->andFilterWhere(['like', 'company.nameEng', $this->nameEng])
             ->andFilterWhere(['like', 'company.nameRu', $this->nameRu])
-            ->andFilterWhere(['between', 'company.created_at', $this->dateStart, $this->dateEnd ?? date('Y-m-d')])
+            ->andFilterWhere(['between', 'company.created_at', $this->dateStart ?? date('Y-m-d', strtotime('01.01.1970')), $this->dateEnd ?? date('Y-m-d')])
             ->andFilterWhere(['like', 'company.formOfOrganization', $this->formOfOrganization])
             ->andFilterWhere(['like', 'company.officeAdress', $this->officeAdress])
             ->andFilterWhere(['like', 'company.legalAddress', $this->legalAddress])
