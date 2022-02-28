@@ -124,6 +124,13 @@ class CompanySearch extends Company
 
         // return explode(",", $this->categories);
         // grid filtering conditions
+        $query->orFilterWhere(['company.id' => $this->all])
+            ->orFilterWhere(['like', 'contact.first_name', $this->all])
+            ->orFilterWhere(['like', 'contact.middle_name', $this->all])
+            ->orFilterWhere(['like', 'contact.last_name', $this->all])
+            ->orFilterWhere(['like', 'phone.phone', $this->all])
+            ->orFilterWhere(['like', 'company.nameEng', $this->all])
+            ->orFilterWhere(['like', 'company.nameRu', $this->all]);
         $query->andFilterWhere([
             'company.id' => $this->id,
             'company.noName' => $this->noName,
@@ -142,13 +149,7 @@ class CompanySearch extends Company
             $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT category.category)'), count($this->categories) - 1]);
         }
 
-        $query->orFilterWhere(['company.id' => $this->all])
-            ->orFilterWhere(['like', 'contact.first_name', $this->all])
-            ->orFilterWhere(['like', 'contact.middle_name', $this->all])
-            ->orFilterWhere(['like', 'contact.last_name', $this->all])
-            ->orFilterWhere(['like', 'phone.phone', $this->all])
-            ->orFilterWhere(['like', 'company.nameEng', $this->all])
-            ->orFilterWhere(['like', 'company.nameRu', $this->all]);
+
 
         $query->andFilterWhere(['like', 'company.nameEng', $this->nameEng])
             ->andFilterWhere(['like', 'company.nameRu', $this->nameRu])
