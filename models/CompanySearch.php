@@ -42,6 +42,17 @@ class CompanySearch extends Company
         }
         return $value;
     }
+    public function normalizeProps()
+    {
+        $this->categories = $this->stringToArray($this->categories);
+
+        if ($this->dateStart === null && $this->dateEnd === null) {
+            return;
+        }
+
+        $this->dateStart = $this->dateStart ?? date('Y-m-d', strtotime('01.01.1970'));
+        $this->dateEnd = $this->dateEnd ?? date('Y-m-d');
+    }
     /**
      * Creates data provider instance with search query applied
      *
@@ -104,7 +115,7 @@ class CompanySearch extends Company
         ]);
 
         $this->load($params, '');
-        $this->categories = $this->stringToArray($this->categories);
+        $this->normalizeProps();
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
@@ -131,9 +142,17 @@ class CompanySearch extends Company
             $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT category.category)'), count($this->categories) - 1]);
         }
 
+        $query->orFilterWhere(['company.id' => $this->all])
+            ->orFilterWhere(['like', 'contact.first_name', $this->all])
+            ->orFilterWhere(['like', 'contact.middle_name', $this->all])
+            ->orFilterWhere(['like', 'contact.last_name', $this->all])
+            ->orFilterWhere(['like', 'phone.phone', $this->all])
+            ->orFilterWhere(['like', 'company.nameEng', $this->all])
+            ->orFilterWhere(['like', 'company.nameRu', $this->all]);
+
         $query->andFilterWhere(['like', 'company.nameEng', $this->nameEng])
             ->andFilterWhere(['like', 'company.nameRu', $this->nameRu])
-            ->andFilterWhere(['between', 'company.created_at', $this->dateStart ?? date('Y-m-d', strtotime('01.01.1970')), $this->dateEnd ?? date('Y-m-d')])
+            ->andFilterWhere(['between', 'company.created_at', $this->dateStart, $this->dateEnd])
             ->andFilterWhere(['like', 'company.formOfOrganization', $this->formOfOrganization])
             ->andFilterWhere(['like', 'company.officeAdress', $this->officeAdress])
             ->andFilterWhere(['like', 'company.legalAddress', $this->legalAddress])
@@ -152,15 +171,6 @@ class CompanySearch extends Company
             ->andFilterWhere(['like', 'company.basis', $this->basis])
             ->andFilterWhere(['like', 'company.documentNumber', $this->documentNumber])
             ->andFilterWhere(['like', 'company.description', $this->description]);
-
-
-        $query->orFilterWhere(['company.id' => $this->all])
-            ->orFilterWhere(['like', 'contact.first_name', $this->all])
-            ->orFilterWhere(['like', 'contact.middle_name', $this->all])
-            ->orFilterWhere(['like', 'contact.last_name', $this->all])
-            ->orFilterWhere(['like', 'phone.phone', $this->all])
-            ->orFilterWhere(['like', 'company.nameEng', $this->all])
-            ->orFilterWhere(['like', 'company.nameRu', $this->all]);
 
         return $dataProvider;
     }
