@@ -8,6 +8,7 @@ use app\models\RequestSearch;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
+use yii\filters\Cors;
 
 /**
  * RequestController implements the CRUD actions for Request model.
@@ -19,7 +20,17 @@ class RequestController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
+        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
+        $behaviors['corsFilter'] = [
+            'class' => Cors::className(),
+            'cors' => [
+                'Origin' => ['*'],
+                'Access-Control-Request-Method' => ['*'],
+                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
+                'Access-Control-Expose-Headers' => ['X-Pagination-Total-Count', 'X-Pagination-Page-Count', 'X-Pagination-Current-Page', 'X-Pagination-Per-Page', 'Link']
+            ],
+        ];
+        return $behaviors;
     }
 
     public function actions()
@@ -34,7 +45,8 @@ class RequestController extends ActiveController
     }
     public function actionIndex()
     {
-        return true;
+        $searchModel = new RequestSearch();
+        return $searchModel->search(Yii::$app->request->queryParams);
     }
     public function actionCompanyRequests($id)
     {

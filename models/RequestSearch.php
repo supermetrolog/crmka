@@ -17,8 +17,8 @@ class RequestSearch extends Request
     public function rules()
     {
         return [
-            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'antiDustOnly', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate'], 'integer'],
-            [['description', 'created_at', 'updated_at', 'movingDate'], 'safe'],
+            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate', 'antiDustOnly', 'passive_why'], 'integer'],
+            [['description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment'], 'safe'],
         ];
     }
 
@@ -40,15 +40,18 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find();
+        $query = Request::find()->with(['consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => 3
+            ]
         ]);
 
-        $this->load($params);
+        $this->load($params, '');
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -70,7 +73,6 @@ class RequestSearch extends Request
             'maxCeilingHeight' => $this->maxCeilingHeight,
             'firstFloorOnly' => $this->firstFloorOnly,
             'heated' => $this->heated,
-            'antiDustOnly' => $this->antiDustOnly,
             'trainLine' => $this->trainLine,
             'trainLineLength' => $this->trainLineLength,
             'consultant_id' => $this->consultant_id,
@@ -82,9 +84,12 @@ class RequestSearch extends Request
             'updated_at' => $this->updated_at,
             'movingDate' => $this->movingDate,
             'unknownMovingDate' => $this->unknownMovingDate,
+            'antiDustOnly' => $this->antiDustOnly,
+            'passive_why' => $this->passive_why,
         ]);
 
-        $query->andFilterWhere(['like', 'description', $this->description]);
+        $query->andFilterWhere(['like', 'description', $this->description])
+            ->andFilterWhere(['like', 'passive_why_comment', $this->passive_why_comment]);
 
         return $dataProvider;
     }
