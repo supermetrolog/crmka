@@ -40,14 +40,14 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find()->with(['consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal.consultant.userProfile']);
+        $query = Request::find()->with(['company', 'consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 3
+                'pageSize' => 4
             ]
         ]);
 

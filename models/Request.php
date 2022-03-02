@@ -260,6 +260,9 @@ class Request extends \yii\db\ActiveRecord
         $fields['name'] = function ($fields) {
             return self::DEAL_TYPE_LIST[$fields['dealType']] . " {$fields['minArea']} - {$fields['maxArea']} м";
         };
+        $fields['progress_percent'] = function () {
+            return rand(10, 100);
+        };
         return $fields;
     }
     public function extraFields()
