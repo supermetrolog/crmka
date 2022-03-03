@@ -143,22 +143,6 @@ class Request extends \yii\db\ActiveRecord
         $request->status = $status;
         return $request->save(false);
     }
-    // public static function getCompanyRequestsList($company_id)
-    // {
-    //     $dataProvider = new ActiveDataProvider([
-    //         'query' => self::find()->joinWith(['consultant' => function ($query) {
-    //             $query->with(['userProfile']);
-    //         }, 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal' => function ($query) {
-    //             $query->with(['consultant' => function ($query) {
-    //                 $query->with(['userProfile']);
-    //             }]);
-    //         }])->where(['request.company_id' => $company_id]),
-    //         'pagination' => [
-    //             'pageSize' => 0,
-    //         ],
-    //     ]);
-    //     return $dataProvider;
-    // }
     public static function getCompanyRequestsList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
@@ -215,6 +199,7 @@ class Request extends \yii\db\ActiveRecord
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
         try {
+            $post_data['updated_at'] = date('Y-m-d H:i:s');
             if ($request->load($post_data, '') && $request->save()) {
                 $request->updateManyMiniModels([
                     RequestDirection::class =>  $post_data['directions'],
@@ -248,14 +233,14 @@ class Request extends \yii\db\ActiveRecord
             return $fields['movingDate'];
         };
         $fields['movingDate_format'] = function ($fields) {
-            return Yii::$app->formatter->format($fields['movingDate'], 'date');
+            return $fields['movingDate'] ? Yii::$app->formatter->format($fields['movingDate'], 'date') : null;
         };
 
         $fields['updated_at_format'] = function ($fields) {
-            return Yii::$app->formatter->format($fields['updated_at'], 'datetime');
+            return $fields['updated_at'] ? Yii::$app->formatter->format($fields['updated_at'], 'datetime') : null;
         };
         $fields['created_at_format'] = function ($fields) {
-            return Yii::$app->formatter->format($fields['created_at'], 'datetime');
+            return $fields['created_at'] ? Yii::$app->formatter->format($fields['created_at'], 'datetime') : null;
         };
         $fields['name'] = function ($fields) {
             return self::DEAL_TYPE_LIST[$fields['dealType']] . " {$fields['minArea']} - {$fields['maxArea']} м";

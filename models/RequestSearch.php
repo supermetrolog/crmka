@@ -5,12 +5,15 @@ namespace app\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Request;
+use yii\db\Expression;
 
 /**
  * RequestSearch represents the model behind the search form of `app\models\Request`.
  */
 class RequestSearch extends Request
 {
+    // public const DEAL_TYPE_IN_ALPHABETICAL_ORDER = [0, 2, 1, 3];
+    public const DEAL_TYPE_IN_ALPHABETICAL_ORDER = "0, 2, 1, 3";
     /**
      * {@inheritdoc}
      */
@@ -47,7 +50,45 @@ class RequestSearch extends Request
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 4
+                'pageSize' => 50
+            ],
+            'sort' => [
+                'enableMultiSort' => true,
+                'defaultOrder' => [
+                    'default' => SORT_DESC
+                ],
+                'attributes' => [
+                    'pricePerFloor',
+                    'updated_at',
+                    'dealType' => [
+                        'asc' => [
+                            new Expression('FIELD(request.dealType, 3,1,2,0) ASC')
+                        ],
+                        'desc' => [
+                            new Expression('FIELD(request.dealType, 3,1,2,0) DESC')
+                        ]
+                    ],
+                    'status' => [
+                        'asc' => [
+                            new Expression('FIELD(request.status, 2,0,1) ASC'),
+                        ],
+                        'desc' => [
+                            new Expression('FIELD(request.status, 2,0,1) DESC'),
+                        ],
+                    ],
+                    'default' => [
+                        'asc' => [
+                            new Expression('FIELD(request.status, 2,0,1) ASC'),
+                            'request.expressRequest' => SORT_ASC,
+                            'request.created_at' => SORT_ASC
+                        ],
+                        'desc' => [
+                            new Expression('FIELD(request.status, 2,0,1) DESC'),
+                            'request.expressRequest' => SORT_DESC,
+                            'request.created_at' => SORT_DESC
+                        ],
+                    ]
+                ]
             ]
         ]);
 

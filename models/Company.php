@@ -156,7 +156,7 @@ class Company extends \yii\db\ActiveRecord
             return Yii::$app->formatter->format($fields['created_at'], 'datetime');
         };
         $fields['updated_at_format'] = function ($fields) {
-            return Yii::$app->formatter->format($fields['updated_at'], 'datetime');
+            return $fields['updated_at'] ? Yii::$app->formatter->format($fields['updated_at'], 'datetime') : null;
         };
         $fields['full_name'] = function ($fields) {
             $formOfOrganization = $fields['formOfOrganization'];
@@ -317,6 +317,7 @@ class Company extends \yii\db\ActiveRecord
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
         try {
+            $post_data['updated_at'] = date('Y-m-d H:i:s');
             if ($model->load($post_data, '') && $model->save()) {
                 $model->updateManyMiniModels([
                     Category::class =>  $post_data['categories'],
