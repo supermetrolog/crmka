@@ -16,6 +16,8 @@ class RequestSearch extends Request
     public $dateStart;
     public $dateEnd;
     public $objectTypes;
+    public $objectClasses;
+    public $gateTypes;
     public $rangeMinPricePerFloor;
     public $rangeMaxPricePerFloor;
     public $rangeMinArea;
@@ -23,14 +25,15 @@ class RequestSearch extends Request
     public $rangeMinCeilingHeight;
     public $rangeMaxCeilingHeight;
     public $maxDistanceFromMKAD;
+    public $maxElectricity;
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD'], 'integer'],
-            [['description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes'], 'safe'],
+            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
+            [['description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectClasses', 'gateTypes'], 'safe'],
         ];
     }
 
@@ -53,6 +56,8 @@ class RequestSearch extends Request
     public function normalizeProps()
     {
         $this->objectTypes = $this->stringToArray($this->objectTypes);
+        $this->objectClasses = $this->stringToArray($this->objectClasses);
+        $this->gateTypes = $this->stringToArray($this->gateTypes);
         if ($this->dateStart === null && $this->dateEnd === null) {
             return;
         }
@@ -69,7 +74,7 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find()->distinct()->joinWith(['objectTypes'])->with(['company', 'consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'regions', 'deal.consultant.userProfile']);
+        $query = Request::find()->distinct()->joinWith(['objectTypes', 'objectClasses', 'gateTypes'])->with(['company', 'consultant.userProfile', 'directions', 'districts', 'regions', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 
@@ -155,13 +160,27 @@ class RequestSearch extends Request
             'request.unknownMovingDate' => $this->unknownMovingDate,
             'request.antiDustOnly' => $this->antiDustOnly,
             'request.passive_why' => $this->passive_why,
+            'request.water' => $this->water,
+            'request.steam' => $this->steam,
+            'request.sewerage' => $this->sewerage,
+            'request.gaz' => $this->gaz,
+            'request.shelving' => $this->shelving,
             'request_object_type.object_type' => $this->objectTypes,
+            'request_object_class.object_class' => $this->objectClasses,
+            'request_gate_type.gate_type' => $this->gateTypes,
         ]);
         if ($this->objectTypes && count($this->objectTypes) > 1) {
             $query->groupBy('request.id');
             $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_type.object_type)'), count($this->objectTypes) - 1]);
         }
-
+        if ($this->objectClasses && count($this->objectClasses) > 1) {
+            $query->groupBy('request.id');
+            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_class.object_class)'), count($this->objectClasses) - 1]);
+        }
+        if ($this->gateTypes && count($this->gateTypes) > 1) {
+            $query->groupBy('request.id');
+            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_gate_type.gate_type)'), count($this->gateTypes) - 1]);
+        }
         $query->andFilterWhere(['like', 'request.description', $this->description])
             ->andFilterWhere(['like', 'request.passive_why_comment', $this->passive_why_comment])
             ->andFilterWhere(['between', 'request.created_at', $this->dateStart, $this->dateEnd])
@@ -171,7 +190,8 @@ class RequestSearch extends Request
             ->andFilterWhere(['>=', 'request.pricePerFloor', $this->rangeMinPricePerFloor])
             ->andFilterWhere(['<=', 'request.maxCeilingHeight', $this->rangeMaxCeilingHeight])
             ->andFilterWhere(['>=', 'request.maxCeilingHeight', $this->rangeMinCeilingHeight])
-            ->andFilterWhere(['<=', 'request.distanceFromMKAD', $this->maxDistanceFromMKAD]);
+            ->andFilterWhere(['<=', 'request.distanceFromMKAD', $this->maxDistanceFromMKAD])
+            ->andFilterWhere(['<=', 'request.electricity', $this->maxElectricity]);
 
         return $dataProvider;
     }

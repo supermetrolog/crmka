@@ -45,6 +45,11 @@ use app\behaviors\CreateManyMiniModelsBehaviors;
  * @property string|null $updated_at
  * @property string|null $movingDate Дата переезда
  * @property int|null $unknownMovingDate [флаг] Нет конкретики по сроку переезда/рассматривает постоянно
+ * @property int|null $water [флаг]
+ * @property int|null $sewerage [флаг]
+ * @property int|null $gaz [флаг]
+ * @property int|null $steam [флаг]
+ * @property int|null $shelving [флаг]
  *
  * @property Company $company
  * @property User $consultant
@@ -86,7 +91,7 @@ class Request extends \yii\db\ActiveRecord
         return [
             [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'consultant_id'], 'required'],
             [['antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
-            [['company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why'], 'integer'],
+            [['company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
             [['created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
             [['description', 'passive_why_comment'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
@@ -127,6 +132,11 @@ class Request extends \yii\db\ActiveRecord
             'unknownMovingDate' => 'Unknown Moving Date',
             'passive_why' => 'PassiveWhy',
             'passive_why_comment' => 'PassiveWhyComment',
+            'water' => 'Water',
+            'gaz' => 'Gaz',
+            'sewerage' => 'Sewerage',
+            'steam' => 'Steam',
+            'shelving' => 'Shelving',
         ];
     }
     public static function findModel($id)
