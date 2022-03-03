@@ -12,16 +12,25 @@ use yii\db\Expression;
  */
 class RequestSearch extends Request
 {
-    // public const DEAL_TYPE_IN_ALPHABETICAL_ORDER = [0, 2, 1, 3];
-    public const DEAL_TYPE_IN_ALPHABETICAL_ORDER = "0, 2, 1, 3";
+    public $all;
+    public $dateStart;
+    public $dateEnd;
+    public $objectTypes;
+    public $rangeMinPricePerFloor;
+    public $rangeMaxPricePerFloor;
+    public $rangeMinArea;
+    public $rangeMaxArea;
+    public $rangeMinCeilingHeight;
+    public $rangeMaxCeilingHeight;
+    public $maxDistanceFromMKAD;
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate', 'antiDustOnly', 'passive_why'], 'integer'],
-            [['description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment'], 'safe'],
+            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD'], 'integer'],
+            [['description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes'], 'safe'],
         ];
     }
 
@@ -34,6 +43,23 @@ class RequestSearch extends Request
         return Model::scenarios();
     }
 
+    public function stringToArray($value)
+    {
+        if (is_string($value)) {
+            return explode(",", $value);
+        }
+        return $value;
+    }
+    public function normalizeProps()
+    {
+        $this->objectTypes = $this->stringToArray($this->objectTypes);
+        if ($this->dateStart === null && $this->dateEnd === null) {
+            return;
+        }
+
+        $this->dateStart = $this->dateStart ?? date('Y-m-d', strtotime('01.01.1970'));
+        $this->dateEnd = $this->dateEnd ?? date('Y-m-d');
+    }
     /**
      * Creates data provider instance with search query applied
      *
@@ -43,7 +69,7 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find()->with(['company', 'consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal.consultant.userProfile']);
+        $query = Request::find()->distinct()->joinWith(['objectTypes'])->with(['company', 'consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'regions', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 
@@ -93,6 +119,7 @@ class RequestSearch extends Request
         ]);
 
         $this->load($params, '');
+        $this->normalizeProps();
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -102,35 +129,49 @@ class RequestSearch extends Request
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'company_id' => $this->company_id,
-            'dealType' => $this->dealType,
-            'expressRequest' => $this->expressRequest,
-            'distanceFromMKAD' => $this->distanceFromMKAD,
-            'distanceFromMKADnotApplicable' => $this->distanceFromMKADnotApplicable,
-            'minArea' => $this->minArea,
-            'maxArea' => $this->maxArea,
-            'minCeilingHeight' => $this->minCeilingHeight,
-            'maxCeilingHeight' => $this->maxCeilingHeight,
-            'firstFloorOnly' => $this->firstFloorOnly,
-            'heated' => $this->heated,
-            'trainLine' => $this->trainLine,
-            'trainLineLength' => $this->trainLineLength,
-            'consultant_id' => $this->consultant_id,
-            'pricePerFloor' => $this->pricePerFloor,
-            'electricity' => $this->electricity,
-            'haveCranes' => $this->haveCranes,
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'movingDate' => $this->movingDate,
-            'unknownMovingDate' => $this->unknownMovingDate,
-            'antiDustOnly' => $this->antiDustOnly,
-            'passive_why' => $this->passive_why,
+            'request.id' => $this->id,
+            'request.company_id' => $this->company_id,
+            'request.dealType' => $this->dealType,
+            'request.expressRequest' => $this->expressRequest,
+            'request.distanceFromMKAD' => $this->distanceFromMKAD,
+            'request.distanceFromMKADnotApplicable' => $this->distanceFromMKADnotApplicable,
+            'request.minCeilingHeight' => $this->minCeilingHeight,
+            'request.maxCeilingHeight' => $this->maxCeilingHeight,
+            'request.firstFloorOnly' => $this->firstFloorOnly,
+            'request.heated' => $this->heated,
+            'request.minArea' => $this->minArea,
+            'request.maxArea' => $this->maxArea,
+            'request.heated' => $this->heated,
+            'request.trainLine' => $this->trainLine,
+            'request.trainLineLength' => $this->trainLineLength,
+            'request.consultant_id' => $this->consultant_id,
+            'request.pricePerFloor' => $this->pricePerFloor,
+            'request.electricity' => $this->electricity,
+            'request.haveCranes' => $this->haveCranes,
+            'request.status' => $this->status,
+            'request.created_at' => $this->created_at,
+            'request.updated_at' => $this->updated_at,
+            'request.movingDate' => $this->movingDate,
+            'request.unknownMovingDate' => $this->unknownMovingDate,
+            'request.antiDustOnly' => $this->antiDustOnly,
+            'request.passive_why' => $this->passive_why,
+            'request_object_type.object_type' => $this->objectTypes,
         ]);
+        if ($this->objectTypes && count($this->objectTypes) > 1) {
+            $query->groupBy('request.id');
+            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_type.object_type)'), count($this->objectTypes) - 1]);
+        }
 
-        $query->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['like', 'passive_why_comment', $this->passive_why_comment]);
+        $query->andFilterWhere(['like', 'request.description', $this->description])
+            ->andFilterWhere(['like', 'request.passive_why_comment', $this->passive_why_comment])
+            ->andFilterWhere(['between', 'request.created_at', $this->dateStart, $this->dateEnd])
+            ->andFilterWhere(['<=', 'request.maxArea', $this->rangeMaxArea])
+            ->andFilterWhere(['>=', 'request.maxArea', $this->rangeMinArea])
+            ->andFilterWhere(['<=', 'request.pricePerFloor', $this->rangeMaxPricePerFloor])
+            ->andFilterWhere(['>=', 'request.pricePerFloor', $this->rangeMinPricePerFloor])
+            ->andFilterWhere(['<=', 'request.maxCeilingHeight', $this->rangeMaxCeilingHeight])
+            ->andFilterWhere(['>=', 'request.maxCeilingHeight', $this->rangeMinCeilingHeight])
+            ->andFilterWhere(['<=', 'request.distanceFromMKAD', $this->maxDistanceFromMKAD]);
 
         return $dataProvider;
     }
