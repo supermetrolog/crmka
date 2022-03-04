@@ -258,6 +258,9 @@ class Request extends \yii\db\ActiveRecord
         $fields['progress_percent'] = function () {
             return rand(10, 100);
         };
+        $fields['pricePerFloorMonth'] = function ($fields) {
+            return round($fields['pricePerFloor'] !== null ? $fields['pricePerFloor'] / 12 : $fields['pricePerFloor'], 2);
+        };
         return $fields;
     }
     public function extraFields()
