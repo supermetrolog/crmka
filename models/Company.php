@@ -46,6 +46,8 @@ use yii\data\Sort;
  * @property string|null $passive_why_comment
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property string|null $latitude
+ * @property string|null $longitude
  *
  * @property User $broker
  * @property Companygroup $companyGroup
@@ -87,7 +89,7 @@ class Company extends \yii\db\ActiveRecord
             [['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment'], 'string', 'max' => 255],
+            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'latitude', 'longitude'], 'string', 'max' => 255],
             [['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['broker_id' => 'id']],
             [['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::className(), 'targetAttribute' => ['companyGroup_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
@@ -134,6 +136,8 @@ class Company extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
             'passive_why' => 'PassiveWhy',
             'passive_why_comment' => 'PassiveWhyComment',
+            'latitude' => 'Latitude',
+            'longitude' => 'Longitude'
         ];
     }
     public function fields()
