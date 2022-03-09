@@ -143,7 +143,11 @@ class Contact extends \yii\db\ActiveRecord
     }
     private function changeIsMain()
     {
-        $model = static::find()->where(['isMain' => 1, 'company_id' => $this->company_id])->limit(1)->one();
+        $query = static::find()->where(['isMain' => 1, 'company_id' => $this->company_id]);
+        if ($this->id) {
+            $query->andWhere(['!=', 'id', $this->id]);
+        }
+        $model = $query->limit(1)->one();
         if ($model) {
             $model->isMain = null;
             $model->save(false);
@@ -151,10 +155,10 @@ class Contact extends \yii\db\ActiveRecord
     }
     public function beforeSave($insert)
     {
-        parent::beforeSave($insert);
-        if ($this->isMain) {
+        if ($this->isMain == 1) {
             $this->changeIsMain();
         }
+        parent::beforeSave($insert);
         return true;
     }
 
