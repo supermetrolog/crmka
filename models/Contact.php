@@ -34,6 +34,7 @@ use app\behaviors\CreateManyMiniModelsBehaviors;
  * @property int|null $passive_why
  * @property string|null $passive_why_comment
  * @property string|null $warning_why_comment
+ * @property int|null $isMain основной контакт
  * @property Company $company
  * @property User $consultant
  * @property ContactComment[] $contactComments
@@ -68,7 +69,7 @@ class Contact extends \yii\db\ActiveRecord
     {
         return [
             [['company_id'], 'required'],
-            [['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'passive_why', 'position_unknown'], 'integer'],
+            [['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['first_name', 'middle_name', 'last_name', 'passive_why_comment', 'warning_why_comment'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
@@ -99,7 +100,8 @@ class Contact extends \yii\db\ActiveRecord
             'passive_why' => 'PassiveWhy',
             'passive_why_comment' => 'PassiveWhyComment',
             'warning_why_comment' => 'WarningWhyComment',
-            'position_unknown' => 'PositionUnknown'
+            'position_unknown' => 'PositionUnknown',
+            'isMain' => 'IsMain'
         ];
     }
 
@@ -139,7 +141,22 @@ class Contact extends \yii\db\ActiveRecord
         };
         return $fields;
     }
-
+    private function changeIsMain()
+    {
+        $model = static::find()->where(['isMain' => 1, 'company_id' => $this->company_id])->limit(1)->one();
+        if ($model) {
+            $model->isMain = null;
+            $model->save(false);
+        }
+    }
+    public function beforeSave($insert)
+    {
+        parent::beforeSave($insert);
+        if ($this->isMain) {
+            $this->changeIsMain();
+        }
+        return true;
+    }
 
     public static function getCompanyContactList($company_id)
     {
@@ -152,7 +169,7 @@ class Contact extends \yii\db\ActiveRecord
                 }]);
             }])->where(['contact.company_id' => $company_id]),
             'pagination' => [
-                'pageSize' => 10000,
+                'pageSize' => 0,
             ],
         ]);
         return $dataProvider;
