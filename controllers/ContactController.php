@@ -8,6 +8,7 @@ use app\models\Contact;
 use app\models\miniModels\ContactComment;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
+use app\models\ContactSearch;
 
 class ContactController extends ActiveController
 {
@@ -25,7 +26,13 @@ class ContactController extends ActiveController
         unset($actions['create']);
         unset($actions['delete']);
         unset($actions['update']);
+        unset($actions['index']);
         return $actions;
+    }
+    public function actionIndex()
+    {
+        $searchModel = new ContactSearch();
+        return $searchModel->search(Yii::$app->request->queryParams);
     }
     public function actionCompanyContacts($id)
     {
