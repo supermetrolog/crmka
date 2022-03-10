@@ -197,6 +197,7 @@ class Contact extends \yii\db\ActiveRecord
     {
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            $post_data['updated_at'] = date('Y-m-d H:i:s');
             if (!$model->load($post_data, '') || !$model->save())
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
 

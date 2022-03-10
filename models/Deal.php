@@ -120,6 +120,7 @@ class Deal extends \yii\db\ActiveRecord
 
     public static function updateDeal($model, $post_data)
     {
+        $post_data['updated_at'] = date('Y-m-d H:i:s');
         if ($model->load($post_data, '') && $model->save()) {
             return ['message' => "Сделка изменена", 'data' => $model->id];
         }

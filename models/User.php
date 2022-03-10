@@ -126,9 +126,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             $post_data['updated_at'] = time();
             if ($user->load($post_data, '') && $user->save()) {
                 UserProfile::updateUserProfile($post_data['userProfile'], $uploadFileModel);
-                // $transaction->rollBack();
-                // return $post_data;
-
                 $transaction->commit();
                 return ['message' => "Пользователь изменен", 'data' => $user->id];
             }
@@ -142,11 +139,11 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         $fields = parent::fields();
         unset($fields['auth_key'], $fields['password_hash'], $fields['password_reset_token'], $fields['access_token']);
-        $fields['created_at'] = function ($fields) {
+        $fields['created_at_format'] = function ($fields) {
             return Yii::$app->formatter->format($fields['created_at'], 'datetime');
         };
-        $fields['updated_at'] = function ($fields) {
-            return Yii::$app->formatter->format($fields['updated_at'], 'datetime');
+        $fields['updated_at_format'] = function ($fields) {
+            return $fields['updated_at'] ? Yii::$app->formatter->format($fields['updated_at'], 'datetime') : null;
         };
         return $fields;
     }
