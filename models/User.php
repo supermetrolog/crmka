@@ -86,9 +86,11 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public static function getUsers()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['userProfile'])->where(['status' => self::STATUS_ACTIVE]),
+            'query' => self::find()->distinct()->with(['userProfile' => function ($query) {
+                $query->with(['phones', 'emails']);
+            }])->where(['status' => self::STATUS_ACTIVE]),
             'pagination' => [
-                'pageSize' => 200,
+                'pageSize' => 0,
             ],
         ]);
 
