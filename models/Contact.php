@@ -165,13 +165,7 @@ class Contact extends \yii\db\ActiveRecord
     public static function getCompanyContactList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant' => function ($query) {
-                $query->with(['userProfile']);
-            }, 'contactComments' => function ($query) {
-                $query->with(['author' => function ($query) {
-                    $query->with(['userProfile']);
-                }]);
-            }])->where(['contact.company_id' => $company_id]),
+            'query' => self::find()->with(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant.userProfile', 'contactComments.author.userProfile'])->where(['contact.company_id' => $company_id]),
             'pagination' => [
                 'pageSize' => 0,
             ],

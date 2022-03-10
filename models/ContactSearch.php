@@ -40,20 +40,14 @@ class ContactSearch extends Contact
      */
     public function search($params)
     {
-        $query = Contact::find()->joinWith(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant' => function ($query) {
-            $query->with(['userProfile']);
-        }, 'contactComments' => function ($query) {
-            $query->with(['author' => function ($query) {
-                $query->with(['userProfile']);
-            }]);
-        }]);
+        $query = Contact::find()->with(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant.userProfile', 'contactComments.author.userProfile']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 0,
+                'pageSize' => 50,
             ],
         ]);
 
