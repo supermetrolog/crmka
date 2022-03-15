@@ -29,7 +29,7 @@ class m220215_075708_create_calendar_table extends Migration
         $this->createIndex(
             'idx-calendar-consultant_id',
             'calendar',
-            'consultant_id',
+            'consultant_id'
         );
         $this->addForeignKey(
             'fk-calendar-consultant_id',

@@ -21,7 +21,7 @@ class m220211_081203_create_timeline_object_comment_table extends Migration
         $this->createIndex(
             'idx-timeline_step_object_comment-timeline_step_object_id',
             'timeline_step_object_comment',
-            'timeline_step_object_id',
+            'timeline_step_object_id'
         );
         $this->addForeignKey(
             'fk-timeline_step_object_comment-timeline_step_object_id',

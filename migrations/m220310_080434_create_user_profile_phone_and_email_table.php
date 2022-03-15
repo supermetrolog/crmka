@@ -26,13 +26,13 @@ class m220310_080434_create_user_profile_phone_and_email_table extends Migration
         $this->createIndex(
             'idx-user_profile_phone-user_profile_id',
             'user_profile_phone',
-            'user_profile_id',
+            'user_profile_id'
         );
 
         $this->createIndex(
             'idx-user_profile_email-user_profile_id',
             'user_profile_email',
-            'user_profile_id',
+            'user_profile_id'
         );
 
         $this->addForeignKey(
