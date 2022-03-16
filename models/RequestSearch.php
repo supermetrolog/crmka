@@ -74,7 +74,7 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find()->distinct()->joinWith(['objectTypes', 'objectClasses', 'gateTypes'])->with(['company', 'consultant.userProfile', 'directions', 'districts', 'regions', 'deal.consultant.userProfile']);
+        $query = Request::find()->distinct()->joinWith(['objectTypes', 'objectClasses', 'gateTypes', 'company'])->with(['consultant.userProfile', 'directions', 'districts', 'regions', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 
@@ -131,6 +131,10 @@ class RequestSearch extends Request
             // $query->where('0=1');
             return $dataProvider;
         }
+
+        $query->orFilterWhere(['request.id' => $this->all])
+            ->orFilterWhere(['like', 'company.nameEng', $this->all])
+            ->orFilterWhere(['like', 'company.nameRu', $this->all]);
 
         // grid filtering conditions
         $query->andFilterWhere([
