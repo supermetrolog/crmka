@@ -10,7 +10,8 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\Login;
 use app\models\ContactForm;
-use app\models\Request;
+use app\events\NotificationEvent;
+use app\models\User;
 
 class SiteController extends Controller
 {
@@ -63,11 +64,19 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $models = new Company;
-        // var_dump($models->foreignKeys['fk-request_region-request_id']['request_id']);
-        var_dump($models);
-        $this->foo();
-        return $this->render('index');
+        $user = User::findOne(3);
+        echo "<pre>";
+        // print_r($user);
+        $user->password_reset_token = '222222222';
+        print_r($user->password_reset_token);
+        echo "<br>";
+        print_r($user->getOldAttribute('password_reset_token'));
+        echo "<br>";
+        $user->save(false);
+        print_r($user->password_reset_token);
+        echo "<br>";
+        print_r($user->getOldAttribute('password_reset_token'));
+        return 'fuck';
     }
 
     /**

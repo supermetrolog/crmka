@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\events\NotificationEvent;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\CompanyFile;
@@ -64,6 +65,15 @@ class Company extends \yii\db\ActiveRecord
         5 => 'ИП',
     ];
 
+    public const COMPANY_CREATED_EVENT = 'company_created_event';
+    public const COMPANY_UPDATED_EVENT = 'company_updated_event';
+
+
+    public function init()
+    {
+        $this->on(self::COMPANY_CREATED_EVENT, [Yii::$app->notify, 'notifyUser']);
+        parent::init();
+    }
     public function behaviors()
     {
         return [
@@ -244,7 +254,7 @@ class Company extends \yii\db\ActiveRecord
             $query->with(['userProfile']);
         }, 'files', 'contacts' => function ($query) {
             $query->with(['phones', 'emails', 'contactComments', 'websites']);
-        }])->where(['company.id' => $id])->one();
+        }])->where(['company.id' => $id])->limit(1)->one();
     }
 
     private function createGeneralContact($post_data)
@@ -304,7 +314,13 @@ class Company extends \yii\db\ActiveRecord
                 ]);
                 $model->createGeneralContact($post_data['contacts']);
                 $model->uploadFiles($uploadFileModel);
-                // $transaction->rollBack();
+
+                $model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
+                    'consultant_id' => $model->consultant_id,
+                    'type' => Notification::TYPE_COMPANY,
+                    'title' => 'компания',
+                    'body' => Yii::$app->controller->renderPartial('notification/assigned_company', ['model' => $model])
+                ]));
 
                 $transaction->commit();
                 return ['message' => "Компания создана", 'data' => $model->id];
@@ -320,6 +336,7 @@ class Company extends \yii\db\ActiveRecord
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
+        $oldConsultantId = $model->consultant_id;
         try {
             $post_data['updated_at'] = date('Y-m-d H:i:s');
             if ($model->load($post_data, '') && $model->save()) {
@@ -330,7 +347,20 @@ class Company extends \yii\db\ActiveRecord
                 $model->updateGeneralContact($post_data['contacts']);
                 $model->updateFiles($post_data, $uploadFileModel);
                 // $transaction->rollBack();
-
+                if ($oldConsultantId != $model->consultant_id) {
+                    $model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
+                        'consultant_id' => $oldConsultantId,
+                        'type' => Notification::TYPE_COMPANY,
+                        'title' => 'компания',
+                        'body' => Yii::$app->controller->renderPartial('notification/unAssigned_company', ['model' => $model])
+                    ]));
+                    $model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
+                        'consultant_id' => $model->consultant_id,
+                        'type' => Notification::TYPE_COMPANY,
+                        'title' => 'компания',
+                        'body' => Yii::$app->controller->renderPartial('notification/assigned_company', ['model' => $model])
+                    ]));
+                }
                 $transaction->commit();
                 return ['message' => "Компания изменена", 'data' => $model->id];
             }

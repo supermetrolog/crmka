@@ -24,12 +24,16 @@ class Notification extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public const NO_FETCHED_STATUS = -1;
     private const FETCHED_STATUS = 0;
-    public const NO_VIEWED_STATUS = 0;
+    public const NO_FETCHED_STATUS = -1;
     private const VIEWED_STATUS = 1;
-    private const PROCESSED_STATUS = 2;
+    public const NO_VIEWED_STATUS = 0;
 
+    public const TYPE_COMPANY = 0;
+    public const TYPE_REQUEST = 1;
+    public const TYPE_CALENDAR = 2;
+    public const TYPE_TIMELINE = 3;
+    public const TYPE_COLLECTION = 4;
     public static function tableName()
     {
         return 'notification';

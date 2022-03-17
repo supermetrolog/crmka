@@ -14,6 +14,9 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'components' => [
+        'notify' => [
+            'class' => app\components\NotificationService::class,
+        ],
         'formatter' => [
             'class' => \yii\i18n\Formatter::className(),
             'dateFormat' => 'long',
