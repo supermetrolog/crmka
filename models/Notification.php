@@ -87,10 +87,25 @@ class Notification extends \yii\db\ActiveRecord
         ]);
         return $dataProvider;
     }
+    public static function getNotificationsCount($id)
+    {
+        return self::find()->where(['notification.consultant_id' => $id, 'status' => [self::NO_FETCHED_STATUS, self::NO_VIEWED_STATUS]])->count();
+    }
     public static function getNewNotifications($id)
     {
         $dataProvider = new ActiveDataProvider([
             'query' => self::find()->where(['notification.consultant_id' => $id])->andWhere(['status' => self::NO_FETCHED_STATUS]),
+        ]);
+        $models = $dataProvider->getModels();
+        $response = self::array_copy($models);
+        self::changeNoFetchedStatusToFetched($models);
+        $dataProvider->models = $response;
+        return $dataProvider;
+    }
+    public static function getUsersNewNotifications(array $ids)
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => self::find()->where(['notification.consultant_id' => $ids])->andWhere(['status' => self::NO_FETCHED_STATUS]),
         ]);
         $models = $dataProvider->getModels();
         $response = self::array_copy($models);

@@ -4,17 +4,69 @@ namespace app\daemons;
 
 use app\models\CallList;
 use app\models\Notification;
-use consik\yii2websocket\events\WSClientMessageEvent;
 use consik\yii2websocket\WebSocketServer;
-use Prophecy\Call\Call;
 use Ratchet\ConnectionInterface;
+use Ratchet\Server\IoServer;
+use Ratchet\Http\HttpServer;
+use Ratchet\WebSocket\WsServer;
+use consik\yii2websocket\events\ExceptionEvent;
+use app\daemons\loops\NotifyLoop;
 use yii\helpers\ArrayHelper;
-use yii\data\ActiveDataProvider;
 
 class ServerWS extends WebSocketServer
 {
 
-    private const MESSAGE_TEMPLATE = ['message' => '', 'action' => 'info', 'error' => false, 'success' => false];
+    public const MESSAGE_TEMPLATE = ['message' => '', 'action' => 'info', 'error' => false, 'success' => false];
+    private $_clients = [];
+    private $timeout = 1;
+    public function start()
+    {
+        try {
+            $this->server = IoServer::factory(
+                new HttpServer(
+                    new WsServer(
+                        $this
+                    )
+                ),
+                $this->port
+            );
+            $this->trigger(self::EVENT_WEBSOCKET_OPEN);
+            $this->clients = new \SplObjectStorage();
+            $notifyLoop = new NotifyLoop;
+            $this->server->loop->addPeriodicTimer($this->timeout, function () use ($notifyLoop) {
+                echo "Timer!\n";
+                $notifyLoop->run($this->_clients);
+            });
+            $this->server->run();
+
+            return true;
+        } catch (\Exception $e) {
+            $errorEvent = new ExceptionEvent([
+                'exception' => $e
+            ]);
+            $this->trigger(self::EVENT_WEBSOCKET_OPEN_ERROR, $errorEvent);
+            return false;
+        }
+    }
+    public static function sendAllClients(array $clients, Message $msg)
+    {
+        foreach ($clients as $client_pool) {
+            foreach ($client_pool as  $client) {
+                $client->send($msg->getData());
+            }
+        }
+    }
+    public static function sendClient(array $clients, int $client_id, Message $msg): bool
+    {
+        if (!ArrayHelper::keyExists($client_id, $clients)) return false;
+        echo "SendClient -> $client_id \n";
+
+        foreach ($clients[$client_id] as $client) {
+            $client->send($msg->getData());
+            echo "Sended msg for user -> " . $client_id;
+        }
+        return true;
+    }
     protected function getCommand(ConnectionInterface $from, $msg)
     {
         $request = json_decode($msg, true);
@@ -51,20 +103,6 @@ class ServerWS extends WebSocketServer
         $result['message'] = $models;
         $client->send(json_encode($result));
     }
-    function commandCheckNewNotifications(ConnectionInterface $client, $msg)
-    {
-        echo "\ncommandCheckNewNotification!\n";
-        $result = self::MESSAGE_TEMPLATE;
-
-        $models = Notification::find()->where(['notification.consultant_id' => $client->name])->andWhere(['status' => Notification::NO_FETCHED_STATUS])->all();
-        $response = Notification::array_copy($models);
-        Notification::changeNoFetchedStatusToFetched($models);
-        $models = $response;
-
-        $result['action'] = 'new_notifications';
-        $result['message'] = $models;
-        $client->send(json_encode($result));
-    }
     function commandEcho(ConnectionInterface $client, $msg)
     {
         echo "CommandEcho!";
@@ -88,8 +126,9 @@ class ServerWS extends WebSocketServer
             return $client->send(json_encode($result));
         }
         $client->name = $msg->data->user_id;
+        $this->_clients[$client->name][] = $client;
         $result['action'] = 'user_id_seted';
-        $result['message'] = "Ваш UserID [{$client->name}] зарегистрирован!";
+        $result['message'] = "Yout UserID [{$client->name}] was seted!";
         $result['success'] = true;
         return $client->send(json_encode($result));
     }

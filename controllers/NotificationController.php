@@ -56,6 +56,10 @@ class NotificationController extends ActiveController
     {
         return Notification::viewed($id);
     }
+    public function actionCount($id)
+    {
+        return Notification::getNotificationsCount($id);
+    }
     public function actionNew($id)
     {
         return Notification::getNewNotifications($id);

@@ -73,6 +73,7 @@ return
                 'GET <id>' => 'index',
                 'GET,OPTIONS new/<id>' => 'new',
                 'GET,OPTIONS <id>/viewed' => 'viewed',
+                'GET,OPTIONS <id>/count' => 'count',
             ],
         ],
         [
