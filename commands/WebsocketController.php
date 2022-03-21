@@ -24,10 +24,6 @@ class WebsocketController extends Controller
     {
         $server = new ServerWS();
         $server->port = 8082; //This port must be busy by WebServer and we handle an error
-        // $server->loop->addPeriodicTimer($this->timeout, function () use ($server) {
-        //     echo "\nTimer!\n";
-        //     $server->checkUpdates();
-        // });
         $server->on(WebSocketServer::EVENT_WEBSOCKET_OPEN_ERROR, function ($e) use ($server) {
             echo "Error opening port " . $server->port . "\n";
             $server->port += 1; //Try next port to open
@@ -39,7 +35,10 @@ class WebsocketController extends Controller
         });
         $server->on(WebSocketServer::EVENT_CLIENT_CONNECTED, function ($e) use ($server) {
             echo "\nCLIENT CONNECTED\n";
-            $e->client->send(json_encode(['message' => 'fuck you']));
+            $e->client->send(json_encode(['message' => 'Client connected']));
+        });
+        $server->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) use ($server) {
+            echo "\nCLIENT DISCONNECTED\n";
         });
         echo "Start server\n";
         $server->start();

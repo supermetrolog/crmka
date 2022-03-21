@@ -15,6 +15,7 @@ abstract class BaseLoop
 
     protected function getUsersIds()
     {
+        var_dump($this->clients);
         $users_ids = [];
         foreach ($this->clients as $key => $value) {
             $users_ids[] = $key;
