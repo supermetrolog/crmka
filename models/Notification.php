@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use phpDocumentor\Reflection\Types\Self_;
 use Yii;
 use yii\data\ActiveDataProvider;
 
@@ -28,6 +29,7 @@ class Notification extends \yii\db\ActiveRecord
     public const NO_FETCHED_STATUS = -1;
     private const VIEWED_STATUS = 1;
     public const NO_VIEWED_STATUS = 0;
+    public const PROCESSED_STATUS = 2;
 
     public const TYPE_COMPANY = 0;
     public const TYPE_REQUEST = 1;
@@ -126,6 +128,15 @@ class Notification extends \yii\db\ActiveRecord
         foreach ($models as $model) {
             if ($model->status == self::NO_FETCHED_STATUS) {
                 $model->status = self::FETCHED_STATUS;
+                $model->save();
+            }
+        }
+    }
+    public static function changeNoViewedStatusToViewed($models)
+    {
+        foreach ($models as $model) {
+            if ($model->status == self::NO_VIEWED_STATUS && $model->status != self::PROCESSED_STATUS) {
+                $model->status = self::VIEWED_STATUS;
                 $model->save();
             }
         }

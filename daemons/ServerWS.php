@@ -11,6 +11,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use consik\yii2websocket\events\ExceptionEvent;
 use app\daemons\loops\NotifyLoop;
+use app\models\NotificationSearch;
 use yii\helpers\ArrayHelper;
 
 class ServerWS extends WebSocketServer
@@ -114,6 +115,17 @@ class ServerWS extends WebSocketServer
         $result = self::MESSAGE_TEMPLATE;
         $result['message'] = $client->name;
         $client->send(json_encode($result));
+    }
+    function commandViewedAllNotify(ConnectionInterface $client, $msg)
+    {
+        echo "CommandViewdAllNotify!";
+        $message = new Message();
+        $message->setBody("");
+        $message->setAction(Message::ACTION_CHECK_NOTIFICATIONS_COUNT);
+        $searchModel = new NotificationSearch();
+        $models = $searchModel->search(['consultant_id' => $client->name, 'status' => [-1, 0]])->getModels();
+        Notification::changeNoViewedStatusToViewed($models);
+        return self::sendClient($this->_clients, $client->name, $message);
     }
     function commandSetUserID(ConnectionInterface $client, $msg)
     {

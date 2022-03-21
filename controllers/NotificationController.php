@@ -8,6 +8,7 @@ use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use yii\filters\Cors;
 use app\behaviors\BaseControllerBehaviors;
+use app\models\NotificationSearch;
 
 /**
  * NotificationController implements the CRUD actions for Notification model.
@@ -48,9 +49,15 @@ class NotificationController extends ActiveController
      * Lists all Notification models.
      * @return mixed
      */
-    public function actionIndex($id)
+    public function actionIndex()
     {
-        return Notification::getNotificationsForUser($id);
+        $searchModel = new NotificationSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        // $models = $dataProvider->getModels();
+        // $copyModels = Notification::array_copy($models);
+        // Notification::changeNoViewedStatusToViewed($models);
+        // $dataProvider->models = $copyModels;
+        return $dataProvider;
     }
     public function actionViewed($id)
     {

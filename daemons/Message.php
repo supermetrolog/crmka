@@ -8,6 +8,7 @@ use yii\base\Model;
 class Message extends Model
 {
     public const ACTION_NEW_NOTIFICATION = 'new_notifications';
+    public const ACTION_CHECK_NOTIFICATIONS_COUNT = 'check_notifications_count';
     private $body;
     private string $action;
     private bool $error = false;
