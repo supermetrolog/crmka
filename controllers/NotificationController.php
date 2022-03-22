@@ -53,10 +53,10 @@ class NotificationController extends ActiveController
     {
         $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        // $models = $dataProvider->getModels();
-        // $copyModels = Notification::array_copy($models);
-        // Notification::changeNoViewedStatusToViewed($models);
-        // $dataProvider->models = $copyModels;
+        $models = $dataProvider->getModels();
+        $copyModels = Notification::array_copy($models);
+        Notification::changeNoViewedStatusToNoCount($models);
+        $dataProvider->models = $copyModels;
         return $dataProvider;
     }
     public function actionViewed($id)

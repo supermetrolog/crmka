@@ -15,7 +15,7 @@ class Message extends Model
 
     public function setBody($data)
     {
-        $this->body = $data;
+        $this->body = $data ?? "";
     }
     public function setAction($data)
     {
@@ -36,7 +36,8 @@ class Message extends Model
 
         foreach ($data as $key => $item) {
             if (is_null($item)) {
-                throw new InvalidValueException("$key was not be NULL");
+                echo "$key was not be NULL";
+                return;
             }
         }
         return json_encode($data);

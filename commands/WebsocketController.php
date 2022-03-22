@@ -37,9 +37,7 @@ class WebsocketController extends Controller
             echo "\nCLIENT CONNECTED\n";
             $e->client->send(json_encode(['message' => 'Client connected']));
         });
-        $server->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) use ($server) {
-            echo "\nCLIENT DISCONNECTED\n";
-        });
+
         echo "Start server\n";
         $server->start();
         echo "\nStop server";

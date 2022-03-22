@@ -67,11 +67,11 @@ class NotificationSearch extends Notification
                     'created_at',
                     'default' => [
                         'asc' => [
-                            new Expression('FIELD(notification.status, 0,-1) ASC'),
+                            new Expression('FIELD(notification.status, 0,-1,3) ASC'),
                             'created_at' => SORT_ASC
                         ],
                         'desc' => [
-                            new Expression('FIELD(notification.status, 0,-1) DESC'),
+                            new Expression('FIELD(notification.status, 0,-1,3) DESC'),
                             'created_at' => SORT_DESC
                         ],
                     ]

@@ -11,8 +11,6 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use consik\yii2websocket\events\ExceptionEvent;
 use app\daemons\loops\NotifyLoop;
-use app\models\NotificationSearch;
-use yii\helpers\ArrayHelper;
 
 class ServerWS extends WebSocketServer
 {
@@ -39,6 +37,12 @@ class ServerWS extends WebSocketServer
                 echo "Timer!\n";
                 $notifyLoop->run($this->_clients);
             });
+
+            $this->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) {
+                echo "\nCLIENT DISCONNECTED\n";
+                $this->_clients->removeClient($e->client);
+            });
+
             $this->server->run();
 
             return true;
@@ -57,17 +61,6 @@ class ServerWS extends WebSocketServer
                 $client->send($msg->getData());
             }
         }
-    }
-    public static function sendClient(array $clients, int $client_id, Message $msg): bool
-    {
-        if (!ArrayHelper::keyExists($client_id, $clients)) return false;
-        echo "SendClient -> $client_id \n";
-
-        foreach ($clients[$client_id] as $client) {
-            $client->send($msg->getData());
-            echo "Sended msg for user -> " . $client_id;
-        }
-        return true;
     }
     protected function getCommand(ConnectionInterface $from, $msg)
     {
@@ -117,17 +110,15 @@ class ServerWS extends WebSocketServer
     //     $result['message'] = $client->name;
     //     $client->send(json_encode($result));
     // }
-    function commandViewedAllNotify(ConnectionInterface $client, $msg)
+
+    function commandSendPool(ConnectionInterface $client, $msg)
     {
-        echo "CommandViewdAllNotify!";
+        echo "SendPool!\n";
+        $msg = json_decode($msg);
         $message = new Message();
-        $message->setBody("");
-        $message->setAction(Message::ACTION_CHECK_NOTIFICATIONS_COUNT);
-        $searchModel = new NotificationSearch();
-        $models = $searchModel->search(['consultant_id' => $client->name, 'status' => [-1, 0]])->getModels();
-        Notification::changeNoViewedStatusToViewed($models);
-        // return self::sendClient($this->_clients, $client->name, $message);
-        return $this->_clients->sendClient($client, $message);
+        $message->setBody($msg->data->message);
+        $message->setAction($msg->data->action);
+        return $this->_clients->sendClientPool($client->name->user_id, $message);
     }
     // function commandSetUserID(ConnectionInterface $client, $msg)
     // {

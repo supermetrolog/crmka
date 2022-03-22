@@ -30,6 +30,7 @@ class Notification extends \yii\db\ActiveRecord
     private const VIEWED_STATUS = 1;
     public const NO_VIEWED_STATUS = 0;
     public const PROCESSED_STATUS = 2;
+    public const NO_COUNT_STATUS = 3;
 
     public const TYPE_COMPANY = 0;
     public const TYPE_REQUEST = 1;
@@ -72,14 +73,10 @@ class Notification extends \yii\db\ActiveRecord
     }
     public static function viewed($id)
     {
-        $models = self::find()->where(['consultant_id' => $id])->andWhere(['status' => self::NO_VIEWED_STATUS])->all();
+        $models = self::find()->where(['consultant_id' => $id])->andWhere(['status' => self::NO_COUNT_STATUS])->all();
         foreach ($models as $model) {
-            // var_dump($model->status);
-
-            if ($model->status == self::NO_VIEWED_STATUS) {
-                $model->status = self::VIEWED_STATUS;
-                $model->save();
-            }
+            $model->status = self::VIEWED_STATUS;
+            $model->save();
         }
     }
     public static function getNotificationsForUser($id)
@@ -132,10 +129,19 @@ class Notification extends \yii\db\ActiveRecord
             }
         }
     }
-    public static function changeNoViewedStatusToViewed($models)
+    public static function changeNoViewedStatusToNoCount($models)
     {
         foreach ($models as $model) {
             if ($model->status == self::NO_VIEWED_STATUS && $model->status != self::PROCESSED_STATUS) {
+                $model->status = self::NO_COUNT_STATUS;
+                $model->save();
+            }
+        }
+    }
+    public static function changeNoCountStatusToViewed($models)
+    {
+        foreach ($models as $model) {
+            if ($model->status == self::NO_COUNT_STATUS) {
                 $model->status = self::VIEWED_STATUS;
                 $model->save();
             }
