@@ -25,9 +25,9 @@ class Notification extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    private const FETCHED_STATUS = 0;
+    public const FETCHED_STATUS = 0;
     public const NO_FETCHED_STATUS = -1;
-    private const VIEWED_STATUS = 1;
+    public const VIEWED_STATUS = 1;
     public const NO_VIEWED_STATUS = 0;
     public const PROCESSED_STATUS = 2;
     public const NO_COUNT_STATUS = 3;
@@ -87,38 +87,9 @@ class Notification extends \yii\db\ActiveRecord
             $model->save();
         }
     }
-    public static function getNotificationsForUser($id)
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->where(['notification.consultant_id' => $id]),
-        ]);
-        return $dataProvider;
-    }
     public static function getNotificationsCount($id)
     {
-        return self::find()->where(['notification.consultant_id' => $id, 'status' => [self::NO_FETCHED_STATUS, self::NO_VIEWED_STATUS]])->count();
-    }
-    public static function getNewNotifications($id)
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->where(['notification.consultant_id' => $id])->andWhere(['status' => self::NO_FETCHED_STATUS]),
-        ]);
-        $models = $dataProvider->getModels();
-        $response = self::array_copy($models);
-        self::changeNoFetchedStatusToFetched($models);
-        $dataProvider->models = $response;
-        return $dataProvider;
-    }
-    public static function getUsersNewNotifications(array $ids)
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->where(['notification.consultant_id' => $ids])->andWhere(['status' => self::NO_FETCHED_STATUS]),
-        ]);
-        $models = $dataProvider->getModels();
-        $response = self::array_copy($models);
-        self::changeNoFetchedStatusToFetched($models);
-        $dataProvider->models = $response;
-        return $dataProvider;
+        return self::find()->where(['consultant_id' => $id, 'status' => [self::NO_FETCHED_STATUS, self::NO_VIEWED_STATUS]])->count();
     }
     public static function array_copy($array)
     {
@@ -142,15 +113,6 @@ class Notification extends \yii\db\ActiveRecord
         foreach ($models as $model) {
             if ($model->status == self::NO_VIEWED_STATUS && $model->status != self::PROCESSED_STATUS) {
                 $model->status = self::NO_COUNT_STATUS;
-                $model->save();
-            }
-        }
-    }
-    public static function changeNoCountStatusToViewed($models)
-    {
-        foreach ($models as $model) {
-            if ($model->status == self::NO_COUNT_STATUS) {
-                $model->status = self::VIEWED_STATUS;
                 $model->save();
             }
         }

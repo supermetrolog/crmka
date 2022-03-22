@@ -2,6 +2,7 @@
 
 namespace app\daemons;
 
+use app\daemons\loops\CallsLoop;
 use app\models\CallList;
 use app\models\Notification;
 use consik\yii2websocket\WebSocketServer;
@@ -29,20 +30,9 @@ class ServerWS extends WebSocketServer
                 ),
                 $this->port
             );
-            $this->_clients = new Clients();
             $this->trigger(self::EVENT_WEBSOCKET_OPEN);
             $this->clients = new \SplObjectStorage();
-            $notifyLoop = new NotifyLoop;
-            $this->server->loop->addPeriodicTimer($this->timeout, function () use ($notifyLoop) {
-                echo "Timer!\n";
-                $notifyLoop->run($this->_clients);
-            });
-
-            $this->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) {
-                echo "\nCLIENT DISCONNECTED\n";
-                $this->_clients->removeClient($e->client);
-            });
-
+            $this->initServerData();
             $this->server->run();
 
             return true;
@@ -54,13 +44,28 @@ class ServerWS extends WebSocketServer
             return false;
         }
     }
-    public static function sendAllClients(array $clients, Message $msg)
+    public function initServerData()
     {
-        foreach ($clients as $client_pool) {
-            foreach ($client_pool as  $client) {
-                $client->send($msg->getData());
-            }
-        }
+        $this->_clients = new Clients();
+
+
+        $loop = new NotifyLoop;
+        $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
+            echo "Timer Notify!\n";
+            $loop->run($this->_clients);
+        });
+
+        $loop = new CallsLoop;
+        $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
+            echo "Timer Calls!\n";
+            $loop->run($this->_clients);
+        });
+
+
+        $this->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) {
+            echo "\nCLIENT DISCONNECTED\n";
+            $this->_clients->removeClient($e->client);
+        });
     }
     protected function getCommand(ConnectionInterface $from, $msg)
     {
@@ -98,18 +103,11 @@ class ServerWS extends WebSocketServer
     //     $result['message'] = $models;
     //     $client->send(json_encode($result));
     // }
-    // function commandEcho(ConnectionInterface $client, $msg)
-    // {
-    //     echo "CommandEcho!";
-    //     $client->send($msg);
-    // }
-    // function commandGetName(ConnectionInterface $client, $msg)
-    // {
-    //     echo "CommandGetName!";
-    //     $result = self::MESSAGE_TEMPLATE;
-    //     $result['message'] = $client->name;
-    //     $client->send(json_encode($result));
-    // }
+    function commandEcho(ConnectionInterface $client, $msg)
+    {
+        echo "CommandEcho!";
+        $client->send($msg);
+    }
 
     function commandSendPool(ConnectionInterface $client, $msg)
     {
@@ -120,23 +118,6 @@ class ServerWS extends WebSocketServer
         $message->setAction($msg->data->action);
         return $this->_clients->sendClientPool($client->name->user_id, $message);
     }
-    // function commandSetUserID(ConnectionInterface $client, $msg)
-    // {
-    //     echo "SetUserID!";
-    //     $msg = json_decode($msg);
-    //     $result = self::MESSAGE_TEMPLATE;
-    //     if ($client->name) {
-    //         $result['message'] = "Ваш UserID [{$client->name}] уже зарегистрирован в сокете!";
-    //         $result['error'] = true;
-    //         return $client->send(json_encode($result));
-    //     }
-    //     $client->name = $msg->data;
-    //     $this->_clients[$client->name][] = $client;
-    //     $result['action'] = 'user_id_seted';
-    //     $result['message'] = "Yout UserID [{$client->name}] was seted!";
-    //     $result['success'] = true;
-    //     return $client->send(json_encode($result));
-    // }
     function commandSetUser(ConnectionInterface $client, $msg)
     {
         echo "SetUser!";

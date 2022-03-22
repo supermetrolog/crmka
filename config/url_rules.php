@@ -70,7 +70,6 @@ return
             'controller' => 'notification',
             'except' => [],
             'extraPatterns' => [
-                'GET,OPTIONS new/<id>' => 'new',
                 'GET,OPTIONS <id>/viewed-not-count' => 'viewed-not-count',
                 'GET,OPTIONS <id>/viewed-all' => 'viewed-all',
                 'GET,OPTIONS <id>/count' => 'count',
@@ -81,8 +80,9 @@ return
             'controller' => 'calllist',
             'except' => [],
             'extraPatterns' => [
-                'GET <id>' => 'index',
-                'GET,OPTIONS <id>/viewed' => 'viewed',
+                'GET,OPTIONS <caller_id>/viewed-not-count' => 'viewed-not-count',
+                'GET,OPTIONS <caller_id>/viewed-all' => 'viewed-all',
+                'GET,OPTIONS <caller_id>/count' => 'count',
             ],
         ],
         [

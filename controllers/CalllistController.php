@@ -4,15 +4,14 @@ namespace app\controllers;
 
 use app\behaviors\BaseControllerBehaviors;
 use app\models\CallList;
-use Yii;
-use app\models\Notification;
 use yii\rest\ActiveController;
-use yii\web\NotFoundHttpException;
 use yii\filters\Cors;
+use Yii;
+use app\models\CallListSearch;
 // use yii\filters\auth\HttpBearerAuth;
 
 /**
- * NotificationController implements the CRUD actions for Notification model.
+ * CallListController implements the CRUD actions for CallList model.
  */
 class CalllistController extends ActiveController
 {
@@ -27,7 +26,7 @@ class CalllistController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
+        $behaviors =  BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
@@ -47,82 +46,29 @@ class CalllistController extends ActiveController
         return $actions;
     }
     /**
-     * Lists all Notification models.
+     * Lists all CallList models.
      * @return mixed
      */
-    public function actionIndex($id)
+    public function actionIndex()
     {
-        return CallList::getCallListForUser($id);
+        $searchModel = new CallListSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $models = $dataProvider->getModels();
+        $copyModels = CallList::array_copy($models);
+        CallList::changeNoViewedStatusToNoCount($models);
+        $dataProvider->models = $copyModels;
+        return $dataProvider;
     }
-    public function actionViewed($id)
+    public function actionViewedNotCount($caller_id)
     {
-        return CallList::viewed($id);
+        return CallList::viewedNotCount($caller_id);
     }
-    /**
-     * Creates a new Notification model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
+    public function actionViewedAll($caller_id)
     {
-        $model = new CallList();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        return CallList::viewedAll($caller_id);
     }
-
-    /**
-     * Updates an existing Notification model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
+    public function actionCount($caller_id)
     {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Deletes an existing Notification model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Notification model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Notification the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Notification::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
+        return CallList::getCallsCount($caller_id);
     }
 }

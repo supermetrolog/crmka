@@ -26,9 +26,12 @@ class CallList extends \yii\db\ActiveRecord
     public const TYPE_OUTGOING = 0;
     public const TYPE_INCOMING = 1;
 
-    public const VIEWED_NOT_REQUESTED = 0;
-    public const VIEWED_REQUESTED = 1;
-    public const VIEWED_VIEWED = 2;
+    public const FETCHED_STATUS = 0;
+    public const NO_FETCHED_STATUS = -1;
+    public const VIEWED_STATUS = 1;
+    public const NO_VIEWED_STATUS = 0;
+    public const PROCESSED_STATUS = 2;
+    public const NO_COUNT_STATUS = 3;
     /**
      * {@inheritdoc}
      */
@@ -44,9 +47,9 @@ class CallList extends \yii\db\ActiveRecord
     {
         return [
             [['caller_id', 'from', 'to', 'type'], 'required'],
-            [['type', 'viewed'], 'integer'],
-            [['created_at'], 'safe'],
-            [['caller_id', 'from', 'to', 'status', 'uniqueid'], 'string', 'max' => 255],
+            [['type', 'status'], 'integer'],
+            [['created_at', 'updated_at'], 'safe'],
+            [['caller_id', 'from', 'to', 'call_ended_status', 'uniqueid'], 'string', 'max' => 255],
             [['caller_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserProfile::className(), 'targetAttribute' => ['caller_id' => 'caller_id']],
         ];
     }
@@ -69,41 +72,51 @@ class CallList extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function viewed($id)
+    public static function viewedNotCount($caller_id)
     {
-        $models = self::find()->joinWith(['caller'])->where(['user_profile.user_id' => $id])->andWhere(['!=', 'viewed', self::VIEWED_VIEWED])->all();
-
+        $models = self::find()->where(['caller_id' => $caller_id])->andWhere(['status' => self::NO_COUNT_STATUS])->all();
         foreach ($models as $model) {
-            if ($model->viewed != self::VIEWED_VIEWED) {
-                $model->viewed = self::VIEWED_VIEWED;
+            $model->status = self::VIEWED_STATUS;
+            $model->save();
+        }
+    }
+    public static function viewedAll($caller_id)
+    {
+        $models = self::find()->where(['caller_id' => $caller_id])->andWhere(['status' => [self::NO_COUNT_STATUS, self::NO_VIEWED_STATUS]])->all();
+        foreach ($models as $model) {
+            $model->status = self::VIEWED_STATUS;
+            $model->save();
+        }
+    }
+    public static function getCallsCount($caller_id)
+    {
+        return self::find()->where(['caller_id' => $caller_id, 'status' => [self::NO_FETCHED_STATUS, self::NO_VIEWED_STATUS]])->count();
+    }
+    public static function array_copy($array)
+    {
+        $newArray = [];
+        foreach ($array as $item) {
+            $newArray[] = clone $item;
+        }
+        return $newArray;
+    }
+    public static function changeNoFetchedStatusToFetched($models)
+    {
+        foreach ($models as $model) {
+            if ($model->status == self::NO_FETCHED_STATUS) {
+                $model->status = self::FETCHED_STATUS;
                 $model->save();
             }
         }
     }
-    public static function getCallListForUser($id)
+    public static function changeNoViewedStatusToNoCount($models)
     {
-        // $contactColumns = ',contact.middle_name, contact.first_name, contact.company_id, contact.type, contact.position, contact.faceToFaceMeeting, contact.warning, contact.good, contact.status as cstatus';
-        // $dataProvider = new ActiveDataProvider([
-        //     'query' => self::find()->select('call_list.*, phone.phone, phone.contact_id' . $contactColumns)->joinWith(['caller'])->leftJoin('phone', 'phone.phone = call_list.from')->leftJoin('contact', 'contact.id = phone.contact_id')->where(['user_profile.user_id' => $id])->andWhere(['is not', 'call_list.status', new \yii\db\Expression('null')])->asArray(),
-        // ]);
-        // return $dataProvider;
-        $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->joinWith(['caller', 'phoneFrom' => function ($query) {
-                $query->with(['contact']);
-            }, 'phoneTo' => function ($query) {
-                $query->with(['contact']);
-            }])->where(['user_profile.user_id' => $id])->andWhere(['is not', 'call_list.status', new \yii\db\Expression('null')]),
-        ]);
-        return $dataProvider;
-    }
-
-    public function changeViewed($flag)
-    {
-        if ($this->viewed == $flag) {
-            return true;
+        foreach ($models as $model) {
+            if ($model->status == self::NO_VIEWED_STATUS && $model->status != self::PROCESSED_STATUS) {
+                $model->status = self::NO_COUNT_STATUS;
+                $model->save();
+            }
         }
-        $this->viewed = $flag;
-        return $this->save();
     }
     /**
      * Gets query for [[Caller]].
