@@ -71,7 +71,8 @@ return
             'except' => [],
             'extraPatterns' => [
                 'GET,OPTIONS new/<id>' => 'new',
-                'GET,OPTIONS <id>/viewed' => 'viewed',
+                'GET,OPTIONS <id>/viewed-not-count' => 'viewed-not-count',
+                'GET,OPTIONS <id>/viewed-all' => 'viewed-all',
                 'GET,OPTIONS <id>/count' => 'count',
             ],
         ],

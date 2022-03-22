@@ -71,9 +71,17 @@ class Notification extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
         ];
     }
-    public static function viewed($id)
+    public static function viewedNotCount($id)
     {
         $models = self::find()->where(['consultant_id' => $id])->andWhere(['status' => self::NO_COUNT_STATUS])->all();
+        foreach ($models as $model) {
+            $model->status = self::VIEWED_STATUS;
+            $model->save();
+        }
+    }
+    public static function viewedAll($id)
+    {
+        $models = self::find()->where(['consultant_id' => $id])->andWhere(['status' => [self::NO_COUNT_STATUS, self::NO_VIEWED_STATUS]])->all();
         foreach ($models as $model) {
             $model->status = self::VIEWED_STATUS;
             $model->save();

@@ -59,9 +59,13 @@ class NotificationController extends ActiveController
         $dataProvider->models = $copyModels;
         return $dataProvider;
     }
-    public function actionViewed($id)
+    public function actionViewedNotCount($id)
     {
-        return Notification::viewed($id);
+        return Notification::viewedNotCount($id);
+    }
+    public function actionViewedAll($id)
+    {
+        return Notification::viewedAll($id);
     }
     public function actionCount($id)
     {
