@@ -10,7 +10,7 @@ use yii\helpers\ArrayHelper;
 
 class CallsLoop extends BaseLoop
 {
-    private $sendedLastEmptyData = false;
+    private $lastSendedCurrentCalls = [];
     public function processed()
     {
         $this->getUserCalls();
@@ -37,16 +37,23 @@ class CallsLoop extends BaseLoop
         $message = new Message();
         $message->setAction('update_current_calls');
         $message->setBody($models);
-
-        if (count($models)) {
+        if (!$this->modelsEqual($models, $this->lastSendedCurrentCalls)) {
             $this->clients->sendAllClients($message);
-            $this->sendedLastEmptyData = false;
-        } else {
-            if (!$this->sendedLastEmptyData) {
-                $this->clients->sendAllClients($message);
-                $this->sendedLastEmptyData = true;
-            }
         }
+        $this->lastSendedCurrentCalls = $models;
+    }
+    private function modelsEqual($models1, $models2)
+    {
+        $ids1 = [];
+        foreach ($models1 as $model) {
+            $ids1[] = $model->id;
+        }
+
+        $ids2 = [];
+        foreach ($models2 as $model) {
+            $ids2[] = $model->id;
+        }
+        return $ids1 == $ids2;
     }
     protected function changeIndex($array, $index = null)
     {
