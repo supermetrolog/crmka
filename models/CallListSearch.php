@@ -19,7 +19,7 @@ class CallListSearch extends CallList
     {
         return [
             [['id', 'type'], 'integer'],
-            [['caller_id', 'from', 'to', 'created_at', 'uniqueid', 'call_ended_status', 'updated_at', 'status'], 'safe'],
+            [['caller_id', 'from', 'to', 'created_at', 'uniqueid', 'call_ended_status', 'updated_at', 'status', 'hangup_timestamp'], 'safe'],
         ];
     }
 

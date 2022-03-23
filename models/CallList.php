@@ -49,7 +49,7 @@ class CallList extends \yii\db\ActiveRecord
         return [
             [['caller_id', 'from', 'to', 'type'], 'required'],
             [['type', 'status'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'hangup_timestamp'], 'safe'],
             [['caller_id', 'from', 'to', 'call_ended_status', 'uniqueid'], 'string', 'max' => 255],
             [['caller_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserProfile::className(), 'targetAttribute' => ['caller_id' => 'caller_id']],
         ];
