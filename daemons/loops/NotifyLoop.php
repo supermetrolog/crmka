@@ -17,7 +17,7 @@ class NotifyLoop extends BaseLoop
         $message = new Message();
         $message->setAction(Message::ACTION_NEW_NOTIFICATION);
         foreach ($modelsArray as $user_id => $userNotify) {
-            $message->setBody($userNotify);
+            $message->setBody(count($modelsArray));
             $this->clients->sendClientPool($user_id, $message);
         }
         Notification::changeNoFetchedStatusToFetched($models);

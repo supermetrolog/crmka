@@ -65,18 +65,11 @@ class Clients extends Model
 
     public function sendAllClients(Message $msg, ConnectionInterface $notAsweredclient = null)
     {
-        foreach ($this->clients_pool as $pool) {
-            foreach ($pool as $_client) {
-                if ($notAsweredclient) {
-                    if ($_client->name->window_id == $notAsweredclient->name->window_id) {
-                        continue;
-                    }
-                    $_client->sendClient($_client, $msg);
-                } else {
-                    $_client->sendClient($_client, $msg);
-                }
-            }
+        echo "Send ALl Clients\n";
+        foreach ($this->clients_pool as $user_id => $pool) {
+            $this->sendClientPool($user_id, $msg);
         }
+        echo "Sended ALl Clients\n";
     }
     public function clientExist(ConnectionInterface $client)
     {

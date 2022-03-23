@@ -47,6 +47,7 @@ class CallListSearch extends CallList
      */
     public function search($params)
     {
+        // $query = CallList::find()->with(['caller', 'phoneFrom.contact', 'phoneTo.contact'])->where(['is not', 'call_ended_status', new Expression('null')]);
         $query = CallList::find()->with(['caller', 'phoneFrom.contact', 'phoneTo.contact']);
 
         // add conditions that should always apply here

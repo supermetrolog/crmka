@@ -5,6 +5,7 @@ namespace app\models;
 use app\models\miniModels\Phone;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "call_list".
@@ -90,6 +91,7 @@ class CallList extends \yii\db\ActiveRecord
     }
     public static function getCallsCount($caller_id)
     {
+        // return self::find()->where(['caller_id' => $caller_id, 'status' => [self::NO_FETCHED_STATUS, self::NO_VIEWED_STATUS]])->andWhere(['is not', 'call_ended_status', new Expression('null')])->count();
         return self::find()->where(['caller_id' => $caller_id, 'status' => [self::NO_FETCHED_STATUS, self::NO_VIEWED_STATUS]])->count();
     }
     public static function array_copy($array)
