@@ -25,7 +25,7 @@ class CallsLoop extends BaseLoop
         $message = new Message();
         $message->setAction(Message::ACTION_NEW_CALL);
         foreach ($modelsArray as $user_id => $userCall) {
-            $message->setBody(count($modelsArray));
+            $message->setBody(count($modelsArray[$user_id]));
             $this->clients->sendClientPool($user_id, $message);
         }
         CallList::changeNoFetchedStatusToFetched($models);

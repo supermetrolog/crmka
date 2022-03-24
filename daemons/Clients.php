@@ -31,6 +31,9 @@ class Clients extends Model
         }
 
         $this->clients_pool[$client->name->user_id] = $pool;
+        if (!count($this->clients_pool[$client->name->user_id])) {
+            unset($this->clients_pool[$client->name->user_id]);
+        }
         echo "Removed User\n";
         var_dump($this->clients_pool);
         return true;
