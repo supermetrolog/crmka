@@ -2,11 +2,13 @@
 
 namespace app\models\miniModels;
 
+use app\events\SendMessageEvent;
 use app\models\Timeline;
 use yii\web\NotFoundHttpException;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\Deal;
 use app\models\Request;
+use app\models\UserSendedData;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -39,6 +41,15 @@ class TimelineStep extends \yii\db\ActiveRecord
     public const INTEREST_STEP_NUMBER = 5;
     public const TALK_STEP_NUMBER = 6;
     public const DEAL_STEP_NUMBER = 7;
+
+    public const SEND_OBJECTS_EVENT = 'send_objects';
+    public function init()
+    {
+        $this->on(self::SEND_OBJECTS_EVENT, [Yii::$app->notify, 'sendMessage']);
+        parent::init();
+    }
+
+
     /**
      * {@inheritdoc}
      */
@@ -207,6 +218,16 @@ class TimelineStep extends \yii\db\ActiveRecord
     {
         if ($this->negative) return;
         $this->addTimelineStepObjects($post_data, false, false);
+        $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
+            'user_id' => Yii::$app->user->identity->id,
+            'htmlBody' => '<b>Держи ебаные объекты чшорт баляд!</b>',
+            'subject' => 'Объекты',
+            'contacts' => $post_data['contactsForSendMessage'],
+            'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
+            'description' => "Отправил объекты",
+            'notSend' => !$post_data['sendClientFlag']
+        ]));
+
         return $this->createNewStep(self::FEEDBACK_STEP_NUMBER);
     }
     public function updateFeedbackStep($post_data)

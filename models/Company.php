@@ -319,7 +319,7 @@ class Company extends \yii\db\ActiveRecord
                     'consultant_id' => $model->consultant_id,
                     'type' => Notification::TYPE_COMPANY,
                     'title' => 'компания',
-                    'body' => Yii::$app->controller->renderPartial('notification/assigned_company', ['model' => $model])
+                    'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
                 ]));
 
                 $transaction->commit();
@@ -352,13 +352,13 @@ class Company extends \yii\db\ActiveRecord
                         'consultant_id' => $oldConsultantId,
                         'type' => Notification::TYPE_COMPANY,
                         'title' => 'компания',
-                        'body' => Yii::$app->controller->renderPartial('notification/unAssigned_company', ['model' => $model])
+                        'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_company.php', ['model' => $model])
                     ]));
                     $model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
                         'consultant_id' => $model->consultant_id,
                         'type' => Notification::TYPE_COMPANY,
                         'title' => 'компания',
-                        'body' => Yii::$app->controller->renderPartial('notification/assigned_company', ['model' => $model])
+                        'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
                     ]));
                 }
                 $transaction->commit();

@@ -21,7 +21,7 @@ class TimelineController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
     }
 
     public function actions()
@@ -41,10 +41,10 @@ class TimelineController extends ActiveController
         // return ['message' => "Успешно изменено", 'data' => Yii::$app->request->post()];
         return TimelineStep::updateTimelineStep($id, Yii::$app->request->post());
     }
-    public function actionAddObjects($id)
-    {
-        return TimelineStepObject::addObjects($id, Yii::$app->request->post());
-    }
+    // public function actionAddObjects($id)
+    // {
+    //     return TimelineStepObject::addObjects($id, Yii::$app->request->post());
+    // }
     public function actionIndex()
     {
         $consultant_id = Yii::$app->request->getQueryParam('consultant_id');

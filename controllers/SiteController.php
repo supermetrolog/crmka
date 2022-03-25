@@ -11,10 +11,13 @@ use yii\filters\VerbFilter;
 use app\models\Login;
 use app\models\ContactForm;
 use app\events\NotificationEvent;
+use app\events\SendMessageEvent;
 use app\models\User;
+use app\models\UserSendedData;
 
 class SiteController extends Controller
 {
+    public const FUCK_EVENT = 'fuck_event';
     /**
      * {@inheritdoc}
      */
@@ -57,6 +60,11 @@ class SiteController extends Controller
         ];
     }
 
+    public function init()
+    {
+        $this->on(self::FUCK_EVENT, [Yii::$app->notify, 'sendMessage']);
+        parent::init();
+    }
     /**
      * Displays homepage.
      *
@@ -64,18 +72,16 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $user = User::findOne(3);
-        echo "<pre>";
-        // print_r($user);
-        $user->password_reset_token = '222222222';
-        print_r($user->password_reset_token);
-        echo "<br>";
-        print_r($user->getOldAttribute('password_reset_token'));
-        echo "<br>";
-        $user->save(false);
-        print_r($user->password_reset_token);
-        echo "<br>";
-        print_r($user->getOldAttribute('password_reset_token'));
+        $contacts = ['+7 (966) 555-12-58', 'fuck@mail.ru'];
+        // $this->trigger(self::FUCK_EVENT, new SendMessageEvent([
+        //     'user_id' => 3,
+        //     'htmlBody' => '<b>fucking html body</b>',
+        //     'subject' => 'tema',
+        //     'contacts' => $contacts,
+        //     'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
+        //     'description' => "<p>Отправил объекты: <a href='http://localhost:8080/'>5623</a></p>"
+        // ]));
+        var_dump(Yii::$app->user->identity);
         return 'fuck';
     }
 
