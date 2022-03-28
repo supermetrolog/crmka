@@ -21,7 +21,7 @@ class CompanyController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
+        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view']);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
@@ -47,7 +47,6 @@ class CompanyController extends ActiveController
     {
         $searchModel = new CompanySearch();
         return $searchModel->search(Yii::$app->request->queryParams);
-        // return Company::getCompanyList();
     }
     public function actionView($id)
     {

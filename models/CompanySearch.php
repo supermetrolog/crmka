@@ -75,7 +75,8 @@ class CompanySearch extends Company
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 50,
+                'defaultPageSize' => 50,
+                'pageSizeLimit' => [0, 50],
             ],
             'sort' => [
                 'enableMultiSort' => true,

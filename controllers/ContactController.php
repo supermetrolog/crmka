@@ -17,7 +17,7 @@ class ContactController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index']);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view', '*']);
     }
 
     public function actions()
@@ -27,6 +27,7 @@ class ContactController extends ActiveController
         unset($actions['delete']);
         unset($actions['update']);
         unset($actions['index']);
+        unset($actions['view']);
         return $actions;
     }
     public function actionIndex()
@@ -37,6 +38,12 @@ class ContactController extends ActiveController
     public function actionCompanyContacts($id)
     {
         return Contact::getCompanyContactList($id);
+    }
+    public function actionView($id)
+    {
+        return  Contact::find()->with(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant.userProfile', 'contactComments.author.userProfile'])
+            ->where(['id' => $id])
+            ->limit(1)->one();
     }
     public function actionCreate()
     {
