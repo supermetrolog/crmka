@@ -69,7 +69,7 @@ class UserController extends ActiveController
     public function actionLogout()
     {
         if (Yii::$app->user->isGuest) {
-            return ['message' => 'Вы не аутентифицированы'];
+            return ['message' => 'Вы вышли из системы'];
         }
         $model = User::findIdentityByAccessToken(Yii::$app->user->identity->access_token);
         $model->generateAccessToken();
