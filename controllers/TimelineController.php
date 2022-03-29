@@ -71,6 +71,7 @@ class TimelineController extends ActiveController
             'wayOfSending' => $post_data['wayOfSending'],
             'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
             'description' => 'Отправил объекты на шаге "' . $stepName . '"',
+            'notSend' => !$post_data['sendClientFlag']
         ]));
         return ['message' => 'Объекты отправлены!', 'data' => true];
     }

@@ -30,7 +30,10 @@ class NotificationService  extends Component
     }
     private function normalizeContacts($contacts)
     {
-        $newContacts = [];
+        $newContacts = [
+            'phones' => [],
+            'emails' => []
+        ];
         foreach ($contacts as $contact) {
             if (str_contains($contact, '@')) {
                 $newContacts['emails'][] = $contact;
@@ -51,6 +54,22 @@ class NotificationService  extends Component
             $this->sendEmails($event);
             $isSended = true;
         }
+        if (in_array(UserSendedData::SMS_CONTACT_TYPE, $event->wayOfSending)) {
+            $this->sendPhones($event, UserSendedData::SMS_CONTACT_TYPE);
+            $isSended = true;
+        }
+        if (in_array(UserSendedData::TELEGRAM_CONTACT_TYPE, $event->wayOfSending)) {
+            $this->sendPhones($event, UserSendedData::TELEGRAM_CONTACT_TYPE);
+            $isSended = true;
+        }
+        if (in_array(UserSendedData::WHATSAPP_CONTACT_TYPE, $event->wayOfSending)) {
+            $this->sendPhones($event, UserSendedData::WHATSAPP_CONTACT_TYPE);
+            $isSended = true;
+        }
+        if (in_array(UserSendedData::VIBER_CONTACT_TYPE, $event->wayOfSending)) {
+            $this->sendPhones($event, UserSendedData::VIBER_CONTACT_TYPE);
+            $isSended = true;
+        }
         /**
           Todo: Developed sendPhones features!
          */
@@ -59,7 +78,19 @@ class NotificationService  extends Component
             throw new Exception('Message not sended');
         }
     }
-
+    private function sendPhones(SendMessageEvent $event, $contact_type)
+    {
+        if (!count($event->contacts['phones'])) {
+            throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[$contact_type] . '), нужно выбрать номер телефона!');
+        }
+        foreach ($event->contacts['phones'] as $contact) {
+            if ($event->notSend) {
+                $this->saveUserSendedData($event, $contact, $contact_type);
+                continue;
+            }
+            $this->saveUserSendedData($event, $contact, $contact_type);
+        }
+    }
     private function sendEmails(SendMessageEvent $event)
     {
         foreach ($event->contacts['emails'] as $contact) {

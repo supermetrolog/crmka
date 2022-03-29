@@ -23,6 +23,17 @@ class UserSendedData extends \yii\db\ActiveRecord
 {
     public const EMAIL_CONTACT_TYPE = 0;
     public const SMS_CONTACT_TYPE = 1;
+    public const WHATSAPP_CONTACT_TYPE = 2;
+    public const TELEGRAM_CONTACT_TYPE = 3;
+    public const VIBER_CONTACT_TYPE = 4;
+
+    public const CONTACT_TYPES = [
+        0 => 'Email',
+        1 => 'SMS',
+        2 => 'WhatsApp',
+        3 => 'Telegram',
+        4 => 'Viber',
+    ];
 
     public const OBJECTS_SEND_FROM_TIMELINE_TYPE = 0;
     /**
