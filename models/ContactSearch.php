@@ -17,8 +17,8 @@ class ContactSearch extends Contact
     public function rules()
     {
         return [
-            [['id', 'company_id', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'status', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
-            [['middle_name', 'last_name', 'created_at', 'updated_at', 'first_name', 'passive_why_comment', 'warning_why_comment'], 'safe'],
+            [['company_id', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'status', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
+            [['id', 'middle_name', 'last_name', 'created_at', 'updated_at', 'first_name', 'passive_why_comment', 'warning_why_comment'], 'safe'],
         ];
     }
 
@@ -30,7 +30,17 @@ class ContactSearch extends Contact
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
-
+    public function stringToArray($value)
+    {
+        if (is_string($value)) {
+            return explode(",", $value);
+        }
+        return $value;
+    }
+    public function normalizeProps()
+    {
+        $this->id = $this->stringToArray($this->id);
+    }
     /**
      * Creates data provider instance with search query applied
      *
@@ -53,7 +63,7 @@ class ContactSearch extends Contact
         ]);
 
         $this->load($params, '');
-
+        $this->normalizeProps();
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
