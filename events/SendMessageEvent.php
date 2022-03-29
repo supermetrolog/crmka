@@ -11,6 +11,7 @@ class SendMessageEvent extends Event
 {
 
     public ?array $contacts = [];
+    public ?array $wayOfSending = [];
     public ?array $from = [];
     public ?string $subject = null;
     public ?string $htmlBody = null;
@@ -28,8 +29,8 @@ class SendMessageEvent extends Event
         if (!$this->from) {
             $this->from =  [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
         }
-        $model = new DynamicModel(['user_id' => $this->user_id, 'from' => $this->from, 'contacts' => $this->contacts, 'subject' => $this->subject, 'type' => $this->type, 'description' => $this->description, 'htmlBody' => $this->htmlBody]);
-        $model->addRule(['subject', 'contacts', 'description', 'type', 'htmlBody'], 'required')
+        $model = new DynamicModel(['wayOfSending' => $this->wayOfSending, 'user_id' => $this->user_id, 'from' => $this->from, 'contacts' => $this->contacts, 'subject' => $this->subject, 'type' => $this->type, 'description' => $this->description, 'htmlBody' => $this->htmlBody]);
+        $model->addRule(['subject', 'contacts', 'description', 'type', 'htmlBody', 'wayOfSending'], 'required')
             ->validate();
 
         if ($model->hasErrors()) {

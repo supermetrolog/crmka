@@ -7,6 +7,7 @@ use app\events\SendMessageEvent;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\Notification;
 use app\models\UserSendedData;
+use Exception;
 use Yii;
 use yii\base\Component;
 
@@ -45,10 +46,18 @@ class NotificationService  extends Component
     public function sendMessage(SendMessageEvent $event)
     {
         $event->contacts = $this->normalizeContacts($event->contacts);
-        $this->sendEmails($event);
+        $isSended = false;
+        if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $event->wayOfSending)) {
+            $this->sendEmails($event);
+            $isSended = true;
+        }
         /**
           Todo: Developed sendPhones features!
          */
+
+        if (!$isSended) {
+            throw new Exception('Message not sended');
+        }
     }
 
     private function sendEmails(SendMessageEvent $event)
@@ -58,14 +67,14 @@ class NotificationService  extends Component
                 $this->saveUserSendedData($event, $contact, UserSendedData::EMAIL_CONTACT_TYPE);
                 continue;
             }
-            $message =  Yii::$app->mailer->compose()
+            $message = Yii::$app->mailer->compose()
                 ->setFrom($event->from)
                 ->setTo($contact)
                 ->setSubject($event->subject)
                 ->setHtmlBody($event->htmlBody);
 
             if (!$message->send()) {
-                return false;
+                throw new Exception('Message not sended');
             }
             $this->saveUserSendedData($event, $contact, UserSendedData::EMAIL_CONTACT_TYPE);
         }

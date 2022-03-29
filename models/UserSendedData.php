@@ -12,6 +12,7 @@ use Yii;
  * @property string $contact
  * @property int $contact_type
  * @property int $type
+ * @property int $status
  * @property string $description
  * @property string $created_at
  * @property string|null $updated_at
@@ -20,8 +21,8 @@ use Yii;
  */
 class UserSendedData extends \yii\db\ActiveRecord
 {
-    public const PHONE_CONTACT_TYPE = 0;
-    public const EMAIL_CONTACT_TYPE = 1;
+    public const EMAIL_CONTACT_TYPE = 0;
+    public const SMS_CONTACT_TYPE = 1;
 
     public const OBJECTS_SEND_FROM_TIMELINE_TYPE = 0;
     /**
@@ -39,7 +40,7 @@ class UserSendedData extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'contact', 'contact_type', 'type', 'description'], 'required'],
-            [['user_id', 'contact_type', 'type'], 'integer'],
+            [['user_id', 'contact_type', 'type', 'status'], 'integer'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['contact'], 'string', 'max' => 255],
