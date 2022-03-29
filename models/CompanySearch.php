@@ -21,8 +21,8 @@ class CompanySearch extends Company
     public function rules()
     {
         return [
-            [['id', 'noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
-            [['all', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at', 'passive_why_comment', 'categories', 'dateStart', 'dateEnd'], 'safe'],
+            [['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
+            [['id', 'all', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'description', 'created_at', 'updated_at', 'passive_why_comment', 'categories', 'dateStart', 'dateEnd'], 'safe'],
         ];
     }
 
@@ -45,7 +45,7 @@ class CompanySearch extends Company
     public function normalizeProps()
     {
         $this->categories = $this->stringToArray($this->categories);
-
+        $this->id = $this->stringToArray($this->id);
         if ($this->dateStart === null && $this->dateEnd === null) {
             return;
         }
