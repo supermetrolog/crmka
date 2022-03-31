@@ -28,11 +28,16 @@ class UserController extends ActiveController
         unset($actions['index']);
         unset($actions['update']);
         unset($actions['delete']);
+        unset($actions['view']);
         return $actions;
     }
     public function actionIndex()
     {
         return User::getUsers();
+    }
+    public function actionView($id)
+    {
+        return User::getUser($id);
     }
     public function actionCreate()
     {
