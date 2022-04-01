@@ -101,6 +101,11 @@ return
         ],
         [
             'class' => 'yii\rest\UrlRule',
+            'controller' => 'oldDb/object',
+            'except' => [],
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
             'controller' => 'deal',
             'except' => [],
         ],

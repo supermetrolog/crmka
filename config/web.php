@@ -2,6 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$db_old = require __DIR__ . '/db_old.php';
 $urlRules = require __DIR__ . '/url_rules.php';
 $config = [
     'id' => 'basic',
@@ -65,6 +66,7 @@ $config = [
             ],
         ],
         'db' => $db,
+        'db_old' => $db_old,
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
