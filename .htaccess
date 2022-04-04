@@ -1,9 +1,15 @@
-AddDefaultCharset UTF-8
-php_flag display_errors on
-php_value error_reporting -1
-RewriteEngine on
-
+Options +FollowSymLinks
+IndexIgnore */*
+RewriteEngine On
+ 
+RewriteCond %{REQUEST_URI} !^/(public_html)
+RewriteRule ^assets/(.*)$ /public_html/assets/$1 [L]
+RewriteRule ^css/(.*)$ public_html/css/$1 [L]
+RewriteRule ^js/(.*)$ public_html/js/$1 [L]
+RewriteRule ^images/(.*)$ public_html/images/$1 [L]
+RewriteRule ^uploads/(.*)$ public_html/images/$1 [L]
+RewriteRule (.*) /public_html/$1
+ 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-
-RewriteRule . index.php
+RewriteRule . /public_html/index.php

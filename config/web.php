@@ -36,7 +36,8 @@ $config = [
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
                 'multipart/form-data' => 'yii\web\MultipartFormDataParser'
-            ]
+            ],
+            'baseUrl' => ''
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager'
