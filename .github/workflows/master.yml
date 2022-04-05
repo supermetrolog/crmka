@@ -32,3 +32,17 @@ jobs:
         username: ${{ secrets.username }}
         password: ${{ secrets.password }}
         script: php7.4 yii migrate --interactive=0
+
+    - name: 📂 Sync files with prod server
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: 176.99.3.73
+        username: ${{ secrets.ftp_prod_server_username }}
+        password: ${{ secrets.ftp_prod_server_password }}
+    - name: multiple command in prod server
+      uses: appleboy/ssh-action@master
+      with:
+        host: 176.99.3.73
+        username: ${{ secrets.ssh_server_username }}
+        password: ${{ secrets.ssh_server_password }}
+        script: cd /var/www/www-root/data/www/api.pennylane.pro && /opt/php71/bin/php yii migrate --interactive=0

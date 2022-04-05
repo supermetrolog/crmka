@@ -72,16 +72,6 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $contacts = ['+7 (966) 555-12-58', 'fuck@mail.ru'];
-        // $this->trigger(self::FUCK_EVENT, new SendMessageEvent([
-        //     'user_id' => 3,
-        //     'htmlBody' => '<b>fucking html body</b>',
-        //     'subject' => 'tema',
-        //     'contacts' => $contacts,
-        //     'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
-        //     'description' => "<p>Отправил объекты: <a href='http://localhost:8080/'>5623</a></p>"
-        // ]));
-        var_dump(Yii::$app->user->identity);
         return 'fuck';
     }
 

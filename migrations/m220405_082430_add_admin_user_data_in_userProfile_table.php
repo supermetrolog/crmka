@@ -25,7 +25,7 @@ class m220405_082430_add_admin_user_data_in_userProfile_table extends Migration
             'first_name' => 'Admin',
             'middle_name' => 'Admin',
             'last_name' => 'Admin',
-            'caller_id' => 102
+            'caller_id' => '102'
         ]);
 
         if (!$model->save()) {
