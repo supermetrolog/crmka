@@ -535,6 +535,10 @@ class Objects extends \yii\db\ActiveRecord
     }
     public function getCompany()
     {
-        return $this->hasMany(Company::class, ['id' => 'company_id']);
+        return $this->hasOne(Company::class, ['id' => 'company_id']);
+    }
+    public function getOfferMix()
+    {
+        return $this->hasMany(OfferMix::class, ['object_id' => 'id'])->where(['deleted' => 0]);
     }
 }

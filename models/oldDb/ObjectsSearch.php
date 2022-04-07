@@ -41,7 +41,9 @@ class ObjectsSearch extends Objects
      */
     public function search($params)
     {
-        $query = Objects::find()->with(['blocks', 'company']);
+        $query = Objects::find()->with(['blocks', 'company', 'offerMix' => function ($query) {
+            $query->andWhere(['type_id' => [1, 2]]);
+        }]);
 
         // add conditions that should always apply here
 
