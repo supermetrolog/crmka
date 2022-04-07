@@ -528,6 +528,19 @@ class Objects extends \yii\db\ActiveRecord
         };
         return $fields;
     }
+    public function extraFields()
+    {
+        $extraFields = parent::extraFields();
+        $extraFields['offerMix_formatted'] = function ($extraFields) {
+            return $this->getFormattedOfferMix($extraFields);
+        };
+        return $extraFields;
+    }
+    public function getFormattedOfferMix($extraFields)
+    {
+        $offerMix = $extraFields->offerMix;
+        return $offerMix[0];
+    }
 
     public function getBlocks()
     {
