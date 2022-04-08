@@ -41,9 +41,9 @@ class ObjectsSearch extends Objects
      */
     public function search($params)
     {
-        $query = Objects::find()->with(['blocks', 'company', 'offerMix' => function ($query) {
-            $query->andWhere(['type_id' => [1, 2]]);
-        }]);
+        $query = Objects::find()->joinWith(['offerMix' => function ($query) {
+            $query->andWhere(['type_id' => [1], 'c_industry_offers_mix.deleted' => 0]);
+        }])->with(['blocks']);
 
         // add conditions that should always apply here
 
@@ -51,6 +51,25 @@ class ObjectsSearch extends Objects
             'query' => $query,
             'pagination' => [
                 'pageSize' => 10,
+            ],
+            'sort' => [
+                'enableMultiSort' => true,
+                'defaultOrder' => [
+                    'default' => SORT_DESC
+                ],
+                'attributes' => [
+                    'default' => [
+                        'asc' => [
+                            'c_industry_offers_mix.type_id' => SORT_ASC,
+                            'c_industry_offers_mix.last_update' => SORT_ASC,
+                        ],
+                        'desc' => [
+                            'c_industry_offers_mix.type_id' => SORT_DESC,
+                            'c_industry_offers_mix.last_update' => SORT_DESC,
+                        ],
+                        'default' => SORT_DESC,
+                    ],
+                ],
             ]
         ]);
 
@@ -72,7 +91,7 @@ class ObjectsSearch extends Objects
             'first_line' => $this->first_line,
             'complex_id' => $this->complex_id,
             'contact_id' => $this->contact_id,
-            'company_id' => $this->company_id,
+            'c_industry.company_id' => $this->company_id,
             'author_id' => $this->author_id,
             'type' => $this->type,
             'status_id' => $this->status_id,

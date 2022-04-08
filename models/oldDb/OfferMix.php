@@ -568,15 +568,20 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['calc_area_mezzanine'] = function ($fields) {
             return $this->calcMinMaxArea($fields->area_mezzanine_min, $fields->area_mezzanine_max);
         };
+        $fields['calc_area_tech'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->area_tech_min, $fields->area_tech_max);
+        };
         $fields['calc_area_warehouse'] = function ($fields) {
             $min = $fields->area_floor_min;
             $max = $fields->area_mezzanine_max + $fields->area_floor_max;
             return $this->calcMinMaxArea($min, $max);
         };
         $fields['calc_area_general'] = function ($fields) {
-            $area_warehouse_max = max([(int)$fields->area_floor_min, (int)($fields->area_mezzanine_max + $fields->area_floor_max)]);
-            $area_office = max([$fields->area_office_min, $fields->area_office_max]);
-            return Yii::$app->formatter->format($area_warehouse_max + $area_office, 'decimal');
+            // $area_warehouse_max = max([(int)$fields->area_floor_min, (int)($fields->area_mezzanine_max + $fields->area_floor_max)]);
+            // $area_office = max([$fields->area_office_min, $fields->area_office_max]);
+            // return Yii::$app->formatter->format($area_warehouse_max + $area_office, 'decimal');
+
+            return $this->calcMinMaxArea($fields->area_min, $fields->area_max);
         };
         $fields['calc_price_floor'] = function ($fields) {
             return $this->calcMinMaxArea($fields->price_floor_min, $fields->price_floor_max);
@@ -625,11 +630,14 @@ class OfferMix extends \yii\db\ActiveRecord
     }
     public function calcPriceGeneralForSale($fields)
     {
-        $area_warehouse_max = max([(int)$fields->area_floor_min, (int)($fields->area_mezzanine_max + $fields->area_floor_max)]);
-        $area_office = max([$fields->area_office_min, $fields->area_office_max]);
-        $calc_area_general = $area_warehouse_max + $area_office;
-        $min = $fields->price_sale_min * $calc_area_general;
-        $max = $fields->price_sale_max * $calc_area_general;
+        // $area_warehouse_max = max([(int)$fields->area_floor_min, (int)($fields->area_mezzanine_max + $fields->area_floor_max)]);
+        // $area_office = max([$fields->area_office_min, $fields->area_office_max]);
+        // $calc_area_general = $area_warehouse_max + $area_office;
+        // $min = $fields->price_sale_min * $calc_area_general;
+        // $max = $fields->price_sale_max * $calc_area_general;
+        // return $this->calcMinMaxArea($min, $max);
+        $min = $fields->price_sale_min * $fields->area_min;
+        $max = $fields->price_sale_max * $fields->area_max;
         return $this->calcMinMaxArea($min, $max);
     }
     public function calcMinMaxArea($min, $max)

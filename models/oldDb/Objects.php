@@ -552,6 +552,6 @@ class Objects extends \yii\db\ActiveRecord
     }
     public function getOfferMix()
     {
-        return $this->hasMany(OfferMix::class, ['object_id' => 'id'])->where(['deleted' => 0]);
+        return $this->hasMany(OfferMix::class, ['object_id' => 'id']);
     }
 }
