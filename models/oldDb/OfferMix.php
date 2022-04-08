@@ -559,8 +559,14 @@ class OfferMix extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        $fields['calc_area_office'] = function ($fields) {
-            return $this->calcMinMaxArea($fields->area_office_min, $fields->area_office_max);
+        $fields['photos'] = function ($fields) {
+            return json_decode($fields['photos']);
+        };
+        $fields['calc_floors'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->floor_min, $fields->floor_max);
+        };
+        $fields['calc_ceilingHeight'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->ceiling_height_min, $fields->ceiling_height_max);
         };
         $fields['calc_area_floor'] = function ($fields) {
             return $this->calcMinMaxArea($fields->area_floor_min, $fields->area_floor_max);
@@ -659,5 +665,14 @@ class OfferMix extends \yii\db\ActiveRecord
             }
         }
         return $result;
+    }
+
+
+    public static function normalizeDealType($dealType)
+    {
+        $dealTypes = [
+            0 => 1
+        ];
+        return $dealTypes[$dealType];
     }
 }
