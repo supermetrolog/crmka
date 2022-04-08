@@ -98,11 +98,15 @@ return
             'class' => 'yii\rest\UrlRule',
             'controller' => 'site',
             'except' => [],
+
         ],
         [
             'class' => 'yii\rest\UrlRule',
             'controller' => 'oldDb/object',
             'except' => [],
+            'extraPatterns' => [
+                'GET,OPTIONS offers' => 'offers',
+            ],
         ],
         [
             'class' => 'yii\rest\UrlRule',

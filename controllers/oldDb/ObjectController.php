@@ -6,11 +6,9 @@ use app\behaviors\BaseControllerBehaviors;
 use yii\rest\ActiveController;
 use Yii;
 use app\models\Company;
-use app\models\CompanySearch;
 use app\models\oldDb\ObjectsSearch;
-use app\models\Productrange;
+use app\models\oldDb\OfferMixSearch;
 use app\models\UploadFile;
-use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 use yii\filters\Cors;
@@ -22,7 +20,7 @@ class ObjectController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view']);
+        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view', 'offers']);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
@@ -49,6 +47,12 @@ class ObjectController extends ActiveController
         $searchModel = new ObjectsSearch();
         return $searchModel->search(Yii::$app->request->queryParams);
     }
+
+    public function actionOffers()
+    {
+        $searchModel = new OfferMixSearch();
+        return $searchModel->search(Yii::$app->request->queryParams);
+    }
     public function actionView($id)
     {
         return Company::getCompanyInfo($id);
@@ -67,20 +71,6 @@ class ObjectController extends ActiveController
 
         $model->files = UploadedFile::getInstancesByName('files');
         return Company::updateCompany($this->findModel($id), $request, $model);
-    }
-    public function actionSearch()
-    {
-        $search = new CompanySearch();
-        $searchByAttr['CompanySearch'] = Yii::$app->request->queryParams;
-        return $search->search($searchByAttr);
-    }
-    public function actionProductRangeList()
-    {
-        return ArrayHelper::getColumn(Productrange::find()->select('product')->distinct()->asArray()->all(), 'product');
-    }
-    public function actionInTheBankList()
-    {
-        return ArrayHelper::getColumn(Company::find()->select('inTheBank')->where(['is not', 'inTheBank', new \yii\db\Expression('null')])->distinct()->asArray()->all(), 'inTheBank');
     }
     protected function findModel($id)
     {
