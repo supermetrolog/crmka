@@ -4,6 +4,7 @@ namespace app\models\oldDb;
 
 use app\models\Company;
 use Yii;
+use yii\helpers\HtmlPurifier;
 
 /**
  * This is the model class for table "c_industry".
@@ -525,6 +526,18 @@ class Objects extends \yii\db\ActiveRecord
         $fields['photo'] = function ($fields) {
             return json_decode($fields['photo']);
             // return 'fuck';
+        };
+        $fields['description'] = function ($fields) {
+            $fuck =  HtmlPurifier::process($fields['description'], ['HTML.AllowedElements' => '']);
+            $fuck = str_replace('\\', '', $fuck);
+            $fuck = str_replace('??', '', $fuck);
+            return $fuck;
+        };
+        $fields['description_auto'] = function ($fields) {
+            $fuck =  HtmlPurifier::process($fields['description_auto'], ['HTML.AllowedElements' => '']);
+            $fuck = str_replace('\\', '', $fuck);
+            $fuck = str_replace('??', '', $fuck);
+            return $fuck;
         };
         return $fields;
     }

@@ -2,6 +2,7 @@
 
 namespace app\models\oldDb;
 
+use app\models\Request;
 use Yii;
 
 /**
@@ -258,6 +259,10 @@ use Yii;
  */
 class OfferMix extends \yii\db\ActiveRecord
 {
+    public const DEAL_TYPE_RENT = 1;
+    public const DEAL_TYPE_SALE = 2;
+    public const DEAL_TYPE_RESPONSE_STORAGE = 3;
+    public const DEAL_TYPE_SUBLEASE = 4;
     /**
      * {@inheritdoc}
      */
@@ -562,6 +567,9 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);
         };
+        $fields['blocks'] = function ($fields) {
+            return json_decode($fields['blocks']);
+        };
         $fields['calc_floors'] = function ($fields) {
             return $this->calcMinMaxArea($fields->floor_min, $fields->floor_max);
         };
@@ -670,9 +678,19 @@ class OfferMix extends \yii\db\ActiveRecord
 
     public static function normalizeDealType($dealType)
     {
+        if ($dealType == null) {
+            return;
+        }
         $dealTypes = [
-            0 => 1
+            Request::DEAL_TYPE_RENT => OfferMix::DEAL_TYPE_RENT,
+            Request::DEAL_TYPE_SALE => OfferMix::DEAL_TYPE_SALE,
         ];
         return $dealTypes[$dealType];
+    }
+
+
+    public function getObject()
+    {
+        return $this->hasOne(Objects::class, ['id' => 'object_id']);
     }
 }

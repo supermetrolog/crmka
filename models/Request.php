@@ -67,6 +67,10 @@ class Request extends \yii\db\ActiveRecord
     public const STATUS_PASSIVE = 0;
     public const STATUS_DONE = 2;
     public const DEAL_TYPE_LIST = ['аренда', 'продажа', 'ответ-хранение', 'субаренда'];
+    public const DEAL_TYPE_RENT = 0;
+    public const DEAL_TYPE_SALE = 1;
+    public const DEAL_TYPE_RESPONSE_STORAGE = 2;
+    public const DEAL_TYPE_SUBLEASE = 3;
     public function behaviors()
     {
         return [

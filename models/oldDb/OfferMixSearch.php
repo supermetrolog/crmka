@@ -2,26 +2,33 @@
 
 namespace app\models\oldDb;
 
+use app\exceptions\ValidationErrorHttpException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\oldDb\OfferMix;
+use yii\db\Expression;
 
 /**
  * OfferMixSearch represents the model behind the search form of `app\models\oldDb\OfferMix`.
  */
 class OfferMixSearch extends OfferMix
 {
+    private const APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD =  30;
     public $rangeMinArea;
     public $rangeMaxArea;
+    public $rangeMinCeilingHeight;
+    public $rangeMaxCeilingHeight;
     public $pricePerFloor;
+    public $approximateDistanceFromMKAD;
+    public $minElectricity;
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['pricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'id', 'original_id', 'type_id', 'deal_type', 'status', 'object_id', 'complex_id', 'parent_id', 'company_id', 'contact_id', 'year_built', 'agent_id', 'agent_visited', 'is_land', 'land_width', 'land_length', 'land_use_restrictions', 'from_mkad', 'cian_region', 'outside_mkad', 'near_mo', 'from_metro_value', 'from_metro', 'from_station_value', 'from_station', 'blocks_amount', 'last_update', 'commission_client', 'commission_owner', 'deposit', 'pledge', 'area_building', 'area_floor_full', 'area_mezzanine_full', 'area_office_full', 'area_min', 'area_max', 'area_floor_min', 'area_floor_max', 'area_mezzanine_min', 'area_mezzanine_max', 'area_mezzanine_add', 'area_office_min', 'area_office_max', 'area_office_add', 'area_tech_min', 'area_tech_max', 'area_field_min', 'area_field_max', 'pallet_place_min', 'pallet_place_max', 'cells_place_min', 'cells_place_max', 'inc_electricity', 'inc_heating', 'inc_water', 'price_opex_inc', 'price_opex', 'price_opex_min', 'price_opex_max', 'price_public_services_inc', 'price_public_services', 'public_services', 'price_public_services_min', 'price_public_services_max', 'price_floor_min', 'price_floor_max', 'price_floor_min_month', 'price_floor_max_month', 'price_min_month_all', 'price_max_month_all', 'price_floor_100_min', 'price_floor_100_max', 'price_mezzanine_min', 'price_mezzanine_max', 'price_office_min', 'price_office_max', 'price_sale_min', 'price_sale_max', 'price_safe_pallet_min', 'price_safe_pallet_max', 'price_safe_volume_min', 'price_safe_volume_max', 'price_safe_floor_min', 'price_safe_floor_max', 'price_safe_calc_min', 'price_safe_calc_max', 'price_safe_calc_month_min', 'price_safe_calc_month_max', 'price_sale_min_all', 'price_sale_max_all', 'temperature_min', 'temperature_max', 'prepay', 'floor_min', 'floor_max', 'self_leveling', 'heated', 'elevators_min', 'elevators_max', 'elevators_num', 'has_cranes', 'cranes_num', 'cranes_railway_num', 'cranes_gantry_num', 'cranes_overhead_num', 'cranes_cathead_num', 'telphers_min', 'telphers_max', 'telphers_num', 'railway', 'railway_value', 'power', 'power_value', 'steam', 'steam_value', 'gas', 'gas_value', 'phone', 'water_value', 'sewage_central', 'sewage_central_value', 'sewage_rain', 'firefighting', 'video_control', 'access_control', 'security_alert', 'fire_alert', 'smoke_exhaust', 'canteen', 'hostel', 'racks', 'warehouse_equipment', 'charging_room', 'cross_docking', 'cranes_runways', 'parking_car', 'parking_lorry', 'parking_truck', 'built_to_suit', 'built_to_suit_time', 'built_to_suit_plan', 'rent_business', 'rent_business_fill', 'rent_business_price', 'rent_business_long_contracts', 'rent_business_last_repair', 'rent_business_payback', 'rent_business_income', 'rent_business_profit', 'sale_company', 'holidays', 'ad_realtor', 'ad_cian', 'ad_cian_top3', 'ad_cian_premium', 'ad_cian_hl', 'ad_yandex', 'ad_yandex_raise', 'ad_yandex_promotion', 'ad_yandex_premium', 'ad_arendator', 'ad_free', 'ad_special', 'deleted', 'test_only', 'is_exclusive', 'deal_id', 'hide_from_market'], 'integer'],
-            [['visual_id', 'deal_type_name', 'title', 'object_type', 'purposes', 'purposes_furl', 'object_type_name', 'agent_name', 'landscape_type', 'address', 'class', 'class_name', 'region', 'region_name', 'town', 'town_name', 'district', 'district_name', 'district_moscow', 'district_moscow_name', 'direction', 'direction_name', 'highway', 'highway_name', 'highway_moscow', 'highway_moscow_name', 'metro', 'metro_name', 'railway_station', 'blocks', 'photos', 'videos', 'thumbs', 'tax_form', 'safe_type', 'safe_type_furl', 'floor_type', 'floor_types', 'gates', 'gate_type', 'gate_num', 'column_grid', 'internet', 'heating', 'facing', 'ventilation', 'water', 'guard', 'firefighting_name', 'cadastral_number', 'cadastral_number_land', 'field_allow_usage', 'available_from', 'own_type', 'own_type_land', 'land_category', 'entry_territory', 'parking_car_value', 'parking_lorry_value', 'parking_truck_value', 'description'], 'safe'],
+            [['minElectricity', 'approximateDistanceFromMKAD', 'rangeMaxCeilingHeight', 'rangeMinCeilingHeight', 'pricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'id', 'original_id', 'deal_type', 'status', 'object_id', 'complex_id', 'parent_id', 'company_id', 'contact_id', 'year_built', 'agent_id', 'agent_visited', 'is_land', 'land_width', 'land_length', 'land_use_restrictions', 'from_mkad', 'cian_region', 'outside_mkad', 'near_mo', 'from_metro_value', 'from_metro', 'from_station_value', 'from_station', 'blocks_amount', 'last_update', 'commission_client', 'commission_owner', 'deposit', 'pledge', 'area_building', 'area_floor_full', 'area_mezzanine_full', 'area_office_full', 'area_min', 'area_max', 'area_floor_min', 'area_floor_max', 'area_mezzanine_min', 'area_mezzanine_max', 'area_mezzanine_add', 'area_office_min', 'area_office_max', 'area_office_add', 'area_tech_min', 'area_tech_max', 'area_field_min', 'area_field_max', 'pallet_place_min', 'pallet_place_max', 'cells_place_min', 'cells_place_max', 'inc_electricity', 'inc_heating', 'inc_water', 'price_opex_inc', 'price_opex', 'price_opex_min', 'price_opex_max', 'price_public_services_inc', 'price_public_services', 'public_services', 'price_public_services_min', 'price_public_services_max', 'price_floor_min', 'price_floor_max', 'price_floor_min_month', 'price_floor_max_month', 'price_min_month_all', 'price_max_month_all', 'price_floor_100_min', 'price_floor_100_max', 'price_mezzanine_min', 'price_mezzanine_max', 'price_office_min', 'price_office_max', 'price_sale_min', 'price_sale_max', 'price_safe_pallet_min', 'price_safe_pallet_max', 'price_safe_volume_min', 'price_safe_volume_max', 'price_safe_floor_min', 'price_safe_floor_max', 'price_safe_calc_min', 'price_safe_calc_max', 'price_safe_calc_month_min', 'price_safe_calc_month_max', 'price_sale_min_all', 'price_sale_max_all', 'temperature_min', 'temperature_max', 'prepay', 'floor_min', 'floor_max', 'self_leveling', 'heated', 'elevators_min', 'elevators_max', 'elevators_num', 'has_cranes', 'cranes_num', 'cranes_railway_num', 'cranes_gantry_num', 'cranes_overhead_num', 'cranes_cathead_num', 'telphers_min', 'telphers_max', 'telphers_num', 'railway', 'railway_value', 'power', 'power_value', 'steam', 'steam_value', 'gas', 'gas_value', 'phone', 'water_value', 'sewage_central', 'sewage_central_value', 'sewage_rain', 'firefighting', 'video_control', 'access_control', 'security_alert', 'fire_alert', 'smoke_exhaust', 'canteen', 'hostel', 'racks', 'warehouse_equipment', 'charging_room', 'cross_docking', 'cranes_runways', 'parking_car', 'parking_lorry', 'parking_truck', 'built_to_suit', 'built_to_suit_time', 'built_to_suit_plan', 'rent_business', 'rent_business_fill', 'rent_business_price', 'rent_business_long_contracts', 'rent_business_last_repair', 'rent_business_payback', 'rent_business_income', 'rent_business_profit', 'sale_company', 'holidays', 'ad_realtor', 'ad_cian', 'ad_cian_top3', 'ad_cian_premium', 'ad_cian_hl', 'ad_yandex', 'ad_yandex_raise', 'ad_yandex_promotion', 'ad_yandex_premium', 'ad_arendator', 'ad_free', 'ad_special', 'deleted', 'test_only', 'is_exclusive', 'deal_id', 'hide_from_market'], 'integer'],
+            [['type_id', 'visual_id', 'deal_type_name', 'title', 'object_type', 'purposes', 'purposes_furl', 'object_type_name', 'agent_name', 'landscape_type', 'address', 'class', 'class_name', 'region', 'region_name', 'town', 'town_name', 'district', 'district_name', 'district_moscow', 'district_moscow_name', 'direction', 'direction_name', 'highway', 'highway_name', 'highway_moscow', 'highway_moscow_name', 'metro', 'metro_name', 'railway_station', 'blocks', 'photos', 'videos', 'thumbs', 'tax_form', 'safe_type', 'safe_type_furl', 'floor_type', 'floor_types', 'gates', 'gate_type', 'gate_num', 'column_grid', 'internet', 'heating', 'facing', 'ventilation', 'water', 'guard', 'firefighting_name', 'cadastral_number', 'cadastral_number_land', 'field_allow_usage', 'available_from', 'own_type', 'own_type_land', 'land_category', 'entry_territory', 'parking_car_value', 'parking_lorry_value', 'parking_truck_value', 'description'], 'safe'],
             [['latitude', 'longitude', 'ceiling_height_min', 'ceiling_height_max', 'load_floor_min', 'load_floor_max', 'load_mezzanine_min', 'load_mezzanine_max', 'cranes_min', 'cranes_max', 'cranes_railway_min', 'cranes_railway_max', 'cranes_gantry_min', 'cranes_gantry_max', 'cranes_overhead_min', 'cranes_overhead_max', 'cranes_cathead_min', 'cranes_cathead_max'], 'number'],
         ];
     }
@@ -44,6 +51,10 @@ class OfferMixSearch extends OfferMix
     public function normalizeProps()
     {
         $this->deal_type = OfferMix::normalizeDealType($this->deal_type);
+        $this->type_id = $this->stringToArray($this->type_id);
+        if ($this->approximateDistanceFromMKAD) {
+            $this->approximateDistanceFromMKAD = floor(($this->approximateDistanceFromMKAD * self::APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD / 100) + $this->approximateDistanceFromMKAD);
+        }
     }
     /**
      * Creates data provider instance with search query applied
@@ -54,18 +65,23 @@ class OfferMixSearch extends OfferMix
      */
     public function search($params)
     {
-        $query = OfferMix::find()->select('c_industry_offers_mix.*, area_floor_min as area_warehouse_min, `area_mezzanine_max`+`area_floor_max` as area_warehouse_max')->andWhere(['deleted' => 0]);
+        $query = OfferMix::find()->with(['object'])->andWhere(['deleted' => 0]);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => 100
+            ]
         ]);
 
         $this->load($params, '');
         $this->normalizeProps();
 
         if (!$this->validate()) {
+            throw new ValidationErrorHttpException($this->getErrorSummary(false));
+
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
@@ -323,10 +339,17 @@ class OfferMixSearch extends OfferMix
             ->andFilterWhere(['like', 'parking_lorry_value', $this->parking_lorry_value])
             ->andFilterWhere(['like', 'parking_truck_value', $this->parking_truck_value])
             ->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['<=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMaxArea])
-            ->andFilterWhere(['>=', '`area_floor_min`', $this->rangeMinArea])
-            // ->andFilterWhere(['>=', 'price_sale_max', $this->pricePerFloor])
-            ->andFilterWhere(['>=', 'GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max )', $this->pricePerFloor]);
+            ->andFilterWhere(['<=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMaxArea]) // area_warehouse_max < maxArea
+            ->andFilterWhere(['>=', '`area_floor_min`', $this->rangeMinArea]) // area_warehouse_min < minArea
+            ->andFilterWhere(['<=', new Expression('CASE WHEN ceiling_height_min > ceiling_height_max THEN ceiling_height_min ELSE ceiling_height_max END'), $this->rangeMaxCeilingHeight]) // area_warehouse_max < maxArea
+            ->andFilterWhere(['>=', 'ceiling_height_min', $this->rangeMinCeilingHeight])
+            ->andFilterWhere(['<=', 'from_mkad', $this->approximateDistanceFromMKAD])
+            ->andFilterWhere(['>=', 'power_value', $this->minElectricity]);
+        if ($this->deal_type == self::DEAL_TYPE_RENT || $this->deal_type == self::DEAL_TYPE_SUBLEASE) {
+            $query->andFilterWhere(['<=', 'GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max )', $this->pricePerFloor]);
+        } elseif ($this->deal_type == self::DEAL_TYPE_SALE) {
+            $query->andFilterWhere(['<=', 'price_sale_max', $this->pricePerFloor]);
+        }
 
         return $dataProvider;
     }
