@@ -263,6 +263,9 @@ class OfferMix extends \yii\db\ActiveRecord
     public const DEAL_TYPE_SALE = 2;
     public const DEAL_TYPE_RESPONSE_STORAGE = 3;
     public const DEAL_TYPE_SUBLEASE = 4;
+
+    public const MINI_TYPE_ID = 1;
+    public const GENERAL_TYPE_ID = 2;
     /**
      * {@inheritdoc}
      */
@@ -585,6 +588,9 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['calc_area_tech'] = function ($fields) {
             return $this->calcMinMaxArea($fields->area_tech_min, $fields->area_tech_max);
         };
+        $fields['calc_area_office'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->area_office_min, $fields->area_office_max);
+        };
         $fields['calc_area_warehouse'] = function ($fields) {
             $min = $fields->area_floor_min;
             $max = $fields->area_mezzanine_max + $fields->area_floor_max;
@@ -687,10 +693,45 @@ class OfferMix extends \yii\db\ActiveRecord
         ];
         return $dealTypes[$dealType];
     }
-
+    public static function normalizeRegions($data)
+    {
+        if ($data == null) {
+            return;
+        }
+        $array = [
+            1 => 1,
+            2 => 2,
+            3 => 3,
+            4 => 4,
+            5 => 5,
+            0 => 6,
+            6 => 7,
+            7 => 8,
+            14 => 9,
+            9 => 10,
+            8 => 11,
+            10 => 17,
+            11 => 18,
+            13 => 19,
+            12 => 20
+        ];
+        return $array[$data];
+    }
 
     public function getObject()
     {
         return $this->hasOne(Objects::class, ['id' => 'object_id']);
+    }
+    public function getOffer()
+    {
+        return $this->hasOne(Offers::class, ['id' => 'original_id']);
+    }
+    public function getMiniOffersMix()
+    {
+        return $this->hasMany(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['deleted' => 0, 'type_id' => self::MINI_TYPE_ID]);
+    }
+    public function getGeneralOffersMix()
+    {
+        return $this->hasMany(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['deleted' => 0, 'type_id' => self::GENERAL_TYPE_ID]);
     }
 }

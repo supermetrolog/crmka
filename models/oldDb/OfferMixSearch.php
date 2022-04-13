@@ -48,9 +48,23 @@ class OfferMixSearch extends OfferMix
         }
         return $value;
     }
+    public function normalizeRegion()
+    {
+        $regions = $this->stringToArray($this->region);
+        $array = [];
+        if (is_array($regions)) {
+            foreach ($regions as $region) {
+                $array[] = OfferMix::normalizeRegions($region);
+            }
+
+            $this->region = $array;
+        }
+    }
     public function normalizeProps()
     {
         $this->deal_type = OfferMix::normalizeDealType($this->deal_type);
+        $this->normalizeRegion();
+
         $this->type_id = $this->stringToArray($this->type_id);
         if ($this->approximateDistanceFromMKAD) {
             $this->approximateDistanceFromMKAD = floor(($this->approximateDistanceFromMKAD * self::APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD / 100) + $this->approximateDistanceFromMKAD);
@@ -65,7 +79,7 @@ class OfferMixSearch extends OfferMix
      */
     public function search($params)
     {
-        $query = OfferMix::find()->with(['object'])->andWhere(['deleted' => 0]);
+        $query = OfferMix::find()->with(['object', 'miniOffersMix', 'offer'])->andWhere(['deleted' => 0]);
 
         // add conditions that should always apply here
 
@@ -276,6 +290,7 @@ class OfferMixSearch extends OfferMix
             'is_exclusive' => $this->is_exclusive,
             'deal_id' => $this->deal_id,
             'hide_from_market' => $this->hide_from_market,
+            'region' => $this->region
         ]);
 
         $query->andFilterWhere(['like', 'visual_id', $this->visual_id])
@@ -290,7 +305,6 @@ class OfferMixSearch extends OfferMix
             ->andFilterWhere(['like', 'address', $this->address])
             ->andFilterWhere(['like', 'class', $this->class])
             ->andFilterWhere(['like', 'class_name', $this->class_name])
-            ->andFilterWhere(['like', 'region', $this->region])
             ->andFilterWhere(['like', 'region_name', $this->region_name])
             ->andFilterWhere(['like', 'town', $this->town])
             ->andFilterWhere(['like', 'town_name', $this->town_name])
