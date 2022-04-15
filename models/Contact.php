@@ -46,6 +46,8 @@ use app\behaviors\CreateManyMiniModelsBehaviors;
 class Contact extends \yii\db\ActiveRecord
 {
     public const GENERAL_CONTACT_TYPE = 1;
+    public const DEFAULT_CONTACT_TYPE = 0;
+    public const IS_MAIN_CONTACT = 1;
     public const LIST_CONTACT_TYPE = 0;
 
     public function behaviors()

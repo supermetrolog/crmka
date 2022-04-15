@@ -417,6 +417,17 @@ class Company extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Contact::className(), ['company_id' => 'id']);
     }
+
+    /**
+     * Gets query for [[MainContact]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMainContact()
+    {
+        return $this->hasOne(Contact::className(), ['company_id' => 'id'])
+            ->where(['contact.type' => Contact::DEFAULT_CONTACT_TYPE, 'contact.isMain' => Contact::IS_MAIN_CONTACT]);
+    }
     /**
      * Gets query for [[Deals]].
      *

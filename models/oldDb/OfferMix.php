@@ -2,8 +2,11 @@
 
 namespace app\models\oldDb;
 
+use app\models\Company;
 use app\models\Request;
+use app\models\User;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "c_industry_offers_mix".
@@ -266,6 +269,47 @@ class OfferMix extends \yii\db\ActiveRecord
 
     public const MINI_TYPE_ID = 1;
     public const GENERAL_TYPE_ID = 2;
+
+
+    public const USERS = [
+        '0' => 41,
+        '1' => 32,
+        '2' => 33,
+        '4' => 34,
+        '5' => 35,
+        '6' => 36,
+        '7' => 37,
+        '8' => 38,
+        '9' => 39,
+        '10' => 40,
+        '11' => 41,
+        '12' => 42,
+        '45' => 43,
+        '70' => 44,
+        '109' => 45,
+        '113' => 46,
+        '140' => 47,
+        '141' => 48,
+        '150' => 49,
+        '151' => 50,
+        '154' => 51,
+        '155' => 52,
+        '179' => 53,
+        '218' => 54,
+        '278' => 55,
+        '285' => 56,
+        '287' => 57,
+        '290' => 58,
+        '297' => 59,
+        '314' => 60,
+        '315' => 61,
+        '317' => 62,
+        '319' => 63,
+        '329' => 64,
+        '330' => 65,
+        '331' => 66,
+        '332' => 67,
+    ];
     /**
      * {@inheritdoc}
      */
@@ -560,15 +604,43 @@ class OfferMix extends \yii\db\ActiveRecord
             'hide_from_market' => 'Hide From Market',
         ];
     }
-    public const RENT_DEAL_TYPE = 1;
-    public const SALE_DEAL_TYPE = 2;
-    public const RESPONSE_STORAGE_DEAL_TYPE = 3;
-    public const SUBLEASE_DEAL_TYPE = 4;
+
+    public  function extraFields()
+    {
+        $extraFields = parent::extraFields();
+        $extraFields['consultant'] = function () {
+            if (!ArrayHelper::keyExists($this->agent_id, self::USERS)) {
+                return null;
+            }
+            $user_id = self::USERS[$this->agent_id];
+            $query = User::find()->with(['userProfile'])->where(['user.id' => $user_id])->limit(1);
+            return $query->one();
+        };
+        return $extraFields;
+    }
     public function fields()
     {
         $fields = parent::fields();
+        $fields['last_update_format'] = function ($fields) {
+            return $fields['last_update'] ? Yii::$app->formatter->format($fields['last_update'], 'datetime') : null;
+        };
+        // $fields['region_new_field'] = function ($fields) {
+        //     return self::normalizeRegions($fields['region']);
+        // };
+        // $fields['district_new_field'] = function ($fields) {
+        //     return self::normalizeDistrict($fields['district_moscow']);
+        // };
+        // $fields['direction_new_field'] = function ($fields) {
+        //     return self::normalizeDirection($fields['direction']);
+        // };
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);
+        };
+        $fields['direction_name'] = function ($fields) {
+            if (!$fields['direction_name'] || $fields['direction_name'] == "0") {
+                return null;
+            }
+            return $fields['direction_name'];
         };
         $fields['blocks'] = function ($fields) {
             return json_decode($fields['blocks']);
@@ -615,6 +687,9 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['calc_price_sale'] = function ($fields) {
             return $this->calcMinMaxArea($fields->price_sale_min, $fields->price_sale_max);
         };
+        $fields['calc_price_safe_pallet'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->price_safe_pallet_min, $fields->price_safe_pallet_max);
+        };
         $fields['calc_price_warehouse'] = function ($fields) {
             $array = [
                 $fields->price_mezzanine_min,
@@ -627,7 +702,7 @@ class OfferMix extends \yii\db\ActiveRecord
             return $this->calcMinMaxArea($min, $max);
         };
         $fields['calc_price_general'] = function ($fields) {
-            if ($fields->deal_type == self::SALE_DEAL_TYPE) {
+            if ($fields->deal_type == self::DEAL_TYPE_SALE) {
                 return $this->calcPriceGeneralForSale($fields);
             }
             return $this->calcPriceGeneralForRent($fields);
@@ -688,8 +763,10 @@ class OfferMix extends \yii\db\ActiveRecord
             return;
         }
         $dealTypes = [
-            Request::DEAL_TYPE_RENT => OfferMix::DEAL_TYPE_RENT,
+            Request::DEAL_TYPE_RENT => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE],
             Request::DEAL_TYPE_SALE => OfferMix::DEAL_TYPE_SALE,
+            Request::DEAL_TYPE_RESPONSE_STORAGE => OfferMix::DEAL_TYPE_RESPONSE_STORAGE,
+            Request::DEAL_TYPE_SUBLEASE => OfferMix::DEAL_TYPE_SUBLEASE,
         ];
         return $dealTypes[$dealType];
     }
@@ -717,7 +794,74 @@ class OfferMix extends \yii\db\ActiveRecord
         ];
         return $array[$data];
     }
+    public static function normalizeDistrict($data)
+    {
+        if ($data == null) {
+            return;
+        }
+        $array = [
+            0 => 1,
+            1 => 2,
+            2 => 3,
+            3 => 4,
+            4 => 5,
+            5 => 6,
+            6 => 7,
+            7 => 8,
+            8 => 9,
+            9  => 10,
+            10 => 11,
+        ];
+        return $array[$data];
+    }
+    public static function normalizeDirection($data)
+    {
+        if ($data == null) {
+            return;
+        }
+        $array = [
+            0 => 2,
+            1 => 3,
+            2 => 4,
+            3 => 5,
+            4 => 6,
+            5 => 7,
+            6 => 8,
+            7 => 9,
+            8 => 9,
+            9 => 9,
+        ];
+        return $array[$data];
+    }
+    public function normalizeAgentId($consultant_id)
+    {
+        if ($consultant_id == null) {
+            return null;
+        }
+        $newUsersArray = [];
+        foreach (self::USERS as $key => $value) {
+            $newUsersArray[$value] = $key;
+        }
+        return $newUsersArray[$consultant_id];
+    }
 
+    public static function normalizeObjectClasses($data)
+    {
+        if ($data == null) {
+            return;
+        }
+        $array = [
+            0 => 1,
+            1 => 2,
+            2 => 3,
+            3 => 4,
+        ];
+        return $array[$data];
+    }
+    public function getCompany()
+    {
+        return $this->hasOne(Company::class, ['id' => 'company_id']);
+    }
     public function getObject()
     {
         return $this->hasOne(Objects::class, ['id' => 'object_id']);
@@ -732,6 +876,6 @@ class OfferMix extends \yii\db\ActiveRecord
     }
     public function getGeneralOffersMix()
     {
-        return $this->hasMany(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['deleted' => 0, 'type_id' => self::GENERAL_TYPE_ID]);
+        return $this->hasOne(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['deleted' => 0, 'type_id' => self::GENERAL_TYPE_ID]);
     }
 }
