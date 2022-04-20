@@ -5,6 +5,7 @@ namespace app\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Company;
+use yii\db\Expression;
 
 /**
  * CompanySearch represents the model behind the search form of `app\models\Company`.
@@ -132,6 +133,21 @@ class CompanySearch extends Company
             ->orFilterWhere(['like', 'phone.phone', $this->all])
             ->orFilterWhere(['like', 'company.nameEng', $this->all])
             ->orFilterWhere(['like', 'company.nameRu', $this->all]);
+
+        if ($this->all) {
+            $query->orderBy(new Expression("
+                 (
+                    IF (`company`.`id` LIKE '%{$this->all}%', 90, 0) 
+                    + IF (`phone`.`phone` LIKE '%{$this->all}%', 40, 0) 
+                    + IF (`company`.`nameRu` LIKE '%{$this->all}%', 50, 0) 
+                    + IF (`company`.`nameEng` LIKE '%{$this->all}%', 50, 0) 
+                    + IF (`contact`.`first_name` LIKE '%{$this->all}%', 30, 0) 
+                    + IF (`contact`.`middle_name` LIKE '%{$this->all}%', 30, 0) 
+                    + IF (`contact`.`last_name` LIKE '%{$this->all}%', 30, 0) 
+                )
+                DESC
+            "));
+        }
         $query->andFilterWhere([
             'company.id' => $this->id,
             'company.noName' => $this->noName,
