@@ -792,9 +792,23 @@ class OfferMix extends \yii\db\ActiveRecord
             13 => 19,
             12 => 20
         ];
+        // $array = [
+        //     14 => 9,
+        //     7 => 8,
+        //     6 => 7,
+        //     0 => 6,
+        //     5 => 5,
+        //     4 => 4,
+        //     3 => 3,
+        //     2 => 2,
+        //     1 => 1,
+        //     13 => 19,
+        //     11 => 18,
+        //     10 => 17,
+        // ];
         return $array[$data];
     }
-    public static function normalizeDistrict($data)
+    public static function normalizeDistricts($data)
     {
         if ($data == null) {
             return;
@@ -814,7 +828,7 @@ class OfferMix extends \yii\db\ActiveRecord
         ];
         return $array[$data];
     }
-    public static function normalizeDirection($data)
+    public static function normalizeDirections($data)
     {
         if ($data == null) {
             return;
@@ -828,8 +842,6 @@ class OfferMix extends \yii\db\ActiveRecord
             5 => 7,
             6 => 8,
             7 => 9,
-            8 => 9,
-            9 => 9,
         ];
         return $array[$data];
     }
@@ -855,6 +867,60 @@ class OfferMix extends \yii\db\ActiveRecord
             1 => 2,
             2 => 3,
             3 => 4,
+        ];
+        return $array[$data];
+    }
+    public static function normalizeGateTypes($data)
+    {
+        if ($data == null) {
+            return;
+        }
+        $array = [
+            0 => 1,
+            1 => 2,
+            2 => 3,
+            3 => 4,
+        ];
+        return $array[$data];
+    }
+
+    public static function normalizeObjectTypes($data)
+    {
+        if ($data == null) {
+            return;
+        }
+        $array = [
+            0  => 1,
+            1  => 3,
+            2  => 8,
+            3  => 10,
+            4  => 11,
+            5  => 12,
+            6  => 13,
+            7  => 16,
+            8  => 27,
+            9  => 28,
+            10  => 29,
+            12  => 2,
+            13  => 4,
+            14  => 5,
+            15  => 6,
+            16  => 17,
+            17  => 18,
+            18  => 19,
+            19  => 20,
+            20  => 21,
+            21  => 22,
+            22  => 23,
+            23  => 24,
+            24  => 30,
+            25  => 9,
+            26  => 14,
+            27  => 15,
+            28  => 26,
+            29  => 31,
+            30  => 32,
+            31  => 33,
         ];
         return $array[$data];
     }
