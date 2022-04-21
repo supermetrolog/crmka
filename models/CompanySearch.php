@@ -133,7 +133,7 @@ class CompanySearch extends Company
             ->orFilterWhere(['like', 'phone.phone', $this->all])
             ->orFilterWhere(['like', 'company.nameEng', $this->all])
             ->orFilterWhere(['like', 'company.nameRu', $this->all]);
-
+        // для релевантности
         if ($this->all) {
             $query->orderBy(new Expression("
                  (
