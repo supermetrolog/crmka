@@ -901,6 +901,7 @@ class OfferMix extends \yii\db\ActiveRecord
             8  => 27,
             9  => 28,
             10  => 29,
+            11  => 7,
             12  => 2,
             13  => 4,
             14  => 5,

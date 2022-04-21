@@ -181,6 +181,7 @@ class OfferMixSearch extends OfferMix
         $this->normalizePurposes();
         $this->floor_types = $this->stringToArray($this->floor_types);
         $this->type_id = $this->stringToArray($this->type_id);
+        $this->object_type = $this->stringToArray($this->object_type);
         if ($this->approximateDistanceFromMKAD) {
             $this->approximateDistanceFromMKAD = floor(($this->approximateDistanceFromMKAD * self::APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD / 100) + $this->approximateDistanceFromMKAD);
         }
@@ -469,7 +470,6 @@ class OfferMixSearch extends OfferMix
         $query->andFilterWhere(['like', 'visual_id', $this->visual_id])
             ->andFilterWhere(['like', 'deal_type_name', $this->deal_type_name])
             ->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'object_type', $this->object_type])
             ->andFilterWhere(['like', 'purposes_furl', $this->purposes_furl])
             ->andFilterWhere(['like', 'object_type_name', $this->object_type_name])
             ->andFilterWhere(['like', 'agent_name', $this->agent_name])
@@ -548,9 +548,13 @@ class OfferMixSearch extends OfferMix
             }
         }
         if ($this->purposes && is_array($this->purposes)) {
-            // $query->andFilterWhere(['=', new Expression("JSON_EXTRACT(`c_industry_offers_mix`.`gates`, '$[0]')"), "{$this->gates[0]}"]);
             foreach ($this->purposes as $purpose) {
                 $query->andFilterWhere(['like', 'c_industry_offers_mix.purposes', new Expression("'%\"{$purpose}\"%'")]);
+            }
+        }
+        if ($this->object_type && is_array($this->object_type)) {
+            foreach ($this->object_type as $type) {
+                $query->andFilterWhere(['like', 'c_industry_offers_mix.object_type', new Expression("'%\"{$type}\"%'")]);
             }
         }
         if ($this->floor_types && is_array($this->floor_types)) {
