@@ -66,11 +66,15 @@ class Timeline extends \yii\db\ActiveRecord
     public static function getTimeline($consultant_id, $request_id)
     {
         $data = [];
-        $data['timeline'] = self::find()->with(['timelineSteps' => function ($query) {
-            $query->with(['timelineStepObjects' => function ($query) {
-                $query->with('comments');
-            }, 'timelineStepFeedbackways', 'timelineActionComments']);
-        }, 'timelineActionComments' => function ($query) {
+        // $data['timeline'] = self::find()->with(['timelineSteps' => function ($query) {
+        //     $query->with(['timelineStepObjects' => function ($query) {
+        //         $query->with('comments');
+        //     }, 'timelineStepFeedbackways', 'timelineActionComments']);
+        // }, 'timelineActionComments' => function ($query) {
+        //     $query->orderBy(['timeline_action_comment.created_at' => SORT_DESC]);
+        // }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id])->limit(1)->one();
+
+        $data['timeline'] = self::find()->with(['timelineSteps.timelineStepObjects.offer.object', 'timelineSteps.timelineStepObjects.comments', 'timelineSteps.timelineStepFeedbackways', 'timelineSteps.timelineActionComments' => function ($query) {
             $query->orderBy(['timeline_action_comment.created_at' => SORT_DESC]);
         }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id])->limit(1)->one();
 
@@ -79,9 +83,7 @@ class Timeline extends \yii\db\ActiveRecord
     }
     public static function getTimelineListInRequest($request_id)
     {
-        return self::find()->joinWith(['consultant' => function ($query) {
-            $query->joinWith(['userProfile']);
-        }])->where(['timeline.request_id' => $request_id])->all();
+        return self::find()->joinWith(['consultant.userProfile'])->where(['timeline.request_id' => $request_id])->all();
     }
     public static function createNewTimeline($request_id, $consultant_id)
     {

@@ -2,6 +2,7 @@
 
 namespace app\models\miniModels;
 
+use app\models\oldDb\OfferMix;
 use Yii;
 
 /**
@@ -76,7 +77,15 @@ class TimelineStepObject extends \yii\db\ActiveRecord
     {
         return $this->hasOne(TimelineStep::className(), ['id' => 'timeline_step_id']);
     }
-
+    /**
+     * Gets query for [[Offers]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOffer()
+    {
+        return $this->hasOne(OfferMix::className(), ['object_id' => 'object_id', 'type_id' => 'type_id']);
+    }
     /**
      * Gets query for [[Comments]].
      *

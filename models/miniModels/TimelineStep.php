@@ -7,6 +7,7 @@ use app\models\Timeline;
 use yii\web\NotFoundHttpException;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\Deal;
+use app\models\oldDb\OfferMix;
 use app\models\Request;
 use app\models\UserSendedData;
 use Yii;
@@ -337,6 +338,18 @@ class TimelineStep extends \yii\db\ActiveRecord
             foreach ($extraFields['timelineStepObjects'] as $value) {
                 $object = $value->attributes;
                 $object['comments'] = $value->comments;
+                if ($value->offer) {
+                    $object['offer'] = (array)array_merge(
+                        $value->offer->toArray(),
+                        [
+                            'object' => $value->offer->object,
+                            'duplicate_count' => $count[$object['object_id']],
+                            'generalOffersMix' => $value->offer->generalOffersMix,
+                        ]
+                    );
+                } else {
+                    $object['offer'] = null;
+                }
                 $object['duplicate_count'] = $count[$object['object_id']];
                 $newObjects[$object['object_id']] = $object;
             }
@@ -346,6 +359,18 @@ class TimelineStep extends \yii\db\ActiveRecord
             }
             return $fuck;
         };
+        // $extraFields['timelineStepObjects'] = function ($extraFields) {
+        //     $count = array_count_values((array_map(function ($item) {
+        //         return $item['object_id'];
+        //     }, $extraFields['timelineStepObjects'])));
+
+        //     foreach ($extraFields['timelineStepObjects'] as $key => $value) {
+        //         // $extraFields['timelineStepObjects']['comments'] = $value->comments;
+        //         // $extraFields['timelineStepObjects']['offer'] = $value->offer;
+        //         $extraFields['timelineStepObjects']['duplicate_count'] = $count[$value->object_id];
+        //     }
+        //     return $extraFields['timelineStepObjects'];
+        // };
         return $extraFields;
     }
     /**
