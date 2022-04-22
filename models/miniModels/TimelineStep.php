@@ -344,7 +344,7 @@ class TimelineStep extends \yii\db\ActiveRecord
                         [
                             'object' => $value->offer->object,
                             'duplicate_count' => $count[$object['object_id']],
-                            'generalOffersMix' => $value->offer->generalOffersMix,
+                            'generalOffersMix' => (array) array_merge($value->offer->generalOffersMix->toArray(), ['offer' => $value->offer->generalOffersMix->offer])
                         ]
                     );
                 } else {
