@@ -206,7 +206,10 @@ class TimelineStep extends \yii\db\ActiveRecord
             }
             $commentModel = new TimelineStepObjectComment([
                 'timeline_step_id' => $model->timeline_step_id,
+                'timeline_step_object_id' => $model->id,
                 'object_id' => $model->object_id,
+                'type_id' => $model->type_id,
+                'offer_id' => $model->offer_id,
                 'comment' => $model->comment,
             ]);
             if (!$commentModel->save()) {
@@ -343,6 +346,7 @@ class TimelineStep extends \yii\db\ActiveRecord
                         $value->offer->toArray(),
                         [
                             'object' => $value->offer->object,
+                            'comments' => $value->offer->comments,
                             'duplicate_count' => $count[$object['object_id']],
                             'generalOffersMix' => (array) array_merge($value->offer->generalOffersMix->toArray(), ['offer' => $value->offer->generalOffersMix->offer])
                         ]

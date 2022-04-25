@@ -71,10 +71,12 @@ class TimelineActionComment extends \yii\db\ActiveRecord
         foreach ($newActions as $action) {
             $model = new TimelineActionComment();
             $action['comment'] = trim($action['comment']);
-            if (!$model->load($action, '') || !$model->save()) {
-                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            if ($model->load($action, '') && $model->save()) {
+                continue;
             }
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
         }
+        return true;
     }
     public function fields()
     {

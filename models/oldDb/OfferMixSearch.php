@@ -205,14 +205,14 @@ class OfferMixSearch extends OfferMix
                     return $query->from('crmka.phone');
                 }]);
             }]);
-        }])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails']);
+        }])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'comments']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 50
+                'defaultPageSize' => 50,
             ],
             'sort' => [
                 'enableMultiSort' => true,

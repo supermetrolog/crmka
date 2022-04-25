@@ -3,6 +3,7 @@
 namespace app\models\oldDb;
 
 use app\models\Company;
+use app\models\miniModels\TimelineStepObjectComment;
 use app\models\Request;
 use app\models\User;
 use Yii;
@@ -924,6 +925,15 @@ class OfferMix extends \yii\db\ActiveRecord
             31  => 33,
         ];
         return $array[$data];
+    }
+    /**
+     * Gets query for [[Comments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getComments()
+    {
+        return $this->hasMany(TimelineStepObjectComment::className(), ['object_id' => 'object_id', 'type_id' => 'type_id', 'offer_id' => 'original_id']);
     }
     public function getCompany()
     {

@@ -84,7 +84,7 @@ class TimelineStepObject extends \yii\db\ActiveRecord
      */
     public function getOffer()
     {
-        return $this->hasOne(OfferMix::className(), ['object_id' => 'object_id', 'type_id' => 'type_id']);
+        return $this->hasOne(OfferMix::className(), ['object_id' => 'object_id', 'type_id' => 'type_id', 'original_id' => 'offer_id']);
     }
     /**
      * Gets query for [[Comments]].
@@ -93,7 +93,7 @@ class TimelineStepObject extends \yii\db\ActiveRecord
      */
     public function getComments()
     {
-        return $this->hasMany(TimelineStepObjectComment::className(), ['object_id' => 'object_id', 'timeline_step_id' => 'timeline_step_id']);
+        return $this->hasMany(TimelineStepObjectComment::className(), ['timeline_step_object_id' => 'id']);
     }
 
     /**

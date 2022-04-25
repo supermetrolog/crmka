@@ -9,11 +9,14 @@ use Yii;
  *
  * @property int $id
  * @property int $timeline_step_id [СВЯЗЬ] часть составного внешнего ключа
- * @property int $object_id [СВЯЗЬ] часть составного внешнего ключа
  * @property string $comment комментарий к отправленному или добавленному объекту
+ * @property int $offer_id [СВЯЗЬ] с original_id в c_industry_offers_mix
+ * @property int $type_id [СВЯЗЬ] с type_id в c_industry_offers_mix
+ * @property int $object_id [СВЯЗЬ] с object_id в c_industry_offers_mix
+ * @property int $timeline_step_object_id [СВЯЗЬ] с timeline_step_object
  *
- * @property TimelineStepObject $object
  * @property TimelineStepObject $timelineStep
+ * @property TimelineStepObject $timelineStepObject
  */
 class TimelineStepObjectComment extends \yii\db\ActiveRecord
 {
@@ -31,11 +34,11 @@ class TimelineStepObjectComment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['timeline_step_id', 'object_id', 'comment'], 'required'],
-            [['timeline_step_id', 'object_id'], 'integer'],
+            [['timeline_step_id', 'comment', 'offer_id', 'type_id', 'object_id', 'timeline_step_object_id'], 'required'],
+            [['timeline_step_id', 'offer_id', 'type_id', 'object_id', 'timeline_step_object_id'], 'integer'],
             [['comment'], 'string', 'max' => 255],
-            [['object_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStepObject::className(), 'targetAttribute' => ['object_id' => 'object_id']],
             [['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStepObject::className(), 'targetAttribute' => ['timeline_step_id' => 'timeline_step_id']],
+            [['timeline_step_object_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStepObject::className(), 'targetAttribute' => ['timeline_step_object_id' => 'id']],
         ];
     }
 
@@ -47,19 +50,12 @@ class TimelineStepObjectComment extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'timeline_step_id' => 'Timeline Step ID',
-            'object_id' => 'Object ID',
             'comment' => 'Comment',
+            'offer_id' => 'Offer ID',
+            'type_id' => 'Type ID',
+            'object_id' => 'Object ID',
+            'timeline_step_object_id' => 'Timeline Step Object ID',
         ];
-    }
-
-    /**
-     * Gets query for [[Object]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getObject()
-    {
-        return $this->hasOne(TimelineStepObject::className(), ['object_id' => 'object_id']);
     }
 
     /**
@@ -70,5 +66,15 @@ class TimelineStepObjectComment extends \yii\db\ActiveRecord
     public function getTimelineStep()
     {
         return $this->hasOne(TimelineStepObject::className(), ['timeline_step_id' => 'timeline_step_id']);
+    }
+
+    /**
+     * Gets query for [[TimelineStepObject]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTimelineStepObject()
+    {
+        return $this->hasOne(TimelineStepObject::className(), ['id' => 'timeline_step_object_id']);
     }
 }
