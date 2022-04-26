@@ -82,8 +82,8 @@ class TimelineActionComment extends \yii\db\ActiveRecord
     {
         $fields = parent::fields();
 
-        $fields['created_at'] = function ($fields) {
-            return Yii::$app->formatter->format($fields['created_at'], 'datetime');
+        $fields['created_at_format'] = function ($fields) {
+            return Yii::$app->formatter->format($fields['created_at'], 'date');
         };
         return $fields;
     }
