@@ -111,6 +111,9 @@ return
         [
             'class' => 'yii\rest\UrlRule',
             'controller' => 'pdf/presentation',
+            'extraPatterns' => [
+                'GET fuck' => 'fuck',
+            ],
         ],
         [
             'class' => 'yii\rest\UrlRule',

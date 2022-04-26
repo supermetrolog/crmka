@@ -2,9 +2,12 @@
 
 namespace app\controllers\pdf;
 
-use app\models\pdf\Pdf;
 use yii\web\Controller;
 use app\behaviors\BaseControllerBehaviors;
+use app\models\pdf\OffersPdf;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Yii;
 
 class PresentationController extends Controller
 {
@@ -16,10 +19,28 @@ class PresentationController extends Controller
 
     public function actionIndex()
     {
-        return true;
+        $model = new OffersPdf(Yii::$app->request->queryParams);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('isJavascriptEnabled', true);
+        $dompdf = new Dompdf($options);
+        $html = $this->renderPartial('index', ['model' => $model]);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4');
+        $dompdf->render();
+        $dompdf->stream("pdf.pdf", ['Attachment' => false]);
+
+        return $html;
     }
     public function actionFuck()
     {
-        return true;
+        $model = new OffersPdf(Yii::$app->request->queryParams);
+        // echo "<pre>";
+        // print_r($model->data);
+        var_dump($model->data->photos[0]);
+        $html = $this->renderPartial('index', ['model' => $model]);
+        return $html;
     }
 }
