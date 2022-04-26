@@ -110,6 +110,10 @@ return
         ],
         [
             'class' => 'yii\rest\UrlRule',
+            'controller' => 'pdf/presentation',
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
             'controller' => 'deal',
             'except' => [],
         ],
