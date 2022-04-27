@@ -691,6 +691,9 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['calc_price_safe_pallet'] = function ($fields) {
             return $this->calcMinMaxArea($fields->price_safe_pallet_min, $fields->price_safe_pallet_max);
         };
+        $fields['calc_pallet_place'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->pallet_place_min, $fields->pallet_place_max);
+        };
         $fields['calc_price_warehouse'] = function ($fields) {
             $array = [
                 $fields->price_mezzanine_min,

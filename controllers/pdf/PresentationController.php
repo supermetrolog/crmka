@@ -38,8 +38,8 @@ class PresentationController extends Controller
     {
         $model = new OffersPdf(Yii::$app->request->queryParams);
         // echo "<pre>";
-        // print_r($model->data);
-        var_dump($model->data->photos[0]);
+        // print_r($model->data->miniOffersMix[0]);
+        // var_dump($model->data->miniOffersMix[0]->id);
         $html = $this->renderPartial('index', ['model' => $model]);
         return $html;
     }

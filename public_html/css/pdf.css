@@ -90,6 +90,10 @@ table {
     width: 290px;
 }
 
+.mt-header {
+    margin-top: 1.5cm!important;
+}
+
 
 /* *********** HEADER ************ */
 
@@ -217,6 +221,67 @@ table {
 
 .page-number:before {
     content: "Page " counter(page);
+}
+
+
+/* *********** PARAMETERS ************** */
+
+.parameters {
+    background-color: #ccc;
+}
+
+.parameters h5 {
+    margin: 0;
+    color: #7e86b1;
+    font-size: 15px;
+}
+
+.parameters .list {
+    display: block;
+    float: left;
+    padding: 10px;
+    width: 360px;
+    /* margin: 5px; */
+}
+
+.parameters .list:first-child {
+    padding-left: 0;
+}
+
+.parameters .item {
+    margin-bottom: 10px;
+}
+
+.parameters .item table tr td:last-child p {
+    font-weight: bold;
+    color: black!important;
+}
+
+.parameters .item table tr td p {
+    color: rgb(59, 59, 59);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.parameters .item table tr:nth-child(odd) {
+    background-color: rgb(226, 226, 226);
+    vertical-align: top;
+}
+
+.parameters .item table tr td {
+    padding-left: 3px;
+    vertical-align: top;
+    width: 180px;
+}
+
+.parameters .item table {
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.parameters .item table {
+    vertical-align: top;
+    text-align: left;
 }
 
 
