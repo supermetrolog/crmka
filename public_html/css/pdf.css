@@ -259,7 +259,12 @@ table {
 
 .parameters .item table tr td p {
     color: rgb(59, 59, 59);
-    font-size: 14px;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.parameters .item table tr td p small {
+    font-size: 13px;
     vertical-align: middle;
 }
 

@@ -602,6 +602,17 @@ class ObjectsBlock extends \yii\db\ActiveRecord
             'barrier' => 'Barrier',
         ];
     }
+
+    public function fields()
+    {
+        $fields = parent::fields();
+
+        $fields['cranes'] = function ($fields) {
+            return json_decode($fields['cranes']);
+        };
+
+        return $fields;
+    }
     public function getObject()
     {
         return $this->hasOne(Objects::class, ['id' => 'object_id']);

@@ -364,77 +364,54 @@ use app\models\oldDb\OfferMix;
 
     <div class="parameters">
         <div class="list">
-            <div class="item">
-                <h5>Площади к аренде</h5>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p>Свободная площадь </p>
-                            </td>
-                            <td>
-                                <p>12944 - 24615 м.кв. </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p>Свободная площадь </p>
-                            </td>
-                            <td>
-                                <p>12944 - 24615 м.кв. </p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="item">
-                <h5>Площади к аренде</h5>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p>Свободная площадь </p>
-                            </td>
-                            <td>
-                                <p>12944 - 24615 м.кв. </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p>Свободная площадь </p>
-                            </td>
-                            <td>
-                                <p>12944 - 24615 м.кв. </p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <? foreach ($model->getParameterListOne() as $key => $params) : ?>
+                <div class="item">
+                    <h5><?= $key ?></h5>
+                    <table>
+                        <tbody>
+                            <? foreach ($params as $label => $value) : ?>
+                                <tr>
+                                    <td>
+                                        <p><?= $label ?></p>
+                                    </td>
+                                    <td>
+                                        <? if ($model->isValidParameter($model->normalizeValue($value))) : ?>
+                                            <p><?= $model->normalizeValue($value) . ' ' . $value['dimension'] ?></p>
+                                        <? else : ?>
+                                            <p>—</p>
+                                        <? endif; ?>
+                                    </td>
+                                </tr>
+                            <? endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <? endforeach; ?>
         </div>
         <div class="list">
-            <div class="item">
-                <h5>Площади к аренде</h5>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <p>Свободная площадь </p>
-                            </td>
-                            <td>
-                                <p>12944 - 24615 м.кв. </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p>Свободная площадь </p>
-                            </td>
-                            <td>
-                                <p>12944 - 24615 м.кв. </p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <? foreach ($model->getParameterListTwo() as $key => $params) : ?>
+                <div class="item">
+                    <h5><?= $key ?></h5>
+                    <table>
+                        <tbody>
+                            <? foreach ($params as $label => $value) : ?>
+                                <tr>
+                                    <td>
+                                        <p><?= $label ?></p>
+                                    </td>
+                                    <td>
+                                        <? if ($model->isValidParameter($model->normalizeValue($value))) : ?>
+                                            <p><?= $model->normalizeValue($value) . ' ' . $value['dimension'] ?></p>
+                                        <? else : ?>
+                                            <p>—</p>
+                                        <? endif; ?>
+                                    </td>
+                                </tr>
+                            <? endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <? endforeach; ?>
         </div>
     </div>
     <!-- <hr>

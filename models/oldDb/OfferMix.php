@@ -646,6 +646,18 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['blocks'] = function ($fields) {
             return json_decode($fields['blocks']);
         };
+        $fields['calc_cranes_gantry'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->cranes_gantry_min, $fields->cranes_gantry_max);
+        };
+        $fields['calc_load_floor'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->load_floor_min, $fields->load_floor_max);
+        };
+        $fields['calc_load_mezzanine'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->load_mezzanine_min, $fields->load_mezzanine_max);
+        };
+        $fields['calc_temperature'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->temperature_min, $fields->temperature_max);
+        };
         $fields['calc_floors'] = function ($fields) {
             return $this->calcMinMaxArea($fields->floor_min, $fields->floor_max);
         };
@@ -949,6 +961,10 @@ class OfferMix extends \yii\db\ActiveRecord
     public function getOffer()
     {
         return $this->hasOne(Offers::class, ['id' => 'original_id']);
+    }
+    public function getBlock()
+    {
+        return $this->hasOne(ObjectsBlock::class, ['id' => 'original_id']);
     }
     public function getMiniOffersMix()
     {
