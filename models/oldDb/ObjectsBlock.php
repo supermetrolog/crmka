@@ -284,6 +284,33 @@ use Yii;
  */
 class ObjectsBlock extends \yii\db\ActiveRecord
 {
+    public const COLUMN_GRID_LIST = [
+        1 => '6x6',
+        2 => '6x9',
+        3 => '6x12',
+        4 => '6x18',
+        5 => '6x24',
+        6 => '9x9',
+        7 => '9x12',
+        8 => '9x18',
+        9 => '9x24',
+        10 => '12x12',
+        11 => '12x18',
+        12 => '12x24',
+    ];
+    public const FIREFIGHTING_LIST = [
+        1 => 'Гидрантная система',
+        2 => 'Спринклерная система',
+        3 => 'Порошковая система',
+        4 => 'Газовая система',
+        5 => 'Огнетушители',
+    ];
+    public const VENTILATION_LIST = [
+        1 => 'Естественная',
+        2 => 'Принудительная',
+        3 => 'Приточно-вытяжная',
+        4 => 'Сплит-системы',
+    ];
     /**
      * {@inheritdoc}
      */
@@ -610,7 +637,18 @@ class ObjectsBlock extends \yii\db\ActiveRecord
         $fields['cranes'] = function ($fields) {
             return json_decode($fields['cranes']);
         };
-
+        $fields['column_grids'] = function ($fields) {
+            return json_decode($fields['column_grids']);
+        };
+        $fields['firefighting_type'] = function ($fields) {
+            return json_decode($fields['firefighting_type']);
+        };
+        $fields['ventilation'] = function ($fields) {
+            return json_decode($fields['ventilation']);
+        };
+        $fields['elevators'] = function ($fields) {
+            return json_decode($fields['elevators']);
+        };
         return $fields;
     }
     public function getObject()

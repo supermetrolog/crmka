@@ -646,6 +646,9 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['blocks'] = function ($fields) {
             return json_decode($fields['blocks']);
         };
+        $fields['calc_cranes'] = function ($fields) {
+            return $this->calcMinMaxArea($fields->cranes_min, $fields->cranes_max);
+        };
         $fields['calc_cranes_gantry'] = function ($fields) {
             return $this->calcMinMaxArea($fields->cranes_gantry_min, $fields->cranes_gantry_max);
         };

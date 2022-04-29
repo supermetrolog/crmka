@@ -3,6 +3,7 @@
 namespace app\models\pdf;
 
 use app\models\oldDb\Crane;
+use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix;
 use Exception;
 use Yii;
@@ -42,34 +43,187 @@ class OffersPdf extends Model
             'object' => (object) $this->data->object->toArray(),
             'block' => $block
         ]);
-        $this->normalizeData();
         if ($this->data->deal_type == 3) {
             throw new Exception("Для ОТВЕТ-ХРАНЕНИЯ презентация не реализована!");
         }
+        $this->normalizeData();
     }
     private function normalizeData()
     {
-        $this->data->cranes_gantry = 0;
-        $this->data->cranes_overhead = 0;
-        $this->data->cranes_cathead = 0;
-        $this->data->telphers = 0;
+        $this->normalizeCranes();
+        $this->normalizeColumnGrid();
+        $this->normalizeFirefighting();
+        $this->normalizeVentilation();
+        $this->normalizePower();
+        $this->normalizeSewage();
+        $this->normalizeWater();
+        $this->normalizeElevatorsCount();
+        $this->normalizeDescription();
+    }
+    private function normalizeDescription()
+    {
+        $url = 'https://pennylane.pro/autodesc.php/' . $this->data->original_id . '/' . $this->data->type_id . '?api=1';
+        $this->data->auto_desc = file_get_contents($url);
+    }
+    private function normalizeElevatorsCount()
+    {
+        $this->data->elevators_count = [];
         if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
-            if (!$this->data->block || !$this->data->block->craness) return;
+            if (!$this->data->block) return;
+            $elevators = $this->data->block->elevators;
+            foreach ($elevators as $elevator) {
+                if (!in_array($elevator, $this->data->elevators_count)) {
+                    $this->data->elevators_count[] = $elevator;
+                }
+            }
+        }
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
+            if (!$this->data->miniOffersMix) return;
+            foreach ($this->data->miniOffersMix as  $miniOffer) {
+                if (!$miniOffer->block) return;
+                $elevators = $miniOffer->block->elevators;
+
+                foreach ($elevators as $elevator) {
+                    if (!in_array($elevator, $this->data->elevators_count)) {
+                        $this->data->elevators_count[] = $elevator;
+                    }
+                }
+            }
+        }
+
+        $this->data->elevators_count = count($this->data->elevators_count);
+    }
+    private function normalizeWater()
+    {
+        $this->data->water = 0;
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
+            if (!$this->data->block) return;
+            if ($this->data->block->water == 1) {
+                $this->data->water = 1;
+            }
+        }
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
+            if (!$this->data->miniOffersMix) return;
+            foreach ($this->data->miniOffersMix as  $miniOffer) {
+                if (!$miniOffer->block) return;
+                if ($miniOffer->block->water == 1) {
+                    $this->data->water = 1;
+                }
+            }
+        }
+    }
+    private function normalizeSewage()
+    {
+        $this->data->sewage = 0;
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
+            if (!$this->data->block) return;
+            if ($this->data->block->sewage == 1) {
+                $this->data->sewage = 1;
+            }
+        }
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
+            if (!$this->data->miniOffersMix) return;
+            foreach ($this->data->miniOffersMix as  $miniOffer) {
+                if (!$miniOffer->block) return;
+                if ($miniOffer->block->sewage == 1) {
+                    $this->data->sewage = 1;
+                }
+            }
+        }
+    }
+    private function normalizePower()
+    {
+        $this->data->power = 0;
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
+            if (!$this->data->block) return;
+            $this->data->power = (int) $this->data->block->power;
+        }
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
+            if (!$this->data->miniOffersMix) return;
+            foreach ($this->data->miniOffersMix as  $miniOffer) {
+                if (!$miniOffer->block) return;
+                $this->data->power += (int)$miniOffer->block->power;
+            }
+        }
+    }
+    private function normalizeVentilation()
+    {
+        $this->data->ventilation = [];
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
+            if (!$this->data->block) return;
+            $ventilations = $this->data->block->ventilation;
+
+            foreach ($ventilations as $ventilation) {
+                $this->data->ventilation[] = ObjectsBlock::VENTILATION_LIST[(int)$ventilation];
+            }
+        }
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
+            if (!$this->data->miniOffersMix) return;
+            foreach ($this->data->miniOffersMix as  $miniOffer) {
+                if (!$miniOffer->block) return;
+                $ventilations = $miniOffer->block->ventilation;
+
+                foreach ($ventilations as $ventilation) {
+                    if (!in_array(ObjectsBlock::VENTILATION_LIST[(int)$ventilation], $this->data->ventilation)) {
+                        $this->data->ventilation[] = ObjectsBlock::VENTILATION_LIST[(int)$ventilation];
+                    }
+                }
+            }
+        }
+    }
+    private function normalizeFirefighting()
+    {
+        $this->data->firefighting = [];
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
+            if (!$this->data->block) return;
+            $firefightings = $this->data->block->firefighting_type;
+
+            foreach ($firefightings as $firefighting) {
+                $this->data->firefighting[] = ObjectsBlock::FIREFIGHTING_LIST[(int)$firefighting];
+            }
+        }
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
+            if (!$this->data->miniOffersMix) return;
+            foreach ($this->data->miniOffersMix as  $miniOffer) {
+                if (!$miniOffer->block) return;
+                $firefightings = $miniOffer->block->firefighting_type;
+
+                foreach ($firefightings as $firefighting) {
+                    if (!in_array(ObjectsBlock::FIREFIGHTING_LIST[(int)$firefighting], $this->data->firefighting)) {
+                        $this->data->firefighting[] = ObjectsBlock::FIREFIGHTING_LIST[(int)$firefighting];
+                    }
+                }
+            }
+        }
+    }
+    private function normalizeCranes()
+    {
+        $this->data->cranes_gantry = [];
+        $this->data->cranes_gantry_capacity = 0;
+        $this->data->cranes_overhead = [];
+        $this->data->cranes_overhead_capacity = 0;
+        $this->data->cranes_cathead = [];
+        $this->data->cranes_cathead_capacity = 0;
+        $this->data->telphers = [];
+        $this->data->telphers_capacity = 0;
+
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
+            if (!$this->data->block || !$this->data->block->craness) return $this->generateCranesInfo();
             $cranes = $this->data->block->craness;
 
             foreach ($cranes as $crane) {
                 switch ($crane->crane_type) {
                     case 1:
-                        $this->data->cranes_cathead = 1;
+                        $this->data->cranes_cathead[] = (int) $crane->crane_capacity;
                         break;
                     case 2:
-                        $this->data->cranes_overhead = 1;
+                        $this->data->cranes_overhead[] = (int) $crane->crane_capacity;
                         break;
                     case 3:
-                        $this->data->cranes_gantry = 1;
+                        $this->data->cranes_gantry[] = (int) $crane->crane_capacity;
                         break;
                     case 4:
-                        $this->data->telphers = 1;
+                        $this->data->telphers[] = (int) $crane->crane_capacity;
                         break;
                     default:
                         # code...
@@ -79,27 +233,115 @@ class OffersPdf extends Model
         }
         if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
             if (!$this->data->miniOffersMix) return;
+            $cranesIds = [];
             foreach ($this->data->miniOffersMix as $miniOffer) {
-
-                if (!$miniOffer->block->craness) return;
+                if (!$miniOffer->block->craness) return $this->generateCranesInfo();
                 $cranes = $miniOffer->block->craness;
                 foreach ($cranes as $crane) {
                     switch ($crane->crane_type) {
                         case 1:
-                            $this->data->cranes_cathead = 1;
+                            if (!in_array($crane->id, $cranesIds)) {
+                                $this->data->cranes_cathead[] = (int) $crane->crane_capacity;
+                                $cranesIds[] = $crane->id;
+                            }
                             break;
                         case 2:
-                            $this->data->cranes_overhead = 1;
+                            if (!in_array($crane->id, $cranesIds)) {
+                                $this->data->cranes_overhead[] = (int) $crane->crane_capacity;
+                                $cranesIds[] = $crane->id;
+                            }
                             break;
                         case 3:
-                            $this->data->cranes_gantry = 1;
+                            if (!in_array($crane->id, $cranesIds)) {
+                                $this->data->cranes_gantry[] = (int) $crane->crane_capacity;
+                                $cranesIds[] = $crane->id;
+                            }
                             break;
                         case 4:
-                            $this->data->telphers = 1;
+                            if (!in_array($crane->id, $cranesIds)) {
+                                $this->data->telphers[] = (int) $crane->crane_capacity;
+                                $cranesIds[] = $crane->id;
+                            }
                             break;
                         default:
                             # code...
                             break;
+                    }
+                }
+            }
+        }
+
+        $this->generateCranesInfo();
+    }
+    private function generateCranesInfo()
+    {
+        if (count($this->data->cranes_gantry)) {
+            $this->data->cranes_gantry_capacity = $this->calcMinMax(min($this->data->cranes_gantry), max($this->data->cranes_gantry));
+        }
+
+        $this->data->cranes_gantry = count($this->data->cranes_gantry);
+
+        if (count($this->data->cranes_overhead)) {
+            $this->data->cranes_overhead_capacity = $this->calcMinMax(min($this->data->cranes_overhead), max($this->data->cranes_overhead));
+        }
+
+        $this->data->cranes_overhead = count($this->data->cranes_overhead);
+        if (count($this->data->cranes_cathead)) {
+            $this->data->cranes_cathead_capacity = $this->calcMinMax(min($this->data->cranes_cathead), max($this->data->cranes_cathead));
+        }
+
+        $this->data->cranes_cathead =  count($this->data->cranes_cathead);
+
+        if (count($this->data->telphers)) {
+            $this->data->telphers_capacity = $this->calcMinMax(min($this->data->telphers), max($this->data->telphers));
+        }
+
+        $this->data->telphers = count($this->data->telphers);
+    }
+    private function calcMinMax($min, $max)
+    {
+        $min = (int)$min;
+        $max = (int)$max;
+        $result = 0;
+        if ($min == $max) {
+            return Yii::$app->formatter->format($min, 'decimal');
+        }
+        if ($min) {
+            $result = Yii::$app->formatter->format($min, 'decimal');
+        }
+        if ($max) {
+            if ($min) {
+                $result .= " - " . Yii::$app->formatter->format($max, 'decimal');
+            } else {
+                $result = Yii::$app->formatter->format($max, 'decimal');
+            }
+        }
+        return $result;
+    }
+    public function normalizeColumnGrid()
+    {
+        $this->data->column_grids = [];
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
+            if (!$this->data->block) return;
+            $column_grids = $this->data->block->column_grids;
+
+            foreach ($column_grids as $grid) {
+                if ($grid != 13) {
+                    $this->data->column_grids[] = ObjectsBlock::COLUMN_GRID_LIST[$grid];
+                }
+            }
+        }
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
+            if (!$this->data->miniOffersMix) return;
+            foreach ($this->data->miniOffersMix as  $miniOffer) {
+                if (!$miniOffer->block) return;
+                $column_grids = $miniOffer->block->column_grids;
+
+                foreach ($column_grids as $grid) {
+                    if ($grid != 13) {
+                        if (!in_array(ObjectsBlock::COLUMN_GRID_LIST[$grid], $this->data->column_grids)) {
+                            $this->data->column_grids[] = ObjectsBlock::COLUMN_GRID_LIST[$grid];
+                        }
                     }
                 }
             }
@@ -310,7 +552,7 @@ class OffersPdf extends Model
             } else {
                 $array[] = [
                     'class' => $classList[$i],
-                    'src' => "http://" . $this->getHost() . "/images/1.jpg",
+                    'src' => "http://www.tinybirdgames.com/wp-content/uploads/2017/04/tinybirdgames_telegram_background_02.jpg",
                 ];
             }
             $index++;
@@ -334,7 +576,7 @@ class OffersPdf extends Model
     public function normalizeValue($value)
     {
         if (ArrayHelper::keyExists('value_list', $value)) {
-            if (ArrayHelper::keyExists($value['value'], $value['value_list'])) {
+            if (ArrayHelper::keyExists(is_callable($value['value']) ? $value['value']() : $value['value'], $value['value_list'])) {
                 if (is_callable($value['value_list'][$value['value']])) {
                     return $value['value_list'][$value['value']]();
                 }
@@ -396,7 +638,12 @@ class OffersPdf extends Model
                 'Стеллажи' => [
                     'label' => 'racks',
                     'value' => $data->racks,
-                    'dimension' => '<small>шт</small>',
+                    'dimension' => '',
+                    'value_list' => [
+                        0 => 'нет',
+                        1 => 'есть',
+                        2 => 'нет',
+                    ]
                 ],
                 'Нагрузка на пол' => [
                     'label' => 'calc_load_floor',
@@ -415,12 +662,14 @@ class OffersPdf extends Model
                 ],
                 'Шаг колонн' => [
                     'label' => 'column_grid',
-                    'value' => $data->column_grid,
+                    'value' => function () {
+                        return implode(', ', $this->data->column_grids);
+                    },
                     'dimension' => '',
                 ],
                 'Грузовые лифты' => [
                     'label' => 'elevators_num',
-                    'value' => $data->elevators_num,
+                    'value' => $data->elevators_count,
                     'dimension' => '<small>шт</small>',
                 ],
             ],
@@ -436,12 +685,10 @@ class OffersPdf extends Model
                 ],
                 'Пожаротушение' => [
                     'label' => 'firefighting',
-                    'value' => $data->firefighting,
+                    'value' => function () {
+                        return implode(', ', $this->data->firefighting);
+                    },
                     'dimension' => '',
-                    'value_list' => [
-                        0 => 'нет',
-                        1 => 'есть'
-                    ]
                 ],
                 'Видеонаблюдение' => [
                     'label' => 'video_control',
@@ -490,16 +737,7 @@ class OffersPdf extends Model
                 'Электричество' => [
                     'label' => 'power',
                     'value' => $data->power,
-                    'dimension' => '',
-                    'value_list' => [
-                        0 => 'нет',
-                        1 => function () use ($data) {
-                            if ($data->power_value > 0) {
-                                return $data->power_value . ' <small>кВт</small>';
-                            }
-                            return 'есть';
-                        }
-                    ]
+                    'dimension' => 'кВт',
                 ],
                 'Отопление' => [
                     'label' => 'heating',
@@ -510,19 +748,27 @@ class OffersPdf extends Model
                     'label' => 'water',
                     'value' => $data->water,
                     'dimension' => '',
+                    'value_list' => [
+                        0 => 'нет',
+                        1 => 'есть',
+                        2 => 'нет',
+                    ]
                 ],
                 'Канализация' => [
                     'label' => 'sewage_central',
-                    'value' => $data->sewage_central,
+                    'value' => $data->sewage,
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть'
+                        1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
                 'Вентиляция' => [
                     'label' => 'ventilation',
-                    'value' => $data->ventilation,
+                    'value' => function () {
+                        return implode(', ', $this->data->ventilation);
+                    },
                     'dimension' => '',
                 ],
                 'Газ' => [
@@ -531,7 +777,8 @@ class OffersPdf extends Model
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть'
+                        1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
                 'Пар' => [
@@ -540,7 +787,8 @@ class OffersPdf extends Model
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть'
+                        1 => 'есть',
+                        2 => 'нет'
                     ]
                 ],
                 'Телефония' => [
@@ -549,7 +797,8 @@ class OffersPdf extends Model
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть'
+                        1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
                 'Интернет' => [
@@ -558,7 +807,8 @@ class OffersPdf extends Model
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть'
+                        1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
             ],
@@ -575,38 +825,62 @@ class OffersPdf extends Model
                 ],
                 'Козловые краны' => [
                     'label' => 'cranes_gantry',
-                    'value' => $data->cranes_gantry,
+                    'value' => function () use ($data) {
+                        if (!$data->cranes_gantry) return 0;
+                        $text = $data->cranes_gantry . ' <small>шт</small>';
+                        if ($data->cranes_gantry_capacity) {
+                            $text .= ', ' . $data->cranes_gantry_capacity . ' <small>тонн</small>';
+                        }
+                        return $text;
+                    },
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть',
                     ]
                 ],
                 'Мостовые краны' => [
                     'label' => 'cranes_overhead',
-                    'value' => $data->cranes_overhead,
+                    'value' => function () use ($data) {
+                        if (!$data->cranes_overhead) return 0;
+                        $text = $data->cranes_overhead . ' <small>шт</small>';
+                        if ($data->cranes_overhead_capacity) {
+                            $text .= ', ' . $data->cranes_overhead_capacity . ' <small>тонн</small>';
+                        }
+                        return $text;
+                    },
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть',
                     ]
                 ],
                 'Кран-балки' => [
                     'label' => 'cranes_cathead',
-                    'value' => $data->cranes_cathead,
+                    'value' => function () use ($data) {
+                        if (!$data->cranes_cathead) return 0;
+                        $text = $data->cranes_cathead . ' <small>шт</small>';
+                        if ($data->cranes_cathead_capacity) {
+                            $text .= ', ' . $data->cranes_cathead_capacity . ' <small>тонн</small>';
+                        }
+                        return $text;
+                    },
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть',
                     ]
                 ],
                 'Тельферы' => [
                     'label' => 'telphers',
-                    'value' => $data->telphers,
+                    'value' => function () use ($data) {
+                        if (!$data->telphers) return 0;
+                        $text = $data->telphers . ' <small>шт</small>';
+                        if ($data->telphers_capacity) {
+                            $text .= ', ' . $data->telphers_capacity . ' <small>тонн</small>';
+                        }
+                        return $text;
+                    },
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть',
                     ]
                 ],
             ],
@@ -618,6 +892,7 @@ class OffersPdf extends Model
                     'value_list' => [
                         0 => 'нет',
                         1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
                 'Парковка легковая' => [
@@ -627,6 +902,7 @@ class OffersPdf extends Model
                     'value_list' => [
                         0 => 'нет',
                         1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
                 'Парковка грузовая ' => [
@@ -636,6 +912,7 @@ class OffersPdf extends Model
                     'value_list' => [
                         0 => 'нет',
                         1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
                 'Столовая/кафе' => [
@@ -645,6 +922,7 @@ class OffersPdf extends Model
                     'value_list' => [
                         0 => 'нет',
                         1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
                 'Общежитие' => [
@@ -654,6 +932,7 @@ class OffersPdf extends Model
                     'value_list' => [
                         0 => 'нет',
                         1 => 'есть',
+                        2 => 'нет',
                     ]
                 ],
             ]

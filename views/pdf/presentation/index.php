@@ -69,7 +69,7 @@ use app\models\oldDb\OfferMix;
 </div>
 
 <div class="page no-absolute">
-    <!-- <table class="main-info">
+    <table class="main-info">
         <tbody>
             <tr>
                 <td class="left">
@@ -77,7 +77,7 @@ use app\models\oldDb\OfferMix;
                         <img src="<?= $model->getPhoto() ?>" alt="">
                         <div class="extra-info">
                             <div class="object_id">
-                                Объект <?= $model->data->object_id ?>
+                                <p> Объект <b><?= $model->data->object_id ?></b></p>
                             </div>
                             <div class="content">
                                 <p class="district"><?= $model->data->district_name ?></p>
@@ -152,7 +152,11 @@ use app\models\oldDb\OfferMix;
                                                         <div>
                                                             <div class="icon">
                                                                 <img src="http://<?= $model->getHost() ?>/images/floors-icon.png" alt="">
-                                                                <p><?= $model->data->calc_floors ?> этаж</p>
+                                                                <? if ($model->data->calc_floors) : ?>
+                                                                    <p><?= $model->data->calc_floors ?> этаж</p>
+                                                                <? else : ?>
+                                                                    <p>—</p>
+                                                                <? endif; ?>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -160,7 +164,11 @@ use app\models\oldDb\OfferMix;
                                                         <div>
                                                             <div class="icon">
                                                                 <img src="http://<?= $model->getHost() ?>/images/gates-icon.png" alt="">
-                                                                <p><?= $model->data->gate_num ?> ворот</p>
+                                                                <? if ($model->data->gate_num) : ?>
+                                                                    <p><?= $model->data->gate_num ?> ворот</p>
+                                                                <? else : ?>
+                                                                    <p>—</p>
+                                                                <? endif; ?>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -168,7 +176,11 @@ use app\models\oldDb\OfferMix;
                                                         <div>
                                                             <div class="icon">
                                                                 <img src="http://<?= $model->getHost() ?>/images/power-icon.png" alt="">
-                                                                <p><?= $model->numberFormat($model->data->power_value) ?> кВт</p>
+                                                                <? if ($model->data->power) : ?>
+                                                                    <p><?= $model->numberFormat($model->data->power) ?> кВт</p>
+                                                                <? else : ?>
+                                                                    <p>—</p>
+                                                                <? endif; ?>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -178,8 +190,11 @@ use app\models\oldDb\OfferMix;
                                                         <div>
                                                             <div class="icon">
                                                                 <img src="http://<?= $model->getHost() ?>/images/ceiling-icon.png" alt="">
-                                                                <p><?= $model->data->calc_ceilingHeight ?> м</p>
-
+                                                                <? if ($model->data->calc_ceilingHeight) : ?>
+                                                                    <p><?= $model->data->calc_ceilingHeight ?> м</p>
+                                                                <? else : ?>
+                                                                    <p>—</p>
+                                                                <? endif; ?>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -187,16 +202,30 @@ use app\models\oldDb\OfferMix;
                                                         <div>
                                                             <div class="icon">
                                                                 <img src="http://<?= $model->getHost() ?>/images/floor-icon.png" alt="">
-                                                                <p><?= $model->data->floor_type ? $model->data->floor_type  : 'нет' ?></p>
+                                                                <? if ($model->data->floor_type) : ?>
+                                                                    <p><?= $model->data->floor_type ?></p>
+                                                                <? else : ?>
+                                                                    <p>—</p>
+                                                                <? endif; ?>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td class="item">
                                                         <div>
                                                             <div class="icon">
+                                                                <!-- Канбалки -->
+                                                                <!-- Внешняя отделка -->
                                                                 <img src="http://<?= $model->getHost() ?>/images/crane-icon.png" alt="">
-                                                                <p><?= 2 ?> тонн</p>
-
+                                                                <? if ($model->data->elevators_count) : ?>
+                                                                    <p><?= $model->data->elevators_count ?> шт</p>
+                                                                <? else : ?>
+                                                                    <p>—</p>
+                                                                <? endif; ?>
+                                                                <!-- <? if ($model->data->calc_cranes) : ?>
+                                                                    <p><?= $model->data->calc_cranes ?> тонн</p>
+                                                                <? else : ?>
+                                                                    <p>—</p>
+                                                                <? endif; ?> -->
                                                             </div>
                                                         </div>
                                                     </td>
@@ -212,19 +241,22 @@ use app\models\oldDb\OfferMix;
             </tr>
         </tbody>
     </table>
-    <table class="photos">
-        <tbody>
-            <tr>
-                <? foreach ($model->getPhotosForBlock() as $photo) : ?>
-                    <td class="<?= $photo['class'] ?>">
-                        <div>
-                            <img src="<?= $photo['src'] ?>" alt="">
-                        </div>
-                    </td>
-                <? endforeach; ?>
-            </tr>
-        </tbody>
-    </table>
+    <? if ($model->data->photos && count($model->data->photos) > 1) : ?>
+
+        <table class="photos">
+            <tbody>
+                <tr>
+                    <? foreach ($model->getPhotosForBlock() as $photo) : ?>
+                        <td class="<?= $photo['class'] ?>">
+                            <div>
+                                <img src="<?= $photo['src'] ?>" alt="">
+                            </div>
+                        </td>
+                    <? endforeach; ?>
+                </tr>
+            </tbody>
+        </table>
+    <? endif; ?>
     <? if ($model->getBlocksCount() > 1) : ?>
         <div class="title">
             <h3 class="one">Варианты деления</h3>
@@ -334,26 +366,27 @@ use app\models\oldDb\OfferMix;
             </tbody>
         </table>
     <? endif; ?>
-    <? if ($model->getBlocksCount() && $model->getBlocksCount() < 7) : ?>
+    <? if ($model->getBlocksCount() > 1 && $model->getBlocksCount() < 7) : ?>
         <hr>
     <? endif; ?>
-
-    <table class="photos mt-header">
-        <tbody>
-            <tr>
-                <? foreach ($model->getPhotosForBlock(2) as $photo) : ?>
-                    <td class="<?= $photo['class'] ?>">
-                        <div>
-                            <img src="<?= $photo['src'] ?>" alt="">
-                        </div>
-                    </td>
-                <? endforeach; ?>
-            </tr>
-        </tbody>
-    </table>
-    <? if (!$model->getBlocksCount()) : ?>
+    <? if ($model->data->photos && count($model->data->photos) > 3) : ?>
+        <table class="photos mt-header">
+            <tbody>
+                <tr>
+                    <? foreach ($model->getPhotosForBlock(2) as $photo) : ?>
+                        <td class="<?= $photo['class'] ?>">
+                            <div>
+                                <img src="<?= $photo['src'] ?>" alt="">
+                            </div>
+                        </td>
+                    <? endforeach; ?>
+                </tr>
+            </tbody>
+        </table>
+    <? endif; ?>
+    <? if ($model->getBlocksCount() <= 1) : ?>
         <hr>
-    <? endif; ?> -->
+    <? endif; ?>
 
 
 
@@ -414,7 +447,7 @@ use app\models\oldDb\OfferMix;
             <? endforeach; ?>
         </div>
     </div>
-    <!-- <hr>
+    <hr>
     <div class="banner mt-header">
         <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
         <div>
@@ -428,7 +461,7 @@ use app\models\oldDb\OfferMix;
     </div>
     <div class="offer-description">
         <p>
-            <?= $model->data->object->description_auto ?>
+            <?= $model->data->auto_desc ?>
         </p>
-    </div> -->
+    </div>
 </div>
