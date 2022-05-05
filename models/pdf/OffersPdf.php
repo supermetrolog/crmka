@@ -3,6 +3,7 @@
 namespace app\models\pdf;
 
 use app\models\oldDb\Crane;
+use app\models\oldDb\Elevator;
 use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix;
 use Exception;
@@ -34,10 +35,10 @@ class OffersPdf extends Model
         $miniOffersMixModels = $this->data->miniOffersMix;
         if ($miniOffersMixModels) {
             foreach ($miniOffersMixModels as $miniOffersMix) {
-                $array[] = (object) array_merge($miniOffersMix->toArray(), ['block' => (object) array_merge($miniOffersMix->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['cranes']])->all()])]);
+                $array[] = (object) array_merge($miniOffersMix->toArray(), ['block' => (object) array_merge($miniOffersMix->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['cranes']])->all(), 'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['elevators']])->all()])]);
             }
         }
-        $block = $this->data->block ? (object) array_merge($this->data->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['cranes']])->all()]) : null;
+        $block = $this->data->block ? (object) array_merge($this->data->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['cranes']])->all(), 'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['elevators']])->all()]) : null;
         $this->data = (object) array_merge($this->data->toArray(), [
             'miniOffersMix' => $array,
             'object' => (object) $this->data->object->toArray(),
@@ -51,6 +52,7 @@ class OffersPdf extends Model
     private function normalizeData()
     {
         $this->normalizeCranes();
+        $this->normalizeElevators();
         $this->normalizeColumnGrid();
         $this->normalizeFirefighting();
         $this->normalizeVentilation();
@@ -68,6 +70,84 @@ class OffersPdf extends Model
         } catch (\Throwable $th) {
             $this->data->auto_desc = null;
         }
+    }
+    private function normalizeElevators()
+    {
+        $this->data->elevators_lift = [];
+        $this->data->elevators_list_capacity = 0;
+        $this->data->elevators_hydraulic_platform = [];
+        $this->data->elevators_hydraulic_platform_capacity = 0;
+        $this->data->elevators_service_lift = [];
+        $this->data->elevators_service_lift_capacity = 0;
+
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID) {
+            if (!$this->data->block || !$this->data->block->elevatorss) return $this->generateElevatorsInfo();
+            $elevators = $this->data->block->elevatorss;
+
+            foreach ($elevators as $elevator) {
+                switch ($elevator->elevator_type) {
+                    case 1:
+                        $this->data->elevators_lift[] = (int) $elevator->elevator_capacity;
+                        break;
+                    case 2:
+                        $this->data->elevators_service_lift[] = (int) $elevator->elevator_capacity;
+                        break;
+                    case 3:
+                        $this->data->elevators_hydraulic_platform[] = (int) $elevator->elevator_capacity;
+                        break;
+                }
+            }
+        }
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID) {
+            if (!$this->data->miniOffersMix) return;
+            $elevatorsIds = [];
+            foreach ($this->data->miniOffersMix as $miniOffer) {
+                if (!$miniOffer->block->elevatorss) return $this->generateElevatorsInfo();
+                $elevators = $miniOffer->block->elevatorss;
+                foreach ($elevators as $elevator) {
+                    switch ($elevator->elevator_type) {
+                        case 1:
+                            if (!in_array($elevator->id, $elevatorsIds)) {
+                                $this->data->elevators_lift[] = (int) $elevator->elevator_capacity;
+                                $elevatorsIds[] = $elevator->id;
+                            }
+                            break;
+                        case 2:
+                            if (!in_array($elevator->id, $elevatorsIds)) {
+                                $this->data->elevators_service_lift[] = (int) $elevator->elevator_capacity;
+                                $elevatorsIds[] = $elevator->id;
+                            }
+                            break;
+                        case 3:
+                            if (!in_array($elevator->id, $elevatorsIds)) {
+                                $this->data->elevators_hydraulic_platform[] = (int) $elevator->elevator_capacity;
+                                $elevatorsIds[] = $elevator->id;
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+
+        $this->generateElevatorsInfo();
+    }
+    private function generateElevatorsInfo()
+    {
+        if (count($this->data->elevators_lift)) {
+            $this->data->elevators_lift_capacity = $this->calcMinMax(min($this->data->elevators_lift), max($this->data->elevators_lift));
+        }
+        $this->data->elevators_lift = count($this->data->elevators_lift);
+
+        if (count($this->data->elevators_service_lift)) {
+            $this->data->elevators_service_lift_capacity = $this->calcMinMax(min($this->data->elevators_service_lift), max($this->data->elevators_service_lift));
+        }
+        $this->data->elevators_service_lift = count($this->data->elevators_service_lift);
+
+        if (count($this->data->elevators_hydraulic_platform)) {
+            $this->data->elevators_hydraulic_platform_capacity = $this->calcMinMax(min($this->data->elevators_hydraulic_platform), max($this->data->elevators_hydraulic_platform));
+        }
+
+        $this->data->elevators_hydraulic_platform =  count($this->data->elevators_hydraulic_platform);
     }
     private function normalizeElevatorsCount()
     {
@@ -671,10 +751,10 @@ class OffersPdf extends Model
                     },
                     'dimension' => '',
                 ],
-                'Грузовые лифты' => [
-                    'label' => 'elevators_num',
-                    'value' => $data->elevators_count,
-                    'dimension' => '<small>шт</small>',
+                'Внешняя отделка' => [
+                    'label' => 'facing',
+                    'value' => $data->facing,
+                    'dimension' => '',
                 ],
             ],
             'Безопасность' => [
@@ -816,6 +896,7 @@ class OffersPdf extends Model
                     ]
                 ],
             ],
+
             'Ж/Д и крановые устр-ва' => [
                 'Ж/Д ветка' => [
                     'label' => 'railway',
@@ -879,6 +960,53 @@ class OffersPdf extends Model
                         $text = $data->telphers . ' <small>шт</small>';
                         if ($data->telphers_capacity) {
                             $text .= ', ' . $data->telphers_capacity . ' <small>тонн</small>';
+                        }
+                        return $text;
+                    },
+                    'dimension' => '',
+                    'value_list' => [
+                        0 => 'нет',
+                    ]
+                ],
+            ],
+            'Подъемные устройства' => [
+                'Подъемники' => [
+                    'label' => 'elevators_lift',
+                    'value' => function () use ($data) {
+                        if (!$data->elevators_lift) return 0;
+                        $text = $data->elevators_lift . ' <small>шт</small>';
+                        if ($data->elevators_lift_capacity) {
+                            $text .= ', ' . $data->elevators_lift_capacity . ' <small>тонн</small>';
+                        }
+                        return $text;
+                    },
+                    'dimension' => '',
+                    'value_list' => [
+                        0 => 'нет',
+                    ]
+                ],
+                'Грузовые лифты' => [
+                    'label' => 'elevators_service_lift',
+                    'value' => function () use ($data) {
+                        if (!$data->elevators_service_lift) return 0;
+                        $text = $data->elevators_service_lift . ' <small>шт</small>';
+                        if ($data->elevators_service_lift_capacity) {
+                            $text .= ', ' . $data->elevators_service_lift_capacity . ' <small>тонн</small>';
+                        }
+                        return $text;
+                    },
+                    'dimension' => '',
+                    'value_list' => [
+                        0 => 'нет',
+                    ]
+                ],
+                'Гидроплатформа' => [
+                    'label' => 'elevators_hydraulic_platform',
+                    'value' => function () use ($data) {
+                        if (!$data->elevators_hydraulic_platform) return 0;
+                        $text = $data->elevators_hydraulic_platform . ' <small>шт</small>';
+                        if ($data->elevators_hydraulic_platform_capacity) {
+                            $text .= ', ' . $data->elevators_hydraulic_platform_capacity . ' <small>тонн</small>';
                         }
                         return $text;
                     },

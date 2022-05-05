@@ -364,7 +364,7 @@ use app\models\oldDb\OfferMix;
     <!-- <? if ($model->getBlocksCount() > 1 && $model->getBlocksCount() < 7) : ?>
         <hr>
     <? endif; ?> -->
-    <? if ($model->data->photos && count($model->data->photos) > 3 && $model->getBlocksCount() <= 1) : ?>
+    <? if ($model->data->photos && count($model->data->photos) > 4 && $model->getBlocksCount() <= 1) : ?>
         <table class="photos mt-header">
             <tbody>
                 <tr>
@@ -390,7 +390,7 @@ use app\models\oldDb\OfferMix;
         </div>
     <? endif; ?>
     <hr>
-    <? if ($model->data->photos && count($model->data->photos) > 3 && $model->getBlocksCount() > 1) : ?>
+    <? if ($model->data->photos && count($model->data->photos) > 4 && $model->getBlocksCount() > 1) : ?>
         <table class="photos mt-header">
             <tbody>
                 <tr>
@@ -408,7 +408,7 @@ use app\models\oldDb\OfferMix;
             <h3 class="four">Характеристики</h3>
         </div>
     <? else : ?>
-        <div class="title mt-header">
+        <div class="title mt-header-min">
             <h3 class="four">Характеристики</h3>
         </div>
     <? endif; ?>
@@ -465,7 +465,7 @@ use app\models\oldDb\OfferMix;
         </div>
     </div>
 
-    <? if ($model->data->photos && count($model->data->photos) <= 3 || $model->getBlocksCount() <= 1) : ?>
+    <? if ($model->data->photos && count($model->data->photos) <= 4 || $model->getBlocksCount() <= 1) : ?>
         <table class="after-parameters mt-header">
             <div class="container">
                 <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
