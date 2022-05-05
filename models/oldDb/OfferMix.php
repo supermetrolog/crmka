@@ -637,6 +637,9 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);
         };
+        $fields['object_type'] = function ($fields) {
+            return json_decode($fields['object_type']);
+        };
         $fields['direction_name'] = function ($fields) {
             if (!$fields['direction_name'] || $fields['direction_name'] == "0") {
                 return null;

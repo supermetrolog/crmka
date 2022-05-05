@@ -474,7 +474,7 @@ table.digital-info-container {
 .digital-info td.one div p {
     text-transform: uppercase;
     font-weight: bold;
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .digital-info td.one div p.big {
@@ -513,6 +513,7 @@ table.digital-info-container {
 }
 
 .digital-info td.three .items {
+    /* border-collapse: separate!important; */
     border-collapse: collapse;
 }
 

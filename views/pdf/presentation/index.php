@@ -120,12 +120,17 @@ use app\models\oldDb\OfferMix;
                                 <td class="one">
                                     <div>
                                         <p><?= $model->getAreaLabel() ?></p>
-                                        <p class="big"><?= $model->formatter->format($model->getArea($model->data), 'decimal')  ?> м<sup>2</sup></p>
+                                        <p class="big"><?= $model->formatter->format($model->getAreaMax($model->data), 'decimal')  ?> м<sup>2</sup></p>
                                         <? if ($model->data->type_id == OfferMix::GENERAL_TYPE_ID && count($model->data->miniOffersMix) > 1) : ?>
                                             <p class="small">Деление от <span class="danger"><?= $model->getBlocksMinArea() ?> м<sup>2</sup></span></p>
                                         <? else : ?>
-                                            <p class="small">Деление не предполагается</p>
+                                            <? if ($model->data->type_id == OfferMix::MINI_TYPE_ID && $model->getAreaMinSplit($model->data)) : ?>
+                                                <p class="small">Деление от <span class="danger"><?= $model->getAreaMinSplit($model->data) ?> м<sup>2</sup></span></p>
+                                            <? else : ?>
+                                                <p class="small">Деление не предполагается</p>
+                                            <? endif; ?>
                                         <? endif; ?>
+
                                     </div>
                                 </td>
                                 <td class="two">
@@ -319,7 +324,7 @@ use app\models\oldDb\OfferMix;
                         </td>
                         <td class="three">
                             <div>
-                                <p><b><?= $model->formatter->format($model->getArea($block), 'decimal')  ?></b> м<sup>2</sup></p>
+                                <p><b><?= $model->formatter->format($model->getAreaMax($block), 'decimal')  ?></b> м<sup>2</sup></p>
                             </div>
                         </td>
                         <td class="four">

@@ -469,12 +469,61 @@ class OffersPdf extends Model
             return "ПЛОЩАДИ НА ПРОДАЖУ";
         }
     }
-    public function getArea($model)
+    public function getAreaMax($model)
     {
+        if ($this->isPlot()) {
+            return  $this->getAreaMaxForPlot($model);
+        }
         $min = $model->area_floor_min;
         $max = $model->area_mezzanine_max + $model->area_floor_max;
         $area = max($min, $max);
         return $area;
+    }
+    public function getAreaMin($model)
+    {
+        if ($this->isPlot()) {
+            return  $this->getAreaMinForPlot($model);
+        }
+        $min = $model->area_floor_min;
+        $max = $model->area_mezzanine_max + $model->area_floor_max;
+        $area = min($min, $max);
+        return $area;
+    }
+    public function getAreaMaxForPlot($model)
+    {
+        $min = $model->area_min;
+        $max = $model->area_max;
+        $area = max($min, $max);
+        return $area;
+    }
+    public function getAreaMinForPlot($model)
+    {
+
+        $min = $model->area_floor_min;
+        $max = $model->area_mezzanine_max + $model->area_floor_max;
+        $area = min($min, $max);
+        return $area;
+    }
+    public function getAreaMinSplit($model)
+    {
+        if ($this->isPlot()) {
+            return  $this->getAreaMinSplitForPlot($model);
+        }
+        $min = $model->area_floor_min;
+        $max = $model->area_mezzanine_max + $model->area_floor_max;
+        if ($min == $max) {
+            return false;
+        }
+        return min($min, $max);
+    }
+    public function getAreaMinSplitForPlot($model)
+    {
+        $min = $model->area_min;
+        $max = $model->area_max;
+        if ($min == $max) {
+            return false;
+        }
+        return min($min, $max);
     }
     public function getPriceLabel()
     {
@@ -510,7 +559,7 @@ class OffersPdf extends Model
     public function getTotalPrice($model)
     {
         $pricePerYear = (int) $this->getMaxPrice($model);
-        $area = (int) $this->getArea($model);
+        $area = (int) $this->getAreaMax($model);
         $totalPricePerMonth = round(floor($pricePerYear * $area / 12), 0);
         return $this->formatter->format($totalPricePerMonth, 'decimal');
     }
@@ -644,6 +693,21 @@ class OffersPdf extends Model
 
         return $array;
     }
+
+    public function isPlot()
+    {
+        $object_types = $this->data->object_type;
+        if (!$object_types || !is_array($object_types)) {
+            return null;
+        }
+        foreach ($object_types  as $type) {
+            if ($type == 3) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     public function isValidParameter($value)
     {
         $invalidParamsList = ["", null, 0, " ", "0", "  ", "0 "];
@@ -675,7 +739,7 @@ class OffersPdf extends Model
     public function getParameterListOne()
     {
         $data = $this->data;
-        return [
+        $array =  [
             'Площади к аренде' => [
                 'Свободная площадь' => [
                     'label' => 'calc_area_general',
@@ -812,11 +876,15 @@ class OffersPdf extends Model
                 ],
             ]
         ];
+        if ($this->isPlot()) {
+            return $this->getParameterListOneForPlot($array);
+        }
+        return $array;
     }
     public function getParameterListTwo()
     {
         $data = $this->data;
-        return [
+        $array =  [
             'Коммуникации' => [
                 'Электричество' => [
                     'label' => 'power',
@@ -1069,6 +1137,51 @@ class OffersPdf extends Model
                 ],
             ]
         ];
+        if ($this->isPlot()) {
+            return $this->getParameterListTwoForPlot($array);
+        }
+        return $array;
+    }
+    public function getParameterListOneForPlot(array $array): array
+    {
+        $data = $this->data;
+        $security = $array['Безопасность'];
+
+        unset($array['Характеристики']);
+        unset($array['Безопасность']);
+        $array['Характеристики'] = [
+            'Правовой статус земли' => [
+                'label' => 'own_type_land',
+                'value' => $data->own_type_land,
+                'dimension' => '',
+            ],
+            'Категория земли' => [
+                'label' => 'land_category',
+                'value' => $data->land_category,
+                'dimension' => '',
+            ],
+            'Рельеф' => [
+                'label' => 'landscape_type',
+                'value' => $data->landscape_type,
+                'dimension' => '',
+            ],
+            'Строения на участке' => [
+                'label' => 'buildings_on_territory',
+                'value' => $data->object->buildings_on_territory,
+                'dimension' => '',
+                'value_list' => [
+                    0 => 'нет',
+                    1 => 'есть',
+                    2 => 'нет',
+                ]
+            ],
+        ];
+        $array['Безопасность'] = $security;
+        return $array;
+    }
+    public function getParameterListTwoForPlot(array $array): array
+    {
+        return $array;
     }
     // public function getGatesCount()
     // {

@@ -200,7 +200,7 @@ class OfferMixSearch extends OfferMix
         // $query = OfferMix::find()->distinct()->select(['crm.c_industry_offers_mix.id', 'crmka.company.id as anal'])->from(['crm.c_industry_offers_mix', 'crmka.company'])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails'])->andWhere(['deleted' => 0]);
         // $query = OfferMix::find()->joinWith(['company.mainContact.phones'])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails'])->andWhere(['deleted' => 0]);
         $query = OfferMix::find()->distinct()->joinWith(['company' => function ($query) {
-            return $query->from('crmka.company')->joinWith(['mainContact' => function ($query) {
+            return $query->from('crmka.company')->joinWith(['contacts' => function ($query) {
                 return $query->from('crmka.contact')->joinWith(['phones' => function ($query) {
                     return $query->from('crmka.phone');
                 }]);
@@ -273,7 +273,21 @@ class OfferMixSearch extends OfferMix
             ->orFilterWhere(['like', 'contact.middle_name', $this->all])
             ->orFilterWhere(['like', 'contact.last_name', $this->all])
             ->orFilterWhere(['like', 'phone.phone', $this->all]);
-
+        // для релевантности
+        if ($this->all) {
+            $query->orderBy(new Expression("
+                 (
+                    IF (`c_industry_offers_mix`.`object_id` LIKE '%{$this->all}%', 90, 0) 
+                    + IF (`phone`.`phone` LIKE '%{$this->all}%', 40, 0) 
+                    + IF (`company`.`nameRu` LIKE '%{$this->all}%', 50, 0) 
+                    + IF (`company`.`nameEng` LIKE '%{$this->all}%', 50, 0) 
+                    + IF (`contact`.`first_name` LIKE '%{$this->all}%', 30, 0) 
+                    + IF (`contact`.`middle_name` LIKE '%{$this->all}%', 30, 0) 
+                    + IF (`contact`.`last_name` LIKE '%{$this->all}%', 30, 0) 
+                )
+                DESC
+            "));
+        }
         // grid filtering conditions
         $query->andFilterWhere([
             'crm.c_industry_offers_mix.id' => $this->id,
