@@ -654,11 +654,62 @@ table.digital-info-container {
 .offer-description p {
     font-size: 13px;
     line-height: 17px;
-    color: rgb(129, 129, 129);
+    color: rgb(15, 15, 15);
 }
 
 
 /* ************** BANNER ************ */
+
+.after-parameters {
+    position: absolute;
+    bottom: 2cm;
+    left: 0;
+    right: 0;
+    height: 170px;
+    width: 100%;
+}
+
+.after-parameters .container {
+    height: 170px;
+    position: relative;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.after-parameters img {
+    width: 100%;
+    height: 170px;
+}
+
+.after-parameters .container>div {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, .8);
+    padding: 20px 0;
+}
+
+.after-parameters h3 {
+    color: white;
+    text-align: center;
+}
+
+.after-parameters p {
+    color: #ccc;
+    text-align: center;
+    font-size: 12px;
+}
+
+.after-parameters a {
+    color: #6397da;
+    text-decoration: underline;
+    text-transform: uppercase;
+    display: block;
+    text-align: center;
+    font-weight: bold;
+}
 
 .banner {
     height: 170px;

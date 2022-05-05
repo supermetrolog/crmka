@@ -216,16 +216,11 @@ use app\models\oldDb\OfferMix;
                                                                 <!-- Канбалки -->
                                                                 <!-- Внешняя отделка -->
                                                                 <img src="http://<?= $model->getHost() ?>/images/crane-icon.png" alt="">
-                                                                <? if ($model->data->elevators_count) : ?>
-                                                                    <p><?= $model->data->elevators_count ?> шт</p>
+                                                                <? if ($model->data->cranes_cathead_capacity) : ?>
+                                                                    <p><?= $model->data->cranes_cathead_capacity ?> тонн</p>
                                                                 <? else : ?>
                                                                     <p>—</p>
                                                                 <? endif; ?>
-                                                                <!-- <? if ($model->data->calc_cranes) : ?>
-                                                                    <p><?= $model->data->calc_cranes ?> тонн</p>
-                                                                <? else : ?>
-                                                                    <p>—</p>
-                                                                <? endif; ?> -->
                                                             </div>
                                                         </div>
                                                     </td>
@@ -366,10 +361,10 @@ use app\models\oldDb\OfferMix;
             </tbody>
         </table>
     <? endif; ?>
-    <? if ($model->getBlocksCount() > 1 && $model->getBlocksCount() < 7) : ?>
+    <!-- <? if ($model->getBlocksCount() > 1 && $model->getBlocksCount() < 7) : ?>
         <hr>
-    <? endif; ?>
-    <? if ($model->data->photos && count($model->data->photos) > 3) : ?>
+    <? endif; ?> -->
+    <? if ($model->data->photos && count($model->data->photos) > 3 && $model->getBlocksCount() <= 1) : ?>
         <table class="photos mt-header">
             <tbody>
                 <tr>
@@ -384,17 +379,39 @@ use app\models\oldDb\OfferMix;
             </tbody>
         </table>
     <? endif; ?>
-    <? if ($model->getBlocksCount() <= 1) : ?>
-        <hr>
+    <? if ($model->getBlocksCount() <= 1 && count($model->data->photos) <= 1 && $model->data->auto_desc) : ?>
+        <div class="title">
+            <h3 class="two">Описание предложения</h3>
+        </div>
+        <div class="offer-description">
+            <p>
+                <?= $model->data->auto_desc ?>
+            </p>
+        </div>
     <? endif; ?>
-
-
-
-
-    <div class="title">
-        <h3 class="three">Подробные параметры</h3>
-    </div>
-
+    <hr>
+    <? if ($model->data->photos && count($model->data->photos) > 3 && $model->getBlocksCount() > 1) : ?>
+        <table class="photos mt-header">
+            <tbody>
+                <tr>
+                    <? foreach ($model->getPhotosForBlock(2) as $photo) : ?>
+                        <td class="<?= $photo['class'] ?>">
+                            <div>
+                                <img src="<?= $photo['src'] ?>" alt="">
+                            </div>
+                        </td>
+                    <? endforeach; ?>
+                </tr>
+            </tbody>
+        </table>
+        <div class="title">
+            <h3 class="four">Характеристики</h3>
+        </div>
+    <? else : ?>
+        <div class="title mt-header">
+            <h3 class="four">Характеристики</h3>
+        </div>
+    <? endif; ?>
     <div class="parameters">
         <div class="list">
             <? foreach ($model->getParameterListOne() as $key => $params) : ?>
@@ -447,21 +464,38 @@ use app\models\oldDb\OfferMix;
             <? endforeach; ?>
         </div>
     </div>
-    <hr>
-    <div class="banner mt-header">
-        <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
-        <div>
-            <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
-            <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>
-            <a href="https://industry.realtor.ru">industry.realtor.ru</a>
+
+    <? if ($model->data->photos && count($model->data->photos) <= 3 || $model->getBlocksCount() <= 1) : ?>
+        <table class="after-parameters mt-header">
+            <div class="container">
+                <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
+                <div>
+                    <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
+                    <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>
+                    <a href="https://industry.realtor.ru">industry.realtor.ru</a>
+                </div>
+            </div>
+
+        </table>
+    <? endif; ?>
+
+    <? if ($model->getBlocksCount() > 1 || count($model->data->photos) > 1 && $model->data->auto_desc) : ?>
+        <hr>
+        <div class="banner mt-header">
+            <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
+            <div>
+                <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
+                <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>
+                <a href="https://industry.realtor.ru">industry.realtor.ru</a>
+            </div>
         </div>
-    </div>
-    <div class="title">
-        <h3 class="two">Описание предложения</h3>
-    </div>
-    <div class="offer-description">
-        <p>
-            <?= $model->data->auto_desc ?>
-        </p>
-    </div>
+        <div class="title">
+            <h3 class="two">Описание предложения</h3>
+        </div>
+        <div class="offer-description">
+            <p>
+                <?= $model->data->auto_desc ?>
+            </p>
+        </div>
+    <? endif; ?>
 </div>

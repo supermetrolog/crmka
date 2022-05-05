@@ -63,7 +63,11 @@ class OffersPdf extends Model
     private function normalizeDescription()
     {
         $url = 'https://pennylane.pro/autodesc.php/' . $this->data->original_id . '/' . $this->data->type_id . '?api=1';
-        $this->data->auto_desc = file_get_contents($url);
+        try {
+            $this->data->auto_desc = file_get_contents($url);
+        } catch (\Throwable $th) {
+            $this->data->auto_desc = null;
+        }
     }
     private function normalizeElevatorsCount()
     {
@@ -577,10 +581,10 @@ class OffersPdf extends Model
     {
         if (ArrayHelper::keyExists('value_list', $value)) {
             if (ArrayHelper::keyExists(is_callable($value['value']) ? $value['value']() : $value['value'], $value['value_list'])) {
-                if (is_callable($value['value_list'][$value['value']])) {
-                    return $value['value_list'][$value['value']]();
+                if (is_callable($value['value_list'][is_callable($value['value']) ? $value['value']() : $value['value']])) {
+                    return $value['value_list'][is_callable($value['value']) ? $value['value']() : $value['value']]();
                 }
-                return $value['value_list'][$value['value']];
+                return $value['value_list'][is_callable($value['value']) ? $value['value']() : $value['value']];
             }
         }
         if (is_callable($value['value'])) {
