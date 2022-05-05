@@ -205,7 +205,7 @@ class OfferMixSearch extends OfferMix
                     return $query->from('crmka.phone');
                 }]);
             }]);
-        }])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'comments']);
+        }])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'company.mainContact.phones', 'comments']);
 
         // add conditions that should always apply here
 
@@ -581,10 +581,10 @@ class OfferMixSearch extends OfferMix
         }
         if ($this->water !== null) {
             if ($this->water == 1) {
-                $query->andFilterWhere(['!=', 'c_industry_offers_mix.water', '0']);
+                $query->andFilterWhere(['not in', 'c_industry_offers_mix.water', ['0', 'нет', '']]);
             }
             if ($this->water == 0) {
-                $query->andFilterWhere(['=', 'c_industry_offers_mix.water', '0']);
+                $query->andFilterWhere(['c_industry_offers_mix.water' => ['0', 'нет', '']]);
             }
         }
 
