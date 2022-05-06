@@ -241,8 +241,7 @@ use app\models\oldDb\OfferMix;
             </tr>
         </tbody>
     </table>
-    <? if ($model->data->photos && count($model->data->photos) > 1) : ?>
-
+    <? if ($model->data->photos && count($model->data->photos) > 1 && $model->getBlocksCount() <= 6) : ?>
         <table class="photos">
             <tbody>
                 <tr>
@@ -366,9 +365,7 @@ use app\models\oldDb\OfferMix;
             </tbody>
         </table>
     <? endif; ?>
-    <!-- <? if ($model->getBlocksCount() > 1 && $model->getBlocksCount() < 7) : ?>
-        <hr>
-    <? endif; ?> -->
+
     <? if ($model->data->photos && count($model->data->photos) > 4 && $model->getBlocksCount() <= 1) : ?>
         <table class="photos mt-header">
             <tbody>
@@ -483,9 +480,26 @@ use app\models\oldDb\OfferMix;
 
         </table>
     <? endif; ?>
-
     <? if ($model->getBlocksCount() > 1 || count($model->data->photos) > 1 && $model->data->auto_desc) : ?>
         <hr>
+    <? endif; ?>
+    <? if ($model->getBlocksCount() > 6) : ?>
+        <table class="photos mt-header">
+            <tbody>
+                <tr>
+                    <? foreach ($model->getPhotosForBlock(1) as $photo) : ?>
+                        <td class="<?= $photo['class'] ?>">
+                            <div>
+                                <img src="<?= $photo['src'] ?>" alt="">
+                            </div>
+                        </td>
+                    <? endforeach; ?>
+                </tr>
+            </tbody>
+        </table>
+    <? endif; ?>
+    <? if ($model->getBlocksCount() > 1 || count($model->data->photos) > 1 && $model->data->auto_desc) : ?>
+
         <div class="banner mt-header">
             <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
             <div>
@@ -503,4 +517,5 @@ use app\models\oldDb\OfferMix;
             </p>
         </div>
     <? endif; ?>
+
 </div>
