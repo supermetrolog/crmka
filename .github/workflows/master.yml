@@ -16,33 +16,17 @@ jobs:
       with:
           php-version: '7.4'
 
-    - name: Install Packages
-      run: composer install
-    
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.3.0
-      with:
-        server: billypro.beget.tech
-        username: ${{ secrets.username }}
-        password: ${{ secrets.password }}
-    - name: multiple command
-      uses: appleboy/ssh-action@master
-      with:
-        host: billypro.beget.tech
-        username: ${{ secrets.username }}
-        password: ${{ secrets.password }}
-        script: php7.4 yii migrate --interactive=0
-
     - name: 📂 Sync files with prod server
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: 176.99.3.73
+        server: 62.113.107.218
         username: ${{ secrets.ftp_prod_server_username }}
         password: ${{ secrets.ftp_prod_server_password }}
+
     - name: multiple command in prod server
       uses: appleboy/ssh-action@master
       with:
-        host: 176.99.3.73
+        host: 62.113.107.218
         username: ${{ secrets.ssh_server_username }}
         password: ${{ secrets.ssh_server_password }}
-        script: cd /var/www/www-root/data/www/api.pennylane.pro && /opt/php71/bin/php yii migrate --interactive=0
+        script: cd /home/user/web/api.supermetrolog.ru/public_html && composer install && /bin/php7.4 yii migrate --interactive=0
