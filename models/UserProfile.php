@@ -125,12 +125,6 @@ class UserProfile extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        $fields['avatar'] = function ($fields) {
-            if (!$fields['avatar']) {
-                return "1.jpg";
-            }
-            return $fields['avatar'];
-        };
         $fields['full_name'] = function ($fields) {
             $full_name = "{$fields['middle_name']} {$fields['first_name']}";
             if ($fields['last_name']) {
