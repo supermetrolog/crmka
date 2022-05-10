@@ -29,4 +29,4 @@ jobs:
         host: 62.113.107.218
         username: ${{ secrets.ssh_server_username }}
         password: ${{ secrets.ssh_server_password }}
-        script: cd /home/user/web/api.supermetrolog.ru/public_html && composer install && /bin/php7.4 yii migrate --interactive=0
+        script: cd /home/user/web/api.supermetrolog.ru/public_html && composer install && php yii migrate --interactive=0
