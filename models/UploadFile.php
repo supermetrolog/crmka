@@ -56,7 +56,7 @@ class UploadFile extends Model
     {
         $dir = Yii::getAlias('@app') . '/public_html/uploads';
         if (!is_dir($dir)) {
-            if (!mkdir($dir, 0700)) {
+            if (!mkdir($dir, 0755)) {
                 throw new Exception('Не удалось создать директорию');
             }
         }
