@@ -4,6 +4,7 @@ namespace app\models\oldDb;
 
 use app\components\ExpressionBuilder;
 use app\exceptions\ValidationErrorHttpException;
+use app\models\Company;
 use app\models\Contact;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -224,6 +225,14 @@ class OfferMixSearch extends OfferMix
         $eb->addTablePrefix(OfferMix::tableName());
         return $eb->getConditionExpression();
     }
+    private function getDsnAttribute($name, $dsn)
+    {
+        if (preg_match('/' . $name . '=([^;]*)/', $dsn, $match)) {
+            return $match[1];
+        } else {
+            return null;
+        }
+    }
     /**
      * Creates data provider instance with search query applied
      *
@@ -235,10 +244,11 @@ class OfferMixSearch extends OfferMix
     {
         // $query = OfferMix::find()->distinct()->select(['crm.c_industry_offers_mix.id', 'crmka.company.id as anal'])->from(['crm.c_industry_offers_mix', 'crmka.company'])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails'])->andWhere(['deleted' => 0]);
         // $query = OfferMix::find()->joinWith(['company.mainContact.phones'])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails'])->andWhere(['deleted' => 0]);
-        $query = OfferMix::find()->distinct()->joinWith(['company' => function ($query) {
-            return $query->from('crmka.company')->joinWith(['contacts' => function ($query) {
-                return $query->from('crmka.contact')->joinWith(['phones' => function ($query) {
-                    return $query->from('crmka.phone');
+        $joinedDbName = $this->getDsnAttribute('dbname', Company::getDb()->dsn);
+        $query = OfferMix::find()->distinct()->joinWith(['company' => function ($query) use ($joinedDbName) {
+            return $query->from("$joinedDbName.company")->joinWith(['contacts' => function ($query) use ($joinedDbName) {
+                return $query->from("$joinedDbName.contact")->joinWith(['phones' => function ($query) use ($joinedDbName) {
+                    return $query->from("$joinedDbName.phone");
                 }]);
             }]);
         }])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'company.mainContact.phones', 'comments']);
