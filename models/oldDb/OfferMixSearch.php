@@ -16,6 +16,7 @@ use yii\db\Expression;
  */
 class OfferMixSearch extends OfferMix
 {
+    private const MIN_RECOMMENDED_WEIGHT_SUM = 500;
     private const APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD =  30;
     public $all;
     public $rangeMinArea;
@@ -191,7 +192,7 @@ class OfferMixSearch extends OfferMix
             $this->approximateDistanceFromMKAD = floor(($this->approximateDistanceFromMKAD * self::APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD / 100) + $this->approximateDistanceFromMKAD);
         }
     }
-    public function getRecommendedOrderExpression($sort)
+    public function getRecommendedCondition()
     {
         $eb = new ExpressionBuilder();
         $eb->addCondition(['>=', 'power_value', $this->rangeMinElectricity], 70, 0)
@@ -206,12 +207,11 @@ class OfferMixSearch extends OfferMix
             ->addCondition(['IN', 'district_moscow', $this->district_moscow], 60, 0)
             ->addCondition(['<=', 'CASE WHEN ceiling_height_min > ceiling_height_max THEN ceiling_height_min ELSE ceiling_height_max END', $this->rangeMaxCeilingHeight, false], 40, 0)
             ->addCondition(['>=', 'ceiling_height_min', $this->rangeMinCeilingHeight], 40, 0)
-            ->addCondition(['>=', 'area_floor_min', $this->rangeMinArea], 50, 0)
-            ->addCondition(['<=', 'area_mezzanine_max + area_floor_max', $this->rangeMaxArea, false], 50, 0);
+            ->addCondition(['>=', 'area_floor_min', $this->rangeMinArea], 75, 0)
+            ->addCondition(['<=', 'area_mezzanine_max + area_floor_max', $this->rangeMaxArea, false], 65, 0);
 
 
         if ($this->gates && is_array($this->gates)) {
-            // $query->andFilterWhere(['=', new Expression("JSON_EXTRACT(`c_industry_offers_mix`.`gates`, '$[0]')"), "{$this->gates[0]}"]);
             foreach ($this->gates as $gate) {
                 $eb->addCondition(['like', 'gates', new Expression("'%\"{$gate}\"%'")], 35, 0);
             }
@@ -221,8 +221,13 @@ class OfferMixSearch extends OfferMix
         } elseif ($this->deal_type == self::DEAL_TYPE_SALE) {
             $eb->addCondition(['<=', 'price_sale_max', $this->pricePerFloor], 50, 0);
         }
-        $eb->prepareToEnd($sort);
         $eb->addTablePrefix(OfferMix::tableName());
+        return $eb;
+    }
+    public function getRecommendedOrderExpression($sort)
+    {
+        $eb = $this->getRecommendedCondition();
+        $eb->prepareToEnd($sort);
         return $eb->getConditionExpression();
     }
     private function getDsnAttribute($name, $dsn)
@@ -323,6 +328,7 @@ class OfferMixSearch extends OfferMix
         if ($this->recommended_sort) {
             if ($expression = $this->getRecommendedOrderExpression('DESC')) {
                 $query->orderBy($expression);
+                $query->andFilterWhere(['>=', $this->getRecommendedCondition()->getConditionExpression(), self::MIN_RECOMMENDED_WEIGHT_SUM]);
                 $query->andFilterWhere([
                     'c_industry_offers_mix.deleted' => 0,
                     'c_industry_offers_mix.type_id' => [1, 2],
