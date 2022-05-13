@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use app\exceptions\ValidationErrorHttpException;
+use app\models\oldDb\OfferMix;
 
 /**
  * This is the model class for table "deal".
@@ -50,10 +51,10 @@ class Deal extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'consultant_id', 'complex_id', 'object_id', 'type_id'], 'required'],
-            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor', 'contractTerm', 'formOfOrganization'], 'integer'],
+            [['company_id', 'consultant_id', 'object_id', 'type_id', 'original_id', 'visual_id', 'complex_id'], 'required'],
+            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'original_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor', 'contractTerm', 'formOfOrganization'], 'integer'],
             [['dealDate', 'created_at', 'updated_at'], 'safe'],
-            [['clientLegalEntity', 'description', 'name'], 'string', 'max' => 255],
+            [['clientLegalEntity', 'description', 'name', 'visual_id'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
             [['request_id'], 'exist', 'skipOnError' => true, 'targetClass' => Request::className(), 'targetAttribute' => ['request_id' => 'id']],
@@ -91,10 +92,11 @@ class Deal extends \yii\db\ActiveRecord
     {
         $fields = parent::fields();
         $fields['dealDate'] = function ($fields) {
-            if ($fields['dealDate']) {
-                return date('Y-m-d', strtotime($fields['dealDate']));
-            }
-            return $fields['dealDate'];
+            return $fields['dealDate'] ? Yii::$app->formatter->format($fields['dealDate'], 'date') : null;
+            // if ($fields['dealDate']) {
+            //     return date('Y-m-d', strtotime($fields['dealDate']));
+            // }
+            // return $fields['dealDate'];
         };
         $fields['clientLegalEntity_full_name'] = function ($fields) {
             if ($fields['formOfOrganization']) {
@@ -107,7 +109,7 @@ class Deal extends \yii\db\ActiveRecord
 
     public static function createDeal($post_data)
     {
-        if ($model = self::find()->where(['company_id' => $post_data['company_id'], 'request_id' => $post_data['request_id']])->one()) {
+        if ($post_data['request_id'] && $model = self::find()->where(['company_id' => $post_data['company_id'], 'request_id' => $post_data['request_id']])->one()) {
             $model->addError("request_id", 'Сделка для этого запроса уже существует!');
             throw new ValidationErrorHttpException($model->getErrorSummary(false));
         }
@@ -134,6 +136,16 @@ class Deal extends \yii\db\ActiveRecord
     public function getCompany()
     {
         return $this->hasOne(Company::className(), ['id' => 'company_id']);
+    }
+
+    /**
+     * Gets query for [[Company]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompetitor()
+    {
+        return $this->hasOne(Company::className(), ['id' => 'competitor_company_id']);
     }
     /**
      * Gets query for [[Company]].
@@ -162,5 +174,9 @@ class Deal extends \yii\db\ActiveRecord
     public function getRequest()
     {
         return $this->hasOne(Request::className(), ['id' => 'request_id']);
+    }
+    public function getOffer()
+    {
+        return $this->hasOne(OfferMix::class, ['object_id' => 'object_id', 'original_id' => 'original_id', 'type_id' => 'type_id']);
     }
 }

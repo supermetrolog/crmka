@@ -341,6 +341,7 @@ class OfferMixSearch extends OfferMix
             $query->orderBy(new Expression("
                  (
                     IF (`c_industry_offers_mix`.`object_id` LIKE '%{$this->all}%', 90, 0) 
+                    + IF (`c_industry_offers_mix`.`object_id` = '{$this->all}', 420, 0) 
                     + IF (`phone`.`phone` LIKE '%{$this->all}%', 40, 0) 
                     + IF (`company`.`nameRu` LIKE '%{$this->all}%', 50, 0) 
                     + IF (`company`.`nameEng` LIKE '%{$this->all}%', 50, 0) 

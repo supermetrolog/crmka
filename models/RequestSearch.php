@@ -74,7 +74,7 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find()->distinct()->joinWith(['objectTypes', 'objectClasses', 'gateTypes', 'company'])->with(['consultant.userProfile', 'directions', 'districts', 'regions', 'deal.consultant.userProfile']);
+        $query = Request::find()->distinct()->joinWith(['objectTypes', 'objectClasses', 'gateTypes', 'company'])->with(['consultant.userProfile', 'directions', 'districts', 'regions', 'deal.offer.generalOffersMix', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 

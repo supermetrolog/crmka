@@ -9,6 +9,7 @@ use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\CompanyFile;
 use Yii;
 use yii\data\Sort;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "company".
@@ -252,7 +253,7 @@ class Company extends \yii\db\ActiveRecord
     {
         return self::find()->with(['productRanges', 'categories', 'companyGroup', 'broker', 'deals', 'consultant' => function ($query) {
             $query->with(['userProfile']);
-        }, 'files', 'contacts' => function ($query) {
+        }, 'files', 'dealsRequestEmpty.consultant.userProfile', 'dealsRequestEmpty.offer.generalOffersMix', 'dealsRequestEmpty.competitor', 'contacts' => function ($query) {
             $query->with(['phones', 'emails', 'contactComments', 'websites']);
         }])->where(['company.id' => $id])->limit(1)->one();
     }
@@ -436,6 +437,15 @@ class Company extends \yii\db\ActiveRecord
     public function getDeals()
     {
         return $this->hasMany(Deal::className(), ['company_id' => 'id']);
+    }
+    /**
+     * Gets query for [[Deals]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDealsRequestEmpty()
+    {
+        return $this->hasMany(Deal::className(), ['company_id' => 'id'])->where(['is', 'request_id', new Expression('null')]);
     }
     /**
      * Gets query for [[categories]].
