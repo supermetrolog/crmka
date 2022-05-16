@@ -65,8 +65,7 @@ class CompanySearch extends Company
     {
         // SELECT * FROM (SELECT DISTINCT company.id, company.nameRu, category.category FROM `company` LEFT JOIN `request` ON `company`.`id` = `request`.`company_id` LEFT JOIN `category` ON `company`.`id` = `category`.`company_id` LEFT JOIN `contact` ON `company`.`id` = `contact`.`company_id` LEFT JOIN `phone` ON `contact`.`id` = `phone`.`contact_id` WHERE category.category IN (1,0)) as fuck GROUP BY id HAVING COUNT(*) > 1
 
-        // Select необходим для правильной сортировки!
-        $query = Company::find()->distinct()->select('company.*, request.id as request_id')->joinWith(['requests', 'categories', 'contacts' => function ($query) {
+        $query = Company::find()->distinct()->joinWith(['requests', 'categories', 'contacts' => function ($query) {
             $query->joinWith(['phones'])->with(['emails', 'contactComments']);
         }, 'categories'])->with([
             'requests' => function ($query) {
@@ -98,15 +97,18 @@ class CompanySearch extends Company
                     'default' => [
                         'asc' => [
                             new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'),
-                            new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
+                            // new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
+                            new Expression('(IF ((SELECT EXISTS(SELECT r.status FROM request as r WHERE r.company_id = company.id AND r.status = 1 LIMIT 1)), request.created_at, NULL)) ASC'),
+                            'request.status' => SORT_ASC,
                             'company.rating' => SORT_ASC,
                             'company.status' => SORT_ASC,
                             'company.created_at' => SORT_ASC
                         ],
                         'desc' => [
-                            // new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'),
-                            new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
-                            // 'request.status' => SORT_DESC,
+                            new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'),
+                            // new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
+                            new Expression('(IF ((SELECT EXISTS(SELECT r.status FROM request as r WHERE r.company_id = company.id AND r.status = 1 LIMIT 1)), request.created_at, NULL)) DESC'),
+                            'request.status' => SORT_DESC,
                             'company.rating' => SORT_DESC,
                             'company.status' => SORT_DESC,
                             'company.created_at' => SORT_DESC

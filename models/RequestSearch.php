@@ -26,6 +26,9 @@ class RequestSearch extends Request
     public $rangeMaxCeilingHeight;
     public $maxDistanceFromMKAD;
     public $maxElectricity;
+    public $regions;
+    public $directions;
+    public $districts;
     /**
      * {@inheritdoc}
      */
@@ -33,7 +36,7 @@ class RequestSearch extends Request
     {
         return [
             [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
-            [['description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectClasses', 'gateTypes'], 'safe'],
+            [['regions', 'directions', 'districts', 'description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectClasses', 'gateTypes'], 'safe'],
         ];
     }
 
@@ -58,6 +61,9 @@ class RequestSearch extends Request
         $this->objectTypes = $this->stringToArray($this->objectTypes);
         $this->objectClasses = $this->stringToArray($this->objectClasses);
         $this->gateTypes = $this->stringToArray($this->gateTypes);
+        $this->regions = $this->stringToArray($this->regions);
+        $this->directions = $this->stringToArray($this->directions);
+        $this->districts = $this->stringToArray($this->districts);
         if ($this->dateStart === null && $this->dateEnd === null) {
             return;
         }
@@ -74,7 +80,7 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find()->distinct()->joinWith(['objectTypes', 'objectClasses', 'gateTypes', 'company'])->with(['consultant.userProfile', 'directions', 'districts', 'regions', 'deal.offer.generalOffersMix', 'deal.consultant.userProfile']);
+        $query = Request::find()->distinct()->joinWith(['objectTypes', 'objectClasses', 'gateTypes', 'company', 'directions', 'districts', 'regions'])->with(['consultant.userProfile', 'directions', 'districts', 'regions', 'deal.offer.generalOffersMix', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 
@@ -172,6 +178,9 @@ class RequestSearch extends Request
             'request_object_type.object_type' => $this->objectTypes,
             'request_object_class.object_class' => $this->objectClasses,
             'request_gate_type.gate_type' => $this->gateTypes,
+            'request_region.region' => $this->regions,
+            'request_directions.direction' => $this->directions,
+            'request_district.district' => $this->districts,
         ]);
         if ($this->objectTypes && count($this->objectTypes) > 1) {
             $query->groupBy('request.id');
