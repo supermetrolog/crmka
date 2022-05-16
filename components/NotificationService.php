@@ -51,7 +51,7 @@ class NotificationService  extends Component
         $event->contacts = $this->normalizeContacts($event->contacts);
         $isSended = false;
         if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $event->wayOfSending)) {
-            $this->sendEmails($event);
+            $this->sendEmails($event, UserSendedData::EMAIL_CONTACT_TYPE);
             $isSended = true;
         }
         if (in_array(UserSendedData::SMS_CONTACT_TYPE, $event->wayOfSending)) {
@@ -91,8 +91,11 @@ class NotificationService  extends Component
             $this->saveUserSendedData($event, $contact, $contact_type);
         }
     }
-    private function sendEmails(SendMessageEvent $event)
+    private function sendEmails(SendMessageEvent $event, $contact_type)
     {
+        if (!count($event->contacts['emails'])) {
+            throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[$contact_type] . '), нужно выбрать Email!');
+        }
         foreach ($event->contacts['emails'] as $contact) {
             if ($event->notSend) {
                 $this->saveUserSendedData($event, $contact, UserSendedData::EMAIL_CONTACT_TYPE);
