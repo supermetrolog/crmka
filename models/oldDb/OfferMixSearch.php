@@ -622,28 +622,33 @@ class OfferMixSearch extends OfferMix
         } elseif ($this->deal_type == self::DEAL_TYPE_SALE) {
             $query->andFilterWhere(['<=', 'price_sale_max', $this->pricePerFloor]);
         }
+        $query->andFilterWhere(['or like', 'c_industry_offers_mix.gates', $this->gates]);
+        $query->andFilterWhere(['or like', 'c_industry_offers_mix.purposes', $this->purposes]);
+        $query->andFilterWhere(['or like', 'c_industry_offers_mix.object_type', $this->object_type]);
+        $query->andFilterWhere(['or like', 'c_industry_offers_mix.floor_types', $this->floor_types]);
 
-        if ($this->gates && is_array($this->gates)) {
-            // $query->andFilterWhere(['=', new Expression("JSON_EXTRACT(`c_industry_offers_mix`.`gates`, '$[0]')"), "{$this->gates[0]}"]);
-            foreach ($this->gates as $gate) {
-                $query->andFilterWhere(['like', 'c_industry_offers_mix.gates', new Expression("'%\"{$gate}\"%'")]);
-            }
-        }
-        if ($this->purposes && is_array($this->purposes)) {
-            foreach ($this->purposes as $purpose) {
-                $query->andFilterWhere(['like', 'c_industry_offers_mix.purposes', new Expression("'%\"{$purpose}\"%'")]);
-            }
-        }
-        if ($this->object_type && is_array($this->object_type)) {
-            foreach ($this->object_type as $type) {
-                $query->andFilterWhere(['like', 'c_industry_offers_mix.object_type', new Expression("'%\"{$type}\"%'")]);
-            }
-        }
-        if ($this->floor_types && is_array($this->floor_types)) {
-            foreach ($this->floor_types as $floor_type) {
-                $query->andFilterWhere(['like', 'c_industry_offers_mix.floor_types', new Expression("'%\"{$floor_type}\"%'")]);
-            }
-        }
+        // if ($this->gates && is_array($this->gates)) {
+        //     // $query->andFilterWhere(['=', new Expression("JSON_EXTRACT(`c_industry_offers_mix`.`gates`, '$[0]')"), "{$this->gates[0]}"]);
+        //     foreach ($this->gates as $gate) {
+        //         $query->andFilterWhere(['like', 'c_industry_offers_mix.gates', new Expression("'%\"{$gate}\"%'")]);
+        //     }
+        // }
+        // if ($this->purposes && is_array($this->purposes)) {
+        //     foreach ($this->purposes as $purpose) {
+        //         $query->andFilterWhere(['like', 'c_industry_offers_mix.purposes', new Expression("'%\"{$purpose}\"%'")]);
+        //     }
+        // }
+
+        // if ($this->object_type && is_array($this->object_type)) {
+        //     foreach ($this->object_type as $type) {
+        //         $query->andFilterWhere(['like', 'c_industry_offers_mix.object_type', new Expression("'%\"{$type}\"%'")]);
+        //     }
+        // }
+        // if ($this->floor_types && is_array($this->floor_types)) {
+        //     foreach ($this->floor_types as $floor_type) {
+        //         $query->andFilterWhere(['like', 'c_industry_offers_mix.floor_types', new Expression("'%\"{$floor_type}\"%'")]);
+        //     }
+        // }
         if ($this->water !== null) {
             if ($this->water == 1) {
                 $query->andFilterWhere(['not in', 'c_industry_offers_mix.water', ['0', 'нет', '']]);
