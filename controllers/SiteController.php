@@ -72,6 +72,12 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        // $command1 = "cd " . Yii::getAlias('@app');
+        // $command2 = "yii websocket";
+        // $command = "$command1 && $command2 &";
+        // exec($command);
+        Yii::debug('test message', 'sites');
+        Yii::error('test error', 'fuck');
         return 'fuck';
     }
 

@@ -4,13 +4,15 @@ namespace app\controllers;
 
 use app\models\Timeline;
 use app\models\miniModels\TimelineStep;
-use app\models\miniModels\TimelineStepObject;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
 use app\events\SendMessageEvent;
 use app\models\miniModels\TimelineActionComment;
+use app\models\pdf\OffersPdf;
+use app\models\pdf\PdfManager;
 use app\models\UserSendedData;
+use Dompdf\Options;
 use Yii;
 
 /**
@@ -62,18 +64,52 @@ class TimelineController extends ActiveController
     public function actionSendObjects()
     {
         $post_data = Yii::$app->request->post();
+        if (!$post_data['offers']) {
+            return;
+        }
         $stepName = TimelineStep::STEPS[$post_data['step']];
+        $files = [];
+        $pdfs = [];
+        foreach ($post_data['offers'] as $offer) {
+            $pdf = $this->generatePdf($offer);
+            $files[] = $pdf->getPdfPath();
+            $pdfs[] = $pdf;
+        }
+
         $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
             'user_id' => Yii::$app->user->identity->id,
-            'htmlBody' => '<b>Fucking objects sended</b>',
-            'subject' => 'Objects',
+            'view' => 'presentation/index',
+            'viewArgv' => ['userMessage' => $post_data['comment']],
+            'subject' => 'Список предложений от Pennylane',
             'contacts' => $post_data['contacts'],
             'wayOfSending' => $post_data['wayOfSending'],
             'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
             'description' => 'Отправил объекты на шаге "' . $stepName . '"',
-            'notSend' => !$post_data['sendClientFlag']
+            'notSend' => !$post_data['sendClientFlag'],
+            'files' => $files
         ]));
+
+        foreach ($pdfs as $pdf) {
+            $pdf->removeFile();
+        }
         return ['message' => 'Объекты отправлены!', 'data' => true];
+    }
+    protected function generatePdf($query_params)
+    {
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('isJavascriptEnabled', true);
+        $pdfManager = new PdfManager($options);
+
+        $model = new OffersPdf($query_params);
+        $html = $this->renderFile(Yii::getAlias('@app') . '/views/pdf/presentation/index.php', ['model' => $model]);
+
+        $pdfManager->loadHtml($html);
+        $pdfManager->setPaper('A4');
+        $pdfManager->render();
+        $pdfManager->save();
+        return $pdfManager;
     }
     protected function findModel($id)
     {

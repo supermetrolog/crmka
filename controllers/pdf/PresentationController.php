@@ -26,6 +26,7 @@ class PresentationController extends Controller
         $options->set('isJavascriptEnabled', true);
         $dompdf = new Dompdf($options);
         $html = $this->renderPartial('index', ['model' => $model]);
+        // $html = $this->renderFile(Yii::getAlias('@app') . '/views/pdf/presentation/index.php', ['model' => $model]);
 
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4');

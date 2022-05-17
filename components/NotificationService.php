@@ -101,11 +101,19 @@ class NotificationService  extends Component
                 $this->saveUserSendedData($event, $contact, UserSendedData::EMAIL_CONTACT_TYPE);
                 continue;
             }
-            $message = Yii::$app->mailer->compose()
+            $message = Yii::$app->mailer->compose($event->view, $event->viewArgv)
                 ->setFrom($event->from)
                 ->setTo($contact)
-                ->setSubject($event->subject)
-                ->setHtmlBody($event->htmlBody);
+                ->setSubject($event->subject);
+
+            if ($event->files) {
+                foreach ($event->files as $file) {
+                    $message->attach($file);
+                }
+            }
+            if ($event->htmlBody) {
+                $message->setHtmlBody($event->htmlBody);
+            }
 
             if (!$message->send()) {
                 throw new Exception('Message not sended');
