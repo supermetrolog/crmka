@@ -171,7 +171,6 @@ class OfferMixSearch extends OfferMix
     {
         $this->deal_type = OfferMix::normalizeDealType($this->deal_type);
         $this->agent_id = OfferMix::normalizeAgentId($this->agent_id);
-        // $this->class = OfferMix::normalizeObjectClasses($this->class);
         $this->normalizeClass();
         $this->normalizeRegion();
         $this->normalizeDirection();
@@ -600,20 +599,20 @@ class OfferMixSearch extends OfferMix
             ->andFilterWhere(['like', 'parking_lorry_value', $this->parking_lorry_value])
             ->andFilterWhere(['like', 'parking_truck_value', $this->parking_truck_value])
             ->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['<=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMaxArea]) // area_warehouse_max < maxArea
-            ->andFilterWhere(['>=', '`area_floor_min`', $this->rangeMinArea]) // area_warehouse_min < minArea
-            ->andFilterWhere(['<=', new Expression('CASE WHEN ceiling_height_min > ceiling_height_max THEN ceiling_height_min ELSE ceiling_height_max END'), $this->rangeMaxCeilingHeight])
-            ->andFilterWhere(['>=', 'ceiling_height_min', $this->rangeMinCeilingHeight])
+            // ->andFilterWhere(['<=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMaxArea]) // area_warehouse_max < maxArea
+            // ->andFilterWhere(['>=', '`area_floor_min`', $this->rangeMinArea]) // area_warehouse_min < minArea
+            // ->andFilterWhere(['<=', new Expression('CASE WHEN ceiling_height_min > ceiling_height_max THEN ceiling_height_min ELSE ceiling_height_max END'), $this->rangeMaxCeilingHeight])
+            // ->andFilterWhere(['>=', 'ceiling_height_min', $this->rangeMinCeilingHeight])
             ->andFilterWhere(['<=', 'from_mkad', $this->approximateDistanceFromMKAD])
             ->andFilterWhere(['<=', 'from_mkad', $this->rangeMaxDistanceFromMKAD])
             ->andFilterWhere(['>=', 'power_value', $this->rangeMinElectricity])
-            ->andFilterWhere(['<=', 'power_value', $this->rangeMaxElectricity])
-            ->andFilterWhere([
-                '<=', new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END"), $this->rangeMaxPricePerFloor
-            ])
-            ->andFilterWhere([
-                '>=', new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_min ELSE price_safe_pallet_min END"), $this->rangeMinPricePerFloor
-            ]);
+            ->andFilterWhere(['<=', 'power_value', $this->rangeMaxElectricity]);
+        // ->andFilterWhere([
+        //     '<=', new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END"), $this->rangeMaxPricePerFloor
+        // ])
+        // ->andFilterWhere([
+        //     '>=', new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_min ELSE price_safe_pallet_min END"), $this->rangeMinPricePerFloor
+        // ]);
 
 
 
@@ -627,28 +626,110 @@ class OfferMixSearch extends OfferMix
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.object_type', $this->object_type]);
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.floor_types', $this->floor_types]);
 
-        // if ($this->gates && is_array($this->gates)) {
-        //     // $query->andFilterWhere(['=', new Expression("JSON_EXTRACT(`c_industry_offers_mix`.`gates`, '$[0]')"), "{$this->gates[0]}"]);
-        //     foreach ($this->gates as $gate) {
-        //         $query->andFilterWhere(['like', 'c_industry_offers_mix.gates', new Expression("'%\"{$gate}\"%'")]);
-        //     }
+        // $areaQuery = ['or'];
+        // if ($this->rangeMaxArea !== PHP_INT_MAX) {
+        //     $areaQuery[] = ['between', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMinArea, $this->rangeMaxArea];
         // }
-        // if ($this->purposes && is_array($this->purposes)) {
-        //     foreach ($this->purposes as $purpose) {
-        //         $query->andFilterWhere(['like', 'c_industry_offers_mix.purposes', new Expression("'%\"{$purpose}\"%'")]);
-        //     }
+        // if ($this->rangeMinArea !== PHP_INT_MIN) {
+        //     $areaQuery[] = ['between', '`area_floor_min`', $this->rangeMinArea, $this->rangeMaxArea];
         // }
+        // $query->andFilterWhere($areaQuery);
+        // $query->andFilterWhere([
+        //     'or',
+        //     ['between', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMinArea, $this->rangeMaxArea],
+        //     ['between', '`area_floor_min`', $this->rangeMinArea, $this->rangeMaxArea]
+        // ]);
+        // $query->andFilterWhere(['>=', '`area_floor_min`', $this->rangeMinArea]);
 
-        // if ($this->object_type && is_array($this->object_type)) {
-        //     foreach ($this->object_type as $type) {
-        //         $query->andFilterWhere(['like', 'c_industry_offers_mix.object_type', new Expression("'%\"{$type}\"%'")]);
-        //     }
-        // }
-        // if ($this->floor_types && is_array($this->floor_types)) {
-        //     foreach ($this->floor_types as $floor_type) {
-        //         $query->andFilterWhere(['like', 'c_industry_offers_mix.floor_types', new Expression("'%\"{$floor_type}\"%'")]);
-        //     }
-        // }
+        $query->andFilterWhere([
+            'and',
+            ['<=', '`area_floor_min`', $this->rangeMaxArea],
+            ['>=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMinArea]
+        ]);
+        $query->andFilterWhere([
+            'and',
+            [
+                '<=',
+                new Expression('LEAST(ceiling_height_min, ceiling_height_max)'),
+                $this->rangeMaxCeilingHeight
+            ],
+            [
+                '>=',
+                new Expression('GREATEST(ceiling_height_min, ceiling_height_max)'),
+                $this->rangeMinCeilingHeight
+            ],
+        ]);
+        // $query->andFilterWhere([
+        //     'and',
+        //     [
+        //         '<=',
+        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
+        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+        //             . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = "
+        //             . OfferMix::DEAL_TYPE_SALE
+        //             . " THEN price_sale_max ELSE price_safe_pallet_max END"),
+        //         $this->rangeMaxPricePerFloor
+        //     ],
+        //     [
+        //         '>=',
+        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
+        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+        //             . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = "
+        //             . OfferMix::DEAL_TYPE_SALE
+        //             . " THEN price_sale_min ELSE price_safe_pallet_min END"),
+        //         $this->rangeMinPricePerFloor
+        //     ]
+        // ]);
+        $rent_price_least = "IF(LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min) IS NULL, 0, LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min))";
+        $rent_price_greatest = "IF(GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min) IS NULL, 0, LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min))";
+        $sale_price_least = "IF(LEAST(price_sale_max, price_sale_min) IS NULL, 0, LEAST(price_sale_max, price_sale_min))";
+        $sale_price_greatest = "IF(GREATEST(price_sale_max, price_sale_min) IS NULL, 0, GREATEST(price_sale_max, price_sale_min))";
+        $rs_price_least = "IF(LEAST(price_safe_pallet_max, price_safe_pallet_min) IS NULL, 0, LEAST(price_safe_pallet_max, price_safe_pallet_min))";
+        $rs_price_greatest = "IF(GREATEST(price_safe_pallet_max, price_safe_pallet_min) IS NULL, 0, GREATEST(price_safe_pallet_max, price_safe_pallet_min))";
+
+        $query->andFilterWhere([
+            'and',
+            [
+                '<=',
+                new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
+                    . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+                    . "  THEN $rent_price_least WHEN deal_type = "
+                    . OfferMix::DEAL_TYPE_SALE
+                    . " THEN $sale_price_least ELSE $rs_price_least END"),
+                $this->rangeMaxPricePerFloor
+            ],
+            [
+                '>=',
+                new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
+                    . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+                    . "  THEN $rent_price_greatest WHEN deal_type = "
+                    . OfferMix::DEAL_TYPE_SALE
+                    . " THEN $sale_price_greatest ELSE $rs_price_greatest END"),
+                $this->rangeMinPricePerFloor
+            ],
+        ]);
+
+        // $query->andFilterWhere([
+        //     'and',
+        //     [
+        //         '<=',
+        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
+        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+        //             . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min ) WHEN deal_type = "
+        //             . OfferMix::DEAL_TYPE_SALE
+        //             . " THEN LEAST(price_sale_min, price_sale_max) ELSE LEAST(price_safe_pallet_min, price_safe_pallet_max) END"),
+        //         $this->rangeMaxPricePerFloor
+        //     ],
+        //     [
+        //         '>=',
+        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
+        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+        //             . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min  ) WHEN deal_type = "
+        //             . OfferMix::DEAL_TYPE_SALE
+        //             . " THEN GREATEST(price_sale_max, price_sale_min) ELSE GREATEST(price_safe_pallet_max, price_safe_pallet_min) END"),
+        //         $this->rangeMinPricePerFloor
+        //     ],
+        // ]);
         if ($this->water !== null) {
             if ($this->water == 1) {
                 $query->andFilterWhere(['not in', 'c_industry_offers_mix.water', ['0', 'нет', '']]);

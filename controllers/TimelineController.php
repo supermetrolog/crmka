@@ -92,7 +92,7 @@ class TimelineController extends ActiveController
         foreach ($pdfs as $pdf) {
             $pdf->removeFile();
         }
-        return ['message' => 'Объекты отправлены!', 'data' => true];
+        return ['message' => 'Предложения отправлены!', 'data' => true];
     }
     protected function generatePdf($query_params)
     {
