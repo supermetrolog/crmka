@@ -335,7 +335,7 @@ class TimelineStep extends \yii\db\ActiveRecord
         $extraFields = parent::extraFields();
         $extraFields['timelineStepObjects'] = function ($extraFields) {
             $count = array_count_values((array_map(function ($item) {
-                return $item['object_id'];
+                return $item['offer_id'];
             }, $extraFields['timelineStepObjects'])));
             $newObjects = [];
             foreach ($extraFields['timelineStepObjects'] as $value) {
@@ -347,15 +347,15 @@ class TimelineStep extends \yii\db\ActiveRecord
                         [
                             'object' => $value->offer->object,
                             'comments' => $value->offer->comments,
-                            'duplicate_count' => $count[$object['object_id']],
+                            'duplicate_count' => $count[$object['offer_id']],
                             'generalOffersMix' => (array) array_merge($value->offer->generalOffersMix->toArray(), ['offer' => $value->offer->generalOffersMix->offer])
                         ]
                     );
                 } else {
                     $object['offer'] = null;
                 }
-                $object['duplicate_count'] = $count[$object['object_id']];
-                $newObjects[$object['object_id']] = $object;
+                $object['duplicate_count'] = $count[$object['offer_id']];
+                $newObjects[$object['offer_id']] = $object;
             }
             $fuck = [];
             foreach ($newObjects as $value) {
