@@ -113,7 +113,7 @@ class OfferMixSearch extends OfferMix
         $array = [];
         if (is_array($gates)) {
             foreach ($gates as $gate) {
-                $array[] = OfferMix::normalizeGateTypes($gate);
+                $array[] = '"' . OfferMix::normalizeGateTypes($gate) . '"';
             }
 
             $this->gates = $array;
@@ -125,7 +125,7 @@ class OfferMixSearch extends OfferMix
         $array = [];
         if (is_array($purposes)) {
             foreach ($purposes as $purpose) {
-                $array[] = OfferMix::normalizeObjectTypes($purpose);
+                $array[] = '"' . OfferMix::normalizeObjectTypes($purpose) . '"';
             }
 
             $this->purposes = $array;
