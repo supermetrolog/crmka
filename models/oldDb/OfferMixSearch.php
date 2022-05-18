@@ -641,10 +641,15 @@ class OfferMixSearch extends OfferMix
         // ]);
         // $query->andFilterWhere(['>=', '`area_floor_min`', $this->rangeMinArea]);
 
+        // $query->andFilterWhere([
+        //     'and',
+        //     ['<=', '`area_floor_min`', $this->rangeMaxArea],
+        //     ['>=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMinArea]
+        // ]);
         $query->andFilterWhere([
             'and',
-            ['<=', '`area_floor_min`', $this->rangeMaxArea],
-            ['>=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMinArea]
+            ['<=', 'area_min', $this->rangeMaxArea],
+            ['>=', 'area_max', $this->rangeMinArea]
         ]);
         $query->andFilterWhere([
             'and',
