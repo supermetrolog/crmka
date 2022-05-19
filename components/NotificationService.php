@@ -28,7 +28,7 @@ class NotificationService  extends Component
 
         throw new ValidationErrorHttpException($model->getErrorSummary(false));
     }
-    private function normalizeContacts($contacts)
+    private static function normalizeContacts($contacts)
     {
         $newContacts = [
             'phones' => [],
@@ -46,9 +46,34 @@ class NotificationService  extends Component
 
         return $newContacts;
     }
+    public static function validateData($contacts, $ways)
+    {
+        $contacts = self::normalizeContacts($contacts);
+        if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $ways)) {
+            if (!count($contacts['emails']))
+                throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[UserSendedData::EMAIL_CONTACT_TYPE] . '), нужно выбрать email!');
+        }
+        if (in_array(UserSendedData::SMS_CONTACT_TYPE, $ways)) {
+            if (!count($contacts['phones']))
+                throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[UserSendedData::SMS_CONTACT_TYPE] . '), нужно выбрать номер телефона!');
+        }
+        if (in_array(UserSendedData::TELEGRAM_CONTACT_TYPE, $ways)) {
+            if (!count($contacts['phones']))
+                throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[UserSendedData::TELEGRAM_CONTACT_TYPE] . '), нужно выбрать  номер телефона!');
+        }
+        if (in_array(UserSendedData::WHATSAPP_CONTACT_TYPE, $ways)) {
+            if (!count($contacts['phones']))
+                throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[UserSendedData::WHATSAPP_CONTACT_TYPE] . '), нужно выбрать  номер телефона!');
+        }
+        if (in_array(UserSendedData::VIBER_CONTACT_TYPE, $ways)) {
+            if (!count($contacts['phones']))
+                throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[UserSendedData::VIBER_CONTACT_TYPE] . '), нужно выбрать  номер телефона!');
+        }
+        return true;
+    }
     public function sendMessage(SendMessageEvent $event)
     {
-        $event->contacts = $this->normalizeContacts($event->contacts);
+        $event->contacts = self::normalizeContacts($event->contacts);
         $isSended = false;
         if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $event->wayOfSending)) {
             $this->sendEmails($event, UserSendedData::EMAIL_CONTACT_TYPE);
@@ -80,7 +105,7 @@ class NotificationService  extends Component
     }
     private function sendPhones(SendMessageEvent $event, $contact_type)
     {
-        if (!count($event->contacts['phones'])) {
+        if (!count($event->contacts['phones']) && !$event->notSend) {
             throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[$contact_type] . '), нужно выбрать номер телефона!');
         }
         foreach ($event->contacts['phones'] as $contact) {
@@ -93,7 +118,7 @@ class NotificationService  extends Component
     }
     private function sendEmails(SendMessageEvent $event, $contact_type)
     {
-        if (!count($event->contacts['emails'])) {
+        if (!count($event->contacts['emails']) && !$event->notSend) {
             throw new Exception('Чтобы отправить сообщение способом (' . UserSendedData::CONTACT_TYPES[$contact_type] . '), нужно выбрать Email!');
         }
         foreach ($event->contacts['emails'] as $contact) {

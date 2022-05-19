@@ -7,12 +7,14 @@ use app\models\miniModels\TimelineStep;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
+use app\components\NotificationService;
 use app\events\SendMessageEvent;
 use app\models\miniModels\TimelineActionComment;
 use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
 use app\models\UserSendedData;
 use Dompdf\Options;
+use Exception;
 use Yii;
 
 /**
@@ -63,17 +65,40 @@ class TimelineController extends ActiveController
 
     public function actionSendObjects()
     {
+        $response = ['message' => 'Предложения отправлены!', 'data' => true];
         $post_data = Yii::$app->request->post();
-        if (!$post_data['offers']) {
-            return;
+        if (!$post_data['offers'] || !is_array($post_data['offers']) || !count($post_data['offers'])) {
+            throw new Exception('Вы не выбрали предложения');
         }
+        if (count($post_data['offers']) > 10) {
+            throw new Exception('Слишком много предложений! Предложений не может быть больше 10.');
+        }
+        try {
+            NotificationService::validateData($post_data['contacts'], $post_data['wayOfSending']);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+        ini_set('max_execution_time', 60 * 10);
+        ignore_user_abort(true);
+        ob_start();
+        echo json_encode($response);
+        header('Access-Control-Allow-Origin: *');
+        header('Connection: close');
+        header('Content-Type: application/json; charset=UTF-8');
+        header('Server: Apache');
+        header('Vary: Accept');
+        header('Content-Length: ' . ob_get_length());
+        ob_end_flush();
+        flush();
         $stepName = TimelineStep::STEPS[$post_data['step']];
         $files = [];
         $pdfs = [];
-        foreach ($post_data['offers'] as $offer) {
-            $pdf = $this->generatePdf($offer);
-            $files[] = $pdf->getPdfPath();
-            $pdfs[] = $pdf;
+        if ($post_data['sendClientFlag']) {
+            foreach ($post_data['offers'] as $offer) {
+                $pdf = $this->generatePdf($offer);
+                $files[] = $pdf->getPdfPath();
+                $pdfs[] = $pdf;
+            }
         }
 
         $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
@@ -92,7 +117,10 @@ class TimelineController extends ActiveController
         foreach ($pdfs as $pdf) {
             $pdf->removeFile();
         }
-        return ['message' => 'Предложения отправлены!', 'data' => true];
+        if (!$post_data['sendClientFlag']) {
+            $response['message'] = null;
+        }
+        return $response;
     }
     protected function generatePdf($query_params)
     {

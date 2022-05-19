@@ -56,15 +56,15 @@ $config = [
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'htmlLayout' => 'layouts/html',
-            'useFileTransport' => true,
-            // 'useFileTransport' => false,
-            // 'transport' => [
-            //     'class' => 'Swift_SmtpTransport',
-            //     'host' => 'smtp.beget.com',
-            //     'port' => 2525,
-            //     'username' => 'test@supermetrolog.store',
-            //     'password' => 'Studentjke2h',
-            // ],
+            // 'useFileTransport' => true,
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.beget.com',
+                'port' => 2525,
+                'username' => 'test@supermetrolog.store',
+                'password' => 'Studentjke2h',
+            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
