@@ -454,10 +454,23 @@ class OffersPdf extends Model
 
     public function getPhoto()
     {
-        if (is_array($this->data->photos)) {
-            return "https://pennylane.pro" . $this->data->photos[0];
+        $photos = $this->data->photos;
+        $object_photos = $this->data->object->photo;
+        $result_image = null;
+        if (is_array($photos)) {
+            foreach ($photos as $photo) {
+                if ($result_image === null && is_string($photo) && mb_strlen($photo) > 2) {
+                    $result_image = "https://pennylane.pro" . $photo;
+                }
+            }
         }
-        return "http://" . $this->getHost() . "/images/1.jpg";
+        if ($result_image) {
+            return $result_image;
+        }
+        if (is_array($object_photos) && is_string($object_photos[0]) && mb_strlen($object_photos[0]) > 2) {
+            return "https://pennylane.pro" . $object_photos[0];
+        }
+        return "http://www.tinybirdgames.com/wp-content/uploads/2017/04/tinybirdgames_telegram_background_02.jpg";
     }
 
     public function getAreaLabel()
