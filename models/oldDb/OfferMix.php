@@ -785,7 +785,7 @@ class OfferMix extends \yii\db\ActiveRecord
             return;
         }
         $dealTypes = [
-            Request::DEAL_TYPE_RENT => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE],
+            Request::DEAL_TYPE_RENT => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE, OfferMix::DEAL_TYPE_RESPONSE_STORAGE],
             Request::DEAL_TYPE_SALE => OfferMix::DEAL_TYPE_SALE,
             Request::DEAL_TYPE_RESPONSE_STORAGE => OfferMix::DEAL_TYPE_RESPONSE_STORAGE,
             Request::DEAL_TYPE_SUBLEASE => OfferMix::DEAL_TYPE_SUBLEASE,
