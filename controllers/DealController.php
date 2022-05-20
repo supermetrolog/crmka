@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\behaviors\BaseControllerBehaviors;
+use app\exceptions\ValidationErrorHttpException;
 use app\models\Deal;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
@@ -31,6 +32,15 @@ class DealController extends ActiveController
     {
         $model = $this->findModel($id);
         return Deal::updateDeal($model, Yii::$app->request->post());
+    }
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $model->status = DEAL::STATUS_DELETED;
+        if ($model->save()) {
+            return ['message' => "Сделка удалена", 'data' => $id];
+        }
+        throw new ValidationErrorHttpException($model->getErrorSummary(false));
     }
     protected function findModel($id)
     {

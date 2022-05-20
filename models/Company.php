@@ -436,7 +436,7 @@ class Company extends \yii\db\ActiveRecord
      */
     public function getDeals()
     {
-        return $this->hasMany(Deal::className(), ['company_id' => 'id']);
+        return $this->hasMany(Deal::className(), ['company_id' => 'id'])->andWhere(['!=', 'status', Deal::STATUS_DELETED]);
     }
     /**
      * Gets query for [[Deals]].
@@ -445,7 +445,7 @@ class Company extends \yii\db\ActiveRecord
      */
     public function getDealsRequestEmpty()
     {
-        return $this->hasMany(Deal::className(), ['company_id' => 'id'])->where(['is', 'request_id', new Expression('null')]);
+        return $this->hasMany(Deal::className(), ['company_id' => 'id'])->where(['is', 'request_id', new Expression('null')])->andWhere(['!=', 'status', Deal::STATUS_DELETED]);
     }
     /**
      * Gets query for [[categories]].

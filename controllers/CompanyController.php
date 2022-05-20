@@ -41,6 +41,7 @@ class CompanyController extends ActiveController
         unset($actions['view']);
         unset($actions['create']);
         unset($actions['update']);
+        unset($actions['delete']);
         return $actions;
     }
     public function actionIndex()

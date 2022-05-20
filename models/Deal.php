@@ -30,6 +30,7 @@ use app\models\oldDb\OfferMix;
  * @property string $created_at
  * @property string|null $updated_at
  * @property int|null  $formOfOrganization
+ * @property int  $status
  *
  * @property Company $company
  * @property User $consultant
@@ -37,6 +38,7 @@ use app\models\oldDb\OfferMix;
  */
 class Deal extends \yii\db\ActiveRecord
 {
+    public const STATUS_DELETED = -1;
     /**
      * {@inheritdoc}
      */
@@ -52,7 +54,7 @@ class Deal extends \yii\db\ActiveRecord
     {
         return [
             [['company_id', 'consultant_id', 'object_id', 'type_id', 'original_id', 'visual_id', 'complex_id'], 'required'],
-            [['company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'original_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor', 'contractTerm', 'formOfOrganization'], 'integer'],
+            [['status', 'company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'original_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor', 'contractTerm', 'formOfOrganization'], 'integer'],
             [['dealDate', 'created_at', 'updated_at'], 'safe'],
             [['clientLegalEntity', 'description', 'name', 'visual_id'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
@@ -86,20 +88,20 @@ class Deal extends \yii\db\ActiveRecord
             'is_competitor' => 'Is Competitor',
             'type_id' => 'Type ID',
             'formOfOrganization' => 'FormOfOrganization',
+            'status' => 'Status',
         ];
     }
     public function fields()
     {
         $fields = parent::fields();
-        $fields['dealDate'] = function ($fields) {
+        $fields['dealDate_format'] = function ($fields) {
             return $fields['dealDate'] ? Yii::$app->formatter->format($fields['dealDate'], 'date') : null;
-            // if ($fields['dealDate']) {
-            //     return date('Y-m-d', strtotime($fields['dealDate']));
-            // }
-            // return $fields['dealDate'];
+        };
+        $fields['dealDate'] = function ($fields) {
+            return $fields['dealDate'] ? date('Y-m-d', strtotime($fields['dealDate'])) : null;
         };
         $fields['clientLegalEntity_full_name'] = function ($fields) {
-            if ($fields['formOfOrganization']) {
+            if ($fields['formOfOrganization'] !== null) {
                 return Company::FORM_OF_ORGANIZATION_LIST[$fields['formOfOrganization']] . ' ' . $fields['clientLegalEntity'];
             }
             return $fields['clientLegalEntity'];
