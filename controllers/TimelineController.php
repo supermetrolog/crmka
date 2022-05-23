@@ -78,6 +78,9 @@ class TimelineController extends ActiveController
         } catch (\Throwable $th) {
             throw $th;
         }
+        if (!$post_data['sendClientFlag']) {
+            $response['message'] = null;
+        }
         ini_set('max_execution_time', 60 * 10);
         ignore_user_abort(true);
         ob_start();
@@ -117,9 +120,7 @@ class TimelineController extends ActiveController
         foreach ($pdfs as $pdf) {
             $pdf->removeFile();
         }
-        if (!$post_data['sendClientFlag']) {
-            $response['message'] = null;
-        }
+
         return $response;
     }
     protected function generatePdf($query_params)
