@@ -16,4 +16,10 @@ class CompanygroupController extends ActiveController
         $behaviors = parent::behaviors();
         return BaseControllerBehaviors::getBaseBehaviors($behaviors, []);
     }
+    public function actions()
+    {
+        $actions = parent::actions();
+        unset($actions['delete']);
+        return $actions;
+    }
 }
