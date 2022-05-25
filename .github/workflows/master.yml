@@ -16,21 +16,21 @@ jobs:
       with:
           php-version: '7.4'
 
-    - name: 📂 Sync files with prod server (api.pennylane.pro)
+    - name: 📂 Sync files with PROD server (api.pennylane.pro)
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: 62.113.107.218
         username: ${{ secrets.ftp_prod_server_username }}
         password: ${{ secrets.ftp_prod_server_password }}
 
-    - name: 📂 Sync files with prod server (api.supermetrolog.ru)
+    - name: 📂 Sync files with DEV server (api.supermetrolog.ru)
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: 62.113.107.218
         username: ${{ secrets.ftp_dev_server_username }}
         password: ${{ secrets.ftp_dev_server_password }}
 
-    - name: multiple command in prod server
+    - name: multiple command in PROD and DEV server
       uses: appleboy/ssh-action@master
       with:
         host: 62.113.107.218
@@ -38,10 +38,12 @@ jobs:
         password: ${{ secrets.ssh_server_password }}
         script: >- 
             cd /home/user/web/api.supermetrolog.ru/public_html &&
-            composer install && php yii migrate --interactive=0 &&
+            composer install &&
+            php yii migrate --interactive=0 &&
             chown user:www-data -R /home/user/web/api.supermetrolog.ru/public_html/ &&
             chmod 775 -R /home/user/web/api.supermetrolog.ru/public_html/ &&
             cd /home/user/web/api.pennylane.pro/public_html &&
-            composer install && php yii migrate --interactive=0 &&
+            composer install &&
+            php yii migrate --interactive=0 &&
             chown user:www-data -R /home/user/web/api.pennylane.pro/public_html/ &&
             chmod 775 -R /home/user/web/api.pennylane.pro/public_html/
