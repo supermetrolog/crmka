@@ -224,7 +224,7 @@ class TimelineStep extends \yii\db\ActiveRecord
     }
     public function updateOfferStep($post_data)
     {
-        if ($this->negative) return;
+        if ($this->negative || ArrayHelper::keyExists('click_negative', $post_data)) return;
         $this->addTimelineStepObjects($post_data, false, false);
         // $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
         //     'user_id' => Yii::$app->user->identity->id,
@@ -244,7 +244,7 @@ class TimelineStep extends \yii\db\ActiveRecord
         $array1 = ArrayHelper::getColumn($currentFeedbackways, 'way');
         $array2 = ArrayHelper::getColumn($post_data['timelineStepFeedbackways'], 'way');
         $hasTheArrayChangedFlag = $this->hasTheArrayChanged($array1, $array2);
-        if (!$this->negative && !$hasTheArrayChangedFlag) {
+        if (!$this->negative && !$hasTheArrayChangedFlag && !ArrayHelper::keyExists('click_negative', $post_data)) {
             $this->addTimelineStepObjects($post_data, false, false);
             $this->createNewStep(self::INSPECTION_STEP_NUMBER);
         }
@@ -263,7 +263,7 @@ class TimelineStep extends \yii\db\ActiveRecord
     }
     public function updateInspectionStep($post_data)
     {
-        if ($this->negative) return;
+        if ($this->negative || ArrayHelper::keyExists('click_negative', $post_data)) return;
         $this->addTimelineStepObjects($post_data, false, false);
         if ($post_data['sendClientFlag']) {
             // $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
@@ -279,25 +279,25 @@ class TimelineStep extends \yii\db\ActiveRecord
     }
     public function updateVisitStep($post_data)
     {
-        if ($this->negative) return;
+        if ($this->negative || ArrayHelper::keyExists('click_negative', $post_data)) return;
         $this->addTimelineStepObjects($post_data, false, false);
         return $this->createNewStep(self::INTEREST_STEP_NUMBER);
     }
     public function updateInterestStep($post_data)
     {
-        if ($this->negative) return;
+        if ($this->negative || ArrayHelper::keyExists('click_negative', $post_data)) return;
         $this->addTimelineStepObjects($post_data, false, false);
         return $this->createNewStep(self::TALK_STEP_NUMBER);
     }
     public function updateTalkStep($post_data)
     {
-        if ($this->negative) return;
+        if ($this->negative || ArrayHelper::keyExists('click_negative', $post_data)) return;
         $this->addTimelineStepObjects($post_data, false, false);
         return $this->createNewStep(self::DEAL_STEP_NUMBER);
     }
     public function updateDealStep($post_data)
     {
-        if ($this->negative) return;
+        if ($this->negative || ArrayHelper::keyExists('click_negative', $post_data)) return;
 
         if (ArrayHelper::keyExists('deal', $post_data)) {
             Request::changeStatus($post_data['deal']['request_id'], Request::STATUS_DONE);
