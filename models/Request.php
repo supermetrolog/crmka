@@ -14,6 +14,7 @@ use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestRegion;
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\models\miniModels\RequestObjectTypeGeneral;
 
 /**
  * This is the model class for table "request".
@@ -93,8 +94,8 @@ class Request extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'consultant_id'], 'required'],
-            [['antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
+            [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'consultant_id'], 'required'],
+            [['heated', 'antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
             [['company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
             [['created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
             [['description'], 'string'],
@@ -161,7 +162,7 @@ class Request extends \yii\db\ActiveRecord
     public static function getCompanyRequestsList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->with(['consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'regions', 'deal.competitor', 'deal.offer', 'deal.consultant.userProfile'])->where(['request.company_id' => $company_id]),
+            'query' => self::find()->with(['consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'objectTypesGeneral',  'regions', 'deal.competitor', 'deal.offer', 'deal.consultant.userProfile'])->where(['request.company_id' => $company_id]),
             'pagination' => [
                 'pageSize' => 0,
             ],
@@ -189,6 +190,7 @@ class Request extends \yii\db\ActiveRecord
                     RequestGateType::class => $post_data['gateTypes'],
                     RequestObjectClass::class => $post_data['objectClasses'],
                     RequestObjectType::class => $post_data['objectTypes'],
+                    RequestObjectTypeGeneral::class => $post_data['objectTypesGeneral'],
                     RequestRegion::class => $post_data['regions'],
                 ]);
                 Timeline::createNewTimeline($request->id, $request->consultant_id);
@@ -216,6 +218,7 @@ class Request extends \yii\db\ActiveRecord
                     RequestGateType::class => $post_data['gateTypes'],
                     RequestObjectClass::class => $post_data['objectClasses'],
                     RequestObjectType::class => $post_data['objectTypes'],
+                    RequestObjectTypeGeneral::class => $post_data['objectTypesGeneral'],
                     RequestRegion::class => $post_data['regions'],
                 ]);
                 Timeline::updateConsultant($request->id, $request->consultant_id);
@@ -354,7 +357,15 @@ class Request extends \yii\db\ActiveRecord
     {
         return $this->hasMany(RequestObjectType::className(), ['request_id' => 'id']);
     }
-
+    /**
+     * Gets query for [[RequestObjectTypesGeneral]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getObjectTypesGeneral()
+    {
+        return $this->hasMany(RequestObjectTypeGeneral::className(), ['request_id' => 'id']);
+    }
     /**
      * Gets query for [[RequestRegions]].
      *

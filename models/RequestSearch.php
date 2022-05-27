@@ -16,6 +16,7 @@ class RequestSearch extends Request
     public $dateStart;
     public $dateEnd;
     public $objectTypes;
+    public $objectTypesGeneral;
     public $objectClasses;
     public $gateTypes;
     public $rangeMinPricePerFloor;
@@ -36,7 +37,7 @@ class RequestSearch extends Request
     {
         return [
             [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'status', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
-            [['regions', 'directions', 'districts', 'description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectClasses', 'gateTypes'], 'safe'],
+            [['regions', 'directions', 'districts', 'description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectTypesGeneral', 'objectClasses', 'gateTypes'], 'safe'],
         ];
     }
 
@@ -59,6 +60,7 @@ class RequestSearch extends Request
     public function normalizeProps()
     {
         $this->objectTypes = $this->stringToArray($this->objectTypes);
+        $this->objectTypesGeneral = $this->stringToArray($this->objectTypesGeneral);
         $this->objectClasses = $this->stringToArray($this->objectClasses);
         $this->gateTypes = $this->stringToArray($this->gateTypes);
         $this->regions = $this->stringToArray($this->regions);
@@ -80,7 +82,7 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find()->distinct()->joinWith(['objectTypes', 'objectClasses', 'gateTypes', 'company', 'directions', 'districts', 'regions'])->with(['consultant.userProfile', 'directions', 'districts', 'regions', 'deal.offer.generalOffersMix', 'deal.consultant.userProfile']);
+        $query = Request::find()->distinct()->joinWith(['objectTypesGeneral', 'objectTypes', 'objectClasses', 'gateTypes', 'company', 'directions', 'districts', 'regions'])->with(['consultant.userProfile', 'directions', 'districts', 'regions', 'deal.offer.generalOffersMix', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 
@@ -176,24 +178,29 @@ class RequestSearch extends Request
             'request.gaz' => $this->gaz,
             'request.shelving' => $this->shelving,
             'request_object_type.object_type' => $this->objectTypes,
+            'request_object_type_general.type' => $this->objectTypesGeneral,
             'request_object_class.object_class' => $this->objectClasses,
             'request_gate_type.gate_type' => $this->gateTypes,
             'request_region.region' => $this->regions,
             'request_directions.direction' => $this->directions,
             'request_district.district' => $this->districts,
         ]);
-        if ($this->objectTypes && count($this->objectTypes) > 1) {
-            $query->groupBy('request.id');
-            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_type.object_type)'), count($this->objectTypes) - 1]);
-        }
-        if ($this->objectClasses && count($this->objectClasses) > 1) {
-            $query->groupBy('request.id');
-            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_class.object_class)'), count($this->objectClasses) - 1]);
-        }
-        if ($this->gateTypes && count($this->gateTypes) > 1) {
-            $query->groupBy('request.id');
-            $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_gate_type.gate_type)'), count($this->gateTypes) - 1]);
-        }
+        // if ($this->objectTypesGeneral && count($this->objectTypesGeneral) > 1) {
+        //     $query->groupBy('request.id');
+        //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_type_general.type)'), count($this->objectTypesGeneral) - 1]);
+        // }
+        // if ($this->objectTypes && count($this->objectTypes) > 1) {
+        //     $query->groupBy('request.id');
+        //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_type.object_type)'), count($this->objectTypes) - 1]);
+        // }
+        // if ($this->objectClasses && count($this->objectClasses) > 1) {
+        //     $query->groupBy('request.id');
+        //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_class.object_class)'), count($this->objectClasses) - 1]);
+        // }
+        // if ($this->gateTypes && count($this->gateTypes) > 1) {
+        //     $query->groupBy('request.id');
+        //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_gate_type.gate_type)'), count($this->gateTypes) - 1]);
+        // }
         $query->andFilterWhere(['like', 'request.description', $this->description])
             ->andFilterWhere(['like', 'request.passive_why_comment', $this->passive_why_comment])
             ->andFilterWhere(['between', 'request.created_at', $this->dateStart, $this->dateEnd])
