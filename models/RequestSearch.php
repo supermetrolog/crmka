@@ -155,10 +155,9 @@ class RequestSearch extends Request
             'request.minCeilingHeight' => $this->minCeilingHeight,
             'request.maxCeilingHeight' => $this->maxCeilingHeight,
             'request.firstFloorOnly' => $this->firstFloorOnly,
-            'request.heated' => $this->heated,
+            // 'request.heated' => $this->heated,
             'request.minArea' => $this->minArea,
             'request.maxArea' => $this->maxArea,
-            'request.heated' => $this->heated,
             'request.trainLine' => $this->trainLine,
             'request.trainLineLength' => $this->trainLineLength,
             'request.consultant_id' => $this->consultant_id,
@@ -201,6 +200,14 @@ class RequestSearch extends Request
         //     $query->groupBy('request.id');
         //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_gate_type.gate_type)'), count($this->gateTypes) - 1]);
         // }
+        if ($this->heated !== null) {
+            $query->andFilterWhere([
+                'or',
+                ['heated' => $this->heated],
+                ['is', 'heated', new Expression('null')]
+            ]);
+        }
+
         $query->andFilterWhere(['like', 'request.description', $this->description])
             ->andFilterWhere(['like', 'request.passive_why_comment', $this->passive_why_comment])
             ->andFilterWhere(['between', 'request.created_at', $this->dateStart, $this->dateEnd])
