@@ -103,25 +103,30 @@ class TimelineController extends ActiveController
                 $pdfs[] = $pdf;
             }
         }
-
-        $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
-            'user_id' => Yii::$app->user->identity->id,
-            'view' => 'presentation/index',
-            'viewArgv' => ['userMessage' => $post_data['comment']],
-            'subject' => 'Список предложений от Pennylane',
-            'contacts' => $post_data['contacts'],
-            'wayOfSending' => $post_data['wayOfSending'],
-            'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
-            'description' => 'Отправил объекты на шаге "' . $stepName . '"',
-            'notSend' => !$post_data['sendClientFlag'],
-            'files' => $files
-        ]));
+        try {
+            $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
+                'user_id' => Yii::$app->user->identity->id,
+                'view' => 'presentation/index',
+                'viewArgv' => ['userMessage' => $post_data['comment']],
+                'subject' => 'Список предложений от Pennylane',
+                'contacts' => $post_data['contacts'],
+                'wayOfSending' => $post_data['wayOfSending'],
+                'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
+                'description' => 'Отправил объекты на шаге "' . $stepName . '"',
+                'notSend' => !$post_data['sendClientFlag'],
+                'files' => $files
+            ]));
+        } catch (\Throwable $th) {
+            foreach ($pdfs as $pdf) {
+                $pdf->removeFile();
+            }
+            Yii::error($th);
+            throw $th;
+        }
 
         foreach ($pdfs as $pdf) {
             $pdf->removeFile();
         }
-
-        return $response;
     }
     protected function generatePdf($query_params)
     {

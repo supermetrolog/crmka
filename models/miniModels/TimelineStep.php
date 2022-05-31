@@ -43,6 +43,9 @@ class TimelineStep extends \yii\db\ActiveRecord
     public const TALK_STEP_NUMBER = 6;
     public const DEAL_STEP_NUMBER = 7;
 
+    public const STATUS_DONE = 1;
+    public const STATUS_PROCESSED = 0;
+
     public const STEPS = [
         0 => 'Знакомство',
         1 => 'Предложения',
@@ -130,7 +133,13 @@ class TimelineStep extends \yii\db\ActiveRecord
     }
     public function createNewStep($stepNumber)
     {
-        if (self::find()->where(['timeline_id' => $this->timeline_id])->andWhere(['number' => $stepNumber])->one()) return;
+        if ($nextStep = self::find()->where(['timeline_id' => $this->timeline_id])->andWhere(['number' => $stepNumber])->one()) {
+            $nextStep->status = self::STATUS_PROCESSED;
+            if (!$nextStep->save()) {
+                throw new ValidationErrorHttpException($nextStep->getErrorSummary(false));
+            }
+            return;
+        };
         $model = new TimelineStep();
         $data = [
             'timeline_id' => $this->timeline_id,
@@ -226,15 +235,6 @@ class TimelineStep extends \yii\db\ActiveRecord
     {
         if ($this->negative || ArrayHelper::keyExists('click_negative', $post_data)) return;
         $this->addTimelineStepObjects($post_data, false, false);
-        // $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
-        //     'user_id' => Yii::$app->user->identity->id,
-        //     'htmlBody' => '<b>Держи ебаные объекты чшорт баляд!</b>',
-        //     'subject' => 'Объекты',
-        //     'contacts' => $post_data['contactsForSendMessage'],
-        //     'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
-        //     'description' => 'Отправил объекты на шаге "Предложения"',
-        //     'notSend' => !$post_data['sendClientFlag']
-        // ]));
 
         return $this->createNewStep(self::FEEDBACK_STEP_NUMBER);
     }
@@ -265,16 +265,6 @@ class TimelineStep extends \yii\db\ActiveRecord
     {
         if ($this->negative || ArrayHelper::keyExists('click_negative', $post_data)) return;
         $this->addTimelineStepObjects($post_data, false, false);
-        if ($post_data['sendClientFlag']) {
-            // $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
-            //     'user_id' => Yii::$app->user->identity->id,
-            //     'htmlBody' => '<b>Держи ебаные объекты чшорт баляд!</b>',
-            //     'subject' => 'Объекты',
-            //     'contacts' => $post_data['contactsForSendMessage'],
-            //     'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
-            //     'description' => 'Отправил объекты на шаге "Организация просмотра"',
-            // ]));
-        }
         return $this->createNewStep(self::VISIT_STEP_NUMBER);
     }
     public function updateVisitStep($post_data)
