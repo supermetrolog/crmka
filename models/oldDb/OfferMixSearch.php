@@ -5,7 +5,6 @@ namespace app\models\oldDb;
 use app\components\ExpressionBuilder;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\Company;
-use app\models\Contact;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\oldDb\OfferMix;
@@ -16,7 +15,7 @@ use yii\db\Expression;
  */
 class OfferMixSearch extends OfferMix
 {
-    private const MIN_RECOMMENDED_WEIGHT_SUM = 500;
+    private const MIN_RECOMMENDED_WEIGHT_SUM = 400;
     private const APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD =  30;
     public $all;
     public $rangeMinArea;
@@ -137,11 +136,17 @@ class OfferMixSearch extends OfferMix
         if ($this->gas == 2) {
             $this->gas = [0, 2];
         }
+        if ($this->gas == 1) {
+            $this->gas = [0, 1];
+        }
     }
     public function normalizeSteam()
     {
         if ($this->steam == 2) {
             $this->steam = [0, 2];
+        }
+        if ($this->steam == 1) {
+            $this->steam = [0, 1];
         }
     }
     public function normalizeSewageCentral()
@@ -205,10 +210,10 @@ class OfferMixSearch extends OfferMix
             ->addCondition(['IN', 'status', $this->status], 80, 0)
             ->addCondition(['IN', 'direction', $this->direction], 60, 0)
             ->addCondition(['IN', 'district_moscow', $this->district_moscow], 60, 0)
-            ->addCondition(['<=', 'CASE WHEN ceiling_height_min > ceiling_height_max THEN ceiling_height_min ELSE ceiling_height_max END', $this->rangeMaxCeilingHeight, false], 40, 0)
-            ->addCondition(['>=', 'ceiling_height_min', $this->rangeMinCeilingHeight], 40, 0)
-            ->addCondition(['>=', 'area_floor_min', $this->rangeMinArea], 75, 0)
-            ->addCondition(['<=', 'area_mezzanine_max + area_floor_max', $this->rangeMaxArea, false], 65, 0);
+            ->addCondition(['<=', 'GREATEST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMaxCeilingHeight, false], 40, 0)
+            ->addCondition(['>=', 'LEAST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMinCeilingHeight], 40, 0)
+            ->addCondition(['>=', 'c_industry_offers_mix.area_max', $this->rangeMinArea], 75, 0)
+            ->addCondition(['<=', 'c_industry_offers_mix.area_min', $this->rangeMaxArea, false], 65, 0);
 
 
         if ($this->gates && is_array($this->gates)) {
@@ -217,9 +222,9 @@ class OfferMixSearch extends OfferMix
             }
         }
         if ($this->deal_type == self::DEAL_TYPE_RENT || $this->deal_type == self::DEAL_TYPE_SUBLEASE) {
-            $eb->addCondition(['<=', 'GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max )', $this->pricePerFloor, false], 50, 0);
+            $eb->addCondition(['<=', 'GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max )', $this->pricePerFloor, false], 50, 0);
         } elseif ($this->deal_type == self::DEAL_TYPE_SALE) {
-            $eb->addCondition(['<=', 'price_sale_max', $this->pricePerFloor], 50, 0);
+            $eb->addCondition(['<=', 'c_industry_offers_mix.price_sale_max', $this->pricePerFloor], 50, 0);
         }
         $eb->addTablePrefix(OfferMix::tableName());
         return $eb;
@@ -256,7 +261,7 @@ class OfferMixSearch extends OfferMix
                     return $query->from("$joinedDbName.phone");
                 }]);
             }]);
-        }])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'company.mainContact.phones', 'comments']);
+        }])->joinWith(['block'])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'company.mainContact.phones', 'comments']);
 
         // add conditions that should always apply here
 
@@ -275,10 +280,10 @@ class OfferMixSearch extends OfferMix
                     'from_mkad',
                     'price' => [
                         'asc' => [
-                            new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END ASC")
+                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END ASC")
                         ],
                         'desc' => [
-                            new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END DESC")
+                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END DESC")
                         ]
                     ],
                     'area' => [
@@ -493,7 +498,7 @@ class OfferMixSearch extends OfferMix
             'c_industry_offers_mix.gas_value' => $this->gas_value,
             'c_industry_offers_mix.phone' => $this->phone,
             'c_industry_offers_mix.water_value' => $this->water_value,
-            'c_industry_offers_mix.sewage_central' => $this->sewage_central,
+            // 'c_industry_offers_mix.sewage_central' => $this->sewage_central,
             'c_industry_offers_mix.sewage_central_value' => $this->sewage_central_value,
             'c_industry_offers_mix.sewage_rain' => $this->sewage_rain,
             'c_industry_offers_mix.firefighting' => $this->firefighting,
@@ -618,15 +623,58 @@ class OfferMixSearch extends OfferMix
 
 
         if ($this->deal_type == self::DEAL_TYPE_RENT || $this->deal_type == self::DEAL_TYPE_SUBLEASE) {
-            $query->andFilterWhere(['<=', 'GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max )', $this->pricePerFloor]);
+            $query->andFilterWhere(['<=', 'GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max )', $this->pricePerFloor]);
         } elseif ($this->deal_type == self::DEAL_TYPE_SALE) {
-            $query->andFilterWhere(['<=', 'price_sale_max', $this->pricePerFloor]);
+            $query->andFilterWhere(['<=', 'c_industry_offers_mix.price_sale_max', $this->pricePerFloor]);
         }
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.gates', $this->gates]);
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.purposes', $this->purposes]);
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.object_type', $this->object_type]);
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.floor_types', $this->floor_types]);
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.floor_types', $this->floor_types]);
+
+
+        if ($this->sewage_central !== null) {
+            $query->andFilterWhere(['in', new Expression("
+                (CASE WHEN type_id = 1 THEN c_industry_blocks.sewage
+                WHEN c_industry_offers_mix.watertype_id = 2 THEN sewage_central
+                ELSE c_industry_offers_mix.watersewage_central
+                END)
+            "), $this->sewage_central]);
+        }
+        if ($this->water !== null) {
+            $query->andFilterWhere(['in', new Expression("
+                (CASE WHEN c_industry_offers_mix.type_id = 1 THEN c_industry_blocks.water
+                WHEN c_industry_offers_mix.type_id = 2 THEN c_industry_offers_mix.water
+                ELSE c_industry_offers_mix.water
+                END)
+            "), $this->water]);
+        }
+        // if ($this->sewage_central !== null) {
+        //     $miniOffers = "SELECT mini.original_id as mini_original_id FROM c_industry_offers_mix as mini LEFT JOIN c_industry_blocks as miniBlock ON miniBlock.id = mini.original_id WHERE mini.object_id = c_industry_offers_mix.object_id AND mini.deal_type = c_industry_offers_mix.deal_type AND mini.deleted = 0 AND mini.type_id = 1 AND miniBlock.sewage = 1";
+        //     $query->andFilterWhere(['in', new Expression("
+        //         (CASE WHEN type_id = 1 THEN c_industry_blocks.sewage
+        //         WHEN type_id = 2 THEN (
+        //             SELECT EXISTS ($miniOffers) 
+        //         )
+        //         ELSE sewage_central
+        //         END)
+        //     "), $this->sewage_central]);
+        // }
+        // if ($this->water !== null) {
+        //     $miniOffers = "SELECT mini.original_id as mini_original_id FROM c_industry_offers_mix as mini LEFT JOIN c_industry_blocks as miniBlock ON miniBlock.id = mini.original_id WHERE mini.object_id = c_industry_offers_mix.object_id AND mini.deal_type = c_industry_offers_mix.deal_type AND mini.deleted = 0 AND mini.type_id = 1 AND miniBlock.water = 1";
+        //     $query->andFilterWhere(['in', new Expression("
+        //         (CASE WHEN c_industry_offers_mix.type_id = 1 THEN c_industry_blocks.water
+        //         WHEN c_industry_offers_mix.type_id = 2 THEN (
+        //             SELECT EXISTS ($miniOffers) 
+        //         )
+        //         ELSE c_industry_offers_mix.water
+        //         END)
+        //     "), $this->water]);
+        // }
+
+
+
 
         // $areaQuery = ['or'];
         // if ($this->rangeMaxArea !== PHP_INT_MAX) {
@@ -650,24 +698,24 @@ class OfferMixSearch extends OfferMix
         // ]);
         $query->andFilterWhere([
             'or',
-            ['=', 'floor_min', $this->firstFloorOnly],
-            ['=', 'floor_max', $this->firstFloorOnly]
+            ['=', 'c_industry_offers_mix.floor_min', $this->firstFloorOnly],
+            ['=', 'c_industry_offers_mix.floor_max', $this->firstFloorOnly]
         ]);
         $query->andFilterWhere([
             'and',
-            ['<=', 'area_min', $this->rangeMaxArea],
-            ['>=', 'area_max', $this->rangeMinArea]
+            ['<=', 'c_industry_offers_mix.area_min', $this->rangeMaxArea],
+            ['>=', 'c_industry_offers_mix.area_max', $this->rangeMinArea]
         ]);
         $query->andFilterWhere([
             'and',
             [
                 '<=',
-                new Expression('LEAST(ceiling_height_min, ceiling_height_max)'),
+                new Expression('LEAST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)'),
                 $this->rangeMaxCeilingHeight
             ],
             [
                 '>=',
-                new Expression('GREATEST(ceiling_height_min, ceiling_height_max)'),
+                new Expression('GREATEST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)'),
                 $this->rangeMinCeilingHeight
             ],
         ]);
@@ -692,29 +740,29 @@ class OfferMixSearch extends OfferMix
         //         $this->rangeMinPricePerFloor
         //     ]
         // ]);
-        $rent_price_least = "IF(LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min) IS NULL, 0, LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min))";
-        $rent_price_greatest = "IF(GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min) IS NULL, 0, LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min))";
-        $sale_price_least = "IF(LEAST(price_sale_max, price_sale_min) IS NULL, 0, LEAST(price_sale_max, price_sale_min))";
-        $sale_price_greatest = "IF(GREATEST(price_sale_max, price_sale_min) IS NULL, 0, GREATEST(price_sale_max, price_sale_min))";
-        $rs_price_least = "IF(LEAST(price_safe_pallet_max, price_safe_pallet_min) IS NULL, 0, LEAST(price_safe_pallet_max, price_safe_pallet_min))";
-        $rs_price_greatest = "IF(GREATEST(price_safe_pallet_max, price_safe_pallet_min) IS NULL, 0, GREATEST(price_safe_pallet_max, price_safe_pallet_min))";
+        $rent_price_least = "IF(LEAST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max, c_industry_offers_mix.price_office_max, c_industry_offers_mix.price_office_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max, c_industry_offers_mix.price_office_max, c_industry_offers_mix.price_office_min))";
+        $rent_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max, c_industry_offers_mix.price_office_max, c_industry_offers_mix.price_office_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max, c_industry_offers_mix.price_office_max, c_industry_offers_mix.price_office_min))";
+        $sale_price_least = "IF(LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
+        $sale_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, GREATEST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
+        $rs_price_least = "IF(LEAST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min))";
+        $rs_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min) IS NULL, 0, GREATEST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min))";
 
         $query->andFilterWhere([
             'and',
             [
                 '<=',
-                new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-                    . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-                    . "  THEN $rent_price_least WHEN deal_type = "
+                new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT
+                    . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+                    . "  THEN $rent_price_least WHEN c_industry_offers_mix.deal_type = "
                     . OfferMix::DEAL_TYPE_SALE
                     . " THEN $sale_price_least ELSE $rs_price_least END"),
                 $this->rangeMaxPricePerFloor
             ],
             [
                 '>=',
-                new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-                    . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-                    . "  THEN $rent_price_greatest WHEN deal_type = "
+                new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT
+                    . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+                    . "  THEN $rent_price_greatest WHEN c_industry_offers_mix.deal_type = "
                     . OfferMix::DEAL_TYPE_SALE
                     . " THEN $sale_price_greatest ELSE $rs_price_greatest END"),
                 $this->rangeMinPricePerFloor
