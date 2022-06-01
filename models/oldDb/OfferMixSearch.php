@@ -209,7 +209,7 @@ class OfferMixSearch extends OfferMix
         $eb = new ExpressionBuilder();
         $eb->addCondition(['>=', 'power_value', $this->rangeMinElectricity], 70, 0)
             ->addCondition(['<=', 'from_mkad', $this->approximateDistanceFromMKAD], 40, 0)
-            ->addCondition(['=', 'heated', $this->heated], 70, 0)
+            ->addCondition(['IN', 'heated', $this->heated], 70, 0)
             ->addCondition(['IN', 'has_cranes', $this->has_cranes], 70, 0)
             ->addCondition(['IN', 'deal_type', $this->deal_type], 20, 0)
             ->addCondition(['IN', 'floor_types', $this->floor_types], 25, 0)
