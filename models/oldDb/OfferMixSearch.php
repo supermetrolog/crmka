@@ -218,9 +218,9 @@ class OfferMixSearch extends OfferMix
             ->addCondition(['IN', 'direction', $this->direction], 60, 0)
             ->addCondition(['IN', 'district_moscow', $this->district_moscow], 60, 0)
             ->addCondition(['<=', 'GREATEST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMaxCeilingHeight, false], 40, 0)
-            ->addCondition(['>=', 'LEAST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMinCeilingHeight], 40, 0)
-            ->addCondition(['>=', 'c_industry_offers_mix.area_max', $this->rangeMinArea], 75, 0)
-            ->addCondition(['<=', 'c_industry_offers_mix.area_min', $this->rangeMaxArea, false], 65, 0);
+            ->addCondition(['>=', 'LEAST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMinCeilingHeight, false], 40, 0)
+            ->addCondition(['>=', 'area_max', $this->rangeMinArea], 75, 0)
+            ->addCondition(['<=', 'area_min', $this->rangeMaxArea], 65, 0);
 
 
         if ($this->gates && is_array($this->gates)) {
@@ -231,7 +231,7 @@ class OfferMixSearch extends OfferMix
         if ($this->deal_type == self::DEAL_TYPE_RENT || $this->deal_type == self::DEAL_TYPE_SUBLEASE) {
             $eb->addCondition(['<=', 'GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max )', $this->pricePerFloor, false], 50, 0);
         } elseif ($this->deal_type == self::DEAL_TYPE_SALE) {
-            $eb->addCondition(['<=', 'c_industry_offers_mix.price_sale_max', $this->pricePerFloor], 50, 0);
+            $eb->addCondition(['<=', 'price_sale_max', $this->pricePerFloor], 50, 0);
         }
         $eb->addTablePrefix(OfferMix::tableName());
         return $eb;
