@@ -15,6 +15,7 @@ use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestRegion;
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\models\miniModels\RequestObjectTypeGeneral;
+use app\models\miniModels\TimelineStep;
 
 /**
  * This is the model class for table "request".
@@ -263,11 +264,21 @@ class Request extends \yii\db\ActiveRecord
         $fields['pricePerFloorMonth'] = function ($fields) {
             return round($fields['pricePerFloor'] !== null ? $fields['pricePerFloor'] / 12 : $fields['pricePerFloor'], 2);
         };
+
+
         return $fields;
     }
     public function extraFields()
     {
         $extraFields = parent::extraFields();
+        $extraFields['timeline_progress'] = function ($extraFields) {
+            $doneTimelineStepCount = Timeline::find()->joinWith(['timelineSteps'])->where(['timeline.request_id' => $this->id, 'timeline_step.status' => TimelineStep::STATUS_DONE])->count();
+            if ($doneTimelineStepCount == null) return $doneTimelineStepCount;
+            if ($doneTimelineStepCount == 0) return (int)$doneTimelineStepCount;
+            $maxTimelineStepCount = 8;
+            $percent = round(100 * $doneTimelineStepCount / $maxTimelineStepCount, 0);
+            return $percent;
+        };
         return $extraFields;
     }
     /**
