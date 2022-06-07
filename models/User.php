@@ -7,6 +7,7 @@ use yii\web\IdentityInterface;
 use yii\filters\auth\HttpBearerAuth;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "user".
@@ -129,10 +130,20 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         $transaction = $db->beginTransaction();
         try {
             $post_data['updated_at'] = time();
-            if ($user->load($post_data, '') && $user->save()) {
-                UserProfile::updateUserProfile($post_data['userProfile'], $uploadFileModel);
-                $transaction->commit();
-                return ['message' => "Пользователь изменен", 'data' => $user->id];
+
+            if ($user->load($post_data, '')) {
+                if (ArrayHelper::keyExists("password", $post_data) && $post_data['password'] != null) {
+                    if (strlen($post_data['password']) < 5) {
+                        throw new ValidationErrorHttpException(["Пароль должен быть больше 4-х символов"]);
+                    }
+
+                    $user->setPassword($post_data['password']);
+                }
+                if ($user->save()) {
+                    UserProfile::updateUserProfile($post_data['userProfile'], $uploadFileModel);
+                    $transaction->commit();
+                    return ['message' => "Пользователь изменен", 'data' => $user->id];
+                }
             }
             throw new ValidationErrorHttpException($user->getErrorSummary(false));
         } catch (\Throwable $th) {
