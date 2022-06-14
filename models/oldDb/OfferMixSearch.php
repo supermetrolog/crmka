@@ -555,9 +555,9 @@ class OfferMixSearch extends OfferMix
             'c_industry_offers_mix.deal_id' => $this->deal_id,
             'c_industry_offers_mix.hide_from_market' => $this->hide_from_market,
             'c_industry_offers_mix.region' => $this->region,
-            'c_industry_offers_mix.direction' => $this->direction,
+            // 'c_industry_offers_mix.direction' => $this->direction,
             'c_industry_offers_mix.district' => $this->district,
-            'c_industry_offers_mix.district_moscow' => $this->district_moscow,
+            // 'c_industry_offers_mix.district_moscow' => $this->district_moscow,
             'c_industry_offers_mix.class' => $this->class
         ]);
 
@@ -612,21 +612,10 @@ class OfferMixSearch extends OfferMix
             ->andFilterWhere(['like', 'parking_lorry_value', $this->parking_lorry_value])
             ->andFilterWhere(['like', 'parking_truck_value', $this->parking_truck_value])
             ->andFilterWhere(['like', 'description', $this->description])
-            // ->andFilterWhere(['<=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMaxArea]) // area_warehouse_max < maxArea
-            // ->andFilterWhere(['>=', '`area_floor_min`', $this->rangeMinArea]) // area_warehouse_min < minArea
-            // ->andFilterWhere(['<=', new Expression('CASE WHEN ceiling_height_min > ceiling_height_max THEN ceiling_height_min ELSE ceiling_height_max END'), $this->rangeMaxCeilingHeight])
-            // ->andFilterWhere(['>=', 'ceiling_height_min', $this->rangeMinCeilingHeight])
             ->andFilterWhere(['<=', 'from_mkad', $this->approximateDistanceFromMKAD])
             ->andFilterWhere(['<=', 'from_mkad', $this->rangeMaxDistanceFromMKAD])
             ->andFilterWhere(['>=', 'power_value', $this->rangeMinElectricity])
             ->andFilterWhere(['<=', 'power_value', $this->rangeMaxElectricity]);
-        // ->andFilterWhere([
-        //     '<=', new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END"), $this->rangeMaxPricePerFloor
-        // ])
-        // ->andFilterWhere([
-        //     '>=', new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_min ELSE price_safe_pallet_min END"), $this->rangeMinPricePerFloor
-        // ]);
-
 
 
         if ($this->deal_type == self::DEAL_TYPE_RENT || $this->deal_type == self::DEAL_TYPE_SUBLEASE) {
@@ -657,52 +646,14 @@ class OfferMixSearch extends OfferMix
                 END)
             "), $this->water]);
         }
-        // if ($this->sewage_central !== null) {
-        //     $miniOffers = "SELECT mini.original_id as mini_original_id FROM c_industry_offers_mix as mini LEFT JOIN c_industry_blocks as miniBlock ON miniBlock.id = mini.original_id WHERE mini.object_id = c_industry_offers_mix.object_id AND mini.deal_type = c_industry_offers_mix.deal_type AND mini.deleted = 0 AND mini.type_id = 1 AND miniBlock.sewage = 1";
-        //     $query->andFilterWhere(['in', new Expression("
-        //         (CASE WHEN type_id = 1 THEN c_industry_blocks.sewage
-        //         WHEN type_id = 2 THEN (
-        //             SELECT EXISTS ($miniOffers) 
-        //         )
-        //         ELSE sewage_central
-        //         END)
-        //     "), $this->sewage_central]);
-        // }
-        // if ($this->water !== null) {
-        //     $miniOffers = "SELECT mini.original_id as mini_original_id FROM c_industry_offers_mix as mini LEFT JOIN c_industry_blocks as miniBlock ON miniBlock.id = mini.original_id WHERE mini.object_id = c_industry_offers_mix.object_id AND mini.deal_type = c_industry_offers_mix.deal_type AND mini.deleted = 0 AND mini.type_id = 1 AND miniBlock.water = 1";
-        //     $query->andFilterWhere(['in', new Expression("
-        //         (CASE WHEN c_industry_offers_mix.type_id = 1 THEN c_industry_blocks.water
-        //         WHEN c_industry_offers_mix.type_id = 2 THEN (
-        //             SELECT EXISTS ($miniOffers) 
-        //         )
-        //         ELSE c_industry_offers_mix.water
-        //         END)
-        //     "), $this->water]);
-        // }
+        $query->andFilterWhere([
+            'or',
+            ['c_industry_offers_mix.district_moscow' => $this->district_moscow],
+            ['c_industry_offers_mix.direction' => $this->direction]
+        ]);
 
 
 
-
-        // $areaQuery = ['or'];
-        // if ($this->rangeMaxArea !== PHP_INT_MAX) {
-        //     $areaQuery[] = ['between', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMinArea, $this->rangeMaxArea];
-        // }
-        // if ($this->rangeMinArea !== PHP_INT_MIN) {
-        //     $areaQuery[] = ['between', '`area_floor_min`', $this->rangeMinArea, $this->rangeMaxArea];
-        // }
-        // $query->andFilterWhere($areaQuery);
-        // $query->andFilterWhere([
-        //     'or',
-        //     ['between', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMinArea, $this->rangeMaxArea],
-        //     ['between', '`area_floor_min`', $this->rangeMinArea, $this->rangeMaxArea]
-        // ]);
-        // $query->andFilterWhere(['>=', '`area_floor_min`', $this->rangeMinArea]);
-
-        // $query->andFilterWhere([
-        //     'and',
-        //     ['<=', '`area_floor_min`', $this->rangeMaxArea],
-        //     ['>=', '`area_mezzanine_max`+`area_floor_max`', $this->rangeMinArea]
-        // ]);
         $query->andFilterWhere([
             'or',
             ['=', 'c_industry_offers_mix.floor_min', $this->firstFloorOnly],
@@ -711,8 +662,9 @@ class OfferMixSearch extends OfferMix
         $query->andFilterWhere([
             'and',
             ['<=', 'c_industry_offers_mix.area_min', $this->rangeMaxArea],
-            ['>=', 'c_industry_offers_mix.area_max', $this->rangeMinArea]
+            ['>=', 'c_industry_offers_mix.area_max', $this->rangeMinArea],
         ]);
+
         $query->andFilterWhere([
             'and',
             [
