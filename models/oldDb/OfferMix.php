@@ -643,9 +643,8 @@ class OfferMix extends \yii\db\ActiveRecord
             return json_decode($fields['photos']);
         };
         $fields['thumb'] = function ($fields) {
-            $photos =
-                json_decode($fields['photos']);
-            $objectPhotos = $this->object->photo;
+            $photos = json_decode($fields['photos']);
+            $objectPhotos = json_decode($this->object->photo);
             $resultImage = null;
 
             if ($photos && is_array($photos)) {
@@ -657,9 +656,8 @@ class OfferMix extends \yii\db\ActiveRecord
             }
 
             if ($resultImage) return $resultImage;
-
             if ($objectPhotos && is_array($objectPhotos) && is_string($objectPhotos[0]) && strlen($objectPhotos[0]) > 2) {
-                return "https://pennylane.pro" + $objectPhotos[0];
+                return "https://pennylane.pro" . $objectPhotos[0];
             }
             return "https://api.pennylane.pro/images/no-image.jpg";
         };
