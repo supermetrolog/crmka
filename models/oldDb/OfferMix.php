@@ -617,6 +617,10 @@ class OfferMix extends \yii\db\ActiveRecord
             $query = User::find()->with(['userProfile'])->where(['user.id' => $user_id])->limit(1);
             return $query->one();
         };
+
+        $extraFields['object_small_info'] = function ($extraFields) {
+            return ['photo' => json_decode($this->object->photo)];
+        };
         return $extraFields;
     }
     public function fields()
@@ -634,8 +638,30 @@ class OfferMix extends \yii\db\ActiveRecord
         // $fields['direction_new_field'] = function ($fields) {
         //     return self::normalizeDirection($fields['direction']);
         // };
+
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);
+        };
+        $fields['thumb'] = function ($fields) {
+            $photos =
+                json_decode($fields['photos']);
+            $objectPhotos = $this->object->photo;
+            $resultImage = null;
+
+            if ($photos && is_array($photos)) {
+                foreach ($photos as $photo) {
+                    if (is_string($photo) && strlen($photo) > 2) {
+                        $resultImage = "https://pennylane.pro" . $photo;
+                    }
+                }
+            }
+
+            if ($resultImage) return $resultImage;
+
+            if ($objectPhotos && is_array($objectPhotos) && is_string($objectPhotos[0]) && strlen($objectPhotos[0]) > 2) {
+                return "https://pennylane.pro" + $objectPhotos[0];
+            }
+            return "https://api.pennylane.pro/images/no-image.jpg";
         };
         $fields['object_type'] = function ($fields) {
             return json_decode($fields['object_type']);
