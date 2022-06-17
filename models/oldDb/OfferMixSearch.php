@@ -346,7 +346,8 @@ class OfferMixSearch extends OfferMix
             ->orFilterWhere(['like', 'contact.first_name', $this->all])
             ->orFilterWhere(['like', 'contact.middle_name', $this->all])
             ->orFilterWhere(['like', 'contact.last_name', $this->all])
-            ->orFilterWhere(['like', 'phone.phone', $this->all]);
+            ->orFilterWhere(['like', 'phone.phone', $this->all])
+            ->orFilterWhere(['like', 'c_industry_offers_mix.address', $this->all]);
 
         if ($this->recommended_sort) {
             if ($expression = $this->getRecommendedOrderExpression('DESC')) {
@@ -371,6 +372,7 @@ class OfferMixSearch extends OfferMix
                     + IF (`contact`.`first_name` LIKE '%{$this->all}%', 30, 0) 
                     + IF (`contact`.`middle_name` LIKE '%{$this->all}%', 30, 0) 
                     + IF (`contact`.`last_name` LIKE '%{$this->all}%', 30, 0) 
+                    + IF (`c_industry_offers_mix`.`address` LIKE '%{$this->all}%', 30, 0) 
                 )
                 DESC
             "));
