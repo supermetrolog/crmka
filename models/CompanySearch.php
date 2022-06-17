@@ -71,7 +71,8 @@ class CompanySearch extends Company
             'requests' => function ($query) {
                 $query->where(['request.status' => Request::STATUS_ACTIVE]);
             },
-            'companyGroup', 'broker', 'deals', 'dealsRequestEmpty', 'consultant.userProfile', 'productRanges'
+            'companyGroup', 'broker', 'deals', 'dealsRequestEmpty', 'consultant.userProfile', 'productRanges',
+            'mainContact.emails', 'mainContact.phones'
         ]);
 
         $dataProvider = new ActiveDataProvider([
