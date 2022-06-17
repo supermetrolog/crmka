@@ -4,6 +4,7 @@ namespace app\models\oldDb;
 
 use app\models\Company;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\HtmlPurifier;
 
 /**
@@ -525,7 +526,29 @@ class Objects extends \yii\db\ActiveRecord
         $fields = parent::fields();
         $fields['photo'] = function ($fields) {
             return json_decode($fields['photo']);
-            // return 'fuck';
+        };
+        $fields['calc_ceiling_height'] = function ($fields) {
+            $maxes = [];
+            foreach ($fields->objectFloors as $floor) {
+                $maxes[] = $floor->ceiling_height_max;
+            }
+            $max = max($maxes);
+            $min = min($maxes);
+            return $this->calcMinMax($min, $max);
+        };
+        $fields['calc_gate_type'] = function ($fields) {
+            $gates = [];
+            foreach ($fields->objectFloors as $floor) {
+                $floorGates = json_decode($floor->gates);
+                if ($floorGates) $gates[] = $floorGates;
+            }
+
+            foreach ($gates as $floorGates) {
+                if (ArrayHelper::keyExists($floorGates[0], ObjectFloors::GATE_TYPE_LIST)) {
+                    return ObjectFloors::GATE_TYPE_LIST[$floorGates[0]];
+                }
+            }
+            return null;
         };
         $fields['description'] = function ($fields) {
             $fuck =  HtmlPurifier::process($fields['description'], ['HTML.AllowedElements' => '']);
@@ -540,6 +563,26 @@ class Objects extends \yii\db\ActiveRecord
             return $fuck;
         };
         return $fields;
+    }
+    public function calcMinMax($min, $max)
+    {
+        $min = (int)$min;
+        $max = (int)$max;
+        $result = 0;
+        if ($min == $max) {
+            return Yii::$app->formatter->format($min, 'decimal');
+        }
+        if ($min) {
+            $result = Yii::$app->formatter->format($min, 'decimal');
+        }
+        if ($max) {
+            if ($min) {
+                $result .= " - " . Yii::$app->formatter->format($max, 'decimal');
+            } else {
+                $result = Yii::$app->formatter->format($max, 'decimal');
+            }
+        }
+        return $result;
     }
     public function extraFields()
     {
@@ -566,5 +609,9 @@ class Objects extends \yii\db\ActiveRecord
     public function getOfferMix()
     {
         return $this->hasMany(OfferMix::class, ['object_id' => 'id']);
+    }
+    public function getObjectFloors()
+    {
+        return $this->hasMany(ObjectFloors::class, ['object_id' => 'id']);
     }
 }
