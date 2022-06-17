@@ -138,7 +138,8 @@ class CompanySearch extends Company
             ->orFilterWhere(['like', 'contact.last_name', $this->all])
             ->orFilterWhere(['like', 'phone.phone', $this->all])
             ->orFilterWhere(['like', 'company.nameEng', $this->all])
-            ->orFilterWhere(['like', 'company.nameRu', $this->all]);
+            ->orFilterWhere(['like', 'company.nameRu', $this->all])
+            ->orFilterWhere(['like', 'company.nameBrand', $this->all]);
         // для релевантности
         if ($this->all) {
             $query->orderBy(new Expression("
@@ -147,6 +148,7 @@ class CompanySearch extends Company
                     + IF (`phone`.`phone` LIKE '%{$this->all}%', 40, 0) 
                     + IF (`company`.`nameRu` LIKE '%{$this->all}%', 50, 0) 
                     + IF (`company`.`nameEng` LIKE '%{$this->all}%', 50, 0) 
+                    + IF (`company`.`nameBrand` LIKE '%{$this->all}%', 50, 0) 
                     + IF (`contact`.`first_name` LIKE '%{$this->all}%', 30, 0) 
                     + IF (`contact`.`middle_name` LIKE '%{$this->all}%', 30, 0) 
                     + IF (`contact`.`last_name` LIKE '%{$this->all}%', 30, 0) 

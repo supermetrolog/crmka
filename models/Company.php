@@ -17,6 +17,7 @@ use yii\db\Expression;
  * @property int $id
  * @property string|null $nameEng
  * @property string|null $nameRu
+ * @property string|null $nameBrand
  * @property int|null $noName
  * @property int|null $formOfOrganization
  * @property int|null $companyGroup_id
@@ -100,7 +101,7 @@ class Company extends \yii\db\ActiveRecord
             [['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'latitude', 'longitude'], 'string', 'max' => 255],
+            [['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'latitude', 'longitude'], 'string', 'max' => 255],
             [['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['broker_id' => 'id']],
             [['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::className(), 'targetAttribute' => ['companyGroup_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
@@ -116,6 +117,7 @@ class Company extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nameEng' => 'Name Eng',
             'nameRu' => 'Name Ru',
+            'nameBrand' => 'Name Brand',
             'noName' => 'No Name',
             'formOfOrganization' => 'Form Of Organization',
             'companyGroup_id' => 'Company Group ID',
@@ -177,6 +179,7 @@ class Company extends \yii\db\ActiveRecord
             $formOfOrganization = $fields['formOfOrganization'];
             $nameEng = $fields['nameEng'];
             $nameRu = $fields['nameRu'];
+            $nameBrand = $fields['nameBrand'];
             $noName = $fields['noName'];
             if ($noName) {
                 return "-";
@@ -194,6 +197,13 @@ class Company extends \yii\db\ActiveRecord
                     $name .= " - $nameEng";
                 } else {
                     $name .= " $nameEng";
+                }
+            }
+            if ($nameBrand) {
+                if ($name != "") {
+                    $name .= " - $nameBrand";
+                } else {
+                    $name .= " $nameBrand";
                 }
             }
             return trim($name);
