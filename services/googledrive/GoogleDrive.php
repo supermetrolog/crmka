@@ -2,16 +2,33 @@
 
 namespace app\services\googledrive;
 
+use Exception;
+use Google\Client;
+use Google\Service\Drive;
+use Google\Service\Drive\DriveFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 class GoogleDrive
 {
+    private $credentialsFileName;
+    private $appName;
+    private $service;
+    public function __construct($credentialsFileName, $appName)
+    {
+        $this->credentialsFileName = $credentialsFileName;
+        $this->appName = $appName;
 
+        $client = $this->getClient();
+
+        $this->service = new Drive($client);
+    }
     public function getClient()
     {
         $client = new Client();
-        $client->setApplicationName('Google Drive API PHP Quickstart');
-        $client->setScopes('https://www.googleapis.com/auth/drive.metadata.readonly');
-        $client->setAuthConfig('credentials.json');
+        $client->setApplicationName($this->appName);
+        // $client->setScopes('https://www.googleapis.com/auth/drive.metadata.readonly');
+        $client->setScopes('https://www.googleapis.com/auth/drive');
+        $client->setAuthConfig($this->credentialsFileName);
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
 
@@ -19,7 +36,7 @@ class GoogleDrive
         // The file token.json stores the user's access and refresh tokens, and is
         // created automatically when the authorization flow completes for the first
         // time.
-        $tokenPath = 'token.json';
+        $tokenPath = 'google_drive_token.json';
         if (file_exists($tokenPath)) {
             $accessToken = json_decode(file_get_contents($tokenPath), true);
             $client->setAccessToken($accessToken);
@@ -60,5 +77,81 @@ class GoogleDrive
             echo 'Some error occured: ' . $e->getMessage();
         }
         return $client;
+    }
+
+    public function createFile($fullpath, $filename, $parent_folder_id = null,  $desc, $mimeType, $uploadType = "multipart")
+    {
+        $data = file_get_contents($fullpath);
+
+        if (!$data) {
+            throw new FileNotFoundException("File not foud");
+        }
+
+        $file = new DriveFile();
+
+        $file->setName($filename);
+        $file->setDescription($desc);
+        $file->setMimeType($mimeType);
+
+        if ($parent_folder_id) {
+            $file->setParents([$parent_folder_id]);
+        }
+        $result = $this->service->files->create($file, [
+            'data' => $data,
+            'mimeType' => $mimeType,
+            'uploadType' => $uploadType
+        ]);
+
+        $file_id = null;
+
+        if (isset($result['id']) && !empty($result['id'])) {
+            $file_id = $result['id'];
+        }
+
+        return $file_id;
+    }
+
+    public function createFolder($folderName, $parentFolderId = null)
+    {
+        $folderList = $this->checkFolderExist($folderName);
+
+        if (count($folderList) == 0) {
+            $folder = new DriveFile();
+
+            $folder->setName($folderName);
+            $folder->setMimeType('application/vnd.google-apps.folder');
+
+            if ($parentFolderId) {
+                $folder->setParents([$parentFolderId]);
+            }
+
+            $result = $this->service->files->create($folder);
+
+            $folder_id = null;
+
+            if (isset($result['id']) && !empty($result['id'])) {
+                $folder_id = $result['id'];
+            }
+
+            return $folder_id;
+        }
+
+        return $folderList[0]['id'];
+    }
+
+    private function checkFolderExist($folderName)
+    {
+        $params = [
+            'q' =>  "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false"
+        ];
+
+        $files = $this->service->files->listFiles($params);
+
+        $op = [];
+
+        foreach ($files as $file) {
+            $op[] = $file;
+        }
+        return $op;
     }
 }

@@ -9,6 +9,10 @@ class Backup
 {
     private $tmpPath;
     private $dbCfg;
+
+    private $filename;
+    private $fullpath;
+
     public function __construct($tmpPath, $dbCfg)
     {
         $this->tmpPath = $tmpPath;
@@ -19,6 +23,7 @@ class Backup
     {
         $dumpCommand = $this->getMysqlDumpCommand();
         $this->runCommand($dumpCommand);
+        return $this;
     }
     private function runCommand($command)
     {
@@ -32,17 +37,38 @@ class Backup
             throw new Exception("Command: $command, exited with error status $result_code");
         }
     }
+
+    public function getBackupFileName()
+    {
+        return $this->filename;
+    }
+    public function getFullPath()
+    {
+        return $this->fullpath;
+    }
+    private function generateBackupFileName()
+    {
+        $dbname = $this->getDsnAttribute("dbname", $this->dbCfg['dsn']);
+        $date = date("Y_m_d_H_i_s");
+        $this->filename = $date . "_" . $dbname . ".sql";
+    }
+    public function generateFullPath()
+    {
+        $this->generateBackupFileName();
+        $this->fullpath = $this->tmpPath . "/" . $this->filename;
+    }
     private function getMysqlDumpCommand()
     {
         $dbname = $this->getDsnAttribute("dbname", $this->dbCfg['dsn']);
         $host = $this->getDsnAttribute("host", $this->dbCfg['dsn']);
+        $this->generateFullPath();
         if ($this->dbCfg['password'] == '') {
             return sprintf(
                 "mysqldump -u%s -h%s %s > %s",
                 $this->dbCfg['username'],
                 $host,
                 $dbname,
-                $this->tmpPath . "/$dbname.sql"
+                $this->fullpath
             );
         }
         return sprintf(
@@ -51,7 +77,7 @@ class Backup
             $host,
             $this->dbCfg['password'],
             $dbname,
-            $this->tmpPath . "/$dbname.sql"
+            $this->fullpath
         );
     }
     private function getDsnAttribute($name, $dsn)
