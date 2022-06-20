@@ -19,7 +19,7 @@ class BackupController extends Controller
     public function actionIndex()
     {
         $this->actionClients();
-        // $this->actionObjects();
+        $this->actionObjects();
     }
 
     public function actionClients()
