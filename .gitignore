@@ -25,6 +25,9 @@ config/db_old.php
 /public_html/uploads
 /public_html/index.php
 
+#secrets
+google_drive_secrets.json
+google_drive_token.json
 # Mac DS_Store Files
 .DS_Store
 

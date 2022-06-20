@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - dev
+name: 🚀 Deploy website on push
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v2
+
+    - name: Setup Enviroment
+      uses: shivammathur/setup-php@v2
+      with:
+          php-version: '7.4'
+
+    - name: 📂 Sync files with DEV server (api.supermetrolog.ru)
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: 62.113.107.218
+        username: ${{ secrets.ftp_dev_server_username }}
+        password: ${{ secrets.ftp_dev_server_password }}
+
+    - name: multiple command in DEV server
+      uses: appleboy/ssh-action@master
+      with:
+        host: 62.113.107.218
+        username: ${{ secrets.ssh_server_username }}
+        password: ${{ secrets.ssh_server_password }}
+        script: >- 
+            cd /home/user/web/api.supermetrolog.ru/public_html &&
+            composer install &&
+            php yii migrate --interactive=0 &&
+            chown user:www-data -R /home/user/web/api.supermetrolog.ru/public_html/ &&
+            chmod 775 -R /home/user/web/api.supermetrolog.ru/public_html/
