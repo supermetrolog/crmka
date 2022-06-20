@@ -15,10 +15,15 @@ class Backup
 
     public function __construct($tmpPath, $dbCfg)
     {
-        $this->tmpPath = $tmpPath;
+        $this->setTmpPath($tmpPath);
         $this->dbCfg = $dbCfg;
     }
-
+    private function setTmpPath($tmpPath)
+    {
+        $this->tmpPath = $tmpPath;
+        if (is_dir($this->tmpPath)) return;
+        mkdir($this->tmpPath, 0700);
+    }
     public function dump()
     {
         $dumpCommand = $this->getMysqlDumpCommand();
