@@ -94,11 +94,12 @@ class GoogleDrive
         $client->setAuthConfig($this->credentialsFileName);
         $client->setApplicationName("MysqlBackup");
         $client->addScope(Drive::DRIVE);
-        $httpClient = new GuzzleClient([
-            'proxy' => 'localhost:8888', // by default, Charles runs on localhost port 8888
-            'verify' => false, // otherwise HTTPS requests will fail.
-        ]);
-        $client->setHttpClient($httpClient);
+        // Charles proxy for debug
+        // $httpClient = new GuzzleClient([
+        //     'proxy' => 'localhost:8888', // by default, Charles runs on localhost port 8888
+        //     'verify' => false, // otherwise HTTPS requests will fail.
+        // ]);
+        // $client->setHttpClient($httpClient);
         $this->debug("get client");
         return $client;
     }
