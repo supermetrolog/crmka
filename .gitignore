@@ -28,6 +28,7 @@ config/db_old.php
 #secrets
 google_drive_secrets.json
 google_drive_token.json
+mysqlbackup_service_account_cred.json
 # Mac DS_Store Files
 .DS_Store
 
