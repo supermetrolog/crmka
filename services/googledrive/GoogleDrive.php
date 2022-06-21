@@ -7,6 +7,7 @@ use Google\Client;
 use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use GuzzleHttp\Client as GuzzleClient;
 
 class GoogleDrive
 {
@@ -18,10 +19,17 @@ class GoogleDrive
         $this->credentialsFileName = $credentialsFileName;
         $this->appName = $appName;
 
-        $client = $this->getClient();
+        $client = $this->getClientServiseCredentials();
 
         $this->service = new Drive($client);
     }
+    //debugger
+    private function debug(...$msgs)
+    {
+        echo implode(" ", $msgs) . "\n";
+    }
+
+    // Client for oAuth2 auth
     public function getClient()
     {
         $client = new Client();
@@ -79,12 +87,30 @@ class GoogleDrive
         return $client;
     }
 
+    // Client for service-account auth
+    public function getClientServiseCredentials()
+    {
+        $client = new Client();
+        $client->setAuthConfig($this->credentialsFileName);
+        $client->setApplicationName("MysqlBackup");
+        $client->addScope(Drive::DRIVE);
+        $httpClient = new GuzzleClient([
+            'proxy' => 'localhost:8888', // by default, Charles runs on localhost port 8888
+            'verify' => false, // otherwise HTTPS requests will fail.
+        ]);
+        $client->setHttpClient($httpClient);
+        $this->debug("get client");
+        return $client;
+    }
+
     public function createFile($fullpath, $filename, $parent_folder_id = null,  $desc, $mimeType, $uploadType = "multipart")
     {
+        $this->debug("create file:", $filename);
+
         $data = file_get_contents($fullpath);
 
         if (!$data) {
-            throw new FileNotFoundException("File not foud");
+            throw new FileNotFoundException("File not found");
         }
 
         $file = new DriveFile();
@@ -107,12 +133,13 @@ class GoogleDrive
         if (isset($result['id']) && !empty($result['id'])) {
             $file_id = $result['id'];
         }
-
+        $this->debug("uploaded file ID:", $file_id);
         return $file_id;
     }
 
     public function createFolder($folderName, $parentFolderId = null)
     {
+        $this->debug("create folder:", $folderName);
         $folderList = $this->checkFolderExist($folderName);
 
         if (count($folderList) == 0) {
@@ -138,15 +165,30 @@ class GoogleDrive
 
         return $folderList[0]['id'];
     }
+    private function printAllFiles()
+    {
+        $this->debug("print all folders");
+        $params = [
+            'q' =>  "mimeType='text/plain' and trashed=false"
+        ];
 
+        $files = $this->service->files->listFiles($params);
+        $op = [];
+
+        foreach ($files as $file) {
+            $op[] = $file;
+            $this->debug("drive folder:", $file->name, "|", $file->id);
+        }
+        return $op;
+    }
     private function checkFolderExist($folderName)
     {
+        $this->debug("check folder exist:", $folderName);
         $params = [
             'q' =>  "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false"
         ];
 
         $files = $this->service->files->listFiles($params);
-
         $op = [];
 
         foreach ($files as $file) {

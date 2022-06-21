@@ -19,9 +19,8 @@ class BackupController extends Controller
     public function actionIndex()
     {
         $this->actionClients();
-        // $this->actionObjects();
+        $this->actionObjects();
     }
-
     public function actionClients()
     {
         $crmkaDBConfig = include Yii::getAlias("@app") . "/config/db.php";
@@ -34,10 +33,12 @@ class BackupController extends Controller
         $backupFullPath = $backup->getFullPath();
 
 
-        $credentialsFileName = Yii::getAlias("@app") . '/google_drive_secrets.json';
-        $googleDriveService = new GoogleDrive($credentialsFileName, "backup");
+        $credentialsFileName = Yii::getAlias("@app") . "/mysqlbackup_service_account_cred.json";
+        $googleDriveService = new GoogleDrive($credentialsFileName, "ClientsBackup");
         $backupDriveFolderId = $googleDriveService->createFolder("pennylane_backup");
-        $googleDriveService->createFile($backupFullPath, $backupFileName, $backupDriveFolderId, "backup crmka db", "text/plain");
+        $googleDriveService->createFile($backupFullPath, $backupFileName, $backupDriveFolderId, "backup clients db", "text/plain");
+
+
         FileManager::UnlinkFiles($tmpPath);
     }
 
@@ -53,10 +54,12 @@ class BackupController extends Controller
         $backupFullPath = $backup->getFullPath();
 
 
-        $credentialsFileName = Yii::getAlias("@app") . '/google_drive_secrets.json';
-        $googleDriveService = new GoogleDrive($credentialsFileName, "backup");
+        $credentialsFileName = Yii::getAlias("@app") . "/mysqlbackup_service_account_cred.json";
+        $googleDriveService = new GoogleDrive($credentialsFileName, "ObjectsBackup");
         $backupDriveFolderId = $googleDriveService->createFolder("pennylane_backup");
-        $googleDriveService->createFile($backupFullPath, $backupFileName, $backupDriveFolderId, "backup crmka db", "text/plain");
+        $googleDriveService->createFile($backupFullPath, $backupFileName, $backupDriveFolderId, "backup objects db", "text/plain");
+
+
         FileManager::UnlinkFiles($tmpPath);
     }
 }
