@@ -126,11 +126,31 @@ class NotificationService  extends Component
                 $this->saveUserSendedData($event, $contact, UserSendedData::EMAIL_CONTACT_TYPE);
                 continue;
             }
-            $message = Yii::$app->mailer->compose($event->view, $event->viewArgv)
+            $mailer = new yii\swiftmailer\Mailer(
+                [
+                    'htmlLayout' => 'layouts/html',
+                    // 'useFileTransport' => true,
+                    'useFileTransport' => false,
+                    'transport' => [
+                        'class' => 'Swift_SmtpTransport',
+                        'host' => 'email.realtor.ru',
+                        // 'host' => 'smtp.beget.com',
+                        // 'port' => 2525,
+                        'port' => 25,
+                        'username' => $event->username,
+                        'password' => $event->password,
+                    ]
+                ]
+            );
+            // $message = Yii::$app->mailer->compose($event->view, $event->viewArgv)
+            //     ->setFrom($event->from)
+            //     ->setTo($contact)
+            //     ->setSubject($event->subject);
+
+            $message = $mailer->compose($event->view, $event->viewArgv)
                 ->setFrom($event->from)
                 ->setTo($contact)
                 ->setSubject($event->subject);
-
             if ($event->files) {
                 foreach ($event->files as $file) {
                     $message->attach($file);

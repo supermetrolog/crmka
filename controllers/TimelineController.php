@@ -12,6 +12,7 @@ use app\events\SendMessageEvent;
 use app\models\miniModels\TimelineActionComment;
 use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
+use app\models\User;
 use app\models\UserSendedData;
 use Dompdf\Options;
 use Exception;
@@ -63,7 +64,7 @@ class TimelineController extends ActiveController
         return TimelineActionComment::getTimelineComments($id);
     }
 
-    public function actionSendObjects()
+    public function actionSendObjects($expand = "userProfile")
     {
         $response = ['message' => 'Предложения отправлены!', 'data' => true];
         $post_data = Yii::$app->request->post();
@@ -104,17 +105,27 @@ class TimelineController extends ActiveController
             }
         }
         try {
+            $user = User::find()->with(['userProfile'])->where(['id' => Yii::$app->user->identity->id])->limit(1)->one();
+            $userProfile = $user->userProfile->toArray();
+            $user = $user->toArray();
+            $from = null;
+            if ($user['email']) {
+                $from = [$user['email'] => $userProfile['short_name']];
+            }
             $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
                 'user_id' => Yii::$app->user->identity->id,
                 'view' => 'presentation/index',
                 'viewArgv' => ['userMessage' => $post_data['comment']],
-                'subject' => 'Список предложений от Pennylane',
+                'subject' => 'Список предложений от Pennylane Realty',
                 'contacts' => $post_data['contacts'],
                 'wayOfSending' => $post_data['wayOfSending'],
                 'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
                 'description' => 'Отправил объекты на шаге "' . $stepName . '"',
                 'notSend' => !$post_data['sendClientFlag'],
-                'files' => $files
+                'files' => $files,
+                'from' => $from,
+                'username' => $user['email_username'],
+                'password' => $user['email_password'],
             ]));
         } catch (\Throwable $th) {
             foreach ($pdfs as $pdf) {

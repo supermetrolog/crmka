@@ -15,7 +15,9 @@ class SignUp extends Model
 {
     public $username;
     public $password;
-
+    public $email;
+    public $email_username;
+    public $email_password;
     private $_user = false;
 
 
@@ -29,6 +31,7 @@ class SignUp extends Model
             [['username', 'password'], 'required'],
             ['password', 'string', 'min' => 4],
             ['username', 'string', 'min' => 4],
+            [['email', 'email_password', 'email_username'], 'string', 'max' => 255],
             // password is validated by validatePassword()
             ['username', 'validateUsername'],
         ];
@@ -63,6 +66,9 @@ class SignUp extends Model
             $user->setPassword($this->password);
             $user->generateAuthKey();
             $user->username = $this->username;
+            $user->email = $this->email;
+            $user->email_username = $this->email_username;
+            $user->email_password = $this->email_password;
             $user->created_at = time();
             $user->updated_at = time();
             if ($user->validate() && $user->save()) return $user->id;

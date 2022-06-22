@@ -18,6 +18,8 @@ use yii\helpers\ArrayHelper;
  * @property string $password_hash
  * @property string|null $password_reset_token
  * @property string $email
+ * @property string $email_username
+ * @property string $email_password
  * @property string|null $access_token
  * @property int $status
  * @property int $created_at
@@ -48,7 +50,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return [
             [['username', 'auth_key', 'password_hash', 'created_at', 'updated_at'], 'required'],
             [['status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'access_token'], 'string', 'max' => 255],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'access_token', 'email_password', 'email_username'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
             [['email'], 'unique'],
