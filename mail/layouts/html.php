@@ -18,7 +18,6 @@ use yii\helpers\Html;
 
 <body>
     <?php $this->beginBody() ?>
-    <h1>Layout</h1>
     <?= $content ?>
     <?php $this->endBody() ?>
 </body>
