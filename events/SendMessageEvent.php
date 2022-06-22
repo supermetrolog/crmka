@@ -35,10 +35,8 @@ class SendMessageEvent extends Event
         if (!$this->from) {
             $this->from = [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
         }
-        if (!$this->username) {
+        if (!$this->username || !$this->password) {
             $this->username = Yii::$app->params['senderEmail'];
-        }
-        if (!$this->password) {
             $this->password = Yii::$app->params['senderPassword'];
         }
         $model = new DynamicModel(['password' => $this->password, 'username' => $this->username, 'wayOfSending' => $this->wayOfSending, 'user_id' => $this->user_id, 'from' => $this->from, 'contacts' => $this->contacts, 'subject' => $this->subject, 'type' => $this->type, 'description' => $this->description, 'htmlBody' => $this->htmlBody]);
