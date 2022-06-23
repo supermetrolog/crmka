@@ -97,6 +97,8 @@ class TimelineController extends ActiveController
         $stepName = TimelineStep::STEPS[$post_data['step']];
         $files = [];
         $pdfs = [];
+        $user = User::find()->with(['userProfile'])->where(['id' => Yii::$app->user->identity->id])->limit(1)->one();
+        $userProfile = $user->userProfile->toArray();
         if ($post_data['sendClientFlag']) {
             foreach ($post_data['offers'] as $offer) {
                 $pdf = $this->generatePdf($offer);
@@ -105,8 +107,7 @@ class TimelineController extends ActiveController
             }
         }
         try {
-            $user = User::find()->with(['userProfile'])->where(['id' => Yii::$app->user->identity->id])->limit(1)->one();
-            $userProfile = $user->userProfile->toArray();
+
             $user = $user->toArray();
             $from = null;
             if ($user['email']) {
