@@ -64,7 +64,7 @@ class TimelineController extends ActiveController
         return TimelineActionComment::getTimelineComments($id);
     }
 
-    public function actionSendObjects($expand = "userProfile")
+    public function actionSendObjects()
     {
         $response = ['message' => 'Предложения отправлены!', 'data' => true];
         $post_data = Yii::$app->request->post();
@@ -85,6 +85,7 @@ class TimelineController extends ActiveController
         ini_set('max_execution_time', 60 * 10);
         ignore_user_abort(true);
         ob_start();
+        ob_implicit_flush(true);
         echo json_encode($response);
         header('Access-Control-Allow-Origin: *');
         header('Connection: close');
