@@ -72,7 +72,7 @@ class TimelineController extends ActiveController
             throw new Exception('Вы не выбрали предложения');
         }
         if (count($post_data['offers']) > 4) {
-            throw new Exception('Слишком много предложений! Предложений не может быть больше 5.');
+            throw new Exception('Слишком много предложений! Предложений не может быть больше 4.');
         }
         try {
             NotificationService::validateData($post_data['contacts'], $post_data['wayOfSending']);
