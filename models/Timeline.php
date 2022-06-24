@@ -6,6 +6,7 @@ use app\models\miniModels\TimelineStep;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\TimelineActionComment;
+use LogicException;
 use Yii;
 
 /**
@@ -123,6 +124,13 @@ class Timeline extends \yii\db\ActiveRecord
             todo: 
                 change all timeline status to INACTIVE before create new Timeline for user
          */
+        $models = self::find()->where(['request_id' => $request_id])->all();
+        foreach ($models as  $model) {
+            $model->status = self::STATUS_INACTIVE;
+            if (!$model->save()) {
+                throw new LogicException(json_decode($model->getErrorSummary(false)));
+            }
+        }
         return self::createNewTimeline($request_id, $consultant_id);
     }
     /**

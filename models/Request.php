@@ -272,7 +272,7 @@ class Request extends \yii\db\ActiveRecord
     {
         $extraFields = parent::extraFields();
         $extraFields['timeline_progress'] = function ($extraFields) {
-            $doneTimelineStepCount = Timeline::find()->joinWith(['timelineSteps'])->where(['timeline.request_id' => $this->id, 'timeline_step.status' => TimelineStep::STATUS_DONE])->count();
+            $doneTimelineStepCount = Timeline::find()->joinWith(['timelineSteps'])->where(['timeline.request_id' => $this->id, 'timeline_step.status' => TimelineStep::STATUS_DONE, 'timeline.status' => Timeline::STATUS_ACTIVE])->count();
             if ($doneTimelineStepCount == null) return $doneTimelineStepCount;
             if ($doneTimelineStepCount == 0) return (int)$doneTimelineStepCount;
             $maxTimelineStepCount = 8;
