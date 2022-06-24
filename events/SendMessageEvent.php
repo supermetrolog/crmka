@@ -36,7 +36,7 @@ class SendMessageEvent extends Event
             $this->from = [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
         }
         if (!$this->username || !$this->password) {
-            $this->username = Yii::$app->params['senderEmail'];
+            $this->username = Yii::$app->params['senderUsername'];
             $this->password = Yii::$app->params['senderPassword'];
             $this->from = [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
         }
