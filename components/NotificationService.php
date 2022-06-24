@@ -157,10 +157,15 @@ class NotificationService  extends Component
             if ($event->htmlBody) {
                 $message->setHtmlBody($event->htmlBody);
             }
-
-            if (!$message->send()) {
-                throw new Exception('Message not sended');
+            try {
+                if (!$message->send()) {
+                    throw new Exception('Message not sended');
+                }
+            } catch (\Throwable $th) {
+                Yii::error("fucking email ERROR: " . "$event->username | $event->password | $event->from");
+                throw $th;
             }
+
             $this->saveUserSendedData($event, $contact, UserSendedData::EMAIL_CONTACT_TYPE);
         }
     }
