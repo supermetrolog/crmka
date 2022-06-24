@@ -162,7 +162,7 @@ class NotificationService  extends Component
                     throw new Exception('Message not sended');
                 }
             } catch (\Throwable $th) {
-                Yii::error("fucking email ERROR: " . "$event->username | $event->password | $event->from");
+                Yii::error("fucking email ERROR: " . "$event->username | $event->password | " . implode(', ', $event->from));
                 throw $th;
             }
 
