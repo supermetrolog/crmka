@@ -82,19 +82,8 @@ class TimelineController extends ActiveController
         if (!$post_data['sendClientFlag']) {
             $response['message'] = null;
         }
-        ini_set('max_execution_time', 60 * 10);
+        ini_set('max_execution_time', 60 * 20);
         ignore_user_abort(true);
-        ob_start();
-        ob_implicit_flush(true);
-        echo json_encode($response);
-        header('Access-Control-Allow-Origin: *');
-        header('Connection: close');
-        header('Content-Type: application/json; charset=UTF-8');
-        header('Server: Apache');
-        header('Vary: Accept');
-        header('Content-Length: ' . ob_get_length());
-        ob_end_flush();
-        flush();
         $stepName = TimelineStep::STEPS[$post_data['step']];
         $files = [];
         $pdfs = [];
@@ -140,6 +129,7 @@ class TimelineController extends ActiveController
         foreach ($pdfs as $pdf) {
             $pdf->removeFile();
         }
+        return $response;
     }
     protected function generatePdf($query_params)
     {
