@@ -120,18 +120,23 @@ class ServerWS extends WebSocketServer
     }
     function commandSetUser(ConnectionInterface $client, $msg)
     {
-        echo "SetUser!";
-        $msg = json_decode($msg);
-        $message = new Message();
-        $message->setAction('user_setted');
-        if ($this->_clients->clientExist($client)) {
-            $message->setError();
-            $message->setBody("You already registered in websocket! ({$client->name->user_id})");
+        try {
+            echo "SetUser!";
+            $msg = json_decode($msg);
+            $message = new Message();
+            $message->setAction('user_setted');
+            if ($this->_clients->clientExist($client)) {
+                $message->setError();
+                $message->setBody("You already registered in websocket! ({$client->name->user_id})");
+                return $this->_clients->sendClient($client, $message);
+            }
+            $client->name = $msg->data;
+            $this->_clients->setClient($client);
+            $message->setBody("You successfuly registered ({$client->name->user_id})");
             return $this->_clients->sendClient($client, $message);
+        } catch (\Throwable $th) {
+            echo "PIZDEC: " . $th->getMessage();
+            throw $th;
         }
-        $client->name = $msg->data;
-        $this->_clients->setClient($client);
-        $message->setBody("You successfuly registered ({$client->name->user_id})");
-        return $this->_clients->sendClient($client, $message);
     }
 }

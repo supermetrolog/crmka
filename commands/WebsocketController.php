@@ -30,7 +30,7 @@ class WebsocketController extends Controller
     public function actionStart($expand = "caller,phoneFrom,phoneFrom.contact,phoneTo,phoneTo.contact")
     {
         $server = new ServerWS();
-        $server->port = 8082; //This port must be busy by WebServer and we handle an error
+        $server->port = 8010; //This port must be busy by WebServer and we handle an error
         $server->on(WebSocketServer::EVENT_WEBSOCKET_OPEN_ERROR, function ($e) use ($server) {
             echo "Error opening port " . $server->port . "\n";
             $server->port += 1; //Try next port to open
