@@ -120,7 +120,6 @@ class ServerWS extends WebSocketServer
     }
     function commandSetUser(ConnectionInterface $client, $msg)
     {
-        var_dump($client);
         try {
             echo "SetUser!";
             $msg = json_decode($msg);

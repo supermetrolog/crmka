@@ -14,7 +14,6 @@ class Clients extends Model
     {
         $this->clients_pool[$client->name->user_id][] = $client;
         echo "Setted User\n";
-        var_dump($this->clients_pool);
     }
 
     public function removeClient(ConnectionInterface $client)
@@ -35,7 +34,6 @@ class Clients extends Model
             unset($this->clients_pool[$client->name->user_id]);
         }
         echo "Removed User\n";
-        var_dump($this->clients_pool);
         return true;
     }
 
@@ -52,7 +50,6 @@ class Clients extends Model
         }
         echo "Send client pool\n";
         $pool = $this->clients_pool[$user_id];
-        var_dump(count($this->clients_pool[$user_id]));
         foreach ($pool as $_client) {
             if ($notAsweredclient) {
                 if ($_client->name->window_id == $notAsweredclient->name->window_id) {
