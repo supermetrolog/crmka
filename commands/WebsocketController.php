@@ -29,6 +29,9 @@ class WebsocketController extends Controller
     }
     public function actionStart($expand = "caller,phoneFrom,phoneFrom.contact,phoneTo,phoneTo.contact")
     {
+        foreach (\Yii::$app->log->targets as $target) {
+            $target->setEnabled(false);
+        }
         $server = new ServerWS();
         $server->port = 8010; //This port must be busy by WebServer and we handle an error
         $server->on(WebSocketServer::EVENT_WEBSOCKET_OPEN_ERROR, function ($e) use ($server) {
@@ -42,6 +45,7 @@ class WebsocketController extends Controller
         });
         $server->on(WebSocketServer::EVENT_CLIENT_CONNECTED, function ($e) use ($server) {
             echo "\nCLIENT CONNECTED\n";
+            $e->client->name = null;
             $e->client->send(json_encode(['message' => 'Client connected']));
         });
 
