@@ -84,7 +84,7 @@ class Timeline extends \yii\db\ActiveRecord
     }
     public static function getTimelineListInRequest($request_id)
     {
-        return self::find()->joinWith(['consultant.userProfile'])->where(['timeline.request_id' => $request_id])->all();
+        return self::find()->joinWith(['consultant.userProfile'])->where(['timeline.request_id' => $request_id])->orderBy(['status' => SORT_ASC])->all();
     }
     public static function createNewTimeline($request_id, $consultant_id)
     {
@@ -116,10 +116,7 @@ class Timeline extends \yii\db\ActiveRecord
     }
     public static function updateConsultant($request_id, $consultant_id)
     {
-        $model = self::find()->where(['request_id' => $request_id])->andWhere(['consultant_id' => $consultant_id])->one();
-        if ($model) {
-            return true;
-        }
+
         /**
             todo: 
                 change all timeline status to INACTIVE before create new Timeline for user
@@ -130,6 +127,13 @@ class Timeline extends \yii\db\ActiveRecord
             if (!$model->save()) {
                 throw new LogicException(json_decode($model->getErrorSummary(false)));
             }
+        }
+
+        $model = self::find()->where(['request_id' => $request_id])->andWhere(['consultant_id' => $consultant_id])->one();
+        if ($model) {
+            $model->status = self::STATUS_ACTIVE;
+            $model->save();
+            return true;
         }
         return self::createNewTimeline($request_id, $consultant_id);
     }
