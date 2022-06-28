@@ -210,7 +210,12 @@ class Request extends \yii\db\ActiveRecord
                 ]);
                 Timeline::createNewTimeline($request->id, $request->consultant_id);
                 // $transaction->rollBack();
-
+                $request->trigger(self::REQUEST_CREATED_EVENT, new NotificationEvent([
+                    'consultant_id' => $request->consultant_id,
+                    'type' => Notification::TYPE_REQUEST_INFO,
+                    'title' => 'запрос',
+                    'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_request.php', ['model' => $request])
+                ]));
                 $transaction->commit();
                 return ['message' => "Запрос создан", 'data' => $request->id];
             }
@@ -238,18 +243,21 @@ class Request extends \yii\db\ActiveRecord
                     RequestRegion::class => $post_data['regions'],
                 ]);
                 Timeline::updateConsultant($request->id, $request->consultant_id);
-                $request->trigger(self::REQUEST_CREATED_EVENT, new NotificationEvent([
-                    'consultant_id' => $request->consultant_id,
-                    'type' => Notification::TYPE_REQUEST_INFO,
-                    'title' => 'запрос',
-                    'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_request.php', ['model' => $request])
-                ]));
-                $request->trigger(self::REQUEST_CREATED_EVENT, new NotificationEvent([
-                    'consultant_id' => $oldConsultantId,
-                    'type' => Notification::TYPE_REQUEST_INFO,
-                    'title' => 'запрос',
-                    'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_request.php', ['model' => $request])
-                ]));
+                if ($oldConsultantId != $request->consultant_id) {
+                    $request->trigger(self::REQUEST_CREATED_EVENT, new NotificationEvent([
+                        'consultant_id' => $request->consultant_id,
+                        'type' => Notification::TYPE_REQUEST_INFO,
+                        'title' => 'запрос',
+                        'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_request.php', ['model' => $request])
+                    ]));
+                    $request->trigger(self::REQUEST_CREATED_EVENT, new NotificationEvent([
+                        'consultant_id' => $oldConsultantId,
+                        'type' => Notification::TYPE_REQUEST_INFO,
+                        'title' => 'запрос',
+                        'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_request.php', ['model' => $request])
+                    ]));
+                }
+
                 // $transaction->rollBack();
 
                 $transaction->commit();
