@@ -32,11 +32,25 @@ class Notification extends \yii\db\ActiveRecord
     public const PROCESSED_STATUS = 2;
     public const NO_COUNT_STATUS = 3;
 
-    public const TYPE_COMPANY = 0;
-    public const TYPE_REQUEST = 1;
-    public const TYPE_CALENDAR = 2;
-    public const TYPE_TIMELINE = 3;
-    public const TYPE_COLLECTION = 4;
+    public const TYPE_SYSTEM_INFO = 0;
+    public const TYPE_SYSTEM_WARNING = 1;
+    public const TYPE_SYSTEM_DANGER = 2;
+    public const TYPE_COMPANY_INFO = 3;
+    public const TYPE_COMPANY_WARNING = 4;
+    public const TYPE_COMPANY_DANGER = 5;
+    public const TYPE_REQUEST_INFO = 6;
+    public const TYPE_REQUEST_WARNING = 7;
+    public const TYPE_REQUEST_DANGER = 8;
+    public const TYPE_CALENDAR_INFO = 9;
+    public const TYPE_CALENDAR_WARNING = 10;
+    public const TYPE_CALENDAR_DANGER = 11;
+    public const TYPE_TIMELINE_INFO = 12;
+    public const TYPE_TIMELINE_WARNING = 13;
+    public const TYPE_TIMELINE_DANGER = 14;
+    public const TYPE_COLLECTION_INFO = 15;
+    public const TYPE_COLLECTION_WARNING = 16;
+    public const TYPE_COLLECTION_DANGER = 17;
+
     public static function tableName()
     {
         return 'notification';

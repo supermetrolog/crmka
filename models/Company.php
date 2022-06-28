@@ -328,7 +328,7 @@ class Company extends \yii\db\ActiveRecord
 
                 $model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
                     'consultant_id' => $model->consultant_id,
-                    'type' => Notification::TYPE_COMPANY,
+                    'type' => Notification::TYPE_COMPANY_INFO,
                     'title' => 'компания',
                     'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
                 ]));
@@ -361,13 +361,13 @@ class Company extends \yii\db\ActiveRecord
                 if ($oldConsultantId != $model->consultant_id) {
                     $model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
                         'consultant_id' => $oldConsultantId,
-                        'type' => Notification::TYPE_COMPANY,
+                        'type' => Notification::TYPE_COMPANY_INFO,
                         'title' => 'компания',
                         'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_company.php', ['model' => $model])
                     ]));
                     $model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
                         'consultant_id' => $model->consultant_id,
-                        'type' => Notification::TYPE_COMPANY,
+                        'type' => Notification::TYPE_COMPANY_INFO,
                         'title' => 'компания',
                         'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
                     ]));

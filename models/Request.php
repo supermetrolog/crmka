@@ -14,6 +14,7 @@ use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestRegion;
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\events\NotificationEvent;
 use app\models\miniModels\RequestObjectTypeGeneral;
 use app\models\miniModels\TimelineStep;
 
@@ -73,6 +74,19 @@ class Request extends \yii\db\ActiveRecord
     public const DEAL_TYPE_SALE = 1;
     public const DEAL_TYPE_RESPONSE_STORAGE = 2;
     public const DEAL_TYPE_SUBLEASE = 3;
+
+
+
+    public const REQUEST_CREATED_EVENT = 'request_created_event';
+    public const REQUEST_UPDATED_EVENT = 'request_updated_event';
+
+
+    public function init()
+    {
+        $this->on(self::REQUEST_CREATED_EVENT, [Yii::$app->notify, 'notifyUser']);
+        parent::init();
+    }
+
     public function behaviors()
     {
         return [
@@ -210,6 +224,7 @@ class Request extends \yii\db\ActiveRecord
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
+        $oldConsultantId = $request->consultant_id;
         try {
             $post_data['updated_at'] = date('Y-m-d H:i:s');
             if ($request->load($post_data, '') && $request->save()) {
@@ -223,7 +238,18 @@ class Request extends \yii\db\ActiveRecord
                     RequestRegion::class => $post_data['regions'],
                 ]);
                 Timeline::updateConsultant($request->id, $request->consultant_id);
-
+                $request->trigger(self::REQUEST_CREATED_EVENT, new NotificationEvent([
+                    'consultant_id' => $request->consultant_id,
+                    'type' => Notification::TYPE_REQUEST_INFO,
+                    'title' => 'запрос',
+                    'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_request.php', ['model' => $request])
+                ]));
+                $request->trigger(self::REQUEST_CREATED_EVENT, new NotificationEvent([
+                    'consultant_id' => $oldConsultantId,
+                    'type' => Notification::TYPE_REQUEST_INFO,
+                    'title' => 'запрос',
+                    'body' => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_request.php', ['model' => $request])
+                ]));
                 // $transaction->rollBack();
 
                 $transaction->commit();
