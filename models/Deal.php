@@ -117,6 +117,13 @@ class Deal extends \yii\db\ActiveRecord
         }
         $model = new self();
         if ($model->load($post_data, '') && $model->save()) {
+            if ($model->request_id) {
+                $request = Request::find()->where(['id' => $model->request_id])->limit(1)->one();
+                $request->status = Request::STATUS_DONE;
+                if (!$request->save()) {
+                    throw new ValidationErrorHttpException($request->getErrorSummary(false));
+                }
+            }
             return ['message' => "Сделка создана", 'data' => $model->id];
         }
         throw new ValidationErrorHttpException($model->getErrorSummary(false));

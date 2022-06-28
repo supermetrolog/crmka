@@ -116,11 +116,6 @@ class Timeline extends \yii\db\ActiveRecord
     }
     public static function updateConsultant($request_id, $consultant_id)
     {
-
-        /**
-            todo: 
-                change all timeline status to INACTIVE before create new Timeline for user
-         */
         $models = self::find()->where(['request_id' => $request_id])->all();
         foreach ($models as  $model) {
             $model->status = self::STATUS_INACTIVE;
