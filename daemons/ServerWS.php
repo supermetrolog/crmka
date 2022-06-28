@@ -51,13 +51,13 @@ class ServerWS extends WebSocketServer
 
         $loop = new NotifyLoop;
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            echo "Timer Notify!\n";
+            // echo "Timer Notify!\n";
             $loop->run($this->_clients);
         });
 
         $loop = new CallsLoop;
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            echo "Timer Calls!\n";
+            // echo "Timer Calls!\n";
             $loop->run($this->_clients);
         });
 
