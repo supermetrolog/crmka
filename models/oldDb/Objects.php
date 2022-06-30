@@ -532,8 +532,12 @@ class Objects extends \yii\db\ActiveRecord
             foreach ($fields->objectFloors as $floor) {
                 $maxes[] = $floor->ceiling_height_max;
             }
-            $max = max($maxes);
-            $min = min($maxes);
+            $max = 0;
+            $min = 0;
+            if ($maxes) {
+                $max = max($maxes);
+                $min = min($maxes);
+            }
             return $this->calcMinMax($min, $max);
         };
         $fields['calc_gate_type'] = function ($fields) {

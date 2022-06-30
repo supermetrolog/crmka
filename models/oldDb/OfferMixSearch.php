@@ -292,10 +292,10 @@ class OfferMixSearch extends OfferMix
                     'from_mkad',
                     'price' => [
                         'asc' => [
-                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END ASC")
+                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END ASC")
                         ],
                         'desc' => [
-                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN price_sale_max ELSE price_safe_pallet_max END DESC")
+                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END DESC")
                         ]
                     ],
                     'area' => [
