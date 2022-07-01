@@ -142,6 +142,10 @@ class UserProfile extends \yii\db\ActiveRecord
 
             return trim($short_name);
         };
+        $fields['medium_name'] = function ($fields) {
+            $medium_name = "{$fields['first_name']} {$fields['middle_name']}";
+            return trim($medium_name);
+        };
         return $fields;
     }
     /**
