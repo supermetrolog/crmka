@@ -120,4 +120,9 @@ return
             'controller' => 'deal',
             'except' => [],
         ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'favorite-offer',
+            'except' => [],
+        ],
     ];
