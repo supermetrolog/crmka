@@ -2,6 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$db_old = require __DIR__ . '/db_old.php';
 
 $config = [
     'id' => 'basic-console',
@@ -14,6 +15,9 @@ $config = [
         '@tests' => '@app/tests',
     ],
     'components' => [
+        'notify' => [
+            'class' => app\components\NotificationService::class,
+        ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager'
         ],
@@ -29,6 +33,7 @@ $config = [
             ],
         ],
         'db' => $db,
+        'db_old' => $db_old,
     ],
     'params' => $params,
     /*

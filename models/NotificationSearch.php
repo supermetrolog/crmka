@@ -55,7 +55,7 @@ class NotificationSearch extends Notification
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 5
+                'pageSize' => 25
             ],
             'sort' => [
                 'enableMultiSort' => true,

@@ -57,6 +57,7 @@ class TimelineStep extends \yii\db\ActiveRecord
         7 => 'Сделка',
     ];
 
+    public const IS_NEGATIVE = 1;
 
     /**
      * {@inheritdoc}
@@ -308,6 +309,7 @@ class TimelineStep extends \yii\db\ActiveRecord
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
         try {
+            $post_data['updated_at'] = date('Y-m-d H:i:s');
             if ($timelineStep->load($post_data, '') && $timelineStep->save()) {
                 $timelineStep->updateSpecificStep($post_data);
                 TimelineActionComment::addActionComments($post_data);

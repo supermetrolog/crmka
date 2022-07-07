@@ -65,7 +65,8 @@ class Notification extends \yii\db\ActiveRecord
             [['consultant_id', 'body', 'type'], 'required'],
             [['consultant_id', 'type', 'status'], 'integer'],
             [['created_at'], 'safe'],
-            [['title', 'body'], 'string', 'max' => 255],
+            [['title'], 'string', 'max' => 255],
+            [['body'], 'string'],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
         ];
     }
