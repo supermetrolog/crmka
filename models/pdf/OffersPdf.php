@@ -632,6 +632,9 @@ class OffersPdf extends Model
         if ($public_services_exist) {
             return $model->tax_form . ", " . 'КУ';
         }
+        if ($model->tax_form == 0) {
+            return null;
+        }
         return $model->tax_form;
     }
     public function getOpex($model)
