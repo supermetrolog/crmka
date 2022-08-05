@@ -55,11 +55,11 @@ class ServerWS extends WebSocketServer
             $loop->run($this->_clients);
         });
 
-        // $loop = new CallsLoop;
-        // $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-        //     // echo "Timer Calls!\n";
-        //     $loop->run($this->_clients);
-        // });
+        $loop = new CallsLoop;
+        $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
+            // echo "Timer Calls!\n";
+            $loop->run($this->_clients);
+        });
 
 
         $this->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) {

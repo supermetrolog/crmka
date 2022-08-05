@@ -34,15 +34,16 @@ class Selection extends Model
             ->all();
 
 
-        $offersSearchModel = new OfferMixSearch();
         foreach ($requests as $request) {
-            $this->processedRequest($request, $offersSearchModel);
+            $this->processedRequest($request);
         }
     }
 
 
-    private function processedRequest($request, $offersSearchModel)
+    private function processedRequest($request)
     {
+        $offersSearchModel = new OfferMixSearch();
+
         $query = $this->generateQuery($request);
 
         $offers = $offersSearchModel->search($query);
@@ -53,7 +54,6 @@ class Selection extends Model
         $recommended = $offers->getModels();
 
         $count = $offers->getPagination()->totalCount;
-        var_dump($count);
 
         $selection = ServiceSelection::find()
             ->where(['request_id' => $request->id])
