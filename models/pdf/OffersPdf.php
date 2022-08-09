@@ -701,7 +701,8 @@ class OffersPdf extends Model
             } else {
                 $array[] = [
                     'class' => $classList[$i],
-                    'src' => "http://www.tinybirdgames.com/wp-content/uploads/2017/04/tinybirdgames_telegram_background_02.jpg",
+                    // 'src' => "http://www.tinybirdgames.com/wp-content/uploads/2017/04/tinybirdgames_telegram_background_02.jpg",
+                    'src' => "https://" . $this->getHost() . "/images/empty.jpg",
                 ];
             }
             $index++;

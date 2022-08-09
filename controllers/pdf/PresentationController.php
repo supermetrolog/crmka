@@ -38,6 +38,7 @@ class PresentationController extends Controller
     public function actionFuck()
     {
         $model = new OffersPdf(Yii::$app->request->queryParams);
+        var_dump($model->getHost());
         // echo "<pre>";
         // print_r($model->data);
         // var_dump($model->data->miniOffersMix[0]->id);
