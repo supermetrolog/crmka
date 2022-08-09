@@ -12,6 +12,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use consik\yii2websocket\events\ExceptionEvent;
 use app\daemons\loops\NotifyLoop;
+use Yii;
 
 class ServerWS extends WebSocketServer
 {
@@ -51,14 +52,28 @@ class ServerWS extends WebSocketServer
 
         $loop = new NotifyLoop;
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            // echo "Timer Notify!\n";
-            $loop->run($this->_clients);
+            echo "Timer Notify!\n";
+            try {
+                $loop->run($this->_clients);
+            } catch (yii\db\Exception $e) {
+                Yii::$app->db->close();
+                Yii::$app->db->open();
+                echo "exception \n";
+                $loop->run($this->_clients);
+            }
         });
 
         $loop = new CallsLoop;
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            // echo "Timer Calls!\n";
-            $loop->run($this->_clients);
+            echo "Timer Calls!\n";
+            try {
+                $loop->run($this->_clients);
+            } catch (yii\db\Exception $e) {
+                Yii::$app->db->close();
+                Yii::$app->db->open();
+                echo "exception \n";
+                $loop->run($this->_clients);
+            }
         });
 
 
