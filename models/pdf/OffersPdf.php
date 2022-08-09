@@ -45,7 +45,7 @@ class OffersPdf extends Model
             'object' => (object) $this->data->object->toArray(),
             'block' => $block
         ]);
-        if ($this->data->deal_type == 3) {
+        if ($this->data->deal_type == OfferMix::DEAL_TYPE_RESPONSE_STORAGE) {
             throw new Exception("Для ОТВЕТ-ХРАНЕНИЯ презентация не реализована!");
         }
         $this->normalizeData();
@@ -61,6 +61,15 @@ class OffersPdf extends Model
         }
         $model = (object) $model->toArray();
         $this->consultant = $model->medium_name;
+    }
+
+    public function getPresentationName()
+    {
+        $prefix = "presentation";
+        $ext = ".pdf";
+
+        $name = "_" . $this->data->object_id . "_" . OfferMix::DEAL_TYPES_STRING[$this->data->deal_type];
+        return $prefix . $name . $ext;
     }
     private function normalizeData()
     {

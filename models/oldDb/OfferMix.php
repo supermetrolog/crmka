@@ -268,6 +268,13 @@ class OfferMix extends \yii\db\ActiveRecord
     public const DEAL_TYPE_RESPONSE_STORAGE = 3;
     public const DEAL_TYPE_SUBLEASE = 4;
 
+    public const DEAL_TYPES_STRING = [
+        1 => "rent",
+        2 => "sale",
+        3 => "responce_storage",
+        4 => "sublease"
+    ];
+
     public const MINI_TYPE_ID = 1;
     public const GENERAL_TYPE_ID = 2;
 

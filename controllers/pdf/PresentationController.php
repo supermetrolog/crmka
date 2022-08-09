@@ -31,7 +31,7 @@ class PresentationController extends Controller
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4');
         $dompdf->render();
-        $dompdf->stream("pdf.pdf", ['Attachment' => false]);
+        $dompdf->stream($model->getPresentationName(), ['Attachment' => false]);
 
         return $html;
     }
