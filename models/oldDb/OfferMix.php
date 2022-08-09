@@ -310,6 +310,7 @@ class OfferMix extends \yii\db\ActiveRecord
         '330' => 65,
         '331' => 66,
         '332' => 67,
+        '333' => 3,
     ];
     /**
      * {@inheritdoc}

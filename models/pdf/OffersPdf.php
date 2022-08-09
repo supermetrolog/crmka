@@ -6,6 +6,7 @@ use app\models\oldDb\Crane;
 use app\models\oldDb\Elevator;
 use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix;
+use app\models\UserProfile;
 use Exception;
 use Yii;
 use yii\base\Model;
@@ -21,7 +22,7 @@ class OffersPdf extends Model
         $this->formatter = Yii::$app->formatter;
         $this->validateOptions($options);
         $this->consultant = $options['consultant'];
-
+        $this->normalizeConsultant();
         $this->data = OfferMix::find()->where([
             'object_id' => $options['object_id'],
             'type_id' => $options['type_id'],
@@ -48,6 +49,18 @@ class OffersPdf extends Model
             throw new Exception("Для ОТВЕТ-ХРАНЕНИЯ презентация не реализована!");
         }
         $this->normalizeData();
+    }
+
+    private function normalizeConsultant()
+    {
+        if (!is_numeric($this->consultant)) return;
+
+        $model = UserProfile::find()->where(['user_id' => OfferMix::USERS[$this->consultant]])->limit(1)->one();
+        if (!$model) {
+            throw new Exception("Пользователя с таким ID не существует");
+        }
+        $model = (object) $model->toArray();
+        $this->consultant = $model->medium_name;
     }
     private function normalizeData()
     {
