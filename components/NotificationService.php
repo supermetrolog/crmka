@@ -133,7 +133,8 @@ class NotificationService  extends Component
                     'useFileTransport' => false,
                     'transport' => [
                         'class' => 'Swift_SmtpTransport',
-                        'host' => 'mailserver3.realtor.ru',
+                        // 'host' => 'mailserver3.realtor.ru',
+                        'host' => 'mailserver.realtor.ru',
                         'port' => 25,
                         'username' => $event->username,
                         'password' => $event->password,
