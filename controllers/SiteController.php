@@ -2,8 +2,9 @@
 
 namespace app\controllers;
 
-
+use app\models\User;
 use Yii;
+use yii\base\Model;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -60,6 +61,8 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $model = User::find()->with('userProfile')->where(['id' => 3])->limit(1)->one();
+        var_dump($model->toArray(['id'], ['userProfile'], true));
         return 'fuck';
     }
 }

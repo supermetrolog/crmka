@@ -2,8 +2,9 @@
 
 namespace app\daemons\loops;
 
+use yii\base\Model;
 
-abstract class BaseLoop
+abstract class BaseLoop extends Model
 {
     protected $clients = null;
     public function run($clients)

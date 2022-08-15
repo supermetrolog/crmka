@@ -6,6 +6,7 @@ use app\daemons\loops\BaseLoop;
 use app\daemons\Message;
 use app\models\CallList;
 use app\models\Notification;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
 class CallsLoop extends BaseLoop
@@ -33,7 +34,10 @@ class CallsLoop extends BaseLoop
 
     private function getCurrentCalls()
     {
-        $models = CallList::find()->with(['caller'])->andWhere(['is', 'call_ended_status', new \yii\db\Expression('null')])->asArray()->all();
+        $models = CallList::find()->with(['caller', 'phoneFrom.contact', 'phoneTo.contact'])->andWhere(['is', 'call_ended_status', new \yii\db\Expression('null')])->all();
+        $models = array_map(function ($model) {
+            return $model->toArray([], ['caller', 'phoneFrom.contact', 'phoneTo.contact']);
+        }, $models);
         $message = new Message();
         $message->setAction('update_current_calls');
         $message->setBody($models);
@@ -42,6 +46,7 @@ class CallsLoop extends BaseLoop
         }
         $this->lastSendedCurrentCalls = $models;
     }
+
     private function modelsEqual($models1, $models2)
     {
         $ids1 = [];
