@@ -331,21 +331,28 @@ class TimelineStep extends \yii\db\ActiveRecord
             }, $extraFields['timelineStepObjects'])));
             $newObjects = [];
             foreach ($extraFields['timelineStepObjects'] as $value) {
-                $object = $value->attributes;
-                $object['comments'] = $value->comments;
-                if ($value->offer) {
-                    $object['offer'] = (array)array_merge(
-                        $value->offer->toArray(),
-                        [
-                            'object' => $value->offer->object,
-                            'comments' => $value->offer->comments,
-                            'duplicate_count' => $count[$object['offer_id']],
-                            'generalOffersMix' => (array) array_merge($value->offer->generalOffersMix->toArray(), ['offer' => $value->offer->generalOffersMix->offer])
-                        ]
-                    );
-                } else {
-                    $object['offer'] = null;
-                }
+                $object = $value->toArray([], [
+                    'comments',
+                    'offer.object',
+                    'offer.comments',
+                    'offer.generalOffersMix.offer'
+                ], true);
+                // $object['offer'] = $value->offer;
+                // $object = $value->attributes;
+                // $object['comments'] = $value->comments;
+                // if ($value->offer) {
+                //     $object['offer'] = (array)array_merge(
+                //         $value->offer->toArray(),
+                //         [
+                //             'object' => $value->offer->object,
+                //             'comments' => $value->offer->comments,
+                //             'duplicate_count' => $count[$object['offer_id']],
+                //             'generalOffersMix' => (array) array_merge($value->offer->generalOffersMix->toArray(), ['offer' => $value->offer->generalOffersMix->offer])
+                //         ]
+                //     );
+                // } else {
+                //     $object['offer'] = null;
+                // }
                 $object['duplicate_count'] = $count[$object['offer_id']];
                 $newObjects[$object['offer_id']] = $object;
             }
