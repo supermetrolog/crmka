@@ -393,7 +393,7 @@ use app\models\oldDb\OfferMix;
     <? endif; ?>
     <hr>
     <? if ($model->data->photos && count($model->data->photos) > 4 && $model->getBlocksCount() > 1) : ?>
-        <table class="photos mt-header">
+        <table class="photos mt-header p-0">
             <tbody>
                 <tr>
                     <? foreach ($model->getPhotosForBlock(2) as $photo) : ?>
@@ -410,7 +410,7 @@ use app\models\oldDb\OfferMix;
             <h3 class="four">Характеристики</h3>
         </div>
     <? else : ?>
-        <div class="title mt-header-min">
+        <div class="title mt-header-min-min">
             <h3 class="four">Характеристики</h3>
         </div>
     <? endif; ?>

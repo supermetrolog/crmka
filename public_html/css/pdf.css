@@ -98,6 +98,10 @@ table {
     margin-top: 1cm!important;
 }
 
+.mt-header-min-min {
+    margin-top: .5cm!important;
+}
+
 
 /* *********** HEADER ************ */
 
@@ -576,6 +580,11 @@ table.digital-info-container {
 
 .bl {
     border-left: 1px solid #ccc;
+}
+
+.photos.p-0 {
+    margin: 0;
+    padding: 0;
 }
 
 .photos td>div {
