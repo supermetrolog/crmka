@@ -34,9 +34,9 @@ class CallsLoop extends BaseLoop
 
     private function getCurrentCalls()
     {
-        $models = CallList::find()->with(['caller', 'phoneFrom.contact', 'phoneTo.contact'])->andWhere(['is', 'call_ended_status', new \yii\db\Expression('null')])->all();
+        $models = CallList::find()->with(['caller', 'phoneFrom.contact.company', 'phoneTo.contact.company'])->andWhere(['is', 'call_ended_status', new \yii\db\Expression('null')])->all();
         $models = array_map(function ($model) {
-            return $model->toArray([], ['caller', 'phoneFrom.contact', 'phoneTo.contact']);
+            return $model->toArray([], ['caller', 'phoneFrom.contact.company', 'phoneTo.contact.company']);
         }, $models);
         $message = new Message();
         $message->setAction('update_current_calls');

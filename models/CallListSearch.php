@@ -18,8 +18,8 @@ class CallListSearch extends CallList
     public function rules()
     {
         return [
-            [['id', 'type'], 'integer'],
-            [['caller_id', 'from', 'to', 'created_at', 'uniqueid', 'call_ended_status', 'updated_at', 'status', 'hangup_timestamp'], 'safe'],
+            [['type'], 'integer'],
+            [['id', 'caller_id', 'from', 'to', 'created_at', 'uniqueid', 'call_ended_status', 'updated_at', 'status', 'hangup_timestamp'], 'safe'],
         ];
     }
 
@@ -38,6 +38,11 @@ class CallListSearch extends CallList
         }
         return $value;
     }
+
+    public  function normalizeParams()
+    {
+        $this->id = $this->stringToArray($this->id);
+    }
     /**
      * Creates data provider instance with search query applied
      *
@@ -48,7 +53,7 @@ class CallListSearch extends CallList
     public function search($params)
     {
         // $query = CallList::find()->with(['caller', 'phoneFrom.contact', 'phoneTo.contact'])->where(['is not', 'call_ended_status', new Expression('null')]);
-        $query = CallList::find()->with(['caller', 'phoneFrom.contact', 'phoneTo.contact']);
+        $query = CallList::find()->with(['caller', 'phoneFrom.contact.company', 'phoneTo.contact.company']);
 
         // add conditions that should always apply here
 
@@ -80,7 +85,7 @@ class CallListSearch extends CallList
         ]);
 
         $this->load($params, '');
-
+        $this->normalizeParams();
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
