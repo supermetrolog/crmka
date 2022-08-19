@@ -932,7 +932,17 @@ class OffersPdf extends Model
                 ],
                 'Отопление' => [
                     'label' => 'heating',
-                    'value' => $data->heating,
+                    'value' => function () {
+                        if ($this->data->heating) {
+                            return $this->data->heating;
+                        }
+
+                        if ($this->data->heated) {
+                            return "есть";
+                        }
+
+                        return "нет";
+                    },
                     'dimension' => '',
                 ],
                 'Водоснабжение' => [
