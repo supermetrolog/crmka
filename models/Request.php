@@ -23,6 +23,7 @@ use app\models\miniModels\TimelineStep;
  *
  * @property int $id
  * @property int $company_id [связь] ID компании
+ * @property string $name Название
  * @property int $dealType Тип сделки
  * @property int|null $expressRequest [флаг] Срочный запрос
  * @property int|null $distanceFromMKAD Удаленность от МКАД
@@ -113,8 +114,8 @@ class Request extends \yii\db\ActiveRecord
             [['heated', 'antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
             [['company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
             [['created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
-            [['description'], 'string'],
-            [['passive_why_comment'], 'string', 'max' => 255],
+            [['description', 'name'], 'string'],
+            [['passive_why_comment', 'name'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
             [['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
         ];
@@ -289,8 +290,9 @@ class Request extends \yii\db\ActiveRecord
         $fields['created_at_format'] = function ($fields) {
             return $fields['created_at'] ? Yii::$app->formatter->format($fields['created_at'], 'datetime') : null;
         };
-        $fields['name'] = function ($fields) {
-            return self::DEAL_TYPE_LIST[$fields['dealType']] . " {$fields['minArea']} - {$fields['maxArea']} м";
+        $fields['format_name'] = function ($fields) {
+            $name = $fields['name'] ? $fields['name'] . " - " : "";
+            return $name . self::DEAL_TYPE_LIST[$fields['dealType']] . " {$fields['minArea']} - {$fields['maxArea']} м";
         };
         $fields['progress_percent'] = function () {
             return rand(10, 100);
