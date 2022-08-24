@@ -36,7 +36,7 @@ class RequestSearch extends Request
     public function rules()
     {
         return [
-            [['id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
+            [['outside_mkad', 'id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
             [['status', 'regions', 'directions', 'districts', 'description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectTypesGeneral', 'objectClasses', 'gateTypes'], 'safe'],
         ];
     }
@@ -156,6 +156,7 @@ class RequestSearch extends Request
             'request.minCeilingHeight' => $this->minCeilingHeight,
             'request.maxCeilingHeight' => $this->maxCeilingHeight,
             'request.firstFloorOnly' => $this->firstFloorOnly,
+            'request.outside_mkad' => $this->outside_mkad,
             // 'request.heated' => $this->heated,
             'request.minArea' => $this->minArea,
             'request.maxArea' => $this->maxArea,

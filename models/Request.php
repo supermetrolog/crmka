@@ -54,6 +54,7 @@ use app\models\miniModels\TimelineStep;
  * @property int|null $gaz [флаг]
  * @property int|null $steam [флаг]
  * @property int|null $shelving [флаг]
+ * @property int|null $outside_mkad [флаг] Вне мкад (если выбран регоин МОСКВА)
  *
  * @property Company $company
  * @property User $consultant
@@ -112,7 +113,7 @@ class Request extends \yii\db\ActiveRecord
         return [
             [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'consultant_id'], 'required'],
             [['heated', 'antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
-            [['company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
+            [['outside_mkad', 'company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
             [['created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
             [['description', 'name'], 'string'],
             [['passive_why_comment', 'name'], 'string', 'max' => 255],
