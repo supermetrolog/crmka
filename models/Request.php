@@ -55,6 +55,7 @@ use app\models\miniModels\TimelineStep;
  * @property int|null $steam [флаг]
  * @property int|null $shelving [флаг]
  * @property int|null $outside_mkad [флаг] Вне мкад (если выбран регоин МОСКВА)
+ * @property int|null $region_neardy [флаг] Регионы рядом
  *
  * @property Company $company
  * @property User $consultant
@@ -113,7 +114,7 @@ class Request extends \yii\db\ActiveRecord
         return [
             [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'consultant_id'], 'required'],
             [['heated', 'antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
-            [['outside_mkad', 'company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
+            [['region_neardy', 'outside_mkad', 'company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
             [['created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
             [['description', 'name'], 'string'],
             [['passive_why_comment', 'name'], 'string', 'max' => 255],
@@ -160,6 +161,8 @@ class Request extends \yii\db\ActiveRecord
             'sewerage' => 'Sewerage',
             'steam' => 'Steam',
             'shelving' => 'Shelving',
+            'outside_mkad' => 'Outside MKAD',
+            'region_neardy' => 'Region neardy',
         ];
     }
     public static function findModel($id)

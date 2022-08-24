@@ -846,7 +846,8 @@ class OfferMix extends \yii\db\ActiveRecord
             10 => 17,
             11 => 18,
             13 => 19,
-            12 => 20
+            12 => 20,
+            15 => 21,
         ];
         // $array = [
         //     14 => 9,

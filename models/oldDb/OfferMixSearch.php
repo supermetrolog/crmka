@@ -667,14 +667,14 @@ class OfferMixSearch extends OfferMix
                 END)
             "), $this->sewage_central]);
         }
-        if ($this->water !== null) {
-            $query->andFilterWhere(['in', new Expression("
-                (CASE WHEN c_industry_offers_mix.type_id = 1 THEN c_industry_blocks.water
-                WHEN c_industry_offers_mix.type_id = 2 THEN c_industry_offers_mix.water
-                ELSE c_industry_offers_mix.water
-                END)
-            "), $this->water]);
-        }
+        // if ($this->water !== null) {
+        //     $query->andFilterWhere(['in', new Expression("
+        //         (CASE WHEN c_industry_offers_mix.type_id = 1 THEN c_industry_blocks.water
+        //         WHEN c_industry_offers_mix.type_id = 2 THEN c_industry_offers_mix.water
+        //         ELSE c_industry_offers_mix.water
+        //         END)
+        //     "), $this->water]);
+        // }
         $query->andFilterWhere([
             'or',
             ['c_industry_offers_mix.district_moscow' => $this->district_moscow],

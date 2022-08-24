@@ -36,7 +36,7 @@ class RequestSearch extends Request
     public function rules()
     {
         return [
-            [['outside_mkad', 'id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
+            [['region_neardy', 'outside_mkad', 'id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
             [['status', 'regions', 'directions', 'districts', 'description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectTypesGeneral', 'objectClasses', 'gateTypes'], 'safe'],
         ];
     }
@@ -182,32 +182,26 @@ class RequestSearch extends Request
             'request_object_type_general.type' => $this->objectTypesGeneral,
             'request_object_class.object_class' => $this->objectClasses,
             'request_gate_type.gate_type' => $this->gateTypes,
-            'request_region.region' => $this->regions,
+
             'request_directions.direction' => $this->directions,
             'request_district.district' => $this->districts,
         ]);
-        // if ($this->objectTypesGeneral && count($this->objectTypesGeneral) > 1) {
-        //     $query->groupBy('request.id');
-        //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_type_general.type)'), count($this->objectTypesGeneral) - 1]);
-        // }
-        // if ($this->objectTypes && count($this->objectTypes) > 1) {
-        //     $query->groupBy('request.id');
-        //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_type.object_type)'), count($this->objectTypes) - 1]);
-        // }
-        // if ($this->objectClasses && count($this->objectClasses) > 1) {
-        //     $query->groupBy('request.id');
-        //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_object_class.object_class)'), count($this->objectClasses) - 1]);
-        // }
-        // if ($this->gateTypes && count($this->gateTypes) > 1) {
-        //     $query->groupBy('request.id');
-        //     $query->andFilterHaving(['>', new \yii\db\Expression('COUNT(DISTINCT request_gate_type.gate_type)'), count($this->gateTypes) - 1]);
-        // }
+
         if ($this->heated !== null) {
             $query->andFilterWhere([
                 'or',
                 ['heated' => $this->heated],
                 ['is', 'heated', new Expression('null')]
             ]);
+        }
+
+        if ($this->region_neardy) {
+            /**
+             *  TODO: узнать каике регионы являются ближайшими к МО
+             */
+            $query->andFilterWhere(['!=', 'request_region.region', 0]);
+        } else {
+            $query->andFilterWhere(['request_region.region' => $this->regions]);
         }
 
         $query->andFilterWhere(['like', 'request.description', $this->description])
