@@ -576,7 +576,8 @@ class OffersPdf extends Model
             if ($price['min'] && $price['min'] < $price['max']) {
                 return "от " . $price['min'];
             }
-            return $this->data->calc_price_general;
+            // return $this->data->calc_price_general;
+            return $this->data->calc_price_warehouse;
         }
         if ($this->data->deal_type == OfferMix::DEAL_TYPE_SALE) {
             return $this->data->calc_price_sale;
