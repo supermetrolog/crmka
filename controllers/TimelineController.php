@@ -102,6 +102,7 @@ class TimelineController extends ActiveController
             $from = null;
             if ($user['email']) {
                 $from = [$user['email'] => $userProfile['short_name']];
+                $post_data['contacts'][] = $user['email'];
             }
             $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
                 'user_id' => Yii::$app->user->identity->id,
