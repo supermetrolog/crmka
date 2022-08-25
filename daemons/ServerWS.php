@@ -52,7 +52,7 @@ class ServerWS extends WebSocketServer
 
         $loop = new NotifyLoop;
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            echo "Timer Notify!\n";
+            // echo "Timer Notify!\n";
             try {
                 $loop->run($this->_clients);
             } catch (yii\db\Exception $e) {
@@ -65,7 +65,7 @@ class ServerWS extends WebSocketServer
 
         $loop = new CallsLoop;
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            echo "Timer Calls!\n";
+            // echo "Timer Calls!\n";
             try {
                 $loop->run($this->_clients);
             } catch (yii\db\Exception $e) {
