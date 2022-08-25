@@ -183,7 +183,7 @@ class RequestSearch extends Request
             'request_object_class.object_class' => $this->objectClasses,
             'request_gate_type.gate_type' => $this->gateTypes,
 
-            'request_directions.direction' => $this->directions,
+            'request_direction.direction' => $this->directions,
             'request_district.district' => $this->districts,
         ]);
 
