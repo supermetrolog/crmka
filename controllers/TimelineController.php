@@ -135,12 +135,12 @@ class TimelineController extends ActiveController
     protected function generatePdf($query_params)
     {
 
+        $model = new OffersPdf($query_params);
         $options = new Options();
         $options->set('isRemoteEnabled', true);
         $options->set('isJavascriptEnabled', true);
-        $pdfManager = new PdfManager($options);
+        $pdfManager = new PdfManager($options, $model->getPresentationName());
 
-        $model = new OffersPdf($query_params);
         $html = $this->renderFile(Yii::getAlias('@app') . '/views/pdf/presentation/index.php', ['model' => $model]);
 
         $pdfManager->loadHtml($html);
