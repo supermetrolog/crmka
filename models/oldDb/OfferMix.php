@@ -1017,10 +1017,10 @@ class OfferMix extends \yii\db\ActiveRecord
     }
     public function getMiniOffersMix()
     {
-        return $this->hasMany(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['deleted' => 0, 'type_id' => self::MINI_TYPE_ID]);
+        return $this->hasMany(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => self::MINI_TYPE_ID]);
     }
     public function getGeneralOffersMix()
     {
-        return $this->hasOne(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['deleted' => 0, 'type_id' => self::GENERAL_TYPE_ID]);
+        return $this->hasOne(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => self::GENERAL_TYPE_ID]);
     }
 }

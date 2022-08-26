@@ -7,6 +7,7 @@ use app\events\NotificationEvent;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\CompanyFile;
+use app\models\oldDb\Objects;
 use Yii;
 use yii\data\Sort;
 use yii\db\Expression;
@@ -215,7 +216,15 @@ class Company extends \yii\db\ActiveRecord
     public function extraFields()
     {
         $extraFields = parent::extraFields();
-
+        $extraFields['contacts_count'] = function ($efields) {
+            return count($efields['contacts']);
+        };
+        $extraFields['requests_count'] = function ($efields) {
+            return count($efields['requests']);
+        };
+        $extraFields['objects_count'] = function ($efields) {
+            return count($efields['objects']);
+        };
         return $extraFields;
     }
 
@@ -475,6 +484,18 @@ class Company extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Productrange::className(), ['company_id' => 'id']);
     }
+
+
+    /**
+     * Gets query for [[productRanges]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getObjects()
+    {
+        return $this->hasMany(Objects::className(), ['company_id' => 'id']);
+    }
+
     /**
      * Gets query for [[Contacts]].
      *

@@ -43,9 +43,9 @@ class ObjectsSearch extends Objects
      */
     public function search($params)
     {
-        $query = Objects::find()->joinWith(['offerMix' => function ($query) {
-            // $query->andWhere(['c_industry_offers_mix.deleted' => 0]);
-        }])->with(['blocks', 'objectFloors']);
+        $query = Objects::find()->joinWith(['offerMix.generalOffersMix'])->with(['blocks', 'objectFloors', 'offerMix' => function ($query) {
+            $query->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => 2]);
+        }]);
 
         // add conditions that should always apply here
 
