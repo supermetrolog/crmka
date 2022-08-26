@@ -215,6 +215,7 @@ class TimelineStep extends \yii\db\ActiveRecord
                 continue;
             }
             $commentModel = new TimelineStepObjectComment([
+                'timeline_id' => $this->timeline_id,
                 'timeline_step_id' => $model->timeline_step_id,
                 'timeline_step_object_id' => $model->id,
                 'object_id' => $model->object_id,
@@ -331,28 +332,24 @@ class TimelineStep extends \yii\db\ActiveRecord
             }, $extraFields['timelineStepObjects'])));
             $newObjects = [];
             foreach ($extraFields['timelineStepObjects'] as $value) {
+                $offer_comments = [];
+                if ($offer = $value->offer) {
+                    $offer_comments = $offer->getTimelineComments($this->timeline_id)->all();
+                }
+
                 $object = $value->toArray([], [
                     'comments',
                     'offer.object',
-                    'offer.comments',
                     'offer.generalOffersMix.offer'
                 ], true);
-                // $object['offer'] = $value->offer;
-                // $object = $value->attributes;
-                // $object['comments'] = $value->comments;
-                // if ($value->offer) {
-                //     $object['offer'] = (array)array_merge(
-                //         $value->offer->toArray(),
-                //         [
-                //             'object' => $value->offer->object,
-                //             'comments' => $value->offer->comments,
-                //             'duplicate_count' => $count[$object['offer_id']],
-                //             'generalOffersMix' => (array) array_merge($value->offer->generalOffersMix->toArray(), ['offer' => $value->offer->generalOffersMix->offer])
-                //         ]
-                //     );
-                // } else {
-                //     $object['offer'] = null;
-                // }
+
+
+                if (key_exists('offer', $object)) {
+                    $object['offer']['comments'] = $offer_comments;
+                }
+
+
+
                 $object['duplicate_count'] = $count[$object['offer_id']];
                 $newObjects[$object['offer_id']] = $object;
             }
@@ -362,18 +359,6 @@ class TimelineStep extends \yii\db\ActiveRecord
             }
             return $fuck;
         };
-        // $extraFields['timelineStepObjects'] = function ($extraFields) {
-        //     $count = array_count_values((array_map(function ($item) {
-        //         return $item['object_id'];
-        //     }, $extraFields['timelineStepObjects'])));
-
-        //     foreach ($extraFields['timelineStepObjects'] as $key => $value) {
-        //         // $extraFields['timelineStepObjects']['comments'] = $value->comments;
-        //         // $extraFields['timelineStepObjects']['offer'] = $value->offer;
-        //         $extraFields['timelineStepObjects']['duplicate_count'] = $count[$value->object_id];
-        //     }
-        //     return $extraFields['timelineStepObjects'];
-        // };
         return $extraFields;
     }
     /**

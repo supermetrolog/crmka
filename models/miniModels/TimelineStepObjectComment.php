@@ -2,6 +2,7 @@
 
 namespace app\models\miniModels;
 
+use app\models\Timeline;
 use Yii;
 
 /**
@@ -14,6 +15,7 @@ use Yii;
  * @property int $type_id [СВЯЗЬ] с type_id в c_industry_offers_mix
  * @property int $object_id [СВЯЗЬ] с object_id в c_industry_offers_mix
  * @property int $timeline_step_object_id [СВЯЗЬ] с timeline_step_object
+ * @property int $timeline_id [СВЯЗЬ] с timeline
  *
  * @property TimelineStepObject $timelineStep
  * @property TimelineStepObject $timelineStepObject
@@ -35,7 +37,7 @@ class TimelineStepObjectComment extends \yii\db\ActiveRecord
     {
         return [
             [['timeline_step_id', 'comment', 'offer_id', 'type_id', 'object_id', 'timeline_step_object_id'], 'required'],
-            [['timeline_step_id', 'offer_id', 'type_id', 'object_id', 'timeline_step_object_id'], 'integer'],
+            [['timeline_id', 'timeline_step_id', 'offer_id', 'type_id', 'object_id', 'timeline_step_object_id'], 'integer'],
             [['comment'], 'string', 'max' => 255],
             [['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStepObject::className(), 'targetAttribute' => ['timeline_step_id' => 'timeline_step_id']],
             [['timeline_step_object_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStepObject::className(), 'targetAttribute' => ['timeline_step_object_id' => 'id']],
@@ -55,6 +57,7 @@ class TimelineStepObjectComment extends \yii\db\ActiveRecord
             'type_id' => 'Type ID',
             'object_id' => 'Object ID',
             'timeline_step_object_id' => 'Timeline Step Object ID',
+            'timeline_id' => 'Timeline ID',
         ];
     }
 
@@ -65,9 +68,17 @@ class TimelineStepObjectComment extends \yii\db\ActiveRecord
      */
     public function getTimelineStep()
     {
-        return $this->hasOne(TimelineStepObject::className(), ['timeline_step_id' => 'timeline_step_id']);
+        return $this->hasOne(TimelineStep::className(), ['id' => 'timeline_step_id']);
     }
-
+    /**
+     * Gets query for [[Timeline]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTimeline()
+    {
+        return $this->hasOne(Timeline::className(), ['id' => 'timeline_id']);
+    }
     /**
      * Gets query for [[TimelineStepObject]].
      *

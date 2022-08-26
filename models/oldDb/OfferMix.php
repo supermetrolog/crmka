@@ -321,6 +321,9 @@ class OfferMix extends \yii\db\ActiveRecord
         '334' => 68,
         '335' => 69
     ];
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -990,6 +993,11 @@ class OfferMix extends \yii\db\ActiveRecord
     public function getComments()
     {
         return $this->hasMany(TimelineStepObjectComment::className(), ['object_id' => 'object_id', 'type_id' => 'type_id', 'offer_id' => 'original_id']);
+    }
+
+    public function getTimelineComments($timeline_id)
+    {
+        return $this->hasMany(TimelineStepObjectComment::className(), ['object_id' => 'object_id', 'type_id' => 'type_id', 'offer_id' => 'original_id'])->where(['timeline_id' => $timeline_id]);
     }
     public function getCompany()
     {
