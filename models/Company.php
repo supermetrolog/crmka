@@ -8,6 +8,8 @@ use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\CompanyFile;
 use app\models\oldDb\Objects;
+use app\models\oldDb\OfferMix;
+use Google\Service\Dfareporting\Country;
 use Yii;
 use yii\data\Sort;
 use yii\db\Expression;
@@ -224,6 +226,10 @@ class Company extends \yii\db\ActiveRecord
         };
         $extraFields['objects_count'] = function ($efields) {
             return count($efields['objects']);
+        };
+        $extraFields['offers_count'] = function ($efields) {
+            $offers = $efields->getOffers()->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => 2])->all();
+            return count($offers);
         };
         return $extraFields;
     }
@@ -487,7 +493,7 @@ class Company extends \yii\db\ActiveRecord
 
 
     /**
-     * Gets query for [[productRanges]].
+     * Gets query for [[Objects]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -495,7 +501,15 @@ class Company extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Objects::className(), ['company_id' => 'id']);
     }
-
+    /**
+     * Gets query for [[OfferMix]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOffers()
+    {
+        return $this->hasMany(OfferMix::className(), ['company_id' => 'id']);
+    }
     /**
      * Gets query for [[Contacts]].
      *
