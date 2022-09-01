@@ -41,9 +41,9 @@ class TimelineStepObject extends \yii\db\ActiveRecord
     {
         return [
             [['timeline_step_id', 'object_id', 'offer_id'], 'required'],
-            [['timeline_step_id', 'object_id', 'status', 'option', 'type_id', 'offer_id', 'complex_id'], 'integer'],
+            [['timeline_id', 'timeline_step_id', 'object_id', 'status', 'option', 'type_id', 'offer_id', 'complex_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['comment'], 'string', 'max' => 255],
+            [['image', 'price', 'area', 'address', 'visual_id', 'deal_type_name', 'class_name', 'comment'], 'string', 'max' => 255],
             [['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStep::className(), 'targetAttribute' => ['timeline_step_id' => 'id']],
         ];
     }
@@ -65,6 +65,13 @@ class TimelineStepObject extends \yii\db\ActiveRecord
             'offer_id' => 'Offer ID',
             'complex_id' => 'Complex ID',
             'comment' => 'Comment',
+            'class_name' => 'Class Name',
+            'deal_type_name' => 'Deal Type Name',
+            'visual_id' => 'Visual ID',
+            'address' => 'Address',
+            'area' => 'Area',
+            'price' => 'Price',
+            'image' => 'Image',
         ];
     }
 
