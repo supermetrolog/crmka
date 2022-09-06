@@ -656,19 +656,16 @@ class OfferMix extends \yii\db\ActiveRecord
             return json_decode($fields['photos']);
         };
         $fields['thumb'] = function ($fields) {
-            $photos = json_decode($fields['photos']);
-            $objectPhotos = json_decode($this->object->photo);
-            $resultImage = null;
-
+            $photos = json_decode($fields['photos'], true);
+            $objectPhotos = json_decode($this->object->photo, true);
             if ($photos && is_array($photos)) {
                 foreach ($photos as $photo) {
-                    if (is_string($photo) && strlen($photo) > 2) {
-                        $resultImage = "https://pennylane.pro" . $photo;
+                    if (is_string($photo) && mb_strlen($photo) > 2) {
+                        return "https://pennylane.pro" . $photo;
                     }
                 }
             }
 
-            if ($resultImage) return $resultImage;
             if ($objectPhotos && is_array($objectPhotos) && is_string($objectPhotos[0]) && strlen($objectPhotos[0]) > 2) {
                 return "https://pennylane.pro" . $objectPhotos[0];
             }
