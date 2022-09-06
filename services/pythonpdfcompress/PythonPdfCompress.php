@@ -54,7 +54,7 @@ class PythonPdfCompress
         $return_code = null;
         exec($cmd, $output, $return_code);
         if ($return_code) {
-            throw new Exception(implode(', ', $output));
+            throw new Exception(implode(', ', $output) . " return code: $return_code");
         }
     }
 
