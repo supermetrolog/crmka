@@ -143,7 +143,7 @@ class TimelineController extends ActiveController
 
         $appPath = Yii::getAlias('@app');
 
-        $pdfManager = new PdfManager($options, $model->getPresentationName());
+        $pdfManager = new PdfManager($options, date("H:i:s") . "_" .  $model->getPresentationName());
 
         $html = $this->renderFile($appPath . '/views/pdf/presentation/index.php', ['model' => $model]);
 
