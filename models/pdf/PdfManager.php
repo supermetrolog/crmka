@@ -11,7 +11,6 @@ class PdfManager extends Dompdf
 {
     public string $savePath;
     public string $filename;
-
     public function __construct(Options $options, $name = null)
     {
         $this->savePath = "tmp/";
@@ -29,9 +28,7 @@ class PdfManager extends Dompdf
     }
     private function generateFilename()
     {
-        // $randomString = Yii::$app->getSecurity()->generateRandomString(15) . date('Y-m-d H:i:s') . time();
         $randomString = Yii::$app->getSecurity()->generateRandomString(15);
-        // $hash = base64_encode(hash("sha256", $randomString, true));
         return $randomString . '.pdf';
     }
     public function getPdfPath()

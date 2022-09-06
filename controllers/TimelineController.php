@@ -14,6 +14,7 @@ use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
 use app\models\User;
 use app\models\UserSendedData;
+use app\services\pythonpdfcompress\PythonPdfCompress;
 use Dompdf\Options;
 use Exception;
 use Yii;
@@ -139,14 +140,28 @@ class TimelineController extends ActiveController
         $options = new Options();
         $options->set('isRemoteEnabled', true);
         $options->set('isJavascriptEnabled', true);
+
+        $appPath = Yii::getAlias('@app');
+
         $pdfManager = new PdfManager($options, $model->getPresentationName());
 
-        $html = $this->renderFile(Yii::getAlias('@app') . '/views/pdf/presentation/index.php', ['model' => $model]);
+        $html = $this->renderFile($appPath . '/views/pdf/presentation/index.php', ['model' => $model]);
 
         $pdfManager->loadHtml($html);
         $pdfManager->setPaper('A4');
         $pdfManager->render();
         $pdfManager->save();
+
+        $pyScriptPath = Yii::$app->params['compressorPath'];
+        $pythonpath = Yii::$app->params['pythonPath'];
+        $inpath = $appPath . "/public_html/" . $pdfManager->getPdfPath();
+        $outpath = $appPath . "/public_html/tmp/" . Yii::$app->security->generateRandomString() . ".pdf";
+        $pythonCompresser = new PythonPdfCompress($pythonpath, $pyScriptPath, $inpath, $outpath);
+        $pythonCompresser->Compress();
+        // Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
+        $pythonCompresser->deleteOriginalFileAndChangeFileName();
+
+
         return $pdfManager;
     }
     protected function findModel($id)
