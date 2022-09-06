@@ -72,8 +72,8 @@ class TimelineController extends ActiveController
         if (!$post_data['offers'] || !is_array($post_data['offers']) || !count($post_data['offers'])) {
             throw new Exception('Вы не выбрали предложения');
         }
-        if (count($post_data['offers']) > 4) {
-            throw new Exception('Слишком много предложений! Предложений не может быть больше 4.');
+        if (count($post_data['offers']) > 20) {
+            throw new Exception('Слишком много предложений! Предложений не может быть больше 20.');
         }
         try {
             NotificationService::validateData($post_data['contacts'], $post_data['wayOfSending']);
