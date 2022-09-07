@@ -83,6 +83,13 @@ class OffersPdf extends Model
         $this->normalizeWater();
         $this->normalizeElevatorsCount();
         $this->normalizeDescription();
+        $this->normalizeVideoControl();
+        $this->normalizeInternet();
+        $this->normalizeAccessControl();
+        $this->normalizeSecurityAlert();
+        $this->normalizeFireAlert();
+        $this->normalizeGas();
+        $this->normalizeSteam();
     }
     private function normalizeDescription()
     {
@@ -93,6 +100,204 @@ class OffersPdf extends Model
             $this->data->auto_desc = null;
         }
     }
+
+
+    private function getSteamForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->steam;
+        }
+        return $model->steam;
+    }
+    private function getSteamForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $steam = $this->getSteamForMiniModel($miniOffer);
+                if ($steam) {
+                    return $steam;
+                }
+            }
+        }
+        return $model->steam;
+    }
+    private function normalizeSteam()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->steam = $this->getSteamForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->steam = $this->getSteamForGeneralModel($this->data);
+    }
+
+
+    private function getGasForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->gas;
+        }
+        return $model->gas;
+    }
+    private function getGasForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $gas = $this->getGasForMiniModel($miniOffer);
+                if ($gas) {
+                    return $gas;
+                }
+            }
+        }
+        return $model->gas;
+    }
+    private function normalizeGas()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->gas = $this->getGasForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->gas = $this->getGasForGeneralModel($this->data);
+    }
+
+
+    private function getFireAlertForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->fire_alert;
+        }
+        return $model->fire_alert;
+    }
+    private function getFireAlertForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $fire_alert = $this->getFireAlertForMiniModel($miniOffer);
+                if ($fire_alert) {
+                    return $fire_alert;
+                }
+            }
+        }
+        return $model->fire_alert;
+    }
+    private function normalizeFireAlert()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->fire_alert = $this->getFireAlertForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->fire_alert = $this->getFireAlertForGeneralModel($this->data);
+    }
+
+    private function getSecurityAlertForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->security_alert;
+        }
+        return $model->security_alert;
+    }
+    private function getSecurityAlertForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $security_alert = $this->getSecurityAlertForMiniModel($miniOffer);
+                if ($security_alert) {
+                    return $security_alert;
+                }
+            }
+        }
+        return $model->security_alert;
+    }
+    private function normalizeSecurityAlert()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->security_alert = $this->getSecurityAlertForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->security_alert = $this->getSecurityAlertForGeneralModel($this->data);
+    }
+    private function getAccessControlForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->access_control;
+        }
+        return $model->access_control;
+    }
+    private function getAccessControlForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $access_control = $this->getAccessControlForMiniModel($miniOffer);
+                if ($access_control) {
+                    return $access_control;
+                }
+            }
+        }
+        return $model->access_control;
+    }
+    private function normalizeAccessControl()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->access_control = $this->getAccessControlForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->access_control = $this->getAccessControlForGeneralModel($this->data);
+    }
+    private function getInternetForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->internet;
+        }
+        return $model->internet;
+    }
+    private function getInternetForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $internet = $this->getInternetForMiniModel($miniOffer);
+                if ($internet) {
+                    return $internet;
+                }
+            }
+        }
+        return $model->internet;
+    }
+    private function normalizeInternet()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->internet = $this->getInternetForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->internet = $this->getInternetForGeneralModel($this->data);
+    }
+
+    private function getVideoControlForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->video_control;
+        }
+        return $model->video_control;
+    }
+    private function getVideoControlForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $video_control = $this->getVideoControlForMiniModel($miniOffer);
+                if ($video_control) {
+                    return $video_control;
+                }
+            }
+        }
+        return $model->video_control;
+    }
+    private function normalizeVideoControl()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->video_control = $this->getVideoControlForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->video_control = $this->getVideoControlForGeneralModel($this->data);
+    }
+
     private function normalizeElevators()
     {
         $this->data->elevators_lift = [];
@@ -906,7 +1111,8 @@ class OffersPdf extends Model
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть'
+                        1 => 'есть',
+                        2 => 'нет'
                     ]
                 ],
                 'Охранная сигнализация' => [
