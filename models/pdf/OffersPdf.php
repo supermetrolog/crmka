@@ -118,8 +118,10 @@ class OffersPdf extends Model
                     return $steam;
                 }
             }
+        } else {
+            return $model->steam;
         }
-        return $model->steam;
+        return 0;
     }
     private function normalizeSteam()
     {
@@ -147,8 +149,10 @@ class OffersPdf extends Model
                     return $gas;
                 }
             }
+        } else {
+            return $model->gas;
         }
-        return $model->gas;
+        return 0;
     }
     private function normalizeGas()
     {
@@ -176,8 +180,10 @@ class OffersPdf extends Model
                     return $fire_alert;
                 }
             }
+        } else {
+            return $model->fire_alert;
         }
-        return $model->fire_alert;
+        return 0;
     }
     private function normalizeFireAlert()
     {
@@ -204,8 +210,10 @@ class OffersPdf extends Model
                     return $security_alert;
                 }
             }
+        } else {
+            return $model->security_alert;
         }
-        return $model->security_alert;
+        return 0;
     }
     private function normalizeSecurityAlert()
     {
@@ -231,8 +239,10 @@ class OffersPdf extends Model
                     return $access_control;
                 }
             }
+        } else {
+            return $model->access_control;
         }
-        return $model->access_control;
+        return 0;
     }
     private function normalizeAccessControl()
     {
@@ -258,8 +268,10 @@ class OffersPdf extends Model
                     return $internet;
                 }
             }
+        } else {
+            return $model->internet;
         }
-        return $model->internet;
+        return 0;
     }
     private function normalizeInternet()
     {
@@ -286,8 +298,10 @@ class OffersPdf extends Model
                     return $video_control;
                 }
             }
+        } else {
+            return $model->video_control;
         }
-        return $model->video_control;
+        return 0;
     }
     private function normalizeVideoControl()
     {
@@ -296,6 +310,11 @@ class OffersPdf extends Model
 
         if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
             $this->data->video_control = $this->getVideoControlForGeneralModel($this->data);
+        // var_dump($this->data->video_control);
+        // echo "<pre>";
+        // print_r($this->data->miniOffersMix);
+        // echo "</pre>";
+        // die;
     }
 
     private function normalizeElevators()
