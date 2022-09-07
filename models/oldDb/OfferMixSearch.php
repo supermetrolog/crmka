@@ -749,7 +749,7 @@ class OfferMixSearch extends OfferMix
              0,
               LEAST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max)
               )";
-        $rent_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max) IS NULL, 0, LEAST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max))";
+        $rent_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max) IS NULL, 0, GREATEST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max))";
         $sale_price_least = "IF(LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
         $sale_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, GREATEST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
         $rs_price_least = "IF(LEAST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min))";
