@@ -743,7 +743,12 @@ class OfferMixSearch extends OfferMix
         //         $this->rangeMinPricePerFloor
         //     ]
         // ]);
-        $rent_price_least = "IF(LEAST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max, c_industry_offers_mix.price_office_max, c_industry_offers_mix.price_office_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max, c_industry_offers_mix.price_office_max, c_industry_offers_mix.price_office_min))";
+        $rent_price_least = "IF(
+            LEAST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max) 
+            IS NULL,
+             0,
+              LEAST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max)
+              )";
         $rent_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max, c_industry_offers_mix.price_office_max, c_industry_offers_mix.price_office_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max, c_industry_offers_mix.price_office_max, c_industry_offers_mix.price_office_min))";
         $sale_price_least = "IF(LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
         $sale_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, GREATEST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
