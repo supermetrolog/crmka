@@ -748,9 +748,9 @@ class OfferMix extends \yii\db\ActiveRecord
         };
         $fields['calc_price_warehouse'] = function ($fields) {
             $array = [
-                $fields->price_mezzanine_min,
+                // $fields->price_mezzanine_min,
                 $fields->price_floor_min,
-                $fields->price_mezzanine_max,
+                // $fields->price_mezzanine_max,
                 $fields->price_floor_max,
             ];
             $min = min($array);
