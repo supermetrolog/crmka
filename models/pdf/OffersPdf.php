@@ -602,12 +602,12 @@ class OffersPdf extends Model
     public function calcPriceGeneralForRent($fields)
     {
         $array = [
-            $fields->price_mezzanine_min,
+            // $fields->price_mezzanine_min,
             $fields->price_floor_min,
-            $fields->price_mezzanine_max,
+            // $fields->price_mezzanine_max,
             $fields->price_floor_max,
-            $fields->price_office_max,
-            $fields->price_office_max,
+            // $fields->price_office_max,
+            // $fields->price_office_max,
         ];
         $min = min($array);
         $max = max($array);
