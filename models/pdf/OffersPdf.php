@@ -83,6 +83,13 @@ class OffersPdf extends Model
         $this->normalizeWater();
         $this->normalizeElevatorsCount();
         $this->normalizeDescription();
+        $this->normalizeVideoControl();
+        $this->normalizeInternet();
+        $this->normalizeAccessControl();
+        $this->normalizeSecurityAlert();
+        $this->normalizeFireAlert();
+        $this->normalizeGas();
+        $this->normalizeSteam();
     }
     private function normalizeDescription()
     {
@@ -93,6 +100,223 @@ class OffersPdf extends Model
             $this->data->auto_desc = null;
         }
     }
+
+
+    private function getSteamForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->steam;
+        }
+        return $model->steam;
+    }
+    private function getSteamForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $steam = $this->getSteamForMiniModel($miniOffer);
+                if ($steam) {
+                    return $steam;
+                }
+            }
+        } else {
+            return $model->steam;
+        }
+        return 0;
+    }
+    private function normalizeSteam()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->steam = $this->getSteamForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->steam = $this->getSteamForGeneralModel($this->data);
+    }
+
+
+    private function getGasForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->gas;
+        }
+        return $model->gas;
+    }
+    private function getGasForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $gas = $this->getGasForMiniModel($miniOffer);
+                if ($gas) {
+                    return $gas;
+                }
+            }
+        } else {
+            return $model->gas;
+        }
+        return 0;
+    }
+    private function normalizeGas()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->gas = $this->getGasForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->gas = $this->getGasForGeneralModel($this->data);
+    }
+
+
+    private function getFireAlertForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->fire_alert;
+        }
+        return $model->fire_alert;
+    }
+    private function getFireAlertForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $fire_alert = $this->getFireAlertForMiniModel($miniOffer);
+                if ($fire_alert) {
+                    return $fire_alert;
+                }
+            }
+        } else {
+            return $model->fire_alert;
+        }
+        return 0;
+    }
+    private function normalizeFireAlert()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->fire_alert = $this->getFireAlertForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->fire_alert = $this->getFireAlertForGeneralModel($this->data);
+    }
+
+    private function getSecurityAlertForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->security_alert;
+        }
+        return $model->security_alert;
+    }
+    private function getSecurityAlertForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $security_alert = $this->getSecurityAlertForMiniModel($miniOffer);
+                if ($security_alert) {
+                    return $security_alert;
+                }
+            }
+        } else {
+            return $model->security_alert;
+        }
+        return 0;
+    }
+    private function normalizeSecurityAlert()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->security_alert = $this->getSecurityAlertForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->security_alert = $this->getSecurityAlertForGeneralModel($this->data);
+    }
+    private function getAccessControlForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->access_control;
+        }
+        return $model->access_control;
+    }
+    private function getAccessControlForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $access_control = $this->getAccessControlForMiniModel($miniOffer);
+                if ($access_control) {
+                    return $access_control;
+                }
+            }
+        } else {
+            return $model->access_control;
+        }
+        return 0;
+    }
+    private function normalizeAccessControl()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->access_control = $this->getAccessControlForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->access_control = $this->getAccessControlForGeneralModel($this->data);
+    }
+    private function getInternetForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->internet;
+        }
+        return $model->internet;
+    }
+    private function getInternetForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $internet = $this->getInternetForMiniModel($miniOffer);
+                if ($internet) {
+                    return $internet;
+                }
+            }
+        } else {
+            return $model->internet;
+        }
+        return 0;
+    }
+    private function normalizeInternet()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->internet = $this->getInternetForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->internet = $this->getInternetForGeneralModel($this->data);
+    }
+
+    private function getVideoControlForMiniModel($model)
+    {
+        if ($model->block) {
+            return $model->block->video_control;
+        }
+        return $model->video_control;
+    }
+    private function getVideoControlForGeneralModel($model)
+    {
+        if ($model->miniOffersMix) {
+            foreach ($model->miniOffersMix as $miniOffer) {
+                $video_control = $this->getVideoControlForMiniModel($miniOffer);
+                if ($video_control) {
+                    return $video_control;
+                }
+            }
+        } else {
+            return $model->video_control;
+        }
+        return 0;
+    }
+    private function normalizeVideoControl()
+    {
+        if ($this->data->type_id == OfferMix::MINI_TYPE_ID)
+            $this->data->video_control = $this->getVideoControlForMiniModel($this->data);
+
+        if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
+            $this->data->video_control = $this->getVideoControlForGeneralModel($this->data);
+        // var_dump($this->data->video_control);
+        // echo "<pre>";
+        // print_r($this->data->miniOffersMix);
+        // echo "</pre>";
+        // die;
+    }
+
     private function normalizeElevators()
     {
         $this->data->elevators_lift = [];
@@ -569,10 +793,23 @@ class OffersPdf extends Model
             return "СТАВКА ЗА М<sup>2</sup>";
         }
     }
+    public function getPriceWarehouseForRent($fields)
+    {
+        $array = [
+            $fields->price_floor_min,
+            $fields->price_floor_max,
+        ];
+        $min = min($array);
+        $max = max($array);
+        return [
+            'min' => $min,
+            'max' => $max
+        ];
+    }
     public function getPrice()
     {
         if ($this->data->deal_type == OfferMix::DEAL_TYPE_RENT || $this->data->deal_type == OfferMix::DEAL_TYPE_SUBLEASE) {
-            $price = $this->calcPriceGeneralForRent($this->data);
+            $price = $this->getPriceWarehouseForRent($this->data);
             if ($price['min'] && $price['min'] < $price['max']) {
                 return "от " . $price['min'];
             }
@@ -893,7 +1130,8 @@ class OffersPdf extends Model
                     'dimension' => '',
                     'value_list' => [
                         0 => 'нет',
-                        1 => 'есть'
+                        1 => 'есть',
+                        2 => 'нет'
                     ]
                 ],
                 'Охранная сигнализация' => [
