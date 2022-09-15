@@ -141,10 +141,6 @@ class NotificationService  extends Component
                     ]
                 ]
             );
-            // $message = Yii::$app->mailer->compose($event->view, $event->viewArgv)
-            //     ->setFrom($event->from)
-            //     ->setTo($contact)
-            //     ->setSubject($event->subject);
 
             $message = $mailer->compose($event->view, $event->viewArgv)
                 ->setFrom($event->from)

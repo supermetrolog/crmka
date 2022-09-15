@@ -3,9 +3,13 @@
 namespace app\controllers;
 
 use app\exceptions\ValidationErrorHttpException;
+use app\models\miniModels\TimelineStep;
 use app\models\SendPresentation;
 use app\models\User;
+use app\models\UserSendedData;
+use app\services\emailsender\EmailSender;
 use app\services\pythonpdfcompress\PythonPdfCompress;
+use app\services\queue\jobs\SendPresentationJob;
 use app\services\queue\jobs\TestJob;
 use Yii;
 use yii\base\Model;
@@ -57,14 +61,29 @@ class SiteController extends Controller
             ],
         ];
     }
+    // public function actionIndex()
+    // {
+    //     $testPostData = [
+    //         'emails' => ["billypro6@gmail.com", "billypro6@gmail.com"],
+    //         'from' => ['tim-a@realtor.ru' => "test"],
+    //         'view' => 'presentation/index',
+    //         'viewArgv' => ['userMessage' => "comment"],
+    //         'subject' => 'Список предложений от Pennylane Realty',
+    //         // 'username' => "tim-a",
+    //         // 'password' => 'Vd$sor2'
+    //     ];
+
+    //     $testPostData['user_id'] = 3;
+    //     $model = new EmailSender();
+    //     $model->load($testPostData, '');
+    //     $model->validate();
+    //     // if (!$model->hasErrors()) {
+    //     //     $model->send();
+    //     // }
+    //     var_dump($model->getErrorSummary(false));
+    // }
     public function actionIndex()
     {
-        // $q = Yii::$app->queue;
-        // $q->push(new TestJob([
-        //     'text' => "Fuck the police"
-        // ]));
-
-
         $testPostData = [
             'comment' => "fuck",
             'contacts' => [
@@ -78,19 +97,20 @@ class SiteController extends Controller
                     'consultant' => "TIMUR"
                 ]
             ],
-            'sendClientFlag' => false,
+            'sendClientFlag' => true,
             'step' => 1,
-            'wayOfSending' => [0]
+            'wayOfSending' => [0],
+            'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
+            'description' => 'Отправил объекты на шаге "' . TimelineStep::STEPS[1] . '"',
         ];
 
+        $testPostData['user_id'] = 3;
         $model = new SendPresentation();
         $model->load($testPostData, '');
-        $model->validate();
-
-        if ($model->hasErrors()) {
-            throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        }
-        return 'fuck';
+        $q = Yii::$app->queue;
+        $q->push(new SendPresentationJob([
+            'model' => $model
+        ]));
     }
     // public function actionIndex()
     // {

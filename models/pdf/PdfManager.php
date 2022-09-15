@@ -11,9 +11,9 @@ class PdfManager extends Dompdf
 {
     public string $savePath;
     public string $filename;
-    public function __construct(Options $options, $name = null)
+    public function __construct(Options $options, $name = null, $savePath = "tmp/")
     {
-        $this->savePath = "tmp/";
+        $this->savePath = $savePath;
         $this->filename = $name ? $name : $this->generateFilename();
         parent::__construct($options);
     }

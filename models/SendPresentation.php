@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\validators\IsArrayValidator;
 use app\models\UserSendedData;
 use app\services\queue\jobs\TestJob;
 use Yii;
@@ -21,13 +22,16 @@ class SendPresentation  extends Model
     public $wayOfSending;
 
     public $user_id;
-
+    public $type;
+    public $description;
     public function rules()
     {
         return [
-            [['contacts', 'offers', 'sendClientFlag', 'step', 'wayOfSending', 'user_id'], 'required'],
-            [['user_id'], 'integer'],
+            [['description', 'type', 'contacts', 'offers', 'sendClientFlag', 'step', 'wayOfSending', 'user_id'], 'required'],
+            [['user_id', 'step'], 'integer'],
+            [['description'], 'string'],
             ['contacts', 'validateContacts'],
+            [['contacts', 'offers', 'wayOfSending'], IsArrayValidator::class],
             ['offers', 'validateOffers'],
             ['wayOfSending', 'validateWayOfSending'],
         ];
@@ -49,16 +53,6 @@ class SendPresentation  extends Model
     }
     public function validateOffers()
     {
-        if (!is_array($this->offers)) {
-            $this->addError('offers', "must be array");
-        }
-        if ($this->offers == null) {
-            $this->addError("offers", 'not be null');
-        }
-
-        if (!count($this->offers)) {
-            $this->addError("offers", 'not be empty');
-        }
         foreach ($this->offers as $offer) {
             if (!$this->checkArrayField($offer, 'object_id')) {
                 $this->addError('offers', 'object_id not be empty');
@@ -76,16 +70,6 @@ class SendPresentation  extends Model
     }
     public function validateWayOfSending()
     {
-        if (!is_array($this->wayOfSending)) {
-            $this->addError('wayOfSending', "must be array");
-        }
-        if ($this->wayOfSending == null) {
-            $this->addError("wayOfSending", 'not be null');
-        }
-
-        if (!count($this->wayOfSending)) {
-            $this->addError("wayOfSending", 'not be empty');
-        }
         // Пока работает только отправка по почте, необходимо иметь только почту
         if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $this->wayOfSending)) {
             if (!$this->emails) {
@@ -130,17 +114,6 @@ class SendPresentation  extends Model
     }
     public function validateContacts()
     {
-        if (!is_array($this->contacts)) {
-            $this->addError('contacts', "must be array");
-        }
-        if ($this->contacts == null) {
-            $this->addError("contacts", 'not be null');
-        }
-
-        if (!count($this->contacts)) {
-            $this->addError("contacts", 'not be empty');
-        }
-
         if ($this->emails == null && $this->phones == null) {
             $this->addError('contacts', 'must be contain either email or phone');
         }
