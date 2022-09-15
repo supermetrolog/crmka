@@ -21,7 +21,9 @@
         "floor12/yii2-phone": "^2.0",
         "consik/yii2-websocket": "^1.0",
         "dompdf/dompdf": "^1.1",
-        "google/apiclient": "^2.12.1"
+        "google/apiclient": "^2.12.1",
+        "enqueue/amqp-lib": "^0.10.9",
+        "yiisoft/yii2-queue": "^2.3"
 
     },
     "require-dev": {

@@ -1,5 +1,4 @@
 <?php
-
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 $db_old = require __DIR__ . '/db_old.php';
@@ -17,6 +16,14 @@ $config = [
     'components' => [
         'notify' => [
             'class' => app\components\NotificationService::class,
+        ],
+        'queue' => [
+            'class' => \yii\queue\amqp_interop\Queue::class,
+            'port' => 5672,
+            'user' => 'user',
+            'password' => 'password',
+            'queueName' => 'timur',
+            'driver' => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
         ],
         'formatter' => [
             'class' => \yii\i18n\Formatter::className(),
@@ -99,6 +106,9 @@ if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
+        'generators' => [
+            'jobs' => yii\queue\gii\Generator::class,
+        ],
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
     ];

@@ -7,7 +7,7 @@ $db_old = require __DIR__ . '/db_old.php';
 $config = [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'queue'],
     'controllerNamespace' => 'app\commands',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
@@ -17,6 +17,14 @@ $config = [
     'components' => [
         'notify' => [
             'class' => app\components\NotificationService::class,
+        ],
+        'queue' => [
+            'class' => \yii\queue\amqp_interop\Queue::class,
+            'port' => 5672,
+            'user' => 'user',
+            'password' => 'password',
+            'queueName' => 'timur',
+            'driver' => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager'
@@ -36,13 +44,11 @@ $config = [
         'db_old' => $db_old,
     ],
     'params' => $params,
-    /*
-    'controllerMap' => [
-        'fixture' => [ // Fixture generation command line.
-            'class' => 'yii\faker\FixtureController',
-        ],
-    ],
-    */
+    // 'controllerMap' => [
+    //     'fixture' => [ // Fixture generation command line.
+    //         'class' => 'yii\faker\FixtureController',
+    //     ],
+    // ],
 ];
 
 if (YII_ENV_DEV) {
