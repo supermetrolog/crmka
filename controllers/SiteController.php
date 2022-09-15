@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\exceptions\ValidationErrorHttpException;
+use app\models\SendPresentation;
 use app\models\User;
 use app\services\pythonpdfcompress\PythonPdfCompress;
 use app\services\queue\jobs\TestJob;
@@ -57,10 +59,38 @@ class SiteController extends Controller
     }
     public function actionIndex()
     {
-        $q = Yii::$app->queue;
-        $q->push(new TestJob([
-            'text' => "Fuck the police"
-        ]));
+        // $q = Yii::$app->queue;
+        // $q->push(new TestJob([
+        //     'text' => "Fuck the police"
+        // ]));
+
+
+        $testPostData = [
+            'comment' => "fuck",
+            'contacts' => [
+                'fuck@gmail.com'
+            ],
+            'offers' => [
+                [
+                    'object_id' => 10377,
+                    'type_id' => 2,
+                    'original_id' => 2938,
+                    'consultant' => "TIMUR"
+                ]
+            ],
+            'sendClientFlag' => false,
+            'step' => 1,
+            'wayOfSending' => [0]
+        ];
+
+        $model = new SendPresentation();
+        $model->load($testPostData, '');
+        $model->validate();
+
+        if ($model->hasErrors()) {
+            throw new ValidationErrorHttpException($model->getErrorSummary(false));
+        }
+        return 'fuck';
     }
     // public function actionIndex()
     // {
