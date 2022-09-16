@@ -48,4 +48,5 @@ jobs:
             php yii migrate --interactive=0 &&
             chown user:www-data -R /home/user/web/api.pennylane.pro/public_html/ &&
             chmod 775 -R /home/user/web/api.pennylane.pro/public_html/ &&
-            systemctl restart my-websocket-daemon.service
+            systemctl restart my-websocket-daemon.service &&
+            systemctl restart "my-queue-listener-daemon@*"
