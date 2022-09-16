@@ -695,7 +695,10 @@ class OffersPdf extends Model
     }
     public function getHost()
     {
-        return $_SERVER['HTTP_HOST'];
+        if (key_exists("HTTP_HOST", $_SERVER)) {
+            return $_SERVER['HTTP_HOST'];
+        }
+        return "api.pennelane.pro";
     }
 
     public function getPhoto()
