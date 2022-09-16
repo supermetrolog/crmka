@@ -698,7 +698,7 @@ class OffersPdf extends Model
         if (key_exists("HTTP_HOST", $_SERVER)) {
             return $_SERVER['HTTP_HOST'];
         }
-        return "api.pennelane.pro";
+        return "api.pennylane.pro";
     }
 
     public function getPhoto()
