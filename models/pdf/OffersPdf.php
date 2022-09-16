@@ -17,8 +17,10 @@ class OffersPdf extends Model
     public $data;
     public $consultant;
     public $formatter;
-    public function __construct($options)
+    public $host;
+    public function __construct($options, $host = "api.pennylane.pro")
     {
+        $this->host = $host;
         $this->formatter = Yii::$app->formatter;
         $this->validateOptions($options);
         $this->consultant = $options['consultant'];
@@ -698,7 +700,7 @@ class OffersPdf extends Model
         if (key_exists("HTTP_HOST", $_SERVER)) {
             return $_SERVER['HTTP_HOST'];
         }
-        return "api.pennylane.pro";
+        return $this->host;
     }
 
     public function getPhoto()
