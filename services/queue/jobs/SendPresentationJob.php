@@ -70,7 +70,7 @@ class SendPresentationJob extends BaseObject implements JobInterface
             return $defaultFrom;
         }
         if ($user['email']) {
-            return [$user['email'], $user['userProfile']['short_name']];
+            return [$user['email'] => $user['userProfile']['short_name']];
         }
 
         return $defaultFrom;
@@ -123,8 +123,6 @@ class SendPresentationJob extends BaseObject implements JobInterface
                 'password' => $this->getPassword($user),
                 'files' => $this->getFiles()
             ];
-            var_dump($data['emails']);
-            var_dump($data['from']);
             if ($this->model->sendClientFlag) {
                 $emailSender = new EmailSender();
                 $emailSender->load($data, '');
