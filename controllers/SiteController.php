@@ -87,7 +87,7 @@ class SiteController extends Controller
         $testPostData = [
             'comment' => "fuck",
             'contacts' => [
-                'fuck@gmail.com'
+                'billypro6@gmail.com'
             ],
             'offers' => [
                 [
