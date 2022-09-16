@@ -12,12 +12,15 @@ use app\events\SendMessageEvent;
 use app\models\miniModels\TimelineActionComment;
 use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
+use app\models\SendPresentation;
 use app\models\User;
 use app\models\UserSendedData;
 use app\services\pythonpdfcompress\PythonPdfCompress;
+use app\services\queue\jobs\SendPresentationJob;
 use Dompdf\Options;
 use Exception;
 use Yii;
+use yii\web\BadRequestHttpException;
 
 /**
  * RequestController implements the CRUD actions for Request model.
@@ -64,75 +67,92 @@ class TimelineController extends ActiveController
     {
         return TimelineActionComment::getTimelineComments($id);
     }
-
     public function actionSendObjects()
     {
-        $response = ['message' => 'Предложения отправлены!', 'data' => true];
+        if (!Yii::$app->request->post()) {
+            throw new BadRequestHttpException("body cannot be empty");
+        }
         $post_data = Yii::$app->request->post();
-        if (!$post_data['offers'] || !is_array($post_data['offers']) || !count($post_data['offers'])) {
-            throw new Exception('Вы не выбрали предложения');
-        }
-        if (count($post_data['offers']) > 20) {
-            throw new Exception('Слишком много предложений! Предложений не может быть больше 20.');
-        }
-        try {
-            NotificationService::validateData($post_data['contacts'], $post_data['wayOfSending']);
-        } catch (\Throwable $th) {
-            throw $th;
-        }
-        if (!$post_data['sendClientFlag']) {
-            $response['message'] = null;
-        }
-        ini_set('max_execution_time', 60 * 20);
-        ignore_user_abort(true);
-        $stepName = TimelineStep::STEPS[$post_data['step']];
-        $files = [];
-        $pdfs = [];
-        $user = User::find()->with(['userProfile'])->where(['id' => Yii::$app->user->identity->id])->limit(1)->one();
-        $userProfile = $user->userProfile->toArray();
-        if ($post_data['sendClientFlag']) {
-            foreach ($post_data['offers'] as $offer) {
-                $pdf = $this->generatePdf($offer);
-                $files[] = $pdf->getPdfPath();
-                $pdfs[] = $pdf;
-            }
-        }
-        try {
+        $post_data['user_id'] = Yii::$app->user->identity->id;
+        $post_data['type'] =  UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE;
+        $post_data['description'] = 'Отправил объекты на шаге "' . TimelineStep::STEPS[1] . '"';
 
-            $user = $user->toArray();
-            $from = null;
-            if ($user['email']) {
-                $from = [$user['email'] => $userProfile['short_name']];
-                $post_data['contacts'][] = $user['email'];
-            }
-            $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
-                'user_id' => Yii::$app->user->identity->id,
-                'view' => 'presentation/index',
-                'viewArgv' => ['userMessage' => $post_data['comment']],
-                'subject' => 'Список предложений от Pennylane Realty',
-                'contacts' => $post_data['contacts'],
-                'wayOfSending' => $post_data['wayOfSending'],
-                'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
-                'description' => 'Отправил объекты на шаге "' . $stepName . '"',
-                'notSend' => !$post_data['sendClientFlag'],
-                'files' => $files,
-                'from' => $from,
-                'username' => $user['email_username'],
-                'password' => $user['email_password'],
-            ]));
-        } catch (\Throwable $th) {
-            foreach ($pdfs as $pdf) {
-                $pdf->removeFile();
-            }
-            Yii::error($th);
-            throw $th;
-        }
-
-        foreach ($pdfs as $pdf) {
-            $pdf->removeFile();
-        }
-        return $response;
+        $model = new SendPresentation();
+        $model->load($post_data, '');
+        $q = Yii::$app->queue;
+        $q->push(new SendPresentationJob([
+            'model' => $model
+        ]));
+        return ['message' => 'Предложения отправлены!', 'data' => true];
     }
+    // public function actionSendObjects()
+    // {
+    //     $response = ['message' => 'Предложения отправлены!', 'data' => true];
+    //     $post_data = Yii::$app->request->post();
+    //     if (!$post_data['offers'] || !is_array($post_data['offers']) || !count($post_data['offers'])) {
+    //         throw new Exception('Вы не выбрали предложения');
+    //     }
+    //     if (count($post_data['offers']) > 20) {
+    //         throw new Exception('Слишком много предложений! Предложений не может быть больше 20.');
+    //     }
+    //     try {
+    //         NotificationService::validateData($post_data['contacts'], $post_data['wayOfSending']);
+    //     } catch (\Throwable $th) {
+    //         throw $th;
+    //     }
+    //     if (!$post_data['sendClientFlag']) {
+    //         $response['message'] = null;
+    //     }
+    //     ini_set('max_execution_time', 60 * 20);
+    //     ignore_user_abort(true);
+    //     $stepName = TimelineStep::STEPS[$post_data['step']];
+    //     $files = [];
+    //     $pdfs = [];
+    //     $user = User::find()->with(['userProfile'])->where(['id' => Yii::$app->user->identity->id])->limit(1)->one();
+    //     $userProfile = $user->userProfile->toArray();
+    //     if ($post_data['sendClientFlag']) {
+    //         foreach ($post_data['offers'] as $offer) {
+    //             $pdf = $this->generatePdf($offer);
+    //             $files[] = $pdf->getPdfPath();
+    //             $pdfs[] = $pdf;
+    //         }
+    //     }
+    //     try {
+
+    //         $user = $user->toArray();
+    //         $from = null;
+    //         if ($user['email']) {
+    //             $from = [$user['email'] => $userProfile['short_name']];
+    //             $post_data['contacts'][] = $user['email'];
+    //         }
+    //         $this->trigger(self::SEND_OBJECTS_EVENT, new SendMessageEvent([
+    //             'user_id' => Yii::$app->user->identity->id,
+    //             'view' => 'presentation/index',
+    //             'viewArgv' => ['userMessage' => $post_data['comment']],
+    //             'subject' => 'Список предложений от Pennylane Realty',
+    //             'contacts' => $post_data['contacts'],
+    //             'wayOfSending' => $post_data['wayOfSending'],
+    //             'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
+    //             'description' => 'Отправил объекты на шаге "' . $stepName . '"',
+    //             'notSend' => !$post_data['sendClientFlag'],
+    //             'files' => $files,
+    //             'from' => $from,
+    //             'username' => $user['email_username'],
+    //             'password' => $user['email_password'],
+    //         ]));
+    //     } catch (\Throwable $th) {
+    //         foreach ($pdfs as $pdf) {
+    //             $pdf->removeFile();
+    //         }
+    //         Yii::error($th);
+    //         throw $th;
+    //     }
+
+    //     foreach ($pdfs as $pdf) {
+    //         $pdf->removeFile();
+    //     }
+    //     return $response;
+    // }
     protected function generatePdf($query_params)
     {
 
