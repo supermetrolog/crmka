@@ -34,6 +34,7 @@ class SendPresentation  extends Model
             [['contacts', 'offers', 'wayOfSending'], IsArrayValidator::class],
             ['offers', 'validateOffers'],
             ['wayOfSending', 'validateWayOfSending'],
+            ['comment', 'safe']
         ];
     }
     private function checkArrayField($array, $key)
