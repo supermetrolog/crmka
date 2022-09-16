@@ -53,14 +53,14 @@ class SendPresentationJob extends BaseObject implements JobInterface
         $pdfManager->render();
         $pdfManager->save();
 
-        // $pyScriptPath = Yii::$app->params['compressorPath'];
-        // $pythonpath = Yii::$app->params['pythonPath'];
-        // $inpath = $appPath . "/public_html/" . $pdfManager->getPdfPath();
-        // $outpath = $appPath . "/public_html/tmp/" . Yii::$app->security->generateRandomString() . ".pdf";
-        // $pythonCompresser = new PythonPdfCompress($pythonpath, $pyScriptPath, $inpath, $outpath);
-        // $pythonCompresser->Compress();
-        // // Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
-        // $pythonCompresser->deleteOriginalFileAndChangeFileName();
+        $pyScriptPath = Yii::$app->params['compressorPath'];
+        $pythonpath = Yii::$app->params['pythonPath'];
+        $inpath = $pdfManager->getPdfPath();
+        $outpath = $appPath . "/public_html/tmp/" . Yii::$app->security->generateRandomString() . ".pdf";
+        $pythonCompresser = new PythonPdfCompress($pythonpath, $pyScriptPath, $inpath, $outpath);
+        $pythonCompresser->Compress();
+        // Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
+        $pythonCompresser->deleteOriginalFileAndChangeFileName();
         return $pdfManager;
     }
     private function getFrom($user)
