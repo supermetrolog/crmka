@@ -24,6 +24,7 @@ $config = [
             'user' => $params['rabbit']['user'],
             'password' => $params['rabbit']['password'],
             'queueName' => $params['rabbit']['queueName'],
+            'exchangeName' => $params['rabbit']['exchangeName'],
             'driver' => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
         ],
         'authManager' => [
