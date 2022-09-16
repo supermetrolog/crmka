@@ -21,9 +21,9 @@ $config = [
         'queue' => [
             'class' => \yii\queue\amqp_interop\Queue::class,
             'port' => 5672,
-            'user' => 'user',
-            'password' => 'password',
-            'queueName' => 'timur',
+            'user' => $params['rabbit']['user'],
+            'password' => $params['rabbit']['password'],
+            'queueName' => $params['rabbit']['queueName'],
             'driver' => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
         ],
         'authManager' => [
