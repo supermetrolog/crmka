@@ -123,6 +123,8 @@ class SendPresentationJob extends BaseObject implements JobInterface
                 'password' => $this->getPassword($user),
                 'files' => $this->getFiles()
             ];
+            var_dump($data['emails']);
+            var_dump($data['from']);
             if ($this->model->sendClientFlag) {
                 $emailSender = new EmailSender();
                 $emailSender->load($data, '');
