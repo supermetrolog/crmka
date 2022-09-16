@@ -34,4 +34,5 @@ jobs:
             composer install &&
             php yii migrate --interactive=0 &&
             chown user:www-data -R /home/user/web/api.supermetrolog.ru/public_html/ &&
-            chmod 775 -R /home/user/web/api.supermetrolog.ru/public_html/
+            chmod 775 -R /home/user/web/api.supermetrolog.ru/public_html/ &&
+            systemctl restart my-dev-queue-listener.service
