@@ -44,10 +44,7 @@ class SendPresentationJob extends BaseObject implements JobInterface
 
         $appPath = Yii::getAlias('@app');
 
-        // Тут изменил название файла т.к не сохраняется на винде с двоеточиями
-        // TODO: Нужно будет испрвить это
-        $pdfManager = new PdfManager($options, $model->getPresentationName(), $appPath . "/public_html/tmp/");
-        // $pdfManager = new PdfManager($options, date("H:i:s") . "_" .  $model->getPresentationName(), $appPath . "/public_html/tmp/");
+        $pdfManager = new PdfManager($options, date("His") . "_" .  $model->getPresentationName(), $appPath . "/public_html/tmp/");
 
         $html = Yii::$app->controller->renderFile($appPath . '/views/pdf/presentation/index.php', ['model' => $model]);
 
