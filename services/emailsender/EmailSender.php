@@ -42,7 +42,7 @@ class EmailSender  extends Model
         $validator = new EmailValidator();
         foreach ($this->from as $email => $name) {
             if (!$validator->validate($email)) {
-                return $this->addError($attr, '"{attribute}" contain invalid email');
+                return $this->addError($attr, '"{attribute}" contain invalid email from');
             }
         }
     }
