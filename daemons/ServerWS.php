@@ -96,7 +96,10 @@ class ServerWS extends WebSocketServer
 
     function commandPing(ConnectionInterface $client, $msg)
     {
-        $client->send('Pong');
+        $message = new Message();
+        $message->setAction('pong');
+        $message->setBody("pong");
+        return $this->_clients->sendClient($client, $message);
     }
     // function commandCheckCall(ConnectionInterface $client, $msg)
     // {
