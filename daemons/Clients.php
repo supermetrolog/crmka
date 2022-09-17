@@ -39,7 +39,7 @@ class Clients extends Model
 
     public function sendClient(ConnectionInterface $client, Message $msg)
     {
-        echo "Send Client!" . $msg->getData() . "\n";
+        // echo "Send Client!" . $msg->getData() . "\n";
         return $client->send($msg->getData());
     }
     public function sendClientPool(int $user_id, Message $msg, ConnectionInterface $notAsweredclient = null)
