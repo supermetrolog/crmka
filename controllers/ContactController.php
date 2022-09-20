@@ -53,11 +53,11 @@ class ContactController extends ActiveController
     {
         return Contact::updateContact($this->findModel($id), Yii::$app->request->post());
     }
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-        return ['message' => 'Контакт удален', 'data' => true];
-    }
+    // public function actionDelete($id)
+    // {
+    //     $this->findModel($id)->delete();
+    //     return ['message' => 'Контакт удален', 'data' => true];
+    // }
     public function actionCreateComment()
     {
         return ContactComment::createComment(Yii::$app->request->post());

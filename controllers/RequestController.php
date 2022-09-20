@@ -64,11 +64,11 @@ class RequestController extends ActiveController
     {
         return Request::updateRequest($this->findModel($id), Yii::$app->request->post());
     }
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-        return ['message' => 'Запрос удален', 'data' => true];
-    }
+    // public function actionDelete($id)
+    // {
+    //     $this->findModel($id)->delete();
+    //     return ['message' => 'Запрос удален', 'data' => true];
+    // }
     public function actionSearch()
     {
         $search = new RequestSearch();

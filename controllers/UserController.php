@@ -53,15 +53,15 @@ class UserController extends ActiveController
         $model->files = UploadedFile::getInstancesByName('files');
         return User::updateUser($this->findModel($id), $request, $model);
     }
-    public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        $model->status = User::STATUS_DELETED;
-        if ($model->save()) {
-            return ['message' => "Пользователь удален", 'data' => $id];
-        }
-        throw new ValidationErrorHttpException($model->getErrorSummary(false));
-    }
+    // public function actionDelete($id)
+    // {
+    //     $model = $this->findModel($id);
+    //     $model->status = User::STATUS_DELETED;
+    //     if ($model->save()) {
+    //         return ['message' => "Пользователь удален", 'data' => $id];
+    //     }
+    //     throw new ValidationErrorHttpException($model->getErrorSummary(false));
+    // }
     public function actionLogin()
     {
         $model = new Login();

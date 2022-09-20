@@ -47,6 +47,7 @@ class TimelineController extends ActiveController
         unset($actions['index']);
         unset($actions['view']);
         unset($actions['update']);
+        unset($actions['delete']);
         return $actions;
     }
     public function actionUpdate($id)
