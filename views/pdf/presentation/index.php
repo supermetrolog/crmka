@@ -343,7 +343,7 @@ use app\models\oldDb\OfferMix;
                         </td>
                         <td class="seven">
                             <div>
-                                <p><?= $block->heating ? $block->heating  : 'нет' ?></p>
+                                <p><?= $model->getHeated($block) ?></p>
                             </div>
                         </td>
                         <td class="eight">

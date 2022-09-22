@@ -702,7 +702,18 @@ class OffersPdf extends Model
         }
         return $this->host;
     }
+    public function getHeated($model)
+    {
+        if ($model->heating) {
+            return $model->heating;
+        }
 
+        if ($model->heated) {
+            return "есть";
+        }
+
+        return "нет";
+    }
     public function getPhoto()
     {
         $photos = $this->data->photos;
