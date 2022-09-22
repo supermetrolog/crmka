@@ -80,7 +80,7 @@ use app\models\oldDb\OfferMix;
                                 <p> Объект <b><?= $model->data->object_id ?></b></p>
                             </div>
                             <div class="content">
-                                <p class="district"><?= $model->data->district_name ?></p>
+                                <p class="district"><?= $model->data->title ?></p>
                                 <p class="type"><?= $model->data->object_type_name ?></p>
                                 <div class="items">
                                     <span class="btn-fake"><?= $model->data->town_name ?></span>
