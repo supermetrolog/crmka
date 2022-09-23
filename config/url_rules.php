@@ -110,6 +110,14 @@ return
         ],
         [
             'class' => 'yii\rest\UrlRule',
+            'controller' => 'oldDb/location',
+            'except' => [],
+            'extraPatterns' => [
+                'GET,OPTIONS region-list' => 'region-list',
+            ],
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
             'controller' => 'pdf/presentation',
             'extraPatterns' => [
                 'GET fuck' => 'fuck',

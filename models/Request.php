@@ -182,7 +182,7 @@ class Request extends \yii\db\ActiveRecord
     public static function getCompanyRequestsList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->with(['consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'objectTypesGeneral',  'regions', 'deal.competitor', 'deal.offer', 'deal.consultant.userProfile'])->where(['request.company_id' => $company_id]),
+            'query' => self::find()->with(['consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'objectTypesGeneral',  'regions.info', 'deal.competitor', 'deal.offer', 'deal.consultant.userProfile'])->where(['request.company_id' => $company_id]),
             'pagination' => [
                 'pageSize' => 0,
             ],
@@ -300,6 +300,14 @@ class Request extends \yii\db\ActiveRecord
         };
         $fields['progress_percent'] = function () {
             return rand(10, 100);
+        };
+        $fields['format_ceilingHeight'] = function ($fields) {
+            $min = $fields['minCeilingHeight'];
+            $max = $fields['maxCeilingHeight'];
+            if ($min && $max) {
+                return "$min - $max";
+            }
+            return "от $min";
         };
         $fields['pricePerFloorMonth'] = function ($fields) {
             return round($fields['pricePerFloor'] !== null ? $fields['pricePerFloor'] / 12 : $fields['pricePerFloor'], 2);

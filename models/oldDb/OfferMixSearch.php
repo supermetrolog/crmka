@@ -67,18 +67,6 @@ class OfferMixSearch extends OfferMix
         }
         return $value;
     }
-    public function normalizeRegion()
-    {
-        $regions = $this->stringToArray($this->region);
-        $array = [];
-        if (is_array($regions)) {
-            foreach ($regions as $region) {
-                $array[] = OfferMix::normalizeRegions($region);
-            }
-
-            $this->region = $array;
-        }
-    }
     public function normalizeDirection()
     {
         $directions = $this->stringToArray($this->direction);
@@ -192,7 +180,6 @@ class OfferMixSearch extends OfferMix
         $this->deal_type = OfferMix::normalizeDealType($this->deal_type);
         $this->agent_id = OfferMix::normalizeAgentId($this->agent_id);
         $this->normalizeClass();
-        $this->normalizeRegion();
         $this->normalizeDirection();
         $this->normalizeDistrict();
         $this->normalizeGates();
@@ -204,6 +191,7 @@ class OfferMixSearch extends OfferMix
         $this->normalizeHasCranes();
         $this->normalizePurposes();
         $this->normalizeHeated();
+        $this->region = $this->stringToArray($this->region);
         $this->floor_types = $this->stringToArray($this->floor_types);
         $this->type_id = $this->stringToArray($this->type_id);
         $this->object_type = $this->stringToArray($this->object_type);

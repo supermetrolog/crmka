@@ -2,6 +2,7 @@
 
 namespace app\models\miniModels;
 
+use app\models\oldDb\location\Region;
 use Yii;
 use app\models\Request;
 
@@ -58,5 +59,15 @@ class RequestRegion extends \yii\db\ActiveRecord
     public function getRequest()
     {
         return $this->hasOne(Request::className(), ['id' => 'request_id']);
+    }
+
+    /**
+     * Gets query for [[RequestRegions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInfo()
+    {
+        return $this->hasOne(Region::className(), ['id' => 'region']);
     }
 }

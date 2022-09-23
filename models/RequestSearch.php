@@ -83,7 +83,7 @@ class RequestSearch extends Request
      */
     public function search($params)
     {
-        $query = Request::find()->distinct()->joinWith(['objectTypesGeneral', 'objectTypes', 'objectClasses', 'gateTypes', 'company', 'directions', 'districts', 'regions'])->with(['consultant.userProfile', 'directions', 'districts', 'regions', 'deal.offer.generalOffersMix', 'deal.consultant.userProfile']);
+        $query = Request::find()->distinct()->joinWith(['objectTypesGeneral', 'objectTypes', 'objectClasses', 'gateTypes', 'company', 'directions', 'districts', 'regions'])->with(['consultant.userProfile', 'directions', 'districts', 'regions.info', 'deal.offer.generalOffersMix', 'deal.consultant.userProfile']);
 
         // add conditions that should always apply here
 
@@ -182,7 +182,6 @@ class RequestSearch extends Request
             'request_object_type_general.type' => $this->objectTypesGeneral,
             'request_object_class.object_class' => $this->objectClasses,
             'request_gate_type.gate_type' => $this->gateTypes,
-
             'request_direction.direction' => $this->directions,
             'request_district.district' => $this->districts,
         ]);
