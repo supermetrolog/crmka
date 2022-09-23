@@ -110,7 +110,7 @@ class SendPresentationJob extends BaseObject implements JobInterface
     private function getEmails($user)
     {
         if ($user['email']) {
-            return $this->model->emails[] = $user['email'];
+            return array_merge($this->model->emails, [$user['email']]);
         }
         return $this->model->emails;
     }
