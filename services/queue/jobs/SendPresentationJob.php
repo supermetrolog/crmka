@@ -107,6 +107,13 @@ class SendPresentationJob extends BaseObject implements JobInterface
             $pdf->removeFile();
         }
     }
+    private function getEmails($user)
+    {
+        if ($user['email']) {
+            return array_merge($this->model->emails, $user['email']);
+        }
+        return $this->model->emails;
+    }
     public function execute($q)
     {
         try {
@@ -114,7 +121,7 @@ class SendPresentationJob extends BaseObject implements JobInterface
             $user = $user->toArray([], ['userProfile']);
 
             $data = [
-                'emails' => $this->model->emails,
+                'emails' => $this->getEmails($user),
                 'from' => $this->getFrom($user),
                 'view' => 'presentation/index',
                 'viewArgv' => ['userMessage' => $this->model->comment],
