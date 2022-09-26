@@ -811,6 +811,9 @@ class OfferMixSearch extends OfferMix
                 ")]
             );
         }
+        if ($this->status == 3) {
+            $query->andFilterWhere(['c_industry_offers_mix.status' => [1, 2]]);
+        }
         if ($this->status == 1) {
             $query->andFilterWhere(['c_industry_offers_mix.status' => $this->status]);
         }
