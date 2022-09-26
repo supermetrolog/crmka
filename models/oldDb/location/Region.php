@@ -73,4 +73,9 @@ class Region extends \yii\db\ActiveRecord
 
         return $fields;
     }
+
+    public function getLocations()
+    {
+        return $this->hasMany(Location::class, ['region' => 'id']);
+    }
 }

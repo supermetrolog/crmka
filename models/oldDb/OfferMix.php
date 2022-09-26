@@ -630,7 +630,6 @@ class OfferMix extends \yii\db\ActiveRecord
             $query = User::find()->with(['userProfile'])->where(['user.id' => $user_id])->limit(1);
             return $query->one();
         };
-
         $extraFields['object_small_info'] = function ($extraFields) {
             return ['photo' => json_decode($this->object->photo)];
         };
