@@ -49,9 +49,27 @@ class LocationController extends ActiveController
     public function actionRegionList()
     {
         $models = Region::find()->orderBy(['id' => new Expression("FIELD(id, 1, 6) DESC")])->all();
-        return array_map(function ($elem) {
+        $list = array_map(function ($elem) {
             return ['value' => $elem->id, 'label' => mb_strtolower($elem->title)];
         }, $models);
+        return array_merge([
+            [
+                'value' => 'mskandmo',
+                'label' => 'Москва и МО'
+            ],
+            [
+                'value' => "mskinsidemkad",
+                'label' => 'Москва внутри МКАД'
+            ],
+            [
+                'value' => 'moandmskoutsidemkad',
+                'label' => 'МО + Москва снаружи МКАД'
+            ],
+            [
+                'value' => 'moandregionneardy',
+                'label' => 'МО + регионы рядом'
+            ]
+        ], $list);
     }
     protected function findModel($id)
     {
