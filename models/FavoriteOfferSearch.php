@@ -5,6 +5,7 @@ namespace app\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\FavoriteOffer;
+use yii\db\Expression;
 
 /**
  * FavoriteOfferSearch represents the model behind the search form of `app\models\FavoriteOffer`.
@@ -40,7 +41,7 @@ class FavoriteOfferSearch extends FavoriteOffer
      */
     public function search($params)
     {
-        $query = FavoriteOffer::find();
+        $query = FavoriteOffer::find()->joinWith(['offer'])->where(['is not', 'c_industry_offers_mix.id', new Expression("null")]);
 
         // add conditions that should always apply here
 
