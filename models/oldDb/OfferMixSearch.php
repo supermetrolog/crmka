@@ -367,7 +367,8 @@ class OfferMixSearch extends OfferMix
             }
             $searchModel = new self();
             $dp = $searchModel->search($withoutQuery);
-            $models =  $dp->getModels();
+            $dp->pagination->pageSize = 0;
+            $models = $dp->getModels();
             $ids = array_map(function ($elem) {
                 return $elem->id;
             }, $models);
