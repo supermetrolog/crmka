@@ -30,7 +30,7 @@ jobs:
     #     username: ${{ secrets.ftp_dev_server_username }}
     #     password: ${{ secrets.ftp_dev_server_password }}
 
-    - name: multiple command in PROD and DEV server
+    - name: multiple command in PROD server
       uses: appleboy/ssh-action@master
       with:
         host: 62.113.107.218
