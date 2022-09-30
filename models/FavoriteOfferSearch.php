@@ -5,6 +5,8 @@ namespace app\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\FavoriteOffer;
+use app\models\oldDb\OfferMix;
+use yii\db\Expression;
 
 /**
  * FavoriteOfferSearch represents the model behind the search form of `app\models\FavoriteOffer`.
@@ -30,7 +32,14 @@ class FavoriteOfferSearch extends FavoriteOffer
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
-
+    private function getDsnAttribute($name, $dsn)
+    {
+        if (preg_match('/' . $name . '=([^;]*)/', $dsn, $match)) {
+            return $match[1];
+        } else {
+            return null;
+        }
+    }
     /**
      * Creates data provider instance with search query applied
      *
@@ -40,7 +49,11 @@ class FavoriteOfferSearch extends FavoriteOffer
      */
     public function search($params)
     {
-        $query = FavoriteOffer::find();
+        $joinedDbName = $this->getDsnAttribute('dbname', OfferMix::getDb()->dsn);
+
+        $query = FavoriteOffer::find()->joinWith(['offer' => function ($query) use ($joinedDbName) {
+            return $query->from($joinedDbName . ".c_industry_offers_mix");
+        }])->where(['is not', $joinedDbName . '.c_industry_offers_mix.id', new Expression("null")]);
 
         // add conditions that should always apply here
 
