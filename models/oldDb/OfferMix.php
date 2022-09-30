@@ -814,7 +814,8 @@ class OfferMix extends \yii\db\ActiveRecord
 
     public static function normalizeDealType($dealType)
     {
-        if ($dealType == null) {
+        // Тройное равно обязательно инача почему-то 0 == null
+        if ($dealType === null) {
             return;
         }
         $dealTypes = [

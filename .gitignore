@@ -25,7 +25,7 @@ config/params.php
 
 /public_html/uploads
 /public_html/index.php
-
+test.txt
 #secrets
 google_drive_secrets.json
 google_drive_token.json

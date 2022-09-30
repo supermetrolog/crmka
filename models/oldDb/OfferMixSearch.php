@@ -9,6 +9,7 @@ use app\models\oldDb\location\Region;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\oldDb\OfferMix;
+use Yii;
 use yii\db\Expression;
 
 /**
