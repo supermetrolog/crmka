@@ -99,7 +99,7 @@ class CompanySearch extends Company
                         'asc' => [
                             new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'),
                             // new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
-                            new Expression('(IF ((SELECT EXISTS(SELECT r.status FROM request as r WHERE r.company_id = company.id AND r.status = 1 LIMIT 1)), request.created_at, NULL)) ASC'),
+                            new Expression('(IF ((SELECT EXISTS(SELECT r.status FROM request as r WHERE r.company_id = company.id AND r.status = 1 LIMIT 1)), request.updated_at, NULL)) ASC'),
                             'request.status' => SORT_ASC,
                             'company.rating' => SORT_ASC,
                             'company.status' => SORT_ASC,
@@ -108,7 +108,7 @@ class CompanySearch extends Company
                         'desc' => [
                             new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'),
                             // new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
-                            new Expression('(IF ((SELECT EXISTS(SELECT r.status FROM request as r WHERE r.company_id = company.id AND r.status = 1 LIMIT 1)), request.created_at, NULL)) DESC'),
+                            new Expression('(IF ((SELECT EXISTS(SELECT r.status FROM request as r WHERE r.company_id = company.id AND r.status = 1 LIMIT 1)), request.updated_at, NULL)) DESC'),
                             'request.status' => SORT_DESC,
                             'company.rating' => SORT_DESC,
                             'company.status' => SORT_DESC,
