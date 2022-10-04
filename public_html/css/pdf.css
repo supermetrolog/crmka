@@ -356,6 +356,7 @@ table {
     font-weight: bold;
     font-size: 36px;
     text-transform: uppercase;
+    line-height: 35px;
 }
 
 .main-info td.left .image .extra-info .content p.type {
