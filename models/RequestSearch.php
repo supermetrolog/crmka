@@ -120,12 +120,12 @@ class RequestSearch extends Request
                         'asc' => [
                             new Expression('FIELD(request.status, 2,0,1) ASC'),
                             'request.expressRequest' => SORT_ASC,
-                            'request.created_at' => SORT_ASC
+                            'request.updated_at' => SORT_ASC
                         ],
                         'desc' => [
                             new Expression('FIELD(request.status, 2,0,1) DESC'),
                             'request.expressRequest' => SORT_DESC,
-                            'request.created_at' => SORT_DESC
+                            'request.updated_at' => SORT_DESC
                         ],
                     ]
                 ]
