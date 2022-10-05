@@ -467,7 +467,7 @@ use app\models\oldDb\OfferMix;
         </div>
     </div>
 
-    <? if ($model->data->photos && count($model->data->photos) <= 4 || $model->getBlocksCount() <= 1) : ?>
+    <!-- <? if ($model->data->photos && count($model->data->photos) <= 4 || $model->getBlocksCount() <= 1) : ?>
         <table class="after-parameters mt-header">
             <div class="container">
                 <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
@@ -479,7 +479,7 @@ use app\models\oldDb\OfferMix;
             </div>
 
         </table>
-    <? endif; ?>
+    <? endif; ?> -->
     <? if ($model->getBlocksCount() > 1 || count($model->data->photos) > 1 && $model->data->auto_desc) : ?>
         <hr>
     <? endif; ?>
