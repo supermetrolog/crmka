@@ -21,6 +21,7 @@ use Yii;
  */
 class UserSendedData extends \yii\db\ActiveRecord
 {
+    public const PHONE_CONTACT_TYPE = -1;
     public const EMAIL_CONTACT_TYPE = 0;
     public const SMS_CONTACT_TYPE = 1;
     public const WHATSAPP_CONTACT_TYPE = 2;

@@ -142,9 +142,18 @@ class SendPresentationJob extends BaseObject implements JobInterface
                 }
             }
 
-            foreach ($this->model->emails as $email) {
-                $this->saveUserSendedData($email, UserSendedData::EMAIL_CONTACT_TYPE);
+            foreach ($this->model->wayOfSending as $way) {
+                if ($way == UserSendedData::EMAIL_CONTACT_TYPE) {
+                    foreach ($this->model->emails as $email) {
+                        $this->saveUserSendedData($email, $way);
+                    }
+                } else {
+                    foreach ($this->model->phones as $phone) {
+                        $this->saveUserSendedData($phone, $way);
+                    }
+                }
             }
+
             $this->removeAllPdfs();
         } catch (\Throwable $th) {
             $this->removeAllPdfs();

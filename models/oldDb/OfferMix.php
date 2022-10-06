@@ -3,6 +3,7 @@
 namespace app\models\oldDb;
 
 use app\models\Company;
+use app\models\Contact;
 use app\models\miniModels\TimelineStepObjectComment;
 use app\models\Request;
 use app\models\User;
@@ -1019,5 +1020,9 @@ class OfferMix extends \yii\db\ActiveRecord
     public function getGeneralOffersMix()
     {
         return $this->hasOne(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => self::GENERAL_TYPE_ID]);
+    }
+    public function getContact()
+    {
+        return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
     }
 }

@@ -27,6 +27,18 @@ $config = [
             'exchangeName' => $params['rabbit']['exchangeName'],
             'driver' => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
         ],
+        'formatter' => [
+            'class' => \yii\i18n\Formatter::className(),
+            'dateFormat' => 'long',
+            'currencyCode' => 'RUB',
+            'decimalSeparator' => '.',
+            'thousandSeparator' => ' ',
+            'nullDisplay' => '',
+            'numberFormatterOptions' => [
+                NumberFormatter::MIN_FRACTION_DIGITS => 0,
+                NumberFormatter::MAX_FRACTION_DIGITS => 2,
+            ]
+        ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager'
         ],

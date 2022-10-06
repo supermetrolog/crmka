@@ -71,13 +71,32 @@ class SendPresentation  extends Model
     }
     public function validateWayOfSending()
     {
-        // Пока работает только отправка по почте, необходимо иметь только почту
-        if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $this->wayOfSending)) {
-            if (!$this->emails) {
-                $this->addError('contacts', 'must be contain emails');
+        if (!$this->sendClientFlag) {
+            if (
+                in_array(UserSendedData::SMS_CONTACT_TYPE, $this->wayOfSending) ||
+                in_array(UserSendedData::TELEGRAM_CONTACT_TYPE, $this->wayOfSending) ||
+                in_array(UserSendedData::VIBER_CONTACT_TYPE, $this->wayOfSending) ||
+                in_array(UserSendedData::WHATSAPP_CONTACT_TYPE, $this->wayOfSending)
+            ) {
+                if (!$this->phones) {
+                    $this->addError('contacts', 'must be contain phone');
+                }
             }
+            if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $this->wayOfSending)) {
+                if (!$this->emails) {
+                    $this->addError('contacts', 'must be contain emails');
+                }
+            }
+            return;
         } else {
-            $this->addError('wayOfSending', 'must contain email contact type, the rest are not supported yet');
+            // Пока работает только отправка по почте, необходимо иметь только почту
+            if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $this->wayOfSending)) {
+                if (!$this->emails) {
+                    $this->addError('contacts', 'must be contain emails');
+                }
+            } else {
+                $this->addError('wayOfSending', 'must contain email contact type, the rest are not supported yet');
+            }
         }
     }
     private static function normalizeContacts($contacts)
