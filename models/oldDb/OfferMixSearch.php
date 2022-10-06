@@ -358,7 +358,7 @@ class OfferMixSearch extends OfferMix
 
 
         if (!$this->noWith) {
-            $query->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'company.mainContact.phones', 'comments']);
+            $query->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'company.mainContact.phones', 'comments', 'contact']);
             if ($this->timeline_id) {
                 $query->with(['comments' => function ($query) use ($joinedDbName) {
                     return $query->from("$joinedDbName.timeline_step_object_comment")->where(["$joinedDbName.timeline_step_object_comment.timeline_id" => $this->timeline_id]);
