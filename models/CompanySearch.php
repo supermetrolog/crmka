@@ -69,7 +69,7 @@ class CompanySearch extends Company
             $query->joinWith(['phones'])->with(['emails', 'contactComments']);
         }, 'categories'])->with([
             'requests' => function ($query) {
-                $query->where(['request.status' => Request::STATUS_ACTIVE]);
+                $query->with(['timelines.timelineSteps'])->where(['request.status' => Request::STATUS_ACTIVE]);
             },
             'companyGroup', 'broker', 'deals', 'dealsRequestEmpty', 'consultant.userProfile', 'productRanges',
             'mainContact.emails', 'mainContact.phones'
