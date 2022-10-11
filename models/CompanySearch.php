@@ -74,7 +74,7 @@ class CompanySearch extends Company
                 }])->where(['request.status' => Request::STATUS_ACTIVE]);
             },
             'companyGroup', 'broker', 'deals', 'dealsRequestEmpty', 'consultant.userProfile', 'productRanges',
-            'mainContact.emails', 'mainContact.phones'
+            'mainContact.emails', 'mainContact.phones', 'objects.offerMix.generalOffersMix', 'objects.objectFloors'
         ]);
 
         $dataProvider = new ActiveDataProvider([
