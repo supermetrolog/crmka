@@ -734,8 +734,8 @@ class OfferMixSearch extends OfferMix
         ]);
         $query->andFilterWhere([
             'and',
-            ['<=', 'c_industry_offers_mix.area_min', $this->rangeMaxArea],
-            ['>=', 'c_industry_offers_mix.area_max', $this->rangeMinArea],
+            ['<=', 'LEAST(c_industry_offers_mix.area_max, c_industry_offers_mix.area_min)', $this->rangeMaxArea],
+            ['>=', 'GREATEST(c_industry_offers_mix.area_max, c_industry_offers_mix.area_min)', $this->rangeMinArea],
         ]);
 
         $query->andFilterWhere([
