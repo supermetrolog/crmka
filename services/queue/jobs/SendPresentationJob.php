@@ -125,7 +125,7 @@ class SendPresentationJob extends BaseObject implements JobInterface
                 'from' => $this->getFrom($user),
                 'view' => 'presentation/index',
                 'viewArgv' => ['userMessage' => $this->model->comment],
-                'subject' => 'Список предложений от Pennylane Realty',
+                'subject' => $this->model->subject,
                 'username' => $this->getUsername($user),
                 'password' => $this->getPassword($user),
                 'files' => $this->getFiles()

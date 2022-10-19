@@ -16,6 +16,7 @@ class SendPresentation  extends Model
     public $phones;
 
     public $comment;
+    public $subject;
     public $offers;
     public $sendClientFlag;
     public $step;
@@ -29,7 +30,7 @@ class SendPresentation  extends Model
         return [
             [['description', 'type', 'contacts', 'offers', 'sendClientFlag', 'step', 'wayOfSending', 'user_id'], 'required'],
             [['user_id', 'step'], 'integer'],
-            [['description'], 'string'],
+            [['description', 'subject'], 'string'],
             ['contacts', 'validateContacts'],
             [['contacts', 'offers', 'wayOfSending'], IsArrayValidator::class],
             ['offers', 'validateOffers'],
