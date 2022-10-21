@@ -726,7 +726,7 @@ class OfferMix extends \yii\db\ActiveRecord
             // $area_office = max([$fields->area_office_min, $fields->area_office_max]);
             // return Yii::$app->formatter->format($area_warehouse_max + $area_office, 'decimal');
 
-            return $this->calcMinMaxArea($fields->area_min, $fields->area_max);
+            return $this->calcMinMaxArea(min($fields->area_min, $fields->area_max), max($fields->area_min, $fields->area_max));
         };
         $fields['calc_price_floor'] = function ($fields) {
             return $this->calcMinMaxArea($fields->price_floor_min, $fields->price_floor_max);
