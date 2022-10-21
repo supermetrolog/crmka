@@ -737,12 +737,10 @@ class OffersPdf extends Model
 
     public function getAreaLabel()
     {
-        if ($this->data->deal_type == 1) {
-            return "ПЛОЩАДИ В АРЕНДУ";
-        }
-        if ($this->data->deal_type == 2) {
+        if ($this->data->deal_type == OfferMix::DEAL_TYPE_SALE) {
             return "ПЛОЩАДИ НА ПРОДАЖУ";
         }
+        return "ПЛОЩАДИ В АРЕНДУ";
     }
     public function getAreaMax($model)
     {
@@ -802,12 +800,10 @@ class OffersPdf extends Model
     }
     public function getPriceLabel()
     {
-        if ($this->data->deal_type == 1) {
-            return "СТАВКА ЗА М<sup>2</sup>/ГОД";
-        }
-        if ($this->data->deal_type == 2) {
+        if ($this->data->deal_type == OfferMix::DEAL_TYPE_SALE) {
             return "СТАВКА ЗА М<sup>2</sup>";
         }
+        return "СТАВКА ЗА М<sup>2</sup>/ГОД";
     }
     public function getPriceWarehouseForRent($fields)
     {
