@@ -14,10 +14,12 @@ use Yii;
  * @property string|null $body Текст письма
  * @property string $created_at
  * @property int $status 1 - отправлено, 0 - ошибка
+ * @property int $type Отправлено из таймлайна или другим способом
  *
  * @property User $user
  * @property LetterContact[] $letterContacts
  * @property LetterOffer[] $letterOffers
+ * @property LetterWay[] $letterWays
  */
 class Letter extends \yii\db\ActiveRecord
 {
@@ -35,8 +37,8 @@ class Letter extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id'], 'required'],
-            [['user_id', 'status'], 'integer'],
+            [['user_id', 'type'], 'required'],
+            [['user_id', 'status', 'type'], 'integer'],
             [['body'], 'string'],
             [['created_at'], 'safe'],
             [['subject'], 'string', 'max' => 255],
@@ -56,6 +58,7 @@ class Letter extends \yii\db\ActiveRecord
             'body' => 'Body',
             'created_at' => 'Created At',
             'status' => 'Status',
+            'type' => 'Type',
         ];
     }
 
@@ -87,5 +90,15 @@ class Letter extends \yii\db\ActiveRecord
     public function getLetterOffers()
     {
         return $this->hasMany(LetterOffer::className(), ['letter_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[LetterWays]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLetterWays()
+    {
+        return $this->hasMany(LetterWay::className(), ['letter_id' => 'id']);
     }
 }
