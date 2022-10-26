@@ -4,6 +4,7 @@ namespace app\models\letter;
 
 use app\models\User;
 use Yii;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "letter".
@@ -15,6 +16,7 @@ use Yii;
  * @property string $created_at
  * @property int $status 1 - отправлено, 0 - ошибка
  * @property int $type Отправлено из таймлайна или другим способом
+ * @property int $shipping_method Отправлено из таймлайна или другим способом
  *
  * @property User $user
  * @property LetterContact[] $letterContacts
@@ -23,6 +25,12 @@ use Yii;
  */
 class Letter extends \yii\db\ActiveRecord
 {
+    const TYPE_FROM_TIMELINE = 1;
+    const STATUS_ERROR = 0;
+    const STATUS_SUCCESS = 1;
+
+    const SHIPPING_FROM_SYSTEM_METHOD = 1;
+    const SHIPPING_OTHER_METHOD = 0;
     /**
      * {@inheritdoc}
      */
@@ -37,8 +45,8 @@ class Letter extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'type'], 'required'],
-            [['user_id', 'status', 'type'], 'integer'],
+            [['user_id', 'type', 'shipping_method'], 'required'],
+            [['user_id', 'status', 'type', 'shipping_method'], 'integer'],
             [['body'], 'string'],
             [['created_at'], 'safe'],
             [['subject'], 'string', 'max' => 255],
@@ -59,6 +67,7 @@ class Letter extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'status' => 'Status',
             'type' => 'Type',
+            'shipping_method' => 'Shippin Method',
         ];
     }
 
@@ -80,6 +89,26 @@ class Letter extends \yii\db\ActiveRecord
     public function getLetterContacts()
     {
         return $this->hasMany(LetterContact::className(), ['letter_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[LetterContacts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLetterEmails()
+    {
+        return $this->hasMany(LetterContact::className(), ['letter_id' => 'id'])->where(['is not', 'email_id', new Expression("null")]);
+    }
+
+    /**
+     * Gets query for [[LetterContacts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLetterPhones()
+    {
+        return $this->hasMany(LetterContact::className(), ['letter_id' => 'id'])->where(['is not', 'phone_id', new Expression("null")]);
     }
 
     /**

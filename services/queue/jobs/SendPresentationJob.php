@@ -3,9 +3,8 @@
 namespace app\services\queue\jobs;
 
 use app\events\NotificationEvent;
-use app\events\SendMessageEvent;
 use app\exceptions\ValidationErrorHttpException;
-use app\models\miniModels\TimelineStep;
+use app\models\letter\Letter;
 use app\models\Notification;
 use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
@@ -91,10 +90,11 @@ class SendPresentationJob extends BaseObject implements JobInterface
         }
         return $user['email_password'];
     }
-    private function getFiles()
+    private function getFiles($user)
     {
         $files = [];
         foreach ($this->model->offers as  $offer) {
+            $offer['consultant'] = $user['userProfile']['medium_name'];
             $pdf = $this->generatePresentation($offer);
             $files[] = $pdf->getPdfPath();
             $this->pdfs[] = $pdf;
@@ -128,37 +128,23 @@ class SendPresentationJob extends BaseObject implements JobInterface
                 'subject' => $this->model->subject,
                 'username' => $this->getUsername($user),
                 'password' => $this->getPassword($user),
-                'files' => $this->getFiles()
+                'files' => $this->getFiles($user)
             ];
-            if ($this->model->sendClientFlag) {
-                $emailSender = new EmailSender();
-                $emailSender->load($data, '');
-                $emailSender->validate();
-                if ($emailSender->hasErrors()) {
-                    throw new Exception("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
-                }
-                if (!$emailSender->send()) {
-                    throw new Exception("Email send error");
-                }
+            $emailSender = new EmailSender();
+            $emailSender->load($data, '');
+            $emailSender->validate();
+            if ($emailSender->hasErrors()) {
+                throw new Exception("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
             }
-
-            foreach ($this->model->wayOfSending as $way) {
-                if ($way == UserSendedData::EMAIL_CONTACT_TYPE) {
-                    foreach ($this->model->emails as $email) {
-                        $this->saveUserSendedData($email, $way);
-                    }
-                } else {
-                    foreach ($this->model->phones as $phone) {
-                        $this->saveUserSendedData($phone, $way);
-                    }
-                }
+            if (!$emailSender->send()) {
+                throw new Exception("Email send error");
             }
 
             $this->removeAllPdfs();
         } catch (\Throwable $th) {
             $this->removeAllPdfs();
-            // TODO: Сдесь нужно послать ошибку пользователю по почте и на сайте
             $this->notifyUser($th->getMessage());
+            $this->changeLetterStatus(Letter::STATUS_ERROR);
             throw $th;
         }
     }
@@ -171,18 +157,10 @@ class SendPresentationJob extends BaseObject implements JobInterface
             'body' => "Ошибка отправки презентаций: {$error}. По контактам: " . implode(', ', $this->model->emails)
         ]));
     }
-    private function saveUserSendedData($contact, $contactType)
+    private function changeLetterStatus($status)
     {
-        $model = new UserSendedData([
-            'user_id' => $this->model->user_id,
-            'contact' => $contact,
-            'contact_type' => $contactType,
-            'type' => $this->model->type,
-            'description' => $this->model->description
-        ]);
-
-        if (!$model->save()) {
-            throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        }
+        $model = Letter::findOne($this->model->letter_id);
+        $model->status = $status;
+        $model->save(false);
     }
 }

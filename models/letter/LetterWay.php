@@ -15,6 +15,11 @@ use Yii;
  */
 class LetterWay extends \yii\db\ActiveRecord
 {
+    public const WAY_EMAIL = 0;
+    public const WAY_SMS = 1;
+    public const WAY_WHATSAPP = 2;
+    public const WAY_TELEGRAM = 3;
+    public const WAY_VIBER = 4;
     /**
      * {@inheritdoc}
      */
@@ -30,6 +35,7 @@ class LetterWay extends \yii\db\ActiveRecord
     {
         return [
             [['letter_id', 'way'], 'required'],
+            ['way', 'in', 'range' => [self::WAY_EMAIL, self::WAY_SMS, self::WAY_WHATSAPP, self::WAY_TELEGRAM, self::WAY_VIBER]],
             [['letter_id', 'way'], 'integer'],
             [['letter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Letter::className(), 'targetAttribute' => ['letter_id' => 'id']],
         ];

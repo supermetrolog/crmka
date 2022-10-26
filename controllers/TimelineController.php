@@ -7,18 +7,13 @@ use app\models\miniModels\TimelineStep;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
-use app\components\NotificationService;
-use app\events\SendMessageEvent;
+use app\models\letter\CreateLetter;
+use app\models\letter\Letter;
+use app\models\miniModels\Email;
+use app\models\miniModels\Phone;
 use app\models\miniModels\TimelineActionComment;
-use app\models\pdf\OffersPdf;
-use app\models\pdf\PdfManager;
 use app\models\SendPresentation;
-use app\models\User;
-use app\models\UserSendedData;
-use app\services\pythonpdfcompress\PythonPdfCompress;
 use app\services\queue\jobs\SendPresentationJob;
-use Dompdf\Options;
-use Exception;
 use Yii;
 use yii\web\BadRequestHttpException;
 
@@ -38,7 +33,7 @@ class TimelineController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index']);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'send-objects']);
     }
 
     public function actions()
@@ -73,18 +68,40 @@ class TimelineController extends ActiveController
         if (!Yii::$app->request->post()) {
             throw new BadRequestHttpException("body cannot be empty");
         }
-        $post_data = Yii::$app->request->post();
-        $post_data['user_id'] = Yii::$app->user->identity->id;
-        $post_data['type'] =  UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE;
-        $post_data['description'] = 'Отправил объекты на шаге "' . TimelineStep::STEPS[1] . '"';
 
+        $post_data = Yii::$app->request->post();
+        // $post_data['user_id'] = Yii::$app->user->identity->id;
+        $post_data['user_id'] = 3;
+        $post_data['type'] = Letter::TYPE_FROM_TIMELINE;
+        $createLetterModel = new CreateLetter();
+        $createLetterModel->create($post_data);
+        if ($createLetterModel->letterModel->shipping_method == Letter::SHIPPING_OTHER_METHOD) {
+            return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
+        }
         $model = new SendPresentation();
-        $model->load($post_data, '');
+        $model->load($this->getDataForSendPresentationModel($createLetterModel), '');
         $q = Yii::$app->queue;
         $q->push(new SendPresentationJob([
             'model' => $model
         ]));
-        return ['message' => 'Предложения отправлены!', 'data' => true];
+        return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
+    }
+    private function getDataForSendPresentationModel(CreateLetter $createLetterModel): array
+    {
+        return [
+            'offers' => $createLetterModel->offers,
+            'emails' => array_map(function ($elem) {
+                if ($model = Email::findOne($elem)) return $model->email;
+            }, $createLetterModel->contacts['emails']),
+            'phones' => array_map(function ($elem) {
+                if ($model = Phone::findOne($elem)) return $model->phone;
+            }, $createLetterModel->contacts['phones']),
+            'comment' => $createLetterModel->letterModel->body,
+            'subject' => $createLetterModel->letterModel->subject,
+            'wayOfSending' => $createLetterModel->ways,
+            'letter_id' => $createLetterModel->letterModel->id,
+            'user_id' => $createLetterModel->letterModel->user_id
+        ];
     }
     protected function findModel($id)
     {

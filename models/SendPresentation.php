@@ -3,39 +3,31 @@
 namespace app\models;
 
 use app\helpers\validators\IsArrayValidator;
-use app\models\UserSendedData;
-use app\services\queue\jobs\TestJob;
-use Yii;
+use app\models\letter\LetterWay;
 use yii\base\Model;
 
 class SendPresentation  extends Model
 {
 
-    public $contacts;
     public $emails;
     public $phones;
 
     public $comment;
     public $subject;
     public $offers;
-    public $sendClientFlag;
-    public $step;
     public $wayOfSending;
-
+    public $letter_id;
     public $user_id;
-    public $type;
-    public $description;
     public function rules()
     {
         return [
-            [['description', 'type', 'contacts', 'offers', 'sendClientFlag', 'step', 'wayOfSending', 'user_id'], 'required'],
-            [['user_id', 'step'], 'integer'],
-            [['description', 'subject'], 'string'],
-            ['contacts', 'validateContacts'],
-            [['contacts', 'offers', 'wayOfSending'], IsArrayValidator::class],
+            [['offers', 'wayOfSending', 'user_id', 'letter_id'], 'required'],
+            [['user_id', 'letter_id'], 'integer'],
+            [['subject'], 'string'],
+            [['offers', 'wayOfSending'], IsArrayValidator::class],
             ['offers', 'validateOffers'],
             ['wayOfSending', 'validateWayOfSending'],
-            ['comment', 'safe']
+            [['comment', 'emails', 'phones'], 'safe']
         ];
     }
     private function checkArrayField($array, $key)
@@ -65,72 +57,27 @@ class SendPresentation  extends Model
             if (!$this->checkArrayField($offer, 'type_id')) {
                 $this->addError('offers', 'type_id not be empty');
             }
-            if (!$this->checkArrayField($offer, 'consultant')) {
-                $this->addError('offers', 'consultant not be empty');
-            }
         }
     }
     public function validateWayOfSending()
     {
-        if (!$this->sendClientFlag) {
-            if (
-                in_array(UserSendedData::SMS_CONTACT_TYPE, $this->wayOfSending) ||
-                in_array(UserSendedData::TELEGRAM_CONTACT_TYPE, $this->wayOfSending) ||
-                in_array(UserSendedData::VIBER_CONTACT_TYPE, $this->wayOfSending) ||
-                in_array(UserSendedData::WHATSAPP_CONTACT_TYPE, $this->wayOfSending)
-            ) {
-                if (!$this->phones) {
-                    $this->addError('contacts', 'must be contain phone');
-                }
+        if (
+            in_array(LetterWay::WAY_SMS, $this->wayOfSending) ||
+            in_array(LetterWay::WAY_TELEGRAM, $this->wayOfSending) ||
+            in_array(LetterWay::WAY_VIBER, $this->wayOfSending) ||
+            in_array(LetterWay::WAY_WHATSAPP, $this->wayOfSending)
+        ) {
+            if (!$this->phones) {
+                $this->addError('contacts', 'must be contain phone');
             }
-            if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $this->wayOfSending)) {
-                if (!$this->emails) {
-                    $this->addError('contacts', 'must be contain emails');
-                }
+        }
+        // Пока работает только отправка по почте, необходимо иметь только почту
+        if (in_array(LetterWay::WAY_EMAIL, $this->wayOfSending)) {
+            if (!$this->emails) {
+                $this->addError('contacts', 'must be contain emails');
             }
-            return;
         } else {
-            // Пока работает только отправка по почте, необходимо иметь только почту
-            if (in_array(UserSendedData::EMAIL_CONTACT_TYPE, $this->wayOfSending)) {
-                if (!$this->emails) {
-                    $this->addError('contacts', 'must be contain emails');
-                }
-            } else {
-                $this->addError('wayOfSending', 'must contain email contact type, the rest are not supported yet');
-            }
-        }
-    }
-    private static function normalizeContacts($contacts)
-    {
-        $newContacts = [
-            'phones' => [],
-            'emails' => []
-        ];
-        foreach ($contacts as $contact) {
-            if (str_contains($contact, '@')) {
-                $newContacts['emails'][] = $contact;
-            } else {
-                preg_match_all('!\d+!', $contact, $numbers);
-                $phone = implode('', $numbers[0]);
-                if ($phone != '') {
-                    $newContacts['phones'][] = $phone;
-                }
-            }
-        }
-        if (!count($newContacts['emails']) && !count($newContacts['phones'])) {
-            return false;
-        }
-        return $newContacts;
-    }
-    public function load($data, $formName = null)
-    {
-        parent::load($data, $formName);
-        if (is_array($this->contacts) && count($this->contacts)) {
-            $contacts = $this->normalizeContacts($this->contacts);
-            if ($contacts) {
-                $this->emails =  $contacts['emails'];
-                $this->phones =  $contacts['phones'];
-            }
+            $this->addError('wayOfSending', 'must contain email contact type, the rest are not supported yet');
         }
     }
     public function validateContacts()
@@ -138,12 +85,5 @@ class SendPresentation  extends Model
         if ($this->emails == null && $this->phones == null) {
             $this->addError('contacts', 'must be contain either email or phone');
         }
-    }
-    public function send()
-    {
-        $q = Yii::$app->queue;
-        $q->push(new TestJob([
-            'text' => "Fuck the police"
-        ]));
     }
 }

@@ -14,4 +14,11 @@ class IsArrayValidator extends Validator
             $this->addError($model, $attr, '"{attribute}" must be array');
         }
     }
+    /**
+     * {@inheritdoc}
+     */
+    protected function validateValue($value)
+    {
+        return is_array($value);
+    }
 }
