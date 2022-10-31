@@ -133,4 +133,10 @@ return
             'controller' => 'favorite-offer',
             'except' => [],
         ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => 'letter',
+            'except' => [],
+
+        ],
     ];
