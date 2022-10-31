@@ -64,10 +64,17 @@ class OffersPdf extends Model
         $model = (object) $model->toArray();
         $this->consultant = $model->medium_name;
     }
-
+    private function getTownNameWithoutSpecialSymbols()
+    {
+        if (!$this->data->town_name) return null;
+        return str_replace("-", "_", $this->data->town_name);
+    }
     public function getPresentationName()
     {
         $prefix = "presentation";
+        if ($this->data->town_name) {
+            $prefix = $this->getTownNameWithoutSpecialSymbols();
+        }
         $ext = ".pdf";
 
         $name = "_" . $this->data->object_id . "_" . OfferMix::DEAL_TYPES_STRING[$this->data->deal_type];
