@@ -466,20 +466,6 @@ use app\models\oldDb\OfferMix;
             <? endforeach; ?>
         </div>
     </div>
-
-    <!-- <? if ($model->data->photos && count($model->data->photos) <= 4 || $model->getBlocksCount() <= 1) : ?>
-        <table class="after-parameters mt-header">
-            <div class="container">
-                <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
-                <div>
-                    <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
-                    <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>
-                    <a href="https://industry.realtor.ru">industry.realtor.ru</a>
-                </div>
-            </div>
-
-        </table>
-    <? endif; ?> -->
     <? if ($model->getBlocksCount() > 1 || count($model->data->photos) > 1 && $model->data->auto_desc) : ?>
         <hr>
     <? endif; ?>
