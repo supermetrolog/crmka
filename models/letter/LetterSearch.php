@@ -40,7 +40,8 @@ class LetterSearch extends Letter
      */
     public function search($params)
     {
-        $query = Letter::find()->with(['letterContacts', 'user.userProfile', 'letterEmails', 'letterPhones', 'letterOffers', 'letterWays']);
+        // EXPAND = letterContacts.email,letterEmails.email,letterPhones.phone,letterOffers.offer, letterContacts.phone,user.userProfile,letterWays
+        $query = Letter::find()->with(['letterContacts.email', 'letterEmails.email', 'letterPhones.phone', 'letterOffers.offer', 'letterContacts.phone', 'user.userProfile', 'letterWays']);
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
