@@ -33,7 +33,7 @@ class TimelineController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'send-objects']);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index']);
     }
 
     public function actions()
@@ -71,7 +71,7 @@ class TimelineController extends ActiveController
 
         $post_data = Yii::$app->request->post();
         // $post_data['user_id'] = Yii::$app->user->identity->id;
-        $post_data['user_id'] = 3;
+        $post_data['user_id'] = Yii::$app->user->identity->id;
         $post_data['type'] = Letter::TYPE_FROM_TIMELINE;
         $createLetterModel = new CreateLetter();
         $createLetterModel->create($post_data);
