@@ -304,17 +304,21 @@ table {
 
 /* *********** MAIN-INFO *************** */
 
+.main-info {
+    padding: 0 3px;
+}
+
 .main-info td.left .image {
     position: relative;
-    width: 500px;
-    max-width: 500px;
+    width: 495px;
+    max-width: 495px;
     height: 375px;
     max-height: 375px;
 }
 
 .main-info td.left .image img {
-    max-width: 500px;
-    width: 500px;
+    max-width: 495pxpx;
+    width: 495pxpx;
     max-height: 375px;
     height: 375px;
 }
