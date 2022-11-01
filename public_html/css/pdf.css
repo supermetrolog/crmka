@@ -587,6 +587,10 @@ table.digital-info-container {
     border-left: 1px solid #ccc;
 }
 
+.photos {
+    padding-left: 3px;
+}
+
 .photos.p-0 {
     margin: 0;
     padding: 0;
