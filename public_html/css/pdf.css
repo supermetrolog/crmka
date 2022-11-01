@@ -616,6 +616,7 @@ table.digital-info-container {
 
 .division-options {
     border-collapse: collapse;
+    padding: 0 3px;
 }
 
 .division-options th,
