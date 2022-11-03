@@ -13,6 +13,7 @@ use app\models\miniModels\Email;
 use app\models\miniModels\Phone;
 use app\models\miniModels\TimelineActionComment;
 use app\models\SendPresentation;
+use app\models\timeline\AddActionComments;
 use app\services\queue\jobs\SendPresentationJob;
 use Yii;
 use yii\web\BadRequestHttpException;
@@ -62,6 +63,15 @@ class TimelineController extends ActiveController
     public function actionActionComments($id)
     {
         return TimelineActionComment::getTimelineComments($id);
+    }
+    public function actionAddActionComments()
+    {
+        $addActionComment = new AddActionComments(Yii::$app->request->post());
+        $addActionComment->add();
+        return [
+            'data' => true,
+            'message' => "Комментарий добавлен",
+        ];
     }
     public function actionSendObjects()
     {

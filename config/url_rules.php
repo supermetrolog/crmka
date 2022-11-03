@@ -65,6 +65,7 @@ return
                 'GET,OPTIONS search' => 'search',
                 'GET,OPTIONS action-comments/<id>' => 'action-comments',
                 'POST,OPTIONS send-objects' => 'send-objects',
+                'POST,OPTIONS add-action-comments' => 'add-action-comments',
             ],
         ],
         [

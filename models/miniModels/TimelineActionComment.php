@@ -62,6 +62,11 @@ class TimelineActionComment extends \yii\db\ActiveRecord
             'type' => 'Type',
         ];
     }
+    public function beforeSave($insert)
+    {
+        $this->comment = trim($this->comment);
+        return parent::beforeSave($insert);
+    }
     public static function addActionComments($post_data)
     {
         if (!ArrayHelper::keyExists('newActionComments', $post_data)) {
@@ -70,7 +75,6 @@ class TimelineActionComment extends \yii\db\ActiveRecord
         $newActions = $post_data['newActionComments'];
         foreach ($newActions as $action) {
             $model = new TimelineActionComment();
-            $action['comment'] = trim($action['comment']);
             if ($model->load($action, '') && $model->save()) {
                 continue;
             }
