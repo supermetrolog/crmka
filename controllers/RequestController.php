@@ -8,6 +8,9 @@ use app\models\RequestSearch;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
+use app\models\request\RequestDisable;
+use app\models\Timeline;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use yii\filters\Cors;
 
 /**
@@ -64,16 +67,20 @@ class RequestController extends ActiveController
     {
         return Request::updateRequest($this->findModel($id), Yii::$app->request->post());
     }
-    // public function actionDelete($id)
-    // {
-    //     $this->findModel($id)->delete();
-    //     return ['message' => 'Запрос удален', 'data' => true];
-    // }
     public function actionSearch()
     {
         $search = new RequestSearch();
         $searchByAttr['CompanySearch'] = Yii::$app->request->queryParams;
         return $search->search($searchByAttr);
+    }
+    public function actionDisable($id)
+    {
+        $disableModel = new RequestDisable($this->findModel($id), Timeline::getActiveTimelineForRequest($id), Yii::$app->request->post());
+        $disableModel->disableRequestAndTimeline();
+        return [
+            'data' => true,
+            'message' => "Запрос переведен в пассив"
+        ];
     }
 
     protected function findModel($id)

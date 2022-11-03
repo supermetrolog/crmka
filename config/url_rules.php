@@ -40,6 +40,7 @@ return
             'extraPatterns' => [
                 'GET,OPTIONS company-requests/<id>' => 'company-requests',
                 'GET,OPTIONS search' => 'search',
+                'PATCH,OPTIONS disable/<id>' => 'disable',
             ],
         ],
         [
