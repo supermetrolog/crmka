@@ -71,7 +71,7 @@ class CompanySearch extends Company
             'requests' => function ($query) {
                 $query->with(['timelines' => function ($query) {
                     $query->with(['timelineSteps'])->where(['timeline.status' => Timeline::STATUS_ACTIVE]);
-                }])->where(['request.status' => Request::STATUS_ACTIVE]);
+                }]);
             },
             'companyGroup', 'broker', 'deals', 'dealsRequestEmpty', 'consultant.userProfile', 'productRanges',
             'mainContact.emails', 'mainContact.phones', 'objects.offerMix.generalOffersMix', 'objects.objectFloors'
