@@ -307,11 +307,14 @@ class TimelineStep extends \yii\db\ActiveRecord
     public static function updateTimelineStep($id, $post_data)
     {
         $timelineStep = self::findModel($id);
+        $request = $timelineStep->timeline->request;
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
         try {
             $post_data['updated_at'] = date('Y-m-d H:i:s');
             if ($timelineStep->load($post_data, '') && $timelineStep->save()) {
+                $request->related_updated_at = $post_data['updated_at'];
+                $request->save(false);
                 $timelineStep->updateSpecificStep($post_data);
                 TimelineActionComment::addActionComments($post_data);
                 $transaction->commit();
