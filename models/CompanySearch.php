@@ -2,9 +2,11 @@
 
 namespace app\models;
 
+use app\exceptions\ValidationErrorHttpException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Company;
+use yii\data\Sort;
 use yii\db\Expression;
 
 /**
@@ -64,64 +66,83 @@ class CompanySearch extends Company
     public function search($params)
     {
         // SELECT * FROM (SELECT DISTINCT company.id, company.nameRu, category.category FROM `company` LEFT JOIN `request` ON `company`.`id` = `request`.`company_id` LEFT JOIN `category` ON `company`.`id` = `category`.`company_id` LEFT JOIN `contact` ON `company`.`id` = `contact`.`company_id` LEFT JOIN `phone` ON `contact`.`id` = `phone`.`contact_id` WHERE category.category IN (1,0)) as fuck GROUP BY id HAVING COUNT(*) > 1
-
-        $query = Company::find()->distinct()->joinWith(['requests', 'categories', 'contacts' => function ($query) {
-            $query->joinWith(['phones'])->with(['emails', 'contactComments']);
-        }, 'categories'])->with([
-            'requests' => function ($query) {
-                $query->with(['timelines' => function ($query) {
-                    $query->with(['timelineSteps'])->where(['timeline.status' => Timeline::STATUS_ACTIVE]);
-                }]);
-            },
-            'companyGroup', 'broker', 'deals', 'dealsRequestEmpty', 'consultant.userProfile', 'productRanges',
-            'mainContact.emails', 'mainContact.phones', 'objects.offerMix.generalOffersMix', 'objects.objectFloors'
+        /**
+         * SELECT DISTINCT `id`, `nameEng`, `nameRu`, `noName`, `companyGroup_id`, `officeAdress`, `status`, `consultant_id`, `broker_id`, `legalAddress`, `ogrn`, `inn`, `kpp`, `checkingAccount`, `correspondentAccount`, `inTheBank`, `bik`, `okved`, `okpo`, `signatoryName`, `signatoryMiddleName`, `signatoryLastName`, `basis`, `documentNumber`, `activityGroup`, `activityProfile`, `description`, `created_at`, `updated_at`, `active`, `formOfOrganization`, `processed`, `passive_why`, `passive_why_comment`, `rating`, `latitude`, `longitude`, `nameBrand` 
+         * FROM (
+         *   SELECT DISTINCT `company`.*, request.status as req_status, request.related_updated_at as fuck, request.created_at as i 
+         *   FROM `company` LEFT JOIN `request` ON `company`.`id` = `request`.`company_id` 
+         *   ORDER BY 
+         *       FIELD(request.status, 0,2,1) DESC,
+         *       request.related_updated_at DESC,
+         *       request.created_at DESC
+         *     ) as company
+         */
+        $query = Company::find()->distinct()->select([
+            'company.*',
+            'req_status' => 'request.status',
+            'req_created_at' => 'request.created_at',
+            'req_updated_at' => 'request.updated_at',
+            'req_related_updated_at' => "request.related_updated_at",
+        ])->joinWith(['requests', 'categories', 'contacts.phones']);
+        $sort = new Sort([
+            'enableMultiSort' => true,
+            'defaultOrder' => [
+                'default' => SORT_DESC
+            ],
+            'attributes' => [
+                'created_at',
+                'nameRu',
+                'rating',
+                'status',
+                'requests' => [
+                    'asc' => new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
+                    'desc' => new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
+                ],
+                'default' => [
+                    'asc' => [
+                        new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'),
+                        new Expression("FIELD(request.status, 0,2,1) ASC"),
+                        // 'request.related_updated_at' => SORT_ASC,
+                        new Expression("IF(request.related_updated_at, request.related_updated_at, request.created_at) ASC"),
+                        'request.created_at' => SORT_ASC,
+                        'request.updated_at' => SORT_ASC,
+                        'company.created_at' => SORT_ASC
+                    ],
+                    'desc' => [
+                        new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'),
+                        new Expression("FIELD(request.status, 0,2,1) DESC"),
+                        // 'request.related_updated_at' => SORT_DESC,
+                        new Expression("IF(request.related_updated_at, request.related_updated_at, request.created_at) DESC"),
+                        'request.created_at' => SORT_DESC,
+                        'request.updated_at' => SORT_DESC,
+                        'company.created_at' => SORT_DESC
+                    ],
+                    'default' => SORT_DESC,
+                ],
+            ],
         ]);
+        $query->addOrderBy($sort->getOrders());
+
+        $wrapperQuery = Company::find()->distinct()->select((new Company())->attributes())->from($query)
+            ->with([
+                'requests' => function ($query) {
+                    $query->with(['timelines' => function ($query) {
+                        $query->with(['timelineSteps'])->where(['timeline.status' => Timeline::STATUS_ACTIVE]);
+                    }]);
+                },
+                'companyGroup', 'broker', 'deals', 'dealsRequestEmpty', 'consultant.userProfile', 'productRanges',
+                'mainContact.emails', 'mainContact.phones', 'objects.offerMix.generalOffersMix', 'objects.objectFloors',
+                'categories', 'contacts' => function ($query) {
+                    $query->with(['phones', 'emails', 'contactComments']);
+                }
+            ]);
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $wrapperQuery,
             'pagination' => [
                 'defaultPageSize' => 50,
                 'pageSizeLimit' => [0, 50],
             ],
-            'sort' => [
-                'enableMultiSort' => true,
-                'defaultOrder' => [
-                    'default' => SORT_DESC
-                ],
-                'attributes' => [
-                    'created_at',
-                    'nameRu',
-                    'rating',
-                    'status',
-                    'requests' => [
-                        'asc' => new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
-                        'desc' => new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
-                    ],
-                    'default' => [
-                        'asc' => [
-                            new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'),
-                            // new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
-                            new Expression('(IF ((SELECT EXISTS(SELECT r.status FROM request as r WHERE r.company_id = company.id AND r.status = 1 LIMIT 1)), IF(request.updated_at IS NOT NULL, request.updated_at, request.created_at), NULL)) ASC'),
-                            'request.status' => SORT_ASC,
-                            'company.rating' => SORT_ASC,
-                            'company.status' => SORT_ASC,
-                            'company.created_at' => SORT_ASC
-                        ],
-                        'desc' => [
-                            new \yii\db\Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'),
-                            // new \yii\db\Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
-                            new Expression('(IF ((SELECT EXISTS(SELECT r.status FROM request as r WHERE r.company_id = company.id AND r.status = 1 LIMIT 1)), IF(request.updated_at IS NOT NULL, request.updated_at, request.created_at), NULL)) DESC'),
-                            'request.status' => SORT_DESC,
-                            'company.rating' => SORT_DESC,
-                            'company.status' => SORT_DESC,
-                            'company.created_at' => SORT_DESC
-                        ],
-                        'default' => SORT_DESC,
-                    ],
-                ],
-
-
-            ]
         ]);
 
         $this->load($params, '');
@@ -129,11 +150,10 @@ class CompanySearch extends Company
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
+            throw new ValidationErrorHttpException($this->getErrorSummary(false));
             return $dataProvider;
         }
 
-        // return explode(",", $this->categories);
-        // grid filtering conditions
         $query->orFilterWhere(['company.id' => $this->all])
             ->orFilterWhere(['like', 'contact.first_name', $this->all])
             ->orFilterWhere(['like', 'contact.middle_name', $this->all])
@@ -146,7 +166,8 @@ class CompanySearch extends Company
         if ($this->all) {
             $query->orderBy(new Expression("
                  (
-                    IF (`company`.`id` LIKE '%{$this->all}%', 90, 0) 
+                    IF (`company`.`id` = {$this->all}, 250, 0) 
+                    + IF (`company`.`id` LIKE '%{$this->all}%', 90, 0) 
                     + IF (`phone`.`phone` LIKE '%{$this->all}%', 40, 0) 
                     + IF (`company`.`nameRu` LIKE '%{$this->all}%', 50, 0) 
                     + IF (`company`.`nameEng` LIKE '%{$this->all}%', 50, 0) 
@@ -199,6 +220,7 @@ class CompanySearch extends Company
             ->andFilterWhere(['like', 'company.basis', $this->basis])
             ->andFilterWhere(['like', 'company.documentNumber', $this->documentNumber])
             ->andFilterWhere(['like', 'company.description', $this->description]);
+
 
         return $dataProvider;
     }

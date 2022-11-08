@@ -28,6 +28,7 @@ $config = [
         ],
         'formatter' => [
             'class' => \yii\i18n\Formatter::className(),
+            'timeZone' => 'UTC',
             'dateFormat' => 'long',
             'currencyCode' => 'RUB',
             'decimalSeparator' => '.',
