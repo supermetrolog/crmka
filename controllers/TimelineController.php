@@ -78,23 +78,28 @@ class TimelineController extends ActiveController
         if (!Yii::$app->request->post()) {
             throw new BadRequestHttpException("body cannot be empty");
         }
-
-        $post_data = Yii::$app->request->post();
-        // $post_data['user_id'] = Yii::$app->user->identity->id;
-        $post_data['user_id'] = Yii::$app->user->identity->id;
-        $post_data['type'] = Letter::TYPE_FROM_TIMELINE;
-        $createLetterModel = new CreateLetter();
-        $createLetterModel->create($post_data);
-        if ($createLetterModel->letterModel->shipping_method == Letter::SHIPPING_OTHER_METHOD) {
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            $post_data = Yii::$app->request->post();
+            $post_data['user_id'] = Yii::$app->user->identity->id;
+            $post_data['type'] = Letter::TYPE_FROM_TIMELINE;
+            $createLetterModel = new CreateLetter();
+            $createLetterModel->create($post_data);
+            if ($createLetterModel->letterModel->shipping_method == Letter::SHIPPING_OTHER_METHOD) {
+                return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
+            }
+            $model = new SendPresentation();
+            $model->load($this->getDataForSendPresentationModel($createLetterModel), '');
+            $q = Yii::$app->queue;
+            $q->push(new SendPresentationJob([
+                'model' => $model
+            ]));
+            $tx->commit();
             return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
+        } catch (\Throwable $th) {
+            $tx->rollBack();
+            throw $th;
         }
-        $model = new SendPresentation();
-        $model->load($this->getDataForSendPresentationModel($createLetterModel), '');
-        $q = Yii::$app->queue;
-        $q->push(new SendPresentationJob([
-            'model' => $model
-        ]));
-        return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
     }
     private function getDataForSendPresentationModel(CreateLetter $createLetterModel): array
     {
