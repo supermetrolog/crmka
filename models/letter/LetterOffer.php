@@ -2,6 +2,7 @@
 
 namespace app\models\letter;
 
+use app\models\oldDb\OfferMix;
 use Yii;
 
 /**
@@ -74,5 +75,15 @@ class LetterOffer extends \yii\db\ActiveRecord
     public function getLetter()
     {
         return $this->hasOne(Letter::className(), ['id' => 'letter_id']);
+    }
+
+    /**
+     * Gets query for [[OfferMix]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOffer()
+    {
+        return $this->hasOne(OfferMix::className(), ['object_id' => 'object_id', 'type_id' => 'type_id', 'original_id' => 'offer_id']);
     }
 }
