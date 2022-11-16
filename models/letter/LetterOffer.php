@@ -84,6 +84,6 @@ class LetterOffer extends \yii\db\ActiveRecord
      */
     public function getOffer()
     {
-        return $this->hasOne(OfferMix::className(), ['object_id' => 'object_id', 'type_id' => 'type_id', 'original_id' => 'offer_id']);
+        return $this->hasOne(OfferMix::className(), ['object_id' => 'object_id', 'type_id' => 'type_id', 'original_id' => 'original_id']);
     }
 }
