@@ -78,7 +78,7 @@ class OffersPdf extends Model
         $ext = ".pdf";
 
         $name = "_" . $this->data->object_id . "_" . OfferMix::DEAL_TYPES_STRING[$this->data->deal_type];
-        return $prefix . $name . $ext;
+        return str_replace(" ", "_", $prefix . $name . $ext);
     }
     private function normalizeData()
     {
