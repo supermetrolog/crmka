@@ -166,11 +166,13 @@ class CompanySearch extends Company
         if ($this->all) {
             $query->orderBy(new Expression("
                  (
-                    IF (`company`.`id` = {$this->all}, 250, 0) 
+                    IF (`company`.`id` = '{$this->all}', 250, 0) 
                     + IF (`company`.`id` LIKE '%{$this->all}%', 90, 0) 
                     + IF (`phone`.`phone` LIKE '%{$this->all}%', 40, 0) 
-                    + IF (`company`.`nameRu` LIKE '%{$this->all}%', 50, 0) 
-                    + IF (`company`.`nameEng` LIKE '%{$this->all}%', 50, 0) 
+                    + IF (`company`.`nameRu` LIKE '%{$this->all}%', 80, 0) 
+                    + IF (`company`.`nameRu` = '{$this->all}', 250, 0) 
+                    + IF (`company`.`nameEng` LIKE '%{$this->all}%', 80, 0) 
+                    + IF (`company`.`nameEng` = '{$this->all}', 250, 0) 
                     + IF (`company`.`nameBrand` LIKE '%{$this->all}%', 50, 0) 
                     + IF (`contact`.`first_name` LIKE '%{$this->all}%', 30, 0) 
                     + IF (`contact`.`middle_name` LIKE '%{$this->all}%', 30, 0) 
