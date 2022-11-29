@@ -15,7 +15,7 @@ use Supermetrolog\Synchronizer\services\sync\Synchronizer;
 
 return [
     'definitions' => [
-        Synchronizer::class => function ($container, $params, $config) {
+        Synchronizer::class => function ($container, $params) {
             $baseRepository = $container->get(BaseRepositoryInterface::class, $params['baseRepository']);
             $targetRepository = $container->get(TargetRepositoryInterface::class, $params['targetRepository']);
             $alreadySynchronizedRepository = $container->get(AlreadySynchronizedRepositoryInterface::class, $params['alreadySynchronizedRepository']);
@@ -24,21 +24,21 @@ return [
             return new Synchronizer($baseRepository, $targetRepository, $alreadySynchronizedRepository, $logger);
         },
 
-        BaseRepositoryInterface::class => function ($container, $params, $config) {
+        BaseRepositoryInterface::class => function ($container, $params) {
             return Filesystem::getInstance($params['dirpath']);
         },
-        TargetRepositoryInterface::class => function ($container, $params, $config) {
+        TargetRepositoryInterface::class => function ($container, $params) {
             $ftpConnOpt = FtpConnectionOptions::fromArray($params['ftp']);
             return FtpFilesystem::getInstance($params['dirpath'], $ftpConnOpt);
         },
-        AlreadySynchronizedRepositoryInterface::class => function ($container, $params, $config) {
+        AlreadySynchronizedRepositoryInterface::class => function ($container, $params) {
             $repo = $container->get(RepositoryInterface::class, $params['repository']);
             return new OneFile($repo, $params['filename']);
         },
-        RepositoryInterface::class => function ($container, $params, $config) {
+        RepositoryInterface::class => function ($container, $params) {
             return $container->get(TargetRepositoryInterface::class, $params);
         },
-        LoggerInterface::class => function ($container, $params, $config) {
+        LoggerInterface::class => function () {
             $logger = new Logger("app");
             $logger->pushHandler(new StreamHandler(STDOUT, Logger::INFO));
             return $logger;
