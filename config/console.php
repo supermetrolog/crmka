@@ -4,7 +4,7 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 $db_old = require __DIR__ . '/db_old.php';
 $container = require __DIR__ . '/container.php';
-$components = require __DIR__ . '/components.php';
+$components = require __DIR__ . '/console_components.php';
 
 $config = [
     'id' => 'basic-console',
