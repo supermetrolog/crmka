@@ -2,10 +2,11 @@
 
 namespace app\services\backup;
 
+use app\services\backuper\interfaces\DbDumperInterface;
 use Exception;
 use Yii;
 
-class Backup
+class Backup implements DbDumperInterface
 {
     private $tmpPath;
     private $dbCfg;
@@ -24,11 +25,10 @@ class Backup
         if (is_dir($this->tmpPath)) return;
         mkdir($this->tmpPath, 0700);
     }
-    public function dump()
+    public function dump(): void
     {
         $dumpCommand = $this->getMysqlDumpCommand();
         $this->runCommand($dumpCommand);
-        return $this;
     }
     private function runCommand($command)
     {
@@ -42,7 +42,18 @@ class Backup
             throw new Exception("Command: $command, exited with error status $result_code");
         }
     }
-
+    public function getFilename(): string
+    {
+        return $this->filename;
+    }
+    public function getContent(): string
+    {
+        return file_get_contents($this->fullpath);
+    }
+    public function getDbName(): string
+    {
+        return $this->getDsnAttribute("dbname", $this->dbCfg['dsn']);
+    }
     public function getBackupFileName()
     {
         return $this->filename;

@@ -1,21 +1,5 @@
 <?php
 $secrets = require __DIR__ . "/secrets.php";
-// $ftpToBackupServerUploads = [
-//     'host' => '62.113.107.218', // required
-//     'root' => '/', // required
-//     'username' => 'user_ftptest', // required
-//     'password' => 'studentjke2h', // required
-//     'port' => 21,
-//     'ssl' => false,
-//     'timeout' => 90,
-//     'utf8' => false,
-//     'passive' => true,
-//     'transferMode' => FTP_BINARY,
-//     'systemType' => "unix", // 'windows' or 'unix'
-//     'ignorePassiveAddress' => true, // true or false
-//     'timestampsOnUnixListingsEnabled' => false, // true or false
-//     'recurseManually' => true // true
-// ];
 
 $ftpOptionsForSyncThisProject = [
     'host' => $secrets['ftp_options_for_sync_this_project']['host'], // required
@@ -39,6 +23,22 @@ $ftpOptionsForSyncObjectsProject = [
     'root' => '/', // required
     'username' => $secrets['ftp_options_for_sync_objects_project']['username'], // required
     'password' => $secrets['ftp_options_for_sync_objects_project']['password'], // required
+    'port' => 21,
+    'ssl' => false,
+    'timeout' => 90,
+    'utf8' => false,
+    'passive' => true,
+    'transferMode' => FTP_BINARY,
+    'systemType' => "unix", // 'windows' or 'unix'
+    'ignorePassiveAddress' => true, // true or false
+    'timestampsOnUnixListingsEnabled' => false, // true or false
+    'recurseManually' => true // true
+];
+$ftpOptionsForBackupsLoad = [
+    'host' => $secrets['ftp_options_for_backups_load']['host'], // required
+    'root' => '/', // required
+    'username' => $secrets['ftp_options_for_backups_load']['username'], // required
+    'password' => $secrets['ftp_options_for_backups_load']['password'], // required
     'port' => 21,
     'ssl' => false,
     'timeout' => 90,
@@ -106,6 +106,16 @@ $parameters = [
                 ]
             ]
         ]
+    ],
+    'db_backup' => [
+        'ftp_client_options' => $ftpOptionsForBackupsLoad,
+        'dump_tmp_dir' => __DIR__ . "/../services/backup/tmp",
+        'db' => [
+            'db_config_path' => __DIR__ . "/db.php"
+        ],
+        'db_old' => [
+            'db_config_path' => __DIR__ . "/db_old.php"
+        ],
     ]
 ];
 
