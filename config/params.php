@@ -1,4 +1,5 @@
 <?php
+$secrets = require __DIR__ . "/secrets.php";
 // $ftpToBackupServerUploads = [
 //     'host' => '62.113.107.218', // required
 //     'root' => '/', // required
@@ -15,7 +16,6 @@
 //     'timestampsOnUnixListingsEnabled' => false, // true or false
 //     'recurseManually' => true // true
 // ];
-$secrets = require __DIR__ . "/secrets.php";
 
 $ftpOptionsForSyncThisProject = [
     'host' => $secrets['ftp_options_for_sync_this_project']['host'], // required

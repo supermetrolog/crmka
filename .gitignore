@@ -17,8 +17,6 @@ Thumbs.db
 
 # composer itself is not needed
 composer.phar
-config/db.php
-config/db_old.php
 config/secrets.php
 
 #uploaded files
