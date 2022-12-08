@@ -8,8 +8,6 @@ $parameters = [
     'username' => $secrets['db_old']['username'],
     'password' => $secrets['db_old']['password'],
     'charset' => 'utf8',
-
-
 ];
 
 if (YII_ENV == "prod") {
