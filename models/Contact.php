@@ -141,6 +141,15 @@ class Contact extends \yii\db\ActiveRecord
             }
             return $full_name;
         };
+
+        $fields['updated_at'] = function ($fields) {
+            return $fields->updated_at == "0000-00-00 00:00:00" ? null : $fields->updated_at;
+        };
+
+        $fields['created_at'] = function ($fields) {
+            return $fields->created_at == "0000-00-00 00:00:00" ? null : $fields->created_at;
+        };
+
         return $fields;
     }
     private function changeIsMain()
