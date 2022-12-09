@@ -36,7 +36,7 @@ $ftpOptionsForSyncObjectsProject = [
 ];
 $ftpOptionsForBackupsLoad = [
     'host' => $secrets['ftp_options_for_backups_load']['host'], // required
-    'root' => '/', // required
+    'root' => '/backup/mysql/', // required
     'username' => $secrets['ftp_options_for_backups_load']['username'], // required
     'password' => $secrets['ftp_options_for_backups_load']['password'], // required
     'port' => 21,
