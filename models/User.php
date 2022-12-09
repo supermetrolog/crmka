@@ -156,7 +156,13 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function fields()
     {
         $fields = parent::fields();
-        unset($fields['auth_key'], $fields['password_hash'], $fields['password_reset_token'], $fields['access_token']);
+        unset(
+            $fields['auth_key'],
+            $fields['password_hash'],
+            $fields['password_reset_token'],
+            $fields['access_token'],
+            $fields['email_password']
+        );
         $fields['created_at_format'] = function ($fields) {
             return Yii::$app->formatter->format($fields['created_at'], 'datetime');
         };

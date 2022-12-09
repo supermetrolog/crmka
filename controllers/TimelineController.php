@@ -82,10 +82,13 @@ class TimelineController extends ActiveController
         try {
             $post_data = Yii::$app->request->post();
             $post_data['user_id'] = Yii::$app->user->identity->id;
+            $post_data['sender_email'] = Yii::$app->user->identity->email ?? Yii::$app->params['senderEmail'];
             $post_data['type'] = Letter::TYPE_FROM_TIMELINE;
             $createLetterModel = new CreateLetter();
             $createLetterModel->create($post_data);
+
             if ($createLetterModel->letterModel->shipping_method == Letter::SHIPPING_OTHER_METHOD) {
+                $tx->commit();
                 return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
             }
             $model = new SendPresentation();

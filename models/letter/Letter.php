@@ -11,6 +11,7 @@ use yii\db\Expression;
  *
  * @property int $id
  * @property int $user_id [СВЯЗЬ] с таблицей юзеров
+ * @property string $sender_email почта отправителя
  * @property string|null $subject Тема письма
  * @property string|null $body Текст письма
  * @property string $created_at
@@ -45,7 +46,7 @@ class Letter extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'type', 'shipping_method'], 'required'],
+            [['user_id', 'type', 'shipping_method', 'sender_email'], 'required'],
             [['user_id', 'status', 'type', 'shipping_method'], 'integer'],
             [['body'], 'string'],
             [['created_at'], 'safe'],
@@ -68,6 +69,7 @@ class Letter extends \yii\db\ActiveRecord
             'status' => 'Status',
             'type' => 'Type',
             'shipping_method' => 'Shippin Method',
+            'sender_email' => 'Sender Email',
         ];
     }
 
