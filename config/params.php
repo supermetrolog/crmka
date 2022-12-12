@@ -148,8 +148,15 @@ $parameters = [
         'db_old' => [
             'db_config_path' => __DIR__ . "/db_old.php"
         ],
+    ],
+    'url' => [
+        'objects' => "https://pennylane.pro/",
+        'this_host' => "http://crmka/",
+        'image_not_found_rel' => "images/no-image.jpg",
+        'empty_image_rel' => "images/empty.jpg"
     ]
 ];
+
 
 if (YII_ENV != "dev") {
     $parameters['synchronizer']['this_project']['baseRepository']['dirpath'] = "/home/user/web/api.pennylane.pro/public_html";
@@ -161,9 +168,10 @@ if (YII_ENV != "dev") {
 }
 
 if (YII_ENV == "stage") {
-
     $parameters['rabbit']['queueName'] = "dev_timeline_presentation_sender";
     $parameters['rabbit']['exchangeName'] = "dev_timeline_presentation_sender_exchange";
+
+    $parameters['url']['this_host'] = "https://api.supermetrolog.ru/";
 }
 
 if (YII_ENV == "prod") {
@@ -173,6 +181,10 @@ if (YII_ENV == "prod") {
         'botToken' => $secrets['tg_logger_bot']['token'], // bot token secret key
         'chatId' => $secrets['tg_logger_bot']['channel'], // chat id or channel username with @ like 12345 or @channel
     ];
+    $parameters['url']['this_host'] = "https://api.pennylane.pro/";
 }
+
+$parameters['url']['image_not_found'] = $parameters['url']['this_host'] . $parameters['url']['image_not_found_rel'];
+$parameters['url']['empty_image'] = $parameters['url']['this_host'] . $parameters['url']['empty_image_rel'];
 
 return $parameters;

@@ -532,9 +532,9 @@ class Objects extends \yii\db\ActiveRecord
         $fields['thumb'] = function ($fields) {
             $photos = json_decode($fields['photo'], true);
             if ($photos && is_array($photos)) {
-                return "https://pennylane.pro" . $photos[0];
+                return Yii::$app->params['url']['objects'] . $photos[0];
             }
-            return "https://api.pennylane.pro/images/no-image.jpg";
+            return Yii::$app->params['url']['image_not_found'];
         };
 
         $fields['calc_ceiling_height'] = function ($fields) {

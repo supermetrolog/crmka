@@ -642,15 +642,6 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['last_update_format'] = function ($fields) {
             return $fields['last_update'] ? Yii::$app->formatter->format($fields['last_update'], 'datetime') : null;
         };
-        // $fields['region_new_field'] = function ($fields) {
-        //     return self::normalizeRegions($fields['region']);
-        // };
-        // $fields['district_new_field'] = function ($fields) {
-        //     return self::normalizeDistrict($fields['district_moscow']);
-        // };
-        // $fields['direction_new_field'] = function ($fields) {
-        //     return self::normalizeDirection($fields['direction']);
-        // };
 
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);
@@ -661,15 +652,15 @@ class OfferMix extends \yii\db\ActiveRecord
             if ($photos && is_array($photos)) {
                 foreach ($photos as $photo) {
                     if (is_string($photo) && mb_strlen($photo) > 2) {
-                        return "https://pennylane.pro" . $photo;
+                        return Yii::$app->params['url']['objects'] . $photo;
                     }
                 }
             }
 
             if ($objectPhotos && is_array($objectPhotos) && is_string($objectPhotos[0]) && strlen($objectPhotos[0]) > 2) {
-                return "https://pennylane.pro" . $objectPhotos[0];
+                return Yii::$app->params['url']['objects'] . $objectPhotos[0];
             }
-            return "https://api.pennylane.pro/images/no-image.jpg";
+            return Yii::$app->params['url']['image_not_found'];
         };
         $fields['object_type'] = function ($fields) {
             return json_decode($fields['object_type']);
