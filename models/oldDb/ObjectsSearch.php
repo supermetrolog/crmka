@@ -43,7 +43,7 @@ class ObjectsSearch extends Objects
      */
     public function search($params)
     {
-        $query = Objects::find()->distinct()->joinWith(['offerMix'])->with(['blocks', 'objectFloors'])->with(['offerMix' => function ($query) {
+        $query = Objects::find()->distinct()->joinWith(['offerMix'])->with(['blocks', 'objectFloors', 'location.highwayRel'])->with(['offerMix' => function ($query) {
             $query->with(['generalOffersMix']);
             return $query->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => 2]);
         }]);
@@ -86,7 +86,7 @@ class ObjectsSearch extends Objects
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'c_industry.id' => $this->id,
             'location_id' => $this->location_id,
             'last_update' => $this->last_update,
             'is_land' => $this->is_land,

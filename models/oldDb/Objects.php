@@ -3,6 +3,7 @@
 namespace app\models\oldDb;
 
 use app\models\Company;
+use app\models\oldDb\location\Location;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\HtmlPurifier;
@@ -601,7 +602,10 @@ class Objects extends \yii\db\ActiveRecord
         $offerMix = $extraFields->offerMix;
         return $offerMix[0];
     }
-
+    public function getLocation()
+    {
+        return $this->hasOne(Location::class, ['id' => 'location_id']);
+    }
     public function getBlocks()
     {
         return $this->hasMany(ObjectsBlock::class, ['object_id' => 'id']);
