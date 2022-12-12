@@ -602,9 +602,9 @@ class Objects extends \yii\db\ActiveRecord
         $offerMix = $extraFields->offerMix;
         return $offerMix[0];
     }
-    public function getLocation()
+    public function getComplex()
     {
-        return $this->hasOne(Location::class, ['id' => 'location_id']);
+        return $this->hasOne(Complex::class, ['id' => 'complex_id']);
     }
     public function getBlocks()
     {
