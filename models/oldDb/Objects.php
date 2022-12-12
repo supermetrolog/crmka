@@ -528,6 +528,15 @@ class Objects extends \yii\db\ActiveRecord
         $fields['photo'] = function ($fields) {
             return json_decode($fields['photo']);
         };
+
+        $fields['thumb'] = function ($fields) {
+            $photos = json_decode($fields['photo'], true);
+            if ($photos && is_array($photos)) {
+                return "https://pennylane.pro" . $photos[0];
+            }
+            return "https://api.pennylane.pro/images/no-image.jpg";
+        };
+
         $fields['calc_ceiling_height'] = function ($fields) {
             $maxes = [];
             foreach ($fields->objectFloors as $floor) {
