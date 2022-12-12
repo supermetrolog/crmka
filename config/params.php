@@ -34,6 +34,22 @@ $ftpOptionsForSyncObjectsProject = [
     'timestampsOnUnixListingsEnabled' => false, // true or false
     'recurseManually' => true // true
 ];
+$ftpOptionsForSyncFrontendProject = [
+    'host' => $secrets['ftp_options_for_sync_frontend_project']['host'], // required
+    'root' => '/', // required
+    'username' => $secrets['ftp_options_for_sync_frontend_project']['username'], // required
+    'password' => $secrets['ftp_options_for_sync_frontend_project']['password'], // required
+    'port' => 21,
+    'ssl' => false,
+    'timeout' => 90,
+    'utf8' => false,
+    'passive' => true,
+    'transferMode' => FTP_BINARY,
+    'systemType' => "unix", // 'windows' or 'unix'
+    'ignorePassiveAddress' => true, // true or false
+    'timestampsOnUnixListingsEnabled' => false, // true or false
+    'recurseManually' => true // true
+];
 $ftpOptionsForBackupsLoad = [
     'host' => $secrets['ftp_options_for_backups_load']['host'], // required
     'root' => '/backup/mysql/', // required
@@ -105,6 +121,22 @@ $parameters = [
                     'ftp' => $ftpOptionsForSyncObjectsProject
                 ]
             ]
+        ],
+        'frontend_project' => [
+            'baseRepository' => [
+                'dirpath' => __DIR__ . "/../public_html/uploads"
+            ],
+            'targetRepository' => [
+                'dirpath' => ".",
+                'ftp' => $ftpOptionsForSyncFrontendProject,
+            ],
+            'alreadySynchronizedRepository' => [
+                'filename' => 'sync-file.data',
+                'repository' => [
+                    'dirpath' => ".",
+                    'ftp' => $ftpOptionsForSyncFrontendProject
+                ]
+            ]
         ]
     ],
     'db_backup' => [
@@ -122,6 +154,7 @@ $parameters = [
 if (YII_ENV != "dev") {
     $parameters['synchronizer']['this_project']['baseRepository']['dirpath'] = "/home/user/web/api.pennylane.pro/public_html";
     $parameters['synchronizer']['objects_project']['baseRepository']['dirpath'] = "/home/user/web/pennylane.pro/public_html";
+    $parameters['synchronizer']['frontend_project']['baseRepository']['dirpath'] = "/home/user/web/clients.pennylane.pro/public_html";
 
     $parameters['compressorPath'] = '/home/user/scripts/pdf_compressor.py';
     $parameters['pythonPath'] = '/bin/python3';

@@ -22,4 +22,11 @@ class SynchronizerController extends Controller
         $synchronizer->load();
         $synchronizer->sync();
     }
+
+    public function actionFrontendProject()
+    {
+        $synchronizer = Yii::$container->get(Synchronizer::class, Yii::$app->params['synchronizer']['frontend_project']);
+        $synchronizer->load();
+        $synchronizer->sync();
+    }
 }
