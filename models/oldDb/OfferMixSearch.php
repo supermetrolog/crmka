@@ -359,6 +359,8 @@ class OfferMixSearch extends OfferMix
             // $query->where('0=1');
             return $dataProvider;
         }
+        // Этот запрос решает проблему дубликатов, но выполняется долго (около 7 секунд)
+        // $query->andWhere(new Expression("IF(c_industry_offers_mix.type_id = 2, JSON_LENGTH(c_industry_offers_mix.blocks) > 1 AND (SELECT COUNT(off.id) FROM c_industry_offers_mix as off WHERE off.type_id = 1 AND off.status = 1 AND FIND_IN_SET(off.id, REPLACE(REPLACE(TRIM(']' FROM TRIM('[' FROM c_industry_offers_mix.blocks->>\"$[*]\")), '\"', ''), ' ', '')) > 0) > 1,JSON_LENGTH(c_industry_offers_mix.blocks) IS NOT NULL OR JSON_LENGTH(c_industry_offers_mix.blocks) IS NULL)"));
 
         if ($this->withoutOffersFromQuery) {
             $withoutQuery = json_decode($this->withoutOffersFromQuery, true);
@@ -711,14 +713,7 @@ class OfferMixSearch extends OfferMix
                 END)
             "), $this->sewage_central]);
         }
-        // if ($this->water !== null) {
-        //     $query->andFilterWhere(['in', new Expression("
-        //         (CASE WHEN c_industry_offers_mix.type_id = 1 THEN c_industry_blocks.water
-        //         WHEN c_industry_offers_mix.type_id = 2 THEN c_industry_offers_mix.water
-        //         ELSE c_industry_offers_mix.water
-        //         END)
-        //     "), $this->water]);
-        // }
+
         $query->andFilterWhere([
             'or',
             ['c_industry_offers_mix.district_moscow' => $this->district_moscow],
@@ -755,27 +750,7 @@ class OfferMixSearch extends OfferMix
         if ($this->objectsOnly) {
             $query->groupBy('object_id');
         }
-        // $query->andFilterWhere([
-        //     'and',
-        //     [
-        //         '<=',
-        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-        //             . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = "
-        //             . OfferMix::DEAL_TYPE_SALE
-        //             . " THEN price_sale_max ELSE price_safe_pallet_max END"),
-        //         $this->rangeMaxPricePerFloor
-        //     ],
-        //     [
-        //         '>=',
-        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-        //             . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = "
-        //             . OfferMix::DEAL_TYPE_SALE
-        //             . " THEN price_sale_min ELSE price_safe_pallet_min END"),
-        //         $this->rangeMinPricePerFloor
-        //     ]
-        // ]);
+
         $rent_price_least = "IF(
             LEAST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max) 
             IS NULL,
@@ -810,27 +785,7 @@ class OfferMixSearch extends OfferMix
             ],
         ]);
 
-        // $query->andFilterWhere([
-        //     'and',
-        //     [
-        //         '<=',
-        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-        //             . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min ) WHEN deal_type = "
-        //             . OfferMix::DEAL_TYPE_SALE
-        //             . " THEN LEAST(price_sale_min, price_sale_max) ELSE LEAST(price_safe_pallet_min, price_safe_pallet_max) END"),
-        //         $this->rangeMaxPricePerFloor
-        //     ],
-        //     [
-        //         '>=',
-        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-        //             . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min  ) WHEN deal_type = "
-        //             . OfferMix::DEAL_TYPE_SALE
-        //             . " THEN GREATEST(price_sale_max, price_sale_min) ELSE GREATEST(price_safe_pallet_max, price_safe_pallet_min) END"),
-        //         $this->rangeMinPricePerFloor
-        //     ],
-        // ]);
+
         if ($this->water !== null) {
             if ($this->water == 1) {
                 $query->andFilterWhere(['not in', 'c_industry_offers_mix.water', ['0', 'нет', '']]);
@@ -839,15 +794,6 @@ class OfferMixSearch extends OfferMix
                 $query->andFilterWhere(['c_industry_offers_mix.water' => ['0', 'нет', '']]);
             }
         }
-        // if ($this->noDuplicate) {
-        //     $query->andFilterWhere([
-        //         'or',
-        //         ['IS', 'c_industry_offers_mix.blocks_amount', new Expression("null")],
-        //         ['>', 'c_industry_offers_mix.blocks_amount', new Expression("
-        //             IF(c_industry_offers_mix.type_id = 2, 1, 0)
-        //         ")]
-        //     ]);
-        // }
 
         if ($this->status == null) {
             $query->andFilterWhere(
@@ -869,6 +815,7 @@ class OfferMixSearch extends OfferMix
                 ")]
             );
         }
+
         return $dataProvider;
     }
 }
