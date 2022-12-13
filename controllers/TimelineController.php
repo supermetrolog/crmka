@@ -46,10 +46,6 @@ class TimelineController extends ActiveController
         unset($actions['delete']);
         return $actions;
     }
-    public function actionUpdate($id)
-    {
-        return $id;
-    }
     public function actionUpdateStep($id)
     {
         return TimelineStep::updateTimelineStep($id, Yii::$app->request->post());

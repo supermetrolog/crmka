@@ -11,16 +11,40 @@ use yii\web\UploadedFile;
 use app\models\UploadFile;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
+use yii\filters\AccessControl;
 
 class UserController extends ActiveController
 {
     public $modelClass = 'app\models\User';
+
     public function behaviors()
     {
-        $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['login', 'logout', 'index']);
-    }
 
+        $behaviors = parent::behaviors();
+        $exceptActions = ['login', 'logout'];
+        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, $exceptActions);
+        // $behaviors['access'] = [
+        //     'class' => AccessControl::class,
+        //     'rules' => [
+        //         [
+        //             'allow' => true,
+        //             'actions' => ['index', 'create', 'update'],
+        //             'roles' => ['admin']
+        //         ],
+        //         [
+        //             'allow' => true,
+        //             'actions' => $exceptActions,
+        //             'roles' => ['?']
+        //         ],
+        //         [
+        //             'allow' => true,
+        //             'actions' => ['view'],
+        //             'roles' => ['@']
+        //         ],
+        //     ]
+        // ];
+        return $behaviors;
+    }
     public function actions()
     {
         $actions = parent::actions();

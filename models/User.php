@@ -7,6 +7,7 @@ use yii\web\IdentityInterface;
 use yii\filters\auth\HttpBearerAuth;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
+use app\models\user\auth\Role;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -91,7 +92,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         $dataProvider = new ActiveDataProvider([
             'query' => self::find()->distinct()->with(['userProfile' => function ($query) {
                 $query->with(['phones', 'emails']);
-            }])->where(['status' => self::STATUS_ACTIVE]),
+            }, 'role'])->where(['status' => self::STATUS_ACTIVE]),
             'pagination' => [
                 'pageSize' => 0,
             ],
@@ -183,6 +184,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
 
+    /**
+     * Gets query for [[UserProfiles]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRole()
+    {
+        return $this->hasOne(Role::className(), ['user_id' => 'id']);
+    }
 
 
     /**
@@ -217,6 +227,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     /**
      * {@inheritdoc}
+     *  @return User 
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {

@@ -13,7 +13,7 @@ class FavoriteOfferController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ["*"]);
+        return BaseControllerBehaviors::getBaseBehaviors($behaviors);
     }
 
     public function actions()
