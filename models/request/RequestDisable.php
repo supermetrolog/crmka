@@ -11,7 +11,7 @@ use yii\base\Model;
 class RequestDisable extends Model
 {
     private Request $request;
-    private Timeline $timeline;
+    public Timeline $timeline;
     public $passive_why;
     public $passive_why_comment;
     public function __construct(Request $request, Timeline $timeline, array $config)
