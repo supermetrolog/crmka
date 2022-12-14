@@ -335,11 +335,6 @@ class TimelineStep extends \yii\db\ActiveRecord
             }, $extraFields['timelineStepObjects'])));
             $newObjects = [];
             foreach ($extraFields['timelineStepObjects'] as $value) {
-                $offer_comments = [];
-                if ($offer = $value->offer) {
-                    $offer_comments = $offer->getTimelineComments($this->timeline_id)->all();
-                }
-
                 $object = $value->toArray([], [
                     'comments',
                     'offer.object',
@@ -347,11 +342,10 @@ class TimelineStep extends \yii\db\ActiveRecord
                 ], true);
 
 
-                if (key_exists('offer', $object)) {
-                    $object['offer']['comments'] = $offer_comments;
+                if ($object['offer'] !== null) {
+                    $object['offer']['comments'] = $object['comments'];
+                    $object['offer']['duplicate_count'] = $count[$object['offer_id']];
                 }
-
-
 
                 $object['duplicate_count'] = $count[$object['offer_id']];
                 $newObjects[$object['offer_id']] = $object;
