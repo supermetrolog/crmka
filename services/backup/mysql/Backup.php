@@ -1,8 +1,8 @@
 <?php
 
-namespace app\services\backup;
+namespace app\services\backup\mysql;
 
-use app\services\backuper\interfaces\DbDumperInterface;
+use app\services\backuper\databases\interfaces\DbDumperInterface;
 use Exception;
 use Yii;
 
@@ -52,7 +52,7 @@ class Backup implements DbDumperInterface
     }
     public function getDbName(): string
     {
-        return $this->getDsnAttribute("dbname", $this->dbCfg['dsn']);
+        return $this->dbCfg['dbname'];
     }
     public function getBackupFileName()
     {
@@ -64,9 +64,8 @@ class Backup implements DbDumperInterface
     }
     private function generateBackupFileName()
     {
-        $dbname = $this->getDsnAttribute("dbname", $this->dbCfg['dsn']);
         $date = date("Y_m_d_H_i_s");
-        $this->filename = $date . "_" . $dbname . ".sql";
+        $this->filename = $date . "_" . $this->dbCfg['dbname'] . ".sql";
     }
     public function generateFullPath()
     {
@@ -75,33 +74,23 @@ class Backup implements DbDumperInterface
     }
     private function getMysqlDumpCommand()
     {
-        $dbname = $this->getDsnAttribute("dbname", $this->dbCfg['dsn']);
-        $host = $this->getDsnAttribute("host", $this->dbCfg['dsn']);
         $this->generateFullPath();
         if ($this->dbCfg['password'] == '') {
             return sprintf(
                 "mysqldump -u%s -h%s %s > %s",
                 $this->dbCfg['username'],
-                $host,
-                $dbname,
+                $this->dbCfg['host'],
+                $this->dbCfg['dbname'],
                 $this->fullpath
             );
         }
         return sprintf(
             "mysqldump -u%s -h%s -p%s %s > %s",
             $this->dbCfg['username'],
-            $host,
+            $this->dbCfg['host'],
             $this->dbCfg['password'],
-            $dbname,
+            $this->dbCfg['dbname'],
             $this->fullpath
         );
-    }
-    private function getDsnAttribute($name, $dsn)
-    {
-        if (preg_match('/' . $name . '=([^;]*)/', $dsn, $match)) {
-            return $match[1];
-        } else {
-            return null;
-        }
     }
 }

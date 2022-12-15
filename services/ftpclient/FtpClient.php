@@ -2,7 +2,7 @@
 
 namespace app\services\ftpclient;
 
-use app\services\backuper\interfaces\RepositoryInterface;
+use app\services\backuper\databases\interfaces\RepositoryInterface;
 use Generator;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;

@@ -149,6 +149,22 @@ $parameters = [
             'db_config_path' => __DIR__ . "/db_old.php"
         ],
     ],
+    'db_importer' => [
+        'workdir' => "/home/user/backup/mysql",
+        'db' => [
+            'db_config_path' => __DIR__ . "/importer_db.php"
+        ],
+        'db_old' => [
+            'db_config_path' => __DIR__ . "/importer_db_old.php"
+        ],
+    ],
+    'ssh' => [
+        'reserve_server' => [
+            'username' => $secrets['ssh']['reserve_server']['username'],
+            'password' => $secrets['ssh']['reserve_server']['password'],
+            'host' => $secrets['ssh']['reserve_server']['host'],
+        ]
+    ],
     'url' => [
         'objects' => "https://pennylane.pro/",
         'this_host' => "http://crmka/",

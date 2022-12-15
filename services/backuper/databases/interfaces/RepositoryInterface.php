@@ -1,6 +1,6 @@
 <?php
 
-namespace app\services\backuper\interfaces;
+namespace app\services\backuper\databases\interfaces;
 
 use Generator;
 

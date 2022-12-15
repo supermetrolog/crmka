@@ -21,12 +21,11 @@
         "floor12/yii2-phone": "^2.0",
         "consik/yii2-websocket": "^1.0",
         "dompdf/dompdf": "^1.1",
-        "google/apiclient": "^2.12.1",
         "enqueue/amqp-lib": "^0.10.9",
         "yiisoft/yii2-queue": "^2.3",
         "supermetrolog/synchronizer": "^1.0",
-        "airani/yii2-telegram-log": "^1.0"
-
+        "airani/yii2-telegram-log": "^1.0",
+        "librasoft-fr/php-ssh-connection": "^3.1"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

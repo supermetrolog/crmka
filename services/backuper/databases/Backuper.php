@@ -1,29 +1,38 @@
 <?php
 
-namespace app\services\backuper;
+namespace app\services\backuper\databases;
 
-use app\services\backuper\interfaces\DbDumperInterface;
-use app\services\backuper\interfaces\RepositoryInterface;
+use app\services\backuper\databases\interfaces\DbDumperInterface;
+use app\services\backuper\databases\interfaces\DbImporterInterface;
+use app\services\backuper\databases\interfaces\RepositoryInterface;
+use Exception;
 
 class Backuper
 {
     private DbDumperInterface $dbDumper;
     private RepositoryInterface $repo;
-
+    private DbImporterInterface $dbImporter;
     private int $backupOffset;
 
-    public function __construct(DbDumperInterface $dbDumper, RepositoryInterface $repo, $backupOffset = 10)
+    public function __construct(DbDumperInterface $dbDumper, RepositoryInterface $repo, DbImporterInterface $dbImporter, $backupOffset = 10)
     {
+        $this->dbImporter = $dbImporter;
         $this->dbDumper = $dbDumper;
         $this->repo = $repo;
         $this->backupOffset = $backupOffset;
     }
 
-    public function run(): void
+    public function run(bool $withImport = false): void
     {
         $this->dbDumper->dump();
         $this->repo->createFile($this->dbDumper->getFilename(), $this->dbDumper->getContent());
         $this->removeOldBackups();
+        if ($withImport) {
+            $result = $this->dbImporter->import($this->dbDumper->getFilename());
+            if (!$result) {
+                throw new Exception("Import db error");
+            }
+        }
     }
 
     private function removeOldBackups(): void
