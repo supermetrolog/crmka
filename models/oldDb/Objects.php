@@ -3,6 +3,7 @@
 namespace app\models\oldDb;
 
 use app\models\Company;
+use app\models\Deal;
 use app\models\oldDb\location\Location;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -630,5 +631,13 @@ class Objects extends \yii\db\ActiveRecord
     public function getObjectFloors()
     {
         return $this->hasMany(ObjectFloors::class, ['object_id' => 'id']);
+    }
+    public function getDeals()
+    {
+        return $this->hasMany(Deal::class, ['object_id' => 'id']);
+    }
+    public function getArendators()
+    {
+        return $this->hasMany(Company::class, ['id' => 'company_id'])->via('deals');
     }
 }
