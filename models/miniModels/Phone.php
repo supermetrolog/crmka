@@ -13,6 +13,7 @@ use floor12\phone\PhoneFormatter;
  * @property int $contact_id
  * @property string $phone
  * @property string $exten
+ * @property int|null $isMain
  *
  * @property Contact $contact
  */
@@ -35,7 +36,7 @@ class Phone extends \yii\db\ActiveRecord
     {
         return [
             [['contact_id', 'phone'], 'required'],
-            [['contact_id'], 'integer'],
+            [['contact_id', 'isMain'], 'integer'],
             [['phone', 'exten'], 'string', 'max' => 255],
             [['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
         ];
@@ -51,6 +52,7 @@ class Phone extends \yii\db\ActiveRecord
             'contact_id' => 'Contact ID',
             'phone' => 'Phone',
             'exten' => 'Exten',
+            'isMain' => 'IsMain',
         ];
     }
     public function beforeSave($insert)
