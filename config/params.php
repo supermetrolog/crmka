@@ -200,6 +200,10 @@ if (YII_ENV == "prod") {
     $parameters['url']['this_host'] = "https://api.pennylane.pro/";
 }
 
+if (YII_ENV == "reserve") {
+    $parameters['url']['this_host'] = "https://reserve-api.supermetrolog.ru/";
+}
+
 $parameters['url']['image_not_found'] = $parameters['url']['this_host'] . $parameters['url']['image_not_found_rel'];
 $parameters['url']['empty_image'] = $parameters['url']['this_host'] . $parameters['url']['empty_image_rel'];
 
