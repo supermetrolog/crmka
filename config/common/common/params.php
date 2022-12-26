@@ -1,5 +1,6 @@
 <?php
-$secrets = require __DIR__ . "/secrets.php";
+
+$secrets = require __DIR__ . "/../../secrets.php";
 
 $ftpOptionsForSyncThisProject = [
     'host' => $secrets['ftp_options_for_sync_this_project']['host'], // required
@@ -67,7 +68,9 @@ $ftpOptionsForBackupsLoad = [
     'recurseManually' => true // true
 ];
 
-$parameters = [
+$common_thisHost = "http://crmka/";
+
+return [
     'adminEmail' => $secrets['adminEmail'],
     'senderEmail' => $secrets['senderEmail'],
     'senderName' => 'PENNYLANE REALTY',
@@ -80,64 +83,6 @@ $parameters = [
         'password' => $secrets['rabbit']['password'],
         'queueName' => "timeline_presentation_sender",
         'exchangeName' => "timeline_presentation_sender_exchange"
-    ],
-    'logger' => [
-        'targets' => [
-            [
-                'class' => 'yii\log\FileTarget',
-                'levels' => ['error', 'warning'],
-            ],
-        ]
-    ],
-    'synchronizer' => [
-        'this_project' => [
-            'baseRepository' => [
-                'dirpath' => __DIR__ . "/../public_html/uploads"
-            ],
-            'targetRepository' => [
-                'dirpath' => ".",
-                'ftp' => $ftpOptionsForSyncThisProject,
-            ],
-            'alreadySynchronizedRepository' => [
-                'filename' => 'sync-file.data',
-                'repository' => [
-                    'dirpath' => ".",
-                    'ftp' => $ftpOptionsForSyncThisProject
-                ]
-            ]
-        ],
-        'objects_project' => [
-            'baseRepository' => [
-                'dirpath' => "/home/user/web/pennylane.pro/public_html"
-            ],
-            'targetRepository' => [
-                'dirpath' => ".",
-                'ftp' => $ftpOptionsForSyncObjectsProject,
-            ],
-            'alreadySynchronizedRepository' => [
-                'filename' => 'sync-file.data',
-                'repository' => [
-                    'dirpath' => ".",
-                    'ftp' => $ftpOptionsForSyncObjectsProject
-                ]
-            ]
-        ],
-        'frontend_project' => [
-            'baseRepository' => [
-                'dirpath' => __DIR__ . "/../public_html/uploads"
-            ],
-            'targetRepository' => [
-                'dirpath' => ".",
-                'ftp' => $ftpOptionsForSyncFrontendProject,
-            ],
-            'alreadySynchronizedRepository' => [
-                'filename' => 'sync-file.data',
-                'repository' => [
-                    'dirpath' => ".",
-                    'ftp' => $ftpOptionsForSyncFrontendProject
-                ]
-            ]
-        ]
     ],
     'db_backup' => [
         'ftp_client_options' => $ftpOptionsForBackupsLoad,
@@ -167,44 +112,8 @@ $parameters = [
     ],
     'url' => [
         'objects' => "https://pennylane.pro/",
-        'this_host' => "http://crmka/",
-        'image_not_found_rel' => "images/no-image.jpg",
-        'empty_image_rel' => "images/empty.jpg"
+        'this_host' => $common_thisHost,
+        'image_not_found' => "{$common_thisHost}images/no-image.jpg",
+        'empty_image' => "{$common_thisHost}images/empty.jpg"
     ],
 ];
-
-
-if (YII_ENV != "dev") {
-    $parameters['synchronizer']['this_project']['baseRepository']['dirpath'] = "/home/user/web/api.pennylane.pro/public_html";
-    $parameters['synchronizer']['objects_project']['baseRepository']['dirpath'] = "/home/user/web/pennylane.pro/public_html";
-    $parameters['synchronizer']['frontend_project']['baseRepository']['dirpath'] = "/home/user/web/clients.pennylane.pro/public_html";
-
-    $parameters['compressorPath'] = '/home/user/scripts/pdf_compressor.py';
-    $parameters['pythonPath'] = '/bin/python3';
-}
-
-if (YII_ENV == "stage") {
-    $parameters['rabbit']['queueName'] = "dev_timeline_presentation_sender";
-    $parameters['rabbit']['exchangeName'] = "dev_timeline_presentation_sender_exchange";
-
-    $parameters['url']['this_host'] = "https://api.supermetrolog.ru/";
-}
-
-if (YII_ENV == "prod") {
-    $parameters['logger']['targets'][] = [
-        'class' => 'airani\log\TelegramTarget',
-        'levels' => ['error'],
-        'botToken' => $secrets['tg_logger_bot']['token'], // bot token secret key
-        'chatId' => $secrets['tg_logger_bot']['channel'], // chat id or channel username with @ like 12345 or @channel
-    ];
-    $parameters['url']['this_host'] = "https://api.pennylane.pro/";
-}
-
-if (YII_ENV == "reserve") {
-    $parameters['url']['this_host'] = "https://reserve-api.supermetrolog.ru/";
-}
-
-$parameters['url']['image_not_found'] = $parameters['url']['this_host'] . $parameters['url']['image_not_found_rel'];
-$parameters['url']['empty_image'] = $parameters['url']['this_host'] . $parameters['url']['empty_image_rel'];
-
-return $parameters;

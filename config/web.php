@@ -4,6 +4,7 @@ $db = require __DIR__ . '/db.php';
 $db_old = require __DIR__ . '/db_old.php';
 $urlRules = require __DIR__ . '/url_rules.php';
 $components = require __DIR__ . "/web_components.php";
+$container = require __DIR__ . '/container.php';
 
 $config = [
     'id' => 'basic',
@@ -15,6 +16,7 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
+    'container' => $container,
     'components' => $components,
     'params' => $params,
 ];
