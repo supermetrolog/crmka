@@ -7,6 +7,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 class SiteController extends Controller
 {
@@ -59,13 +60,26 @@ class SiteController extends Controller
     }
     public function actionIndex()
     {
-        $one = require __DIR__ . "/../config/dev/web/config.php";
+        $one = require __DIR__ . "/../config/staging/web/config.php";
         $two = require __DIR__ . "/../config/common/web/config.php";
-
-        $res = array_merge_recursive($two, $one);
+        $res = ArrayHelper::merge($two, $one);
+        // $res = require __DIR__ . "/../config/console.php";
         unset($res['container']);
-        // $this->dump(array_merge_recursive($one, $two));
         $this->dump($res);
-        // $this->dump($two);
+    }
+
+    public function array_merge_recursive_distinct(array &$array1, array &$array2)
+    {
+        $merged = $array1;
+
+        foreach ($array2 as $key => &$value) {
+            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
+                $merged[$key] = $this->array_merge_recursive_distinct($merged[$key], $value);
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+
+        return $merged;
     }
 }

@@ -84,9 +84,59 @@ return [
         'queueName' => "timeline_presentation_sender",
         'exchangeName' => "timeline_presentation_sender_exchange"
     ],
+    'synchronizer' => [
+        'this_project' => [
+            'baseRepository' => [
+                'dirpath' => YII_PROJECT_ROOT . "/public_html/uploads"
+            ],
+            'targetRepository' => [
+                'dirpath' => ".",
+                'ftp' => $ftpOptionsForSyncThisProject,
+            ],
+            'alreadySynchronizedRepository' => [
+                'filename' => 'sync-file.data',
+                'repository' => [
+                    'dirpath' => ".",
+                    'ftp' => $ftpOptionsForSyncThisProject
+                ]
+            ]
+        ],
+        'objects_project' => [
+            'baseRepository' => [
+                'dirpath' => "/home/user/web/pennylane.pro/public_html"
+            ],
+            'targetRepository' => [
+                'dirpath' => ".",
+                'ftp' => $ftpOptionsForSyncObjectsProject,
+            ],
+            'alreadySynchronizedRepository' => [
+                'filename' => 'sync-file.data',
+                'repository' => [
+                    'dirpath' => ".",
+                    'ftp' => $ftpOptionsForSyncObjectsProject
+                ]
+            ]
+        ],
+        'frontend_project' => [
+            'baseRepository' => [
+                'dirpath' => YII_PROJECT_ROOT . "/public_html/uploads"
+            ],
+            'targetRepository' => [
+                'dirpath' => ".",
+                'ftp' => $ftpOptionsForSyncFrontendProject,
+            ],
+            'alreadySynchronizedRepository' => [
+                'filename' => 'sync-file.data',
+                'repository' => [
+                    'dirpath' => ".",
+                    'ftp' => $ftpOptionsForSyncFrontendProject
+                ]
+            ]
+        ]
+    ],
     'db_backup' => [
         'ftp_client_options' => $ftpOptionsForBackupsLoad,
-        'dump_tmp_dir' => __DIR__ . "/../services/backup/tmp",
+        'dump_tmp_dir' => YII_PROJECT_ROOT . "/runtime/backup_tmp",
         'db' => [
             'db_config_path' => __DIR__ . "/db.php"
         ],

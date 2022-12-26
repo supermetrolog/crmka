@@ -1,10 +1,15 @@
 <?php
 
-return array_merge_recursive(
+use yii\helpers\ArrayHelper;
+
+return ArrayHelper::merge(
     require __DIR__ . '/../common/config.php',
     [
         'id' => 'basic-console',
         'bootstrap' => ['queue'],
+        'aliases' => [
+            '@tests' => '@app/tests'
+        ],
         'controllerNamespace' => 'app\commands',
         'container' => require __DIR__ . '/container.php',
     ]

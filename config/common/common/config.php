@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'basePath' => dirname(__DIR__),
+    'basePath' => realpath(__DIR__ . "/../../../"),
     'bootstrap' => ['log'],
     'timeZone' => 'Europe/Moscow',
     'language' => 'ru-RU',

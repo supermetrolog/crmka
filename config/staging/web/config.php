@@ -5,17 +5,11 @@ use yii\helpers\ArrayHelper;
 return ArrayHelper::merge(
     require __DIR__ . "/../common/config.php",
     [
-        'bootstrap' => ['gii', 'debug'],
+        'bootstrap' => ['debug'],
         'modules' => [
             'debug' => [
                 'class' => 'yii\debug\Module',
                 'allowedIPs' => ["*"],
-            ],
-            'gii' => [
-                'class' => 'yii\gii\Module',
-                'generators' => [
-                    'jobs' => yii\queue\gii\Generator::class,
-                ],
             ]
         ]
     ]
