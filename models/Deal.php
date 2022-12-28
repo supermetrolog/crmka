@@ -106,6 +106,19 @@ class Deal extends \yii\db\ActiveRecord
             }
             return $fields['clientLegalEntity'];
         };
+        $fields['restOfTheTerm'] = function ($fields) {
+            if ($fields['contractTerm'] === null) {
+                return null;
+            }
+            $currentTime = time();
+            $contractTerm = $fields['contractTerm'];
+            $startTime = $fields['dealDate'];
+            $endTime = strtotime("+ $contractTerm month", strtotime($startTime));
+
+            $restOfTheTerm = $endTime - $currentTime;
+            $restOfTheTermInMonth = round($restOfTheTerm / 60 / 60 / 24);
+            return $restOfTheTermInMonth;
+        };
         return $fields;
     }
 
