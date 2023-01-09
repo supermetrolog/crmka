@@ -45,6 +45,16 @@ class LetterController extends ActiveController
         $searchModel = new LetterSearch();
         return $searchModel->search(Yii::$app->request->queryParams);
     }
+    public function actionView($id)
+    {
+        return Letter::find()->where(['id' => $id])->with([
+            "user.userProfile",
+            "letterOffers.offer.object",
+            "letterWays",
+            "letterPhones.phone.contact",
+            "letterEmails.email.contact"
+        ])->limit(1)->one();
+    }
     protected function findModel($id)
     {
         if (($model = Letter::findOne($id)) !== null) {
