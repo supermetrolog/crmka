@@ -113,10 +113,10 @@ class Contact extends \yii\db\ActiveRecord
         $fields['full_name'] = function ($fields) {
             $full_name = $fields['first_name'];
             if ($fields['middle_name']) {
-                $full_name .= " {$fields['middle_name']}";
+                $full_name = $fields['middle_name'] . " " . $full_name;
             }
             if ($fields['last_name']) {
-                $full_name .= " {$fields['last_name']}";
+                $full_name .= " " . $fields['last_name'];
             }
             return $full_name;
         };
