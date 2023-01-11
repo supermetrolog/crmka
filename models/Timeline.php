@@ -138,6 +138,10 @@ class Timeline extends \yii\db\ActiveRecord
     {
         return self::find()->where(['request_id' => $request_id, 'status' => self::STATUS_ACTIVE])->limit(1)->one();
     }
+    public static function getTimelineByRequestAndConsultantID(int $request_id, int $consultant_id)
+    {
+        return self::find()->where(['request_id' => $request_id, 'consultant_id' => $consultant_id])->limit(1)->one();
+    }
     /**
      * Gets query for [[Consultant]].
      *

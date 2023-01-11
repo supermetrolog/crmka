@@ -9,6 +9,7 @@ use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 use app\behaviors\BaseControllerBehaviors;
 use app\models\request\RequestDisable;
+use app\models\request\RequestUnDisable;
 use app\models\Timeline;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use yii\filters\Cors;
@@ -82,7 +83,17 @@ class RequestController extends ActiveController
             'message' => "Запрос переведен в пассив"
         ];
     }
+    public function actionUndisable($id)
+    {
+        $request = $this->findModel($id);
 
+        $disableModel = new RequestUnDisable($request, Timeline::getTimelineByRequestAndConsultantID($request->id, $request->consultant_id));
+        $disableModel->unDisableRequestAndTimeline();
+        return [
+            'data' => true,
+            'message' => "Запрос переведен в актив"
+        ];
+    }
     protected function findModel($id)
     {
         if (($model = Request::findOne($id)) !== null) {
