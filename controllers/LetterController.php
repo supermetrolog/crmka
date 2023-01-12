@@ -48,11 +48,12 @@ class LetterController extends ActiveController
     public function actionView($id)
     {
         return Letter::find()->where(['id' => $id])->with([
+            "company",
             "user.userProfile",
             "letterOffers.offer.object",
             "letterWays",
-            "letterPhones.phone.contact",
-            "letterEmails.email.contact"
+            "letterPhones.contact",
+            "letterEmails.contact"
         ])->limit(1)->one();
     }
     protected function findModel($id)

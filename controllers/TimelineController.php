@@ -109,10 +109,10 @@ class TimelineController extends ActiveController
         return [
             'offers' => $createLetterModel->offers,
             'emails' => array_map(function ($elem) {
-                if ($model = Email::findOne($elem)) return $model->email;
+                return $elem['value'];
             }, $createLetterModel->contacts['emails']),
             'phones' => array_map(function ($elem) {
-                if ($model = Phone::findOne($elem)) return $model->phone;
+                return $elem['value'];
             }, $createLetterModel->contacts['phones']),
             'comment' => $createLetterModel->letterModel->body,
             'subject' => $createLetterModel->letterModel->subject,

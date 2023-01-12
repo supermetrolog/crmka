@@ -2,6 +2,7 @@
 
 namespace app\models\letter;
 
+use app\models\Company;
 use app\models\User;
 use Yii;
 use yii\db\Expression;
@@ -18,6 +19,7 @@ use yii\db\Expression;
  * @property int $status 1 - отправлено, 0 - ошибка
  * @property int $type Отправлено из таймлайна или другим способом
  * @property int $shipping_method Отправлено из таймлайна или другим способом
+ * @property int $company_id [СВЯЗЬ] с таблицей компаний
  *
  * @property User $user
  * @property LetterContact[] $letterContacts
@@ -46,8 +48,8 @@ class Letter extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'type', 'shipping_method', 'sender_email'], 'required'],
-            [['user_id', 'status', 'type', 'shipping_method'], 'integer'],
+            [['user_id', 'type', 'shipping_method', 'sender_email', 'company_id'], 'required'],
+            [['company_id', 'user_id', 'status', 'type', 'shipping_method'], 'integer'],
             [['body'], 'string'],
             [['created_at'], 'safe'],
             [['subject'], 'string', 'max' => 255],
@@ -70,9 +72,18 @@ class Letter extends \yii\db\ActiveRecord
             'type' => 'Type',
             'shipping_method' => 'Shippin Method',
             'sender_email' => 'Sender Email',
+            'company_id' => 'Company ID',
         ];
     }
-
+    /**
+     * Gets query for [[Company]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompany()
+    {
+        return $this->hasOne(Company::className(), ['id' => 'company_id']);
+    }
     /**
      * Gets query for [[User]].
      *
@@ -100,7 +111,7 @@ class Letter extends \yii\db\ActiveRecord
      */
     public function getLetterEmails()
     {
-        return $this->hasMany(LetterContact::className(), ['letter_id' => 'id'])->where(['is not', 'email_id', new Expression("null")]);
+        return $this->hasMany(LetterContact::className(), ['letter_id' => 'id'])->where(['is not', 'email', new Expression("null")]);
     }
 
     /**
@@ -110,7 +121,7 @@ class Letter extends \yii\db\ActiveRecord
      */
     public function getLetterPhones()
     {
-        return $this->hasMany(LetterContact::className(), ['letter_id' => 'id'])->where(['is not', 'phone_id', new Expression("null")]);
+        return $this->hasMany(LetterContact::className(), ['letter_id' => 'id'])->where(['is not', 'phone', new Expression("null")]);
     }
 
     /**

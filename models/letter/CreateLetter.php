@@ -66,9 +66,7 @@ class CreateLetter extends Letter
         if (
             !$this->checkArrayField($this->contacts, 'emails') ||
             !$this->checkArrayField($this->contacts, 'phones') ||
-            (!$required->validate($this->contacts['phones']) && !$required->validate($this->contacts['emails'])) ||
-            !is_array($this->contacts['phones']) ||
-            !is_array($this->contacts['emails'])
+            (!$required->validate($this->contacts['phones']) && !$required->validate($this->contacts['emails']))
         ) {
             $this->addError('contacts', 'emails or phones not be empty');
         }
@@ -85,7 +83,6 @@ class CreateLetter extends Letter
             $this->createLetterOffers($this->offers, $letterModel->id);
             $this->createLetterContacts($this->contacts, $letterModel->id);
             $this->createLetterWays($this->ways, $letterModel->id);
-            // $tx->rollBack();
             $tx->commit();
         } catch (\Throwable $th) {
             $tx->rollBack();
@@ -125,21 +122,23 @@ class CreateLetter extends Letter
     }
     private function createLetterContacts(array $contacts, int $letter_id): void
     {
-        foreach ($contacts['emails'] as $email_id) {
+        foreach ($contacts['emails'] as $email) {
             $model = new LetterContact();
             $config = [
                 'letter_id' => $letter_id,
-                'email_id' => $email_id
+                'email' => $email['value'],
+                'contact_id' => $email['contact_id']
             ];
             if (!$model->load($config, '') || !$model->save())
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
         }
 
-        foreach ($contacts['phones'] as $phone_id) {
+        foreach ($contacts['phones'] as $phone) {
             $model = new LetterContact();
             $config = [
                 'letter_id' => $letter_id,
-                'phone_id' => $phone_id
+                'phone' => $phone['value'],
+                'contact_id' => $phone['contact_id']
             ];
             if (!$model->load($config, '') || !$model->save())
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));

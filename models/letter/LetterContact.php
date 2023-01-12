@@ -2,6 +2,7 @@
 
 namespace app\models\letter;
 
+use app\models\Contact;
 use app\models\miniModels\Email;
 use app\models\miniModels\Phone;
 use Yii;
@@ -12,8 +13,9 @@ use yii\validators\RequiredValidator;
  *
  * @property int $id
  * @property int $letter_id [СВЯЗЬ] с отправленными письмами
- * @property int|null $email_id [СВЯЗЬ] с мейлами
- * @property int|null $phone_id [СВЯЗЬ] с телефонами
+ * @property string|null $email email контакта
+ * @property string|null $phone номер контакта
+ * @property int $contact_id [СВЯЗЬ] с таблицей контактов
  *
  * @property Letter $letter
  */
@@ -33,20 +35,19 @@ class LetterContact extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['letter_id'], 'required'],
-            [['letter_id', 'email_id', 'phone_id'], 'integer'],
-            ['email_id', 'validateContacts'],
-            [['email_id'], 'exist', 'skipOnError' => true, 'targetClass' => Email::className(), 'targetAttribute' => ['email_id' => 'id']],
+            [['letter_id', "contact_id"], 'required'],
+            [['letter_id'], 'integer'],
+            [['email', 'phone'], 'string'],
+            ['email', 'validateContacts'],
             [['letter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Letter::className(), 'targetAttribute' => ['letter_id' => 'id']],
-            [['phone_id'], 'exist', 'skipOnError' => true, 'targetClass' => Phone::className(), 'targetAttribute' => ['phone_id' => 'id']],
         ];
     }
 
     public function validateContacts()
     {
         $required = new RequiredValidator();
-        if ($required->validate($this->email_id) && $required->validate($this->phone_id)) {
-            $this->addError('contacts', 'phone_id or email_id connot be empty');
+        if ($required->validate($this->email) && $required->validate($this->phone)) {
+            $this->addError('contacts', 'phone or email connot be empty');
         }
     }
     /**
@@ -57,10 +58,21 @@ class LetterContact extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'letter_id' => 'Letter ID',
-            'email_id' => 'Email ID',
-            'phone_id' => 'Phone ID',
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'contact_id' => 'Contact ID',
         ];
     }
+    /**
+     * Gets query for [[Contact]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getContact()
+    {
+        return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
+    }
+
 
     /**
      * Gets query for [[Letter]].
@@ -80,7 +92,7 @@ class LetterContact extends \yii\db\ActiveRecord
      */
     public function getEmail()
     {
-        return $this->hasOne(Email::className(), ['id' => 'email_id']);
+        return $this->hasOne(Email::className(), ['id' => 'email']);
     }
 
     /**
@@ -90,6 +102,6 @@ class LetterContact extends \yii\db\ActiveRecord
      */
     public function getPhone()
     {
-        return $this->hasOne(Phone::className(), ['id' => 'phone_id']);
+        return $this->hasOne(Phone::className(), ['id' => 'phone']);
     }
 }
