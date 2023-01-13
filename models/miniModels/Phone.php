@@ -55,6 +55,17 @@ class Phone extends \yii\db\ActiveRecord
             'isMain' => 'IsMain',
         ];
     }
+    public static function isValidPhoneNumber(string $number): bool
+    {
+        if (strlen($number) !== 11) {
+            return false;
+        }
+        if ($number[0] != "7") {
+            return false;
+        }
+
+        return true;
+    }
     public function beforeSave($insert)
     {
         parent::beforeSave($insert);
@@ -66,9 +77,17 @@ class Phone extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        $fields['phone'] = function ($fields) {
-            return PhoneFormatter::format($fields['phone']);
+        $fields['native_phone'] = function ($fields) {
+            return $fields['phone'];
         };
+        $fields['phone'] = function ($fields) {
+            if (self::isValidPhoneNumber($fields['phone'])) {
+                return PhoneFormatter::format($fields['phone']);
+                return PhoneFormatter::format($fields['phone']);
+            }
+            return $fields['phone'];
+        };
+
         return $fields;
     }
     /**

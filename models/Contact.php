@@ -152,6 +152,26 @@ class Contact extends \yii\db\ActiveRecord
 
         return $fields;
     }
+
+    public function extraFields()
+    {
+        $extraFields = parent::extraFields();
+        $extraFields['phones'] = function ($ef) {
+            $phones = array_filter($ef['phones'], function ($phone) {
+                $phone = $phone->toArray();
+                return Phone::isValidPhoneNumber($phone['native_phone']);
+            });
+            return array_values($phones);
+        };
+        $extraFields['invalidPhones'] = function ($ef) {
+            $phones = array_filter($ef['phones'], function ($phone) {
+                $phone = $phone->toArray();
+                return !Phone::isValidPhoneNumber($phone['native_phone']);
+            });
+            return array_values($phones);
+        };
+        return $extraFields;
+    }
     private function changeIsMain()
     {
         $query = static::find()->where(['isMain' => 1, 'company_id' => $this->company_id]);
@@ -193,7 +213,7 @@ class Contact extends \yii\db\ActiveRecord
 
             $model->createManyMiniModels([
                 Email::class =>  ArrayHelper::getValue($post_data, 'emails'),
-                Phone::class => ArrayHelper::getValue($post_data, 'phones'),
+                Phone::class => ArrayHelper::merge(ArrayHelper::getValue($post_data, 'phones'), ArrayHelper::getValue($post_data, 'invalidPhones')),
                 Website::class => ArrayHelper::getValue($post_data, 'websites'),
                 WayOfInforming::class => ArrayHelper::getValue($post_data, 'wayOfInformings'),
             ]);
@@ -214,7 +234,7 @@ class Contact extends \yii\db\ActiveRecord
 
             $model->updateManyMiniModels([
                 Email::class =>  ArrayHelper::getValue($post_data, 'emails'),
-                Phone::class => ArrayHelper::getValue($post_data, 'phones'),
+                Phone::class => ArrayHelper::merge(ArrayHelper::getValue($post_data, 'phones'), ArrayHelper::getValue($post_data, 'invalidPhones')),
                 Website::class => ArrayHelper::getValue($post_data, 'websites'),
                 WayOfInforming::class => ArrayHelper::getValue($post_data, 'wayOfInformings'),
             ]);
