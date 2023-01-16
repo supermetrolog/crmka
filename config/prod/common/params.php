@@ -6,22 +6,15 @@ $prod_common_this_host = "https://api.pennylane.pro/";
 return [
     'synchronizer' => [
         'this_project' => [
-            'baseRepository' => [
-                'dirpath' => "/home/user/web/api.pennylane.pro/public_html"
-            ],
+            'source_repo_dir_path' => "/home/user/web/api.pennylane.pro/public_html",
         ],
         'objects_project' => [
-            'baseRepository' => [
-                'dirpath' => "/home/user/web/pennylane.pro/public_html"
-            ],
+            'source_repo_dir_path' => "/home/user/web/pennylane.pro/public_html",
         ],
         'frontend_project' => [
-            'baseRepository' => [
-                'dirpath' => "/home/user/web/clients.pennylane.pro/public_html"
-            ],
+            'source_repo_dir_path' => "/home/user/web/clients.pennylane.pro/public_html",
         ]
     ],
-    'compressorPath' => '/home/user/scripts/pdf_compressor.py',
     'pythonPath' => '/bin/python3',
     'url' => [
         'this_host' => $prod_common_this_host,

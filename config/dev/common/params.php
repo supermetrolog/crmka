@@ -5,19 +5,13 @@ $secrets = require __DIR__ . "/../../secrets.php";
 return [
     'synchronizer' => [
         'this_project' => [
-            'baseRepository' => [
-                'dirpath' => YII_PROJECT_ROOT . "/public_html/uploads"
-            ],
+            'source_repo_dir_path' => "C:\Users/tim-a/Desktop/test-sync-data",
         ],
         'objects_project' => [
-            'baseRepository' => [
-                'dirpath' => YII_PROJECT_ROOT . "/public_html/uploads"
-            ],
+            'source_repo_dir_path' => "C:\Users/tim-a/Desktop/test-sync-data",
         ],
         'frontend_project' => [
-            'baseRepository' => [
-                'dirpath' => YII_PROJECT_ROOT . "/public_html/uploads"
-            ],
+            'source_repo_dir_path' => "C:\Users/tim-a/Desktop/test-sync-data",
         ]
     ],
 ];

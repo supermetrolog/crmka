@@ -23,10 +23,10 @@
         "dompdf/dompdf": "^1.1",
         "enqueue/amqp-lib": "^0.10.9",
         "yiisoft/yii2-queue": "^2.3",
-        "supermetrolog/synchronizer": "^1.0",
         "airani/yii2-telegram-log": "^1.0",
         "librasoft-fr/php-ssh-connection": "^3.1",
-        "monolog/monolog": "^2.8"
+        "monolog/monolog": "^2.8",
+        "supermetrolog/synchronizer-local-to-ftp-builder": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

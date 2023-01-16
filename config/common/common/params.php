@@ -2,70 +2,11 @@
 
 $secrets = require __DIR__ . "/../../secrets.php";
 
-$ftpOptionsForSyncThisProject = [
-    'host' => $secrets['ftp_options_for_sync_this_project']['host'], // required
-    'root' => '/', // required
-    'username' => $secrets['ftp_options_for_sync_this_project']['username'], // required
-    'password' => $secrets['ftp_options_for_sync_this_project']['password'], // required
-    'port' => 21,
-    'ssl' => false,
-    'timeout' => 90,
-    'utf8' => false,
-    'passive' => true,
-    'transferMode' => FTP_BINARY,
-    'systemType' => "unix", // 'windows' or 'unix'
-    'ignorePassiveAddress' => true, // true or false
-    'timestampsOnUnixListingsEnabled' => false, // true or false
-    'recurseManually' => true // true
-];
-
-$ftpOptionsForSyncObjectsProject = [
-    'host' => $secrets['ftp_options_for_sync_objects_project']['host'], // required
-    'root' => '/', // required
-    'username' => $secrets['ftp_options_for_sync_objects_project']['username'], // required
-    'password' => $secrets['ftp_options_for_sync_objects_project']['password'], // required
-    'port' => 21,
-    'ssl' => false,
-    'timeout' => 90,
-    'utf8' => false,
-    'passive' => true,
-    'transferMode' => FTP_BINARY,
-    'systemType' => "unix", // 'windows' or 'unix'
-    'ignorePassiveAddress' => true, // true or false
-    'timestampsOnUnixListingsEnabled' => false, // true or false
-    'recurseManually' => true // true
-];
-$ftpOptionsForSyncFrontendProject = [
-    'host' => $secrets['ftp_options_for_sync_frontend_project']['host'], // required
-    'root' => '/', // required
-    'username' => $secrets['ftp_options_for_sync_frontend_project']['username'], // required
-    'password' => $secrets['ftp_options_for_sync_frontend_project']['password'], // required
-    'port' => 21,
-    'ssl' => false,
-    'timeout' => 90,
-    'utf8' => false,
-    'passive' => true,
-    'transferMode' => FTP_BINARY,
-    'systemType' => "unix", // 'windows' or 'unix'
-    'ignorePassiveAddress' => true, // true or false
-    'timestampsOnUnixListingsEnabled' => false, // true or false
-    'recurseManually' => true // true
-];
 $ftpOptionsForBackupsLoad = [
     'host' => $secrets['ftp_options_for_backups_load']['host'], // required
     'root' => '/backup/mysql/', // required
     'username' => $secrets['ftp_options_for_backups_load']['username'], // required
     'password' => $secrets['ftp_options_for_backups_load']['password'], // required
-    'port' => 21,
-    'ssl' => false,
-    'timeout' => 90,
-    'utf8' => false,
-    'passive' => true,
-    'transferMode' => FTP_BINARY,
-    'systemType' => "unix", // 'windows' or 'unix'
-    'ignorePassiveAddress' => true, // true or false
-    'timestampsOnUnixListingsEnabled' => false, // true or false
-    'recurseManually' => true // true
 ];
 
 $common_thisHost = "http://crmka/";
@@ -89,53 +30,35 @@ return [
     ],
     'synchronizer' => [
         'this_project' => [
-            'baseRepository' => [
-                'dirpath' => YII_PROJECT_ROOT . "/public_html/uploads"
+            'source_repo_dir_path' => YII_PROJECT_ROOT . "/public_html/uploads",
+            'target_repo_ftp_params' => [
+                'host' => $secrets['ftp_options_for_sync_this_project']['host'],
+                'root' => "/",
+                'username' => $secrets['ftp_options_for_sync_this_project']['username'],
+                'password' => $secrets['ftp_options_for_sync_this_project']['password']
             ],
-            'targetRepository' => [
-                'dirpath' => ".",
-                'ftp' => $ftpOptionsForSyncThisProject,
-            ],
-            'alreadySynchronizedRepository' => [
-                'filename' => 'sync-file.data',
-                'repository' => [
-                    'dirpath' => ".",
-                    'ftp' => $ftpOptionsForSyncThisProject
-                ]
-            ]
+            'already_sync_repo_filename' => "sync-file.data",
         ],
         'objects_project' => [
-            'baseRepository' => [
-                'dirpath' => "/home/user/web/pennylane.pro/public_html"
+            'source_repo_dir_path' => YII_PROJECT_ROOT . "/public_html/uploads",
+            'target_repo_ftp_params' => [
+                'host' => $secrets['ftp_options_for_sync_objects_project']['host'],
+                'root' => "/",
+                'username' => $secrets['ftp_options_for_sync_objects_project']['username'],
+                'password' => $secrets['ftp_options_for_sync_objects_project']['password']
             ],
-            'targetRepository' => [
-                'dirpath' => ".",
-                'ftp' => $ftpOptionsForSyncObjectsProject,
-            ],
-            'alreadySynchronizedRepository' => [
-                'filename' => 'sync-file.data',
-                'repository' => [
-                    'dirpath' => ".",
-                    'ftp' => $ftpOptionsForSyncObjectsProject
-                ]
-            ]
+            'already_sync_repo_filename' => "sync-file.data",
         ],
         'frontend_project' => [
-            'baseRepository' => [
-                'dirpath' => YII_PROJECT_ROOT . "/public_html/uploads"
+            'source_repo_dir_path' => YII_PROJECT_ROOT . "/public_html/uploads",
+            'target_repo_ftp_params' => [
+                'host' => $secrets['ftp_options_for_sync_frontend_project']['host'],
+                'root' => "/",
+                'username' => $secrets['ftp_options_for_sync_frontend_project']['username'],
+                'password' => $secrets['ftp_options_for_sync_frontend_project']['password']
             ],
-            'targetRepository' => [
-                'dirpath' => ".",
-                'ftp' => $ftpOptionsForSyncFrontendProject,
-            ],
-            'alreadySynchronizedRepository' => [
-                'filename' => 'sync-file.data',
-                'repository' => [
-                    'dirpath' => ".",
-                    'ftp' => $ftpOptionsForSyncFrontendProject
-                ]
-            ]
-        ]
+            'already_sync_repo_filename' => "sync-file.data",
+        ],
     ],
     'db_backup' => [
         'ftp_client_options' => $ftpOptionsForBackupsLoad,

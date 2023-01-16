@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e96ae0b4df828d74a163193708d15437",
+    "content-hash": "1a2fdc3c2223651c9c37fb0e713cfea7",
     "packages": [
         {
             "name": "airani/yii2-telegram-log",
@@ -2302,27 +2302,26 @@
         },
         {
             "name": "supermetrolog/synchronizer",
-            "version": "v1.0",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/supermetrolog/synchronizer.git",
-                "reference": "34439d9b05dd019e38d7fe28ae16a22cacf6a702"
+                "reference": "c38332f327379093e27d8fcbbe6597c9578123b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/supermetrolog/synchronizer/zipball/34439d9b05dd019e38d7fe28ae16a22cacf6a702",
-                "reference": "34439d9b05dd019e38d7fe28ae16a22cacf6a702",
+                "url": "https://api.github.com/repos/supermetrolog/synchronizer/zipball/c38332f327379093e27d8fcbbe6597c9578123b5",
+                "reference": "c38332f327379093e27d8fcbbe6597c9578123b5",
                 "shasum": ""
             },
             "require": {
-                "league/flysystem": "^2.5",
-                "league/flysystem-ftp": "^2.4",
                 "php": "^7.4",
                 "psr/log": "^1.1"
             },
             "require-dev": {
-                "monolog/monolog": "^2.8",
-                "phpunit/phpunit": "^9.5"
+                "phpstan/phpstan": "^1.9",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "*"
             },
             "type": "library",
             "autoload": {
@@ -2351,9 +2350,200 @@
             ],
             "support": {
                 "issues": "https://github.com/supermetrolog/synchronizer/issues",
-                "source": "https://github.com/supermetrolog/synchronizer/tree/v1.0"
+                "source": "https://github.com/supermetrolog/synchronizer/tree/v2.0.1"
             },
-            "time": "2022-11-28T08:27:14+00:00"
+            "time": "2022-12-23T21:13:41+00:00"
+        },
+        {
+            "name": "supermetrolog/synchronizer-already-sync-repo",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/supermetrolog/synchronizer-already-sync-repository.git",
+                "reference": "e249a4c5fc18cedd57d3e19e9caac7a769d71d67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/supermetrolog/synchronizer-already-sync-repository/zipball/e249a4c5fc18cedd57d3e19e9caac7a769d71d67",
+                "reference": "e249a4c5fc18cedd57d3e19e9caac7a769d71d67",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4",
+                "supermetrolog/synchronizer": "^2.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.9",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Supermetrolog\\SynchronizerAlreadySyncRepo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "supermetrolog",
+                    "email": "billypro6@gmail.com"
+                }
+            ],
+            "description": "Already synchronized repository interface implemetation",
+            "support": {
+                "issues": "https://github.com/supermetrolog/synchronizer-already-sync-repository/issues",
+                "source": "https://github.com/supermetrolog/synchronizer-already-sync-repository/tree/v2.0.0"
+            },
+            "time": "2022-12-24T01:01:08+00:00"
+        },
+        {
+            "name": "supermetrolog/synchronizer-filesystem-ftp-target-repo",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/supermetrolog/synchronizer-filesystem-ftp-target-repo.git",
+                "reference": "d486605f585e823235d8544c7b62ec5244cae30b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/supermetrolog/synchronizer-filesystem-ftp-target-repo/zipball/d486605f585e823235d8544c7b62ec5244cae30b",
+                "reference": "d486605f585e823235d8544c7b62ec5244cae30b",
+                "shasum": ""
+            },
+            "require": {
+                "league/flysystem-ftp": "^2.4",
+                "php": "^7.4",
+                "supermetrolog/synchronizer": "^2.0",
+                "supermetrolog/synchronizer-already-sync-repo": "^2.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.9",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Supermetrolog\\SynchronizerFilesystemFTPTargetRepo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "supermetrolog",
+                    "email": "billypro6@gmail.com"
+                }
+            ],
+            "description": "Synchronizer target repository interface implementation. And synchronizer already sync repo repository interface implementation",
+            "support": {
+                "issues": "https://github.com/supermetrolog/synchronizer-filesystem-ftp-target-repo/issues",
+                "source": "https://github.com/supermetrolog/synchronizer-filesystem-ftp-target-repo/tree/v1.0.1"
+            },
+            "time": "2022-12-24T22:02:53+00:00"
+        },
+        {
+            "name": "supermetrolog/synchronizer-filesystem-source-repo",
+            "version": "v2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/supermetrolog/synchronizer-filesystem-source-repository.git",
+                "reference": "9da1f1b741f0b516288f1afac5e404660234824c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/supermetrolog/synchronizer-filesystem-source-repository/zipball/9da1f1b741f0b516288f1afac5e404660234824c",
+                "reference": "9da1f1b741f0b516288f1afac5e404660234824c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4",
+                "supermetrolog/synchronizer": "^2.0"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "^1.6",
+                "phpstan/phpstan": "^1.9",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Supermetrolog\\SynchronizerFilesystemSourceRepo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "supermetrolog",
+                    "email": "billypro6@gmail.com"
+                }
+            ],
+            "description": "Source repository implementation",
+            "support": {
+                "issues": "https://github.com/supermetrolog/synchronizer-filesystem-source-repository/issues",
+                "source": "https://github.com/supermetrolog/synchronizer-filesystem-source-repository/tree/v2.2.1"
+            },
+            "time": "2022-12-24T21:44:58+00:00"
+        },
+        {
+            "name": "supermetrolog/synchronizer-local-to-ftp-builder",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/supermetrolog/synchronizer-local-to-ftp-builder.git",
+                "reference": "b5e06bd88c72b8c3f59aaff25bc0c790b25984c8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/supermetrolog/synchronizer-local-to-ftp-builder/zipball/b5e06bd88c72b8c3f59aaff25bc0c790b25984c8",
+                "reference": "b5e06bd88c72b8c3f59aaff25bc0c790b25984c8",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4",
+                "supermetrolog/synchronizer": "^2.0",
+                "supermetrolog/synchronizer-already-sync-repo": "^2.0",
+                "supermetrolog/synchronizer-filesystem-ftp-target-repo": "^1.0",
+                "supermetrolog/synchronizer-filesystem-source-repo": "^2.2"
+            },
+            "require-dev": {
+                "monolog/monolog": "^2.8",
+                "phpstan/phpstan": "^1.9",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Supermetrolog\\SynchronizerLocalToFTPBuilder\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "supermetrolog",
+                    "email": "billypro6@gmail.com"
+                }
+            ],
+            "description": "Synchronizer builder",
+            "support": {
+                "issues": "https://github.com/supermetrolog/synchronizer-local-to-ftp-builder/issues",
+                "source": "https://github.com/supermetrolog/synchronizer-local-to-ftp-builder/tree/v1.0.0"
+            },
+            "time": "2022-12-24T22:14:16+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

@@ -11,6 +11,5 @@ return ArrayHelper::merge(
             '@tests' => '@app/tests'
         ],
         'controllerNamespace' => 'app\commands',
-        'container' => require __DIR__ . '/container.php',
     ]
 );
