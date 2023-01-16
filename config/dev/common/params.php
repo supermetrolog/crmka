@@ -20,6 +20,4 @@ return [
             ],
         ]
     ],
-    'compressorPath' => 'C:\Users\\tim-a\Desktop\pdfcompressor\pdf_compressor.py',
-    'pythonPath' => 'C:\Python310\python.exe',
 ];

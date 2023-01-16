@@ -41,10 +41,11 @@ class SendPresentationJob extends BaseObject implements JobInterface
         $options->set('isRemoteEnabled', true);
         $options->set('isJavascriptEnabled', true);
 
+        $pdfTmpDir = Yii::$app->params['pdf']['tmp_dir'];
+
+        $pdfManager = new PdfManager($options, date("His") . "_" .  $model->getPresentationName(), $pdfTmpDir);
+
         $appPath = Yii::getAlias('@app');
-
-        $pdfManager = new PdfManager($options, date("His") . "_" .  $model->getPresentationName(), $appPath . "/public_html/tmp/");
-
         $html = Yii::$app->controller->renderFile($appPath . '/views/pdf/presentation/index.php', ['model' => $model]);
 
         $pdfManager->loadHtml($html);
@@ -55,7 +56,7 @@ class SendPresentationJob extends BaseObject implements JobInterface
         $pyScriptPath = Yii::$app->params['compressorPath'];
         $pythonpath = Yii::$app->params['pythonPath'];
         $inpath = $pdfManager->getPdfPath();
-        $outpath = $appPath . "/public_html/tmp/" . Yii::$app->security->generateRandomString() . ".pdf";
+        $outpath = $pdfTmpDir . "/" . Yii::$app->security->generateRandomString() . ".pdf";
         $pythonCompresser = new PythonPdfCompress($pythonpath, $pyScriptPath, $inpath, $outpath);
         $pythonCompresser->Compress();
         // Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию

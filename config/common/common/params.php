@@ -76,13 +76,16 @@ return [
     'senderName' => 'PENNYLANE REALTY',
     'senderUsername' => $secrets['senderUsername'],
     'senderPassword' => $secrets['senderPassword'],
-    'compressorPath' => 'C:\Users\\tim-a\Desktop\pdfcompressor\pdf_compressor.py',
+    'compressorPath' => YII_PROJECT_ROOT . "/pdf_compressor.py",
     'pythonPath' => 'C:\Python310\python.exe',
     'rabbit' => [
         'user' => $secrets['rabbit']['user'],
         'password' => $secrets['rabbit']['password'],
         'queueName' => "timeline_presentation_sender",
         'exchangeName' => "timeline_presentation_sender_exchange"
+    ],
+    'pdf' => [
+        'tmp_dir' => YII_PROJECT_ROOT . "/runtime/pdf_tmp",
     ],
     'synchronizer' => [
         'this_project' => [
