@@ -18,7 +18,7 @@ class CreateLetter extends Letter
     public function rules()
     {
         return  [
-            [['offers', 'ways', 'contacts'], 'required'],
+            [['ways', 'contacts'], 'required'],
             [['offers', 'ways'], IsArrayValidator::class],
             ['contacts', 'validateContacts'],
             ['ways', 'validateWays']

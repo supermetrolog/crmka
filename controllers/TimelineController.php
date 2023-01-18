@@ -18,9 +18,6 @@ use app\services\queue\jobs\SendPresentationJob;
 use Yii;
 use yii\web\BadRequestHttpException;
 
-/**
- * RequestController implements the CRUD actions for Request model.
- */
 class TimelineController extends ActiveController
 {
     public $modelClass = 'app\models\Timeline';
@@ -71,54 +68,6 @@ class TimelineController extends ActiveController
         return [
             'data' => true,
             'message' => "Комментарий добавлен",
-        ];
-    }
-    public function actionSendObjects()
-    {
-        if (!Yii::$app->request->post()) {
-            throw new BadRequestHttpException("body cannot be empty");
-        }
-        $tx = Yii::$app->db->beginTransaction();
-        try {
-            $post_data = Yii::$app->request->post();
-            $post_data['user_id'] = Yii::$app->user->identity->id;
-            $post_data['sender_email'] = Yii::$app->user->identity->email ?? Yii::$app->params['senderEmail'];
-            $post_data['type'] = Letter::TYPE_FROM_TIMELINE;
-            $createLetterModel = new CreateLetter();
-            $createLetterModel->create($post_data);
-
-            if ($createLetterModel->letterModel->shipping_method == Letter::SHIPPING_OTHER_METHOD) {
-                $tx->commit();
-                return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
-            }
-            $model = new SendPresentation();
-            $model->load($this->getDataForSendPresentationModel($createLetterModel), '');
-            $q = Yii::$app->queue;
-            $q->push(new SendPresentationJob([
-                'model' => $model
-            ]));
-            $tx->commit();
-            return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
-        } catch (\Throwable $th) {
-            $tx->rollBack();
-            throw $th;
-        }
-    }
-    private function getDataForSendPresentationModel(CreateLetter $createLetterModel): array
-    {
-        return [
-            'offers' => $createLetterModel->offers,
-            'emails' => array_map(function ($elem) {
-                return $elem['value'];
-            }, $createLetterModel->contacts['emails']),
-            'phones' => array_map(function ($elem) {
-                return $elem['value'];
-            }, $createLetterModel->contacts['phones']),
-            'comment' => $createLetterModel->letterModel->body,
-            'subject' => $createLetterModel->letterModel->subject,
-            'wayOfSending' => $createLetterModel->ways,
-            'letter_id' => $createLetterModel->letterModel->id,
-            'user_id' => $createLetterModel->letterModel->user_id
         ];
     }
     protected function findModel($id)

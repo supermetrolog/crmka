@@ -26,7 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property int $updated_at
  * 
  * 
- * @property UserProfile[] $userProfiles
+ * @property UserProfile $userProfile
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -84,8 +84,29 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         ];
         return $behaviors;
     }
+    public function getEmailForSend(): array
+    {
+        $defaultFrom = [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
+        if (!$this->email_username || !$this->email_password || !$this->email) {
+            return $defaultFrom;
+        }
+        return [$this->email => $this->userProfile->short_name];
+    }
+    public function getEmailUsername(): string
+    {
+        if (!$this->email_username || !$this->email_password) {
+            return Yii::$app->params['senderUsername'];
+        }
+        return $this->email_username;
+    }
 
-
+    public function getEmailPassword(): string
+    {
+        if (!$this->email_username || !$this->email_password) {
+            return Yii::$app->params['senderPassword'];
+        }
+        return $this->email_password;
+    }
     public static function getUsers()
     {
         $dataProvider = new ActiveDataProvider([

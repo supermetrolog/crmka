@@ -138,6 +138,9 @@ return
             'class' => 'yii\rest\UrlRule',
             'controller' => 'letter',
             'except' => [],
+            'extraPatterns' => [
+                'POST,OPTIONS send' => 'send'
+            ]
 
         ],
     ];

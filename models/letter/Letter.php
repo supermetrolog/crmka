@@ -29,6 +29,8 @@ use yii\db\Expression;
 class Letter extends \yii\db\ActiveRecord
 {
     const TYPE_FROM_TIMELINE = 1;
+    const TYPE_DEFAULT = 0;
+
     const STATUS_ERROR = 0;
     const STATUS_SUCCESS = 1;
 

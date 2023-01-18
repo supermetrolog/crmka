@@ -2,13 +2,19 @@
 
 namespace app\controllers;
 
-use app\behaviors\BaseControllerBehaviors;
-use yii\rest\ActiveController;
 use Yii;
-use app\models\letter\Letter;
-use app\models\letter\LetterSearch;
-use yii\web\NotFoundHttpException;
+use app\models\User;
 use yii\filters\Cors;
+use app\models\letter\Letter;
+use yii\rest\ActiveController;
+use yii\web\NotFoundHttpException;
+use app\models\letter\CreateLetter;
+use app\models\letter\LetterSearch;
+use app\services\emailsender\EmailSender;
+use app\behaviors\BaseControllerBehaviors;
+use app\models\SendPresentation;
+use app\services\queue\jobs\SendPresentationJob;
+use yii\web\BadRequestHttpException;
 
 class LetterController extends ActiveController
 {
@@ -55,6 +61,57 @@ class LetterController extends ActiveController
             "letterPhones.contact",
             "letterEmails.contact"
         ])->limit(1)->one();
+    }
+
+    public function actionSend()
+    {
+        if (!Yii::$app->request->post()) {
+            throw new BadRequestHttpException("body cannot be empty");
+        }
+        $tx = Yii::$app->db->beginTransaction();
+        try {
+            /** @var User $user */
+            $user = Yii::$app->user->identity;
+            $post_data = Yii::$app->request->post();
+            $post_data['user_id'] = $user->id;
+            $post_data['sender_email'] = $user->email ?? Yii::$app->params['senderEmail'];
+            $post_data['type'] = Letter::TYPE_DEFAULT;
+            $createLetterModel = new CreateLetter();
+            $createLetterModel->create($post_data);
+
+            if ($createLetterModel->letterModel->shipping_method == Letter::SHIPPING_OTHER_METHOD) {
+                $tx->commit();
+                return ['message' => 'Предложения отправлены!', 'data' => $createLetterModel->letterModel->id];
+            }
+            $model = new SendPresentation();
+            $model->load($this->getDataForSendPresentationModel($createLetterModel), '');
+            $q = Yii::$app->queue;
+            $q->push(new SendPresentationJob([
+                'model' => $model
+            ]));
+            $tx->commit();
+            return ['message' => 'Письмо отправлено!', 'data' => $createLetterModel->letterModel->id];
+        } catch (\Throwable $th) {
+            $tx->rollBack();
+            throw $th;
+        }
+    }
+    private function getDataForSendPresentationModel(CreateLetter $createLetterModel): array
+    {
+        return [
+            'offers' => $createLetterModel->offers,
+            'emails' => array_map(function ($elem) {
+                return $elem['value'];
+            }, $createLetterModel->contacts['emails']),
+            'phones' => array_map(function ($elem) {
+                return $elem['value'];
+            }, $createLetterModel->contacts['phones']),
+            'comment' => $createLetterModel->letterModel->body,
+            'subject' => $createLetterModel->letterModel->subject,
+            'wayOfSending' => $createLetterModel->ways,
+            'letter_id' => $createLetterModel->letterModel->id,
+            'user_id' => $createLetterModel->letterModel->user_id
+        ];
     }
     protected function findModel($id)
     {

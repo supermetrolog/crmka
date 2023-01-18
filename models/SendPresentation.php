@@ -21,7 +21,7 @@ class SendPresentation  extends Model
     public function rules()
     {
         return [
-            [['offers', 'wayOfSending', 'user_id', 'letter_id'], 'required'],
+            [['wayOfSending', 'user_id', 'letter_id'], 'required'],
             [['user_id', 'letter_id'], 'integer'],
             [['subject'], 'string'],
             [['offers', 'wayOfSending'], IsArrayValidator::class],

@@ -34,6 +34,55 @@ class SendPresentationJob extends BaseObject implements JobInterface
             throw new ValidationErrorHttpException($this->model->getErrorSummary(false));
         }
     }
+    public function execute($q)
+    {
+        try {
+            $user = User::find()->with(['userProfile'])->where(['id' => $this->model->user_id])->limit(1)->one();
+            $user = $user->toArray([], ['userProfile']);
+
+            $data = [
+                'emails' => $this->getEmails($user),
+                'from' => $this->getFrom($user),
+                'view' => 'presentation/index',
+                'viewArgv' => ['userMessage' => $this->model->comment],
+                'subject' => $this->model->subject,
+                'username' => $this->getUsername($user),
+                'password' => $this->getPassword($user),
+                'files' => $this->getFiles($user)
+            ];
+            $emailSender = new EmailSender();
+            $emailSender->load($data, '');
+            $emailSender->validate();
+            if ($emailSender->hasErrors()) {
+                throw new Exception("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
+            }
+            if (!$emailSender->send()) {
+                throw new Exception("Email send error");
+            }
+
+            $this->removeAllPdfs();
+        } catch (\Throwable $th) {
+            $this->removeAllPdfs();
+            $this->notifyUser($th->getMessage());
+            $this->changeLetterStatus(Letter::STATUS_ERROR);
+            throw $th;
+        }
+    }
+    private function notifyUser($error)
+    {
+        Yii::$app->notify->notifyUser(new NotificationEvent([
+            'consultant_id' => $this->model->user_id,
+            'type' => Notification::TYPE_SYSTEM_DANGER,
+            'title' => 'ошибка',
+            'body' => "Ошибка отправки презентаций: {$error}. По контактам: " . implode(', ', $this->model->emails)
+        ]));
+    }
+    private function changeLetterStatus($status)
+    {
+        $model = Letter::findOne($this->model->letter_id);
+        $model->status = $status;
+        $model->save(false);
+    }
     private function generatePresentation($offer)
     {
         $model = new OffersPdf($offer);
@@ -114,54 +163,5 @@ class SendPresentationJob extends BaseObject implements JobInterface
             return array_merge($this->model->emails, [$user['email']]);
         }
         return $this->model->emails;
-    }
-    public function execute($q)
-    {
-        try {
-            $user = User::find()->with(['userProfile'])->where(['id' => $this->model->user_id])->limit(1)->one();
-            $user = $user->toArray([], ['userProfile']);
-
-            $data = [
-                'emails' => $this->getEmails($user),
-                'from' => $this->getFrom($user),
-                'view' => 'presentation/index',
-                'viewArgv' => ['userMessage' => $this->model->comment],
-                'subject' => $this->model->subject,
-                'username' => $this->getUsername($user),
-                'password' => $this->getPassword($user),
-                'files' => $this->getFiles($user)
-            ];
-            $emailSender = new EmailSender();
-            $emailSender->load($data, '');
-            $emailSender->validate();
-            if ($emailSender->hasErrors()) {
-                throw new Exception("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
-            }
-            if (!$emailSender->send()) {
-                throw new Exception("Email send error");
-            }
-
-            $this->removeAllPdfs();
-        } catch (\Throwable $th) {
-            $this->removeAllPdfs();
-            $this->notifyUser($th->getMessage());
-            $this->changeLetterStatus(Letter::STATUS_ERROR);
-            throw $th;
-        }
-    }
-    private function notifyUser($error)
-    {
-        Yii::$app->notify->notifyUser(new NotificationEvent([
-            'consultant_id' => $this->model->user_id,
-            'type' => Notification::TYPE_SYSTEM_DANGER,
-            'title' => 'ошибка',
-            'body' => "Ошибка отправки презентаций: {$error}. По контактам: " . implode(', ', $this->model->emails)
-        ]));
-    }
-    private function changeLetterStatus($status)
-    {
-        $model = Letter::findOne($this->model->letter_id);
-        $model->status = $status;
-        $model->save(false);
     }
 }
