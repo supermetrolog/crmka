@@ -90,7 +90,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         if (!$this->email_username || !$this->email_password || !$this->email) {
             return $defaultFrom;
         }
-        return [$this->email => $this->userProfile->short_name];
+        return [$this->email => $this->userProfile->shortName];
     }
     public function getEmailUsername(): string
     {

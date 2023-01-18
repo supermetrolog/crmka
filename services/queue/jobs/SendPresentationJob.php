@@ -37,17 +37,16 @@ class SendPresentationJob extends BaseObject implements JobInterface
     public function execute($q)
     {
         try {
+            /** @var User $user */
             $user = User::find()->with(['userProfile'])->where(['id' => $this->model->user_id])->limit(1)->one();
-            $user = $user->toArray([], ['userProfile']);
-
             $data = [
                 'emails' => $this->getEmails($user),
-                'from' => $this->getFrom($user),
+                'from' => $user->getEmailForSend(),
                 'view' => 'presentation/index',
                 'viewArgv' => ['userMessage' => $this->model->comment],
                 'subject' => $this->model->subject,
-                'username' => $this->getUsername($user),
-                'password' => $this->getPassword($user),
+                'username' => $user->getEmailUsername(),
+                'password' => $user->getEmailPassword(),
                 'files' => $this->getFiles($user)
             ];
             $emailSender = new EmailSender();
@@ -112,39 +111,11 @@ class SendPresentationJob extends BaseObject implements JobInterface
         $pythonCompresser->deleteOriginalFileAndChangeFileName();
         return $pdfManager;
     }
-    private function getFrom($user)
-    {
-        $defaultFrom = [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
-        if (!$user['email_username'] || !$user['email_password']) {
-            return $defaultFrom;
-        }
-        if ($user['email']) {
-            return [$user['email'] => $user['userProfile']['short_name']];
-        }
-
-        return $defaultFrom;
-    }
-
-    private function getUsername($user)
-    {
-        if (!$user['email_username'] || !$user['email_password']) {
-            return Yii::$app->params['senderUsername'];
-        }
-        return $user['email_username'];
-    }
-
-    private function getPassword($user)
-    {
-        if (!$user['email_username'] || !$user['email_password']) {
-            return Yii::$app->params['senderPassword'];
-        }
-        return $user['email_password'];
-    }
     private function getFiles($user)
     {
         $files = [];
         foreach ($this->model->offers as  $offer) {
-            $offer['consultant'] = $user['userProfile']['medium_name'];
+            $offer['consultant'] = $user->userProfile->mediumName;
             $pdf = $this->generatePresentation($offer);
             $files[] = $pdf->getPdfPath();
             $this->pdfs[] = $pdf;
@@ -159,8 +130,8 @@ class SendPresentationJob extends BaseObject implements JobInterface
     }
     private function getEmails($user)
     {
-        if ($user['email']) {
-            return array_merge($this->model->emails, [$user['email']]);
+        if ($user->email) {
+            return array_merge($this->model->emails, [$user->email]);
         }
         return $this->model->emails;
     }
