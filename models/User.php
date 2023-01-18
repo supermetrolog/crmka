@@ -135,8 +135,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             if ($model->load($post_data, '') && $user_id = $model->signUp()) {
                 $post_data['userProfile']['user_id'] = $user_id;
                 UserProfile::createUserProfile($post_data['userProfile'], $uploadFileModel);
-                // $transaction->rollBack();
-                // return $post_data;
 
                 $transaction->commit();
                 return ['message' => "Пользователь создан", 'data' => $user_id];
@@ -151,6 +149,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
+        $preventEmailPass = $user->email_password;
         try {
             $post_data['updated_at'] = time();
 
@@ -161,6 +160,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                     }
 
                     $user->setPassword($post_data['password']);
+                }
+                if (!ArrayHelper::keyExists("email_password", $post_data) || $post_data['email_password'] === null) {
+                    $user->email_password = $preventEmailPass;
                 }
                 if ($user->save()) {
                     UserProfile::updateUserProfile($post_data['userProfile'], $uploadFileModel);
