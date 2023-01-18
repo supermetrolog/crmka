@@ -36,7 +36,7 @@ class LetterContact extends \yii\db\ActiveRecord
     {
         return [
             [['letter_id'], 'required'],
-            [['letter_id', "letter_contact"], 'integer'],
+            [['letter_id', "contact_id"], 'integer'],
             [['email', 'phone'], 'string'],
             ['email', 'validateContacts'],
             [['letter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Letter::className(), 'targetAttribute' => ['letter_id' => 'id']],

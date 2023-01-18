@@ -127,7 +127,7 @@ class CreateLetter extends Letter
             $config = [
                 'letter_id' => $letter_id,
                 'email' => $email['value'],
-                'contact_id' => $email['contact_id']
+                'contact_id' => array_key_exists("contact_id", $email) ? $email['contact_id'] : null
             ];
             if (!$model->load($config, '') || !$model->save())
                 throw new ValidationErrorHttpException($model->getErrorSummary(false));
