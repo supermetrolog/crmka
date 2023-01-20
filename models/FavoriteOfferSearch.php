@@ -51,14 +51,20 @@ class FavoriteOfferSearch extends FavoriteOffer
     {
         $joinedDbName = $this->getDsnAttribute('dbname', OfferMix::getDb()->dsn);
 
-        $query = FavoriteOffer::find()->joinWith(['offer' => function ($query) use ($joinedDbName) {
+        $query = FavoriteOffer::find()->distinct()->joinWith(['offer' => function ($query) use ($joinedDbName) {
             return $query->from($joinedDbName . ".c_industry_offers_mix");
-        }])->where(['is not', $joinedDbName . '.c_industry_offers_mix.id', new Expression("null")]);
+        }])->where(['is not', $joinedDbName . '.c_industry_offers_mix.id', new Expression("null")])
+            ->andWhere([$joinedDbName . '.c_industry_offers_mix.status' => 1])
+            ->andWhere(['!=', $joinedDbName . '.c_industry_offers_mix.deleted', 1]);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'defaultPageSize' => 0,
+                'pageSizeLimit' => [0, 50],
+            ],
         ]);
 
         $this->load($params, '');
