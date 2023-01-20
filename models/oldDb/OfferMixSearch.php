@@ -402,14 +402,24 @@ class OfferMixSearch extends OfferMix
             }
         }
 
-        $query->orFilterWhere(['c_industry_offers_mix.object_id' => $this->all])
-            ->orFilterWhere(['like', 'company.nameEng', $this->all])
-            ->orFilterWhere(['like', 'company.nameRu', $this->all])
-            ->orFilterWhere(['like', 'contact.first_name', $this->all])
-            ->orFilterWhere(['like', 'contact.middle_name', $this->all])
-            ->orFilterWhere(['like', 'contact.last_name', $this->all])
-            ->orFilterWhere(['like', 'phone.phone', $this->all])
-            ->orFilterWhere(['like', 'c_industry_offers_mix.address', $this->all]);
+        if ($this->all) {
+            $searchArray = ['and'];
+            $words = explode(" ", $this->all);
+            foreach ($words as $word) {
+                $searchArray[] = [
+                    'or',
+                    ['=', 'c_industry_offers_mix.object_id', $word],
+                    ['like', 'company.nameEng', $word],
+                    ['like', 'company.nameRu', $word],
+                    ['like', 'contact.first_name', $word],
+                    ['like', 'contact.middle_name', $word],
+                    ['like', 'contact.last_name', $word],
+                    ['like', 'phone.phone', $word],
+                    ['like', 'c_industry_offers_mix.address', $word]
+                ];
+            }
+            $query->orFilterWhere($searchArray);
+        }
 
         if ($this->recommended_sort) {
             if ($expression = $this->getRecommendedOrderExpression('DESC')) {
@@ -424,20 +434,28 @@ class OfferMixSearch extends OfferMix
         }
         // для релевантности
         if ($this->all) {
-            $query->orderBy(new Expression("
-                 (
-                    IF (`c_industry_offers_mix`.`object_id` LIKE '%{$this->all}%', 90, 0) 
-                    + IF (`c_industry_offers_mix`.`object_id` = '{$this->all}', 420, 0) 
-                    + IF (`phone`.`phone` LIKE '%{$this->all}%', 40, 0) 
-                    + IF (`company`.`nameRu` LIKE '%{$this->all}%', 50, 0) 
-                    + IF (`company`.`nameEng` LIKE '%{$this->all}%', 50, 0) 
-                    + IF (`contact`.`first_name` LIKE '%{$this->all}%', 30, 0) 
-                    + IF (`contact`.`middle_name` LIKE '%{$this->all}%', 30, 0) 
-                    + IF (`contact`.`last_name` LIKE '%{$this->all}%', 30, 0) 
-                    + IF (`c_industry_offers_mix`.`address` LIKE '%{$this->all}%', 30, 0) 
-                )
-                DESC
-            "));
+            $rangingQueryExp = "";
+            $words = explode(" ", $this->all);
+            $addressWeight = 30;
+            foreach ($words as $key => $word) {
+                if ($key > 0) {
+                    $rangingQueryExp .= "+";
+                    $addressWeight += 20;
+                }
+                $rangingQueryExp .= "(
+                    IF (`c_industry_offers_mix`.`object_id` LIKE '%{$word}%', 90, 0) 
+                    + IF (`c_industry_offers_mix`.`object_id` = '{$word}', 420, 0) 
+                    + IF (`phone`.`phone` LIKE '%{$word}%', 40, 0) 
+                    + IF (`company`.`nameRu` LIKE '%{$word}%', 50, 0) 
+                    + IF (`company`.`nameEng` LIKE '%{$word}%', 50, 0) 
+                    + IF (`contact`.`first_name` LIKE '%{$word}%', 30, 0) 
+                    + IF (`contact`.`middle_name` LIKE '%{$word}%', 30, 0) 
+                    + IF (`contact`.`last_name` LIKE '%{$word}%', 30, 0) 
+                    + IF (`c_industry_offers_mix`.`address` LIKE '%{$word}%', $addressWeight, 0) 
+                )";
+            }
+            $rangingQueryExp .= " DESC";
+            $query->orderBy(new Expression($rangingQueryExp));
         }
 
         // grid filtering conditions
