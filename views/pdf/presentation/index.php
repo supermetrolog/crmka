@@ -7,8 +7,8 @@ use app\models\oldDb\OfferMix;
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="http://<?= $model->getHost() ?>/css/null.css">
-<link rel="stylesheet" href="http://<?= $model->getHost() ?>/css/pdf.css">
+<link rel="stylesheet" href="<?= $model->getHost() ?>/css/null.css">
+<link rel="stylesheet" href="<?= $model->getHost() ?>/css/pdf.css">
 <title>Презентация</title>
 <div id="header">
     <table>
@@ -16,7 +16,7 @@ use app\models\oldDb\OfferMix;
             <tr>
                 <td class="logo">
                     <div class="image">
-                        <img src="http://<?= $model->getHost() ?>/images/logo-plr.png" alt="">
+                        <img src="<?= $model->getHost() ?>/images/logo-plr.png" alt="">
                     </div>
                 </td>
                 <td class="consultant">
@@ -58,7 +58,7 @@ use app\models\oldDb\OfferMix;
                 <td class="image">
                     <div>
                         <div class="logo">
-                            <img src="http://<?= $model->getHost() ?>/images/logo-footer.png" alt="">
+                            <img src="<?= $model->getHost() ?>/images/logo-footer.png" alt="">
                         </div>
 
                     </div>
@@ -156,7 +156,7 @@ use app\models\oldDb\OfferMix;
                                                     <td class="item">
                                                         <div>
                                                             <div class="icon">
-                                                                <img src="http://<?= $model->getHost() ?>/images/floors-icon.png" alt="">
+                                                                <img src="<?= $model->getHost() ?>/images/floors-icon.png" alt="">
                                                                 <? if ($model->data->calc_floors) : ?>
                                                                     <p><?= $model->data->calc_floors ?> этаж</p>
                                                                 <? else : ?>
@@ -168,7 +168,7 @@ use app\models\oldDb\OfferMix;
                                                     <td class="item">
                                                         <div>
                                                             <div class="icon">
-                                                                <img src="http://<?= $model->getHost() ?>/images/gates-icon.png" alt="">
+                                                                <img src="<?= $model->getHost() ?>/images/gates-icon.png" alt="">
                                                                 <? if ($model->data->gate_num) : ?>
                                                                     <p><?= $model->data->gate_num ?> ворот</p>
                                                                 <? else : ?>
@@ -180,7 +180,7 @@ use app\models\oldDb\OfferMix;
                                                     <td class="item">
                                                         <div>
                                                             <div class="icon">
-                                                                <img src="http://<?= $model->getHost() ?>/images/power-icon.png" alt="">
+                                                                <img src="<?= $model->getHost() ?>/images/power-icon.png" alt="">
                                                                 <? if ($model->data->power) : ?>
                                                                     <p><?= $model->numberFormat($model->data->power) ?> кВт</p>
                                                                 <? else : ?>
@@ -194,7 +194,7 @@ use app\models\oldDb\OfferMix;
                                                     <td class="item">
                                                         <div>
                                                             <div class="icon">
-                                                                <img src="http://<?= $model->getHost() ?>/images/ceiling-icon.png" alt="">
+                                                                <img src="<?= $model->getHost() ?>/images/ceiling-icon.png" alt="">
                                                                 <? if ($model->data->calc_ceilingHeight) : ?>
                                                                     <p><?= $model->data->calc_ceilingHeight ?> м</p>
                                                                 <? else : ?>
@@ -206,7 +206,7 @@ use app\models\oldDb\OfferMix;
                                                     <td class="item">
                                                         <div>
                                                             <div class="icon">
-                                                                <img src="http://<?= $model->getHost() ?>/images/floor-icon.png" alt="">
+                                                                <img src="<?= $model->getHost() ?>/images/floor-icon.png" alt="">
                                                                 <? if ($model->data->floor_type) : ?>
                                                                     <p><?= $model->data->floor_type ?></p>
                                                                 <? else : ?>
@@ -220,7 +220,7 @@ use app\models\oldDb\OfferMix;
                                                             <div class="icon">
                                                                 <!-- Канбалки -->
                                                                 <!-- Внешняя отделка -->
-                                                                <img src="http://<?= $model->getHost() ?>/images/crane-icon.png" alt="">
+                                                                <img src="<?= $model->getHost() ?>/images/crane-icon.png" alt="">
                                                                 <? if ($model->data->cranes_cathead_capacity) : ?>
                                                                     <p><?= $model->data->cranes_cathead_capacity ?> тонн</p>
                                                                 <? else : ?>
@@ -466,20 +466,6 @@ use app\models\oldDb\OfferMix;
             <? endforeach; ?>
         </div>
     </div>
-
-    <!-- <? if ($model->data->photos && count($model->data->photos) <= 4 || $model->getBlocksCount() <= 1) : ?>
-        <table class="after-parameters mt-header">
-            <div class="container">
-                <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
-                <div>
-                    <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
-                    <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>
-                    <a href="https://industry.realtor.ru">industry.realtor.ru</a>
-                </div>
-            </div>
-
-        </table>
-    <? endif; ?> -->
     <? if ($model->getBlocksCount() > 1 || count($model->data->photos) > 1 && $model->data->auto_desc) : ?>
         <hr>
     <? endif; ?>
@@ -501,7 +487,7 @@ use app\models\oldDb\OfferMix;
     <? if ($model->getBlocksCount() > 1 || count($model->data->photos) > 1 && $model->data->auto_desc) : ?>
 
         <div class="banner mt-header">
-            <img src="http://<?= $model->getHost() ?>/images/banner-bg.png" alt="">
+            <img src="<?= $model->getHost() ?>/images/banner-bg.png" alt="">
             <div>
                 <h3>Узнайте первым о новом, подходящем Вам предложении</h3>
                 <p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система автоматически пришлет его Вам на почту</p>

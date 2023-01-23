@@ -16,17 +16,6 @@ use Yii;
 
 class WebsocketController extends Controller
 {
-    public function actionIndex()
-    {
-        $i = 0;
-        while (true) {
-            $i++;
-            file_put_contents(Yii::getAlias('@app') . '/public_html/tmp/test.txt', "FUCK " . $i . "\n", FILE_APPEND);
-            echo "FUCK " . $i . "\n";
-            sleep(3);
-        }
-        return ExitCode::OK;
-    }
     public function actionStart($expand = "caller,phoneFrom,phoneFrom.contact,phoneTo,phoneTo.contact")
     {
         foreach (\Yii::$app->log->targets as $target) {

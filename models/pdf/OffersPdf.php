@@ -18,9 +18,9 @@ class OffersPdf extends Model
     public $consultant;
     public $formatter;
     public $host;
-    public function __construct($options, $host = "api.pennylane.pro")
+    public function __construct($options, $host = null)
     {
-        $this->host = $host;
+        $this->host = $host ?? Yii::$app->params['url']['this_host'];
         $this->formatter = Yii::$app->formatter;
         $this->validateOptions($options);
         $this->consultant = $options['consultant'];
@@ -102,7 +102,7 @@ class OffersPdf extends Model
     }
     private function normalizeDescription()
     {
-        $url = 'https://pennylane.pro/autodesc.php/' . $this->data->original_id . '/' . $this->data->type_id . '?api=1';
+        $url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->data->original_id . '/' . $this->data->type_id . '?api=1';
         try {
             $this->data->auto_desc = file_get_contents($url);
         } catch (\Throwable $th) {
@@ -704,9 +704,6 @@ class OffersPdf extends Model
     }
     public function getHost()
     {
-        if (key_exists("HTTP_HOST", $_SERVER)) {
-            return $_SERVER['HTTP_HOST'];
-        }
         return $this->host;
     }
     public function getHeated($model)
@@ -729,7 +726,7 @@ class OffersPdf extends Model
         if (is_array($photos)) {
             foreach ($photos as $photo) {
                 if ($result_image === null && is_string($photo) && mb_strlen($photo) > 2) {
-                    $result_image = "https://pennylane.pro" . $photo;
+                    $result_image = Yii::$app->params['url']['objects'] . $photo;
                 }
             }
         }
@@ -737,7 +734,7 @@ class OffersPdf extends Model
             return $result_image;
         }
         if (is_array($object_photos) && is_string($object_photos[0]) && mb_strlen($object_photos[0]) > 2) {
-            return "https://pennylane.pro" . $object_photos[0];
+            return Yii::$app->params['url']['objects'] . $object_photos[0];
         }
         return "http://www.tinybirdgames.com/wp-content/uploads/2017/04/tinybirdgames_telegram_background_02.jpg";
     }
@@ -963,7 +960,7 @@ class OffersPdf extends Model
         if (!$photos || !is_array($photos) || $photo_count > 3) {
             return $array;
         }
-        $baseUrl = "https://pennylane.pro";
+        $baseUrl = Yii::$app->params['url']['objects'];
 
         unset($photos[0]);
         $start = ($block_index - 1) * $photo_count + 1;
@@ -981,7 +978,7 @@ class OffersPdf extends Model
                 $array[] = [
                     'class' => $classList[$i],
                     // 'src' => "http://www.tinybirdgames.com/wp-content/uploads/2017/04/tinybirdgames_telegram_background_02.jpg",
-                    'src' => "https://" . $this->getHost() . "/images/empty.jpg",
+                    'src' => Yii::$app->params['url']['empty_image'],
                 ];
             }
             $index++;

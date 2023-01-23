@@ -304,17 +304,21 @@ table {
 
 /* *********** MAIN-INFO *************** */
 
+.main-info {
+    padding: 0 3px;
+}
+
 .main-info td.left .image {
     position: relative;
-    width: 500px;
-    max-width: 500px;
+    width: 495px;
+    max-width: 495px;
     height: 375px;
     max-height: 375px;
 }
 
 .main-info td.left .image img {
-    max-width: 500px;
-    width: 500px;
+    max-width: 495pxpx;
+    width: 495pxpx;
     max-height: 375px;
     height: 375px;
 }
@@ -433,9 +437,9 @@ table.digital-info-container {
 }
 
 .digital-info-container .c_one {
-    width: 500px;
-    max-width: 500px;
-    min-width: 500px;
+    width: 487px;
+    max-width: 487px;
+    min-width: 487px;
 }
 
 .digital-info-container .c_two {
@@ -465,9 +469,9 @@ table.digital-info-container {
     padding: 10px 15px;
     padding-right: 0!important;
     margin-right: 4px;
-    max-width: 300px;
-    width: 300px;
-    min-width: 300px;
+    max-width: 298px;
+    width: 298px;
+    min-width: 298px;
 }
 
 .digital-info td.three>div {
@@ -583,6 +587,10 @@ table.digital-info-container {
     border-left: 1px solid #ccc;
 }
 
+.photos {
+    padding-left: 3px;
+}
+
 .photos.p-0 {
     margin: 0;
     padding: 0;
@@ -608,6 +616,7 @@ table.digital-info-container {
 
 .division-options {
     border-collapse: collapse;
+    padding: 0 3px;
 }
 
 .division-options th,
@@ -740,9 +749,9 @@ table.digital-info-container {
 
 .banner>div {
     position: absolute;
-    top: 0;
+    top: -1px;
     bottom: 0;
-    left: 0;
+    left: -1px;
     right: 0;
     background-color: rgba(0, 0, 0, .8);
     padding: 20px 0;

@@ -1,75 +1,15 @@
 <?php
 
-$params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
-$db_old = require __DIR__ . '/db_old.php';
+use yii\helpers\ArrayHelper;
 
-$config = [
-    'id' => 'basic-console',
-    'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'queue'],
-    'controllerNamespace' => 'app\commands',
-    'aliases' => [
-        '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
-        '@tests' => '@app/tests',
-    ],
-    'components' => [
-        'notify' => [
-            'class' => app\components\NotificationService::class,
-        ],
-        'queue' => [
-            'class' => \yii\queue\amqp_interop\Queue::class,
-            'port' => 5672,
-            'user' => $params['rabbit']['user'],
-            'password' => $params['rabbit']['password'],
-            'queueName' => $params['rabbit']['queueName'],
-            'exchangeName' => $params['rabbit']['exchangeName'],
-            'driver' => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
-        ],
-        'formatter' => [
-            'class' => \yii\i18n\Formatter::className(),
-            'dateFormat' => 'long',
-            'currencyCode' => 'RUB',
-            'decimalSeparator' => '.',
-            'thousandSeparator' => ' ',
-            'nullDisplay' => '',
-            'numberFormatterOptions' => [
-                NumberFormatter::MIN_FRACTION_DIGITS => 0,
-                NumberFormatter::MAX_FRACTION_DIGITS => 2,
-            ]
-        ],
-        'authManager' => [
-            'class' => 'yii\rbac\DbManager'
-        ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
-        ],
-        'log' => [
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
-        ],
-        'db' => $db,
-        'db_old' => $db_old,
-    ],
-    'params' => $params,
-    // 'controllerMap' => [
-    //     'fixture' => [ // Fixture generation command line.
-    //         'class' => 'yii\faker\FixtureController',
-    //     ],
-    // ],
-];
-
-if (YII_ENV_DEV) {
-    // configuration adjustments for 'dev' environment
-    $config['bootstrap'][] = 'gii';
-    $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
-    ];
+if (YII_ENV === "dev") {
+    return ArrayHelper::merge(require __DIR__ . "/common/console/config.php", require __DIR__ . "/dev/console/config.php");
 }
 
-return $config;
+if (YII_ENV === "prod") {
+    return ArrayHelper::merge(require __DIR__ . "/common/console/config.php", require __DIR__ . "/prod/console/config.php");
+}
+
+if (YII_ENV === "staging") {
+    return ArrayHelper::merge(require __DIR__ . "/common/console/config.php", require __DIR__ . "/staging/console/config.php");
+}

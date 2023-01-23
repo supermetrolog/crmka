@@ -113,10 +113,10 @@ class Contact extends \yii\db\ActiveRecord
         $fields['full_name'] = function ($fields) {
             $full_name = $fields['first_name'];
             if ($fields['middle_name']) {
-                $full_name .= " {$fields['middle_name']}";
+                $full_name = $fields['middle_name'] . " " . $full_name;
             }
             if ($fields['last_name']) {
-                $full_name .= " {$fields['last_name']}";
+                $full_name .= " " . $fields['last_name'];
             }
             return $full_name;
         };
@@ -141,7 +141,36 @@ class Contact extends \yii\db\ActiveRecord
             }
             return $full_name;
         };
+
+        $fields['updated_at'] = function ($fields) {
+            return $fields->updated_at == "0000-00-00 00:00:00" ? null : $fields->updated_at;
+        };
+
+        $fields['created_at'] = function ($fields) {
+            return $fields->created_at == "0000-00-00 00:00:00" ? null : $fields->created_at;
+        };
+
         return $fields;
+    }
+
+    public function extraFields()
+    {
+        $extraFields = parent::extraFields();
+        $extraFields['phones'] = function ($ef) {
+            $phones = array_filter($ef['phones'], function ($phone) {
+                $phone = $phone->toArray();
+                return Phone::isValidPhoneNumber($phone['native_phone']);
+            });
+            return array_values($phones);
+        };
+        $extraFields['invalidPhones'] = function ($ef) {
+            $phones = array_filter($ef['phones'], function ($phone) {
+                $phone = $phone->toArray();
+                return !Phone::isValidPhoneNumber($phone['native_phone']);
+            });
+            return array_values($phones);
+        };
+        return $extraFields;
     }
     private function changeIsMain()
     {
@@ -184,7 +213,7 @@ class Contact extends \yii\db\ActiveRecord
 
             $model->createManyMiniModels([
                 Email::class =>  ArrayHelper::getValue($post_data, 'emails'),
-                Phone::class => ArrayHelper::getValue($post_data, 'phones'),
+                Phone::class => ArrayHelper::merge(ArrayHelper::getValue($post_data, 'phones'), ArrayHelper::getValue($post_data, 'invalidPhones')),
                 Website::class => ArrayHelper::getValue($post_data, 'websites'),
                 WayOfInforming::class => ArrayHelper::getValue($post_data, 'wayOfInformings'),
             ]);
@@ -205,7 +234,7 @@ class Contact extends \yii\db\ActiveRecord
 
             $model->updateManyMiniModels([
                 Email::class =>  ArrayHelper::getValue($post_data, 'emails'),
-                Phone::class => ArrayHelper::getValue($post_data, 'phones'),
+                Phone::class => ArrayHelper::merge(ArrayHelper::getValue($post_data, 'phones'), ArrayHelper::getValue($post_data, 'invalidPhones')),
                 Website::class => ArrayHelper::getValue($post_data, 'websites'),
                 WayOfInforming::class => ArrayHelper::getValue($post_data, 'wayOfInformings'),
             ]);

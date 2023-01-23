@@ -106,6 +106,19 @@ class Deal extends \yii\db\ActiveRecord
             }
             return $fields['clientLegalEntity'];
         };
+        $fields['restOfTheTerm'] = function ($fields) {
+            if ($fields['contractTerm'] === null) {
+                return null;
+            }
+            $currentTime = time();
+            $contractTerm = $fields['contractTerm'];
+            $startTime = $fields['dealDate'];
+            $endTime = strtotime("+ $contractTerm month", strtotime($startTime));
+
+            $restOfTheTerm = $endTime - $currentTime;
+            $restOfTheTermInMonth = round($restOfTheTerm / 60 / 60 / 24);
+            return $restOfTheTermInMonth;
+        };
         return $fields;
     }
 
@@ -115,18 +128,26 @@ class Deal extends \yii\db\ActiveRecord
             $model->addError("request_id", 'Сделка для этого запроса уже существует!');
             throw new ValidationErrorHttpException($model->getErrorSummary(false));
         }
+        $db = Yii::$app->db;
         $model = new self();
-        if ($model->load($post_data, '') && $model->save()) {
+        $transaction = $db->beginTransaction();
+        try {
+            if (!$model->load($post_data, '') || !$model->save()) {
+                throw new ValidationErrorHttpException($model->getErrorSummary(false));
+            }
             if ($model->request_id) {
                 $request = Request::find()->where(['id' => $model->request_id])->limit(1)->one();
                 $request->status = Request::STATUS_DONE;
-                if (!$request->save()) {
+                if (!$request->save(false)) {
                     throw new ValidationErrorHttpException($request->getErrorSummary(false));
                 }
             }
+            $transaction->commit();
             return ['message' => "Сделка создана", 'data' => $model->id];
+        } catch (\Throwable $th) {
+            $transaction->rollBack();
+            throw $th;
         }
-        throw new ValidationErrorHttpException($model->getErrorSummary(false));
     }
 
     public static function updateDeal($model, $post_data)

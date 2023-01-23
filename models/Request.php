@@ -56,6 +56,8 @@ use app\models\miniModels\TimelineStep;
  * @property int|null $shelving [флаг]
  * @property int|null $outside_mkad [флаг] Вне мкад (если выбран регоин МОСКВА)
  * @property int|null $region_neardy [флаг] Регионы рядом
+ * @property int|null $contact_id [связь] с контактом
+ * @property string|null $related_updated_at дата последнего обновления связанных с запросом сущностей
  *
  * @property Company $company
  * @property User $consultant
@@ -112,10 +114,10 @@ class Request extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'consultant_id'], 'required'],
+            [['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'consultant_id', 'contact_id'], 'required'],
             [['heated', 'antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
-            [['region_neardy', 'outside_mkad', 'company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
-            [['created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
+            [['contact_id', 'region_neardy', 'outside_mkad', 'company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
+            [['related_updated_at', 'created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
             [['description', 'name'], 'string'],
             [['passive_why_comment', 'name'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
@@ -163,6 +165,8 @@ class Request extends \yii\db\ActiveRecord
             'shelving' => 'Shelving',
             'outside_mkad' => 'Outside MKAD',
             'region_neardy' => 'Region neardy',
+            'contact_id' => 'Contact ID',
+            'related_updated_at' => 'Related Updated At',
         ];
     }
     public static function findModel($id)
@@ -182,7 +186,7 @@ class Request extends \yii\db\ActiveRecord
     public static function getCompanyRequestsList($company_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->with(['consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'objectTypesGeneral',  'regions.info', 'deal.competitor', 'deal.offer', 'deal.consultant.userProfile'])->where(['request.company_id' => $company_id]),
+            'query' => self::find()->with(['contact.emails', 'contact.phones', 'consultant.userProfile', 'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'objectTypesGeneral',  'regions.info', 'deal.company', 'deal.competitor', 'deal.offer', 'deal.consultant.userProfile'])->where(['request.company_id' => $company_id]),
             'pagination' => [
                 'pageSize' => 0,
             ],
@@ -366,7 +370,15 @@ class Request extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Deal::className(), ['request_id' => 'id']);
     }
-
+    /**
+     * Gets query for [[Contact]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getContact()
+    {
+        return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
+    }
     /**
      * Gets query for [[RequestDirections]].
      *

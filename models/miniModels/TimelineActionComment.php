@@ -18,6 +18,7 @@ use yii\db\ActiveQuery;
  * @property int $timeline_id [связь]
  * @property int $timeline_step_number номер степа
  * @property int $type тип коммента
+ * @property int $letter_id [связь] с письмом (letter)
  * @property string $comment комментарий к действию
  * @property string $created_at
  * @property string|null $title
@@ -41,7 +42,7 @@ class TimelineActionComment extends \yii\db\ActiveRecord
     {
         return [
             [['timeline_step_id', 'comment'], 'required'],
-            [['timeline_step_id', 'timeline_id', 'timeline_step_number', 'type'], 'integer'],
+            [['timeline_step_id', 'timeline_id', 'timeline_step_number', 'type', "letter_id"], 'integer'],
             [['created_at'], 'safe'],
             [['comment', 'title'], 'string'],
             [['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStep::className(), 'targetAttribute' => ['timeline_step_id' => 'id']],
@@ -60,7 +61,13 @@ class TimelineActionComment extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'title' => 'Title',
             'type' => 'Type',
+            'letter_id' => 'Letter ID',
         ];
+    }
+    public function beforeSave($insert)
+    {
+        $this->comment = trim($this->comment);
+        return parent::beforeSave($insert);
     }
     public static function addActionComments($post_data)
     {
@@ -70,7 +77,6 @@ class TimelineActionComment extends \yii\db\ActiveRecord
         $newActions = $post_data['newActionComments'];
         foreach ($newActions as $action) {
             $model = new TimelineActionComment();
-            $action['comment'] = trim($action['comment']);
             if ($model->load($action, '') && $model->save()) {
                 continue;
             }

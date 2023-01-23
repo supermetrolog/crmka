@@ -2,20 +2,12 @@
 
 namespace app\controllers;
 
-use app\exceptions\ValidationErrorHttpException;
-use app\models\miniModels\TimelineStep;
-use app\models\SendPresentation;
-use app\models\User;
-use app\models\UserSendedData;
-use app\services\emailsender\EmailSender;
-use app\services\pythonpdfcompress\PythonPdfCompress;
-use app\services\queue\jobs\SendPresentationJob;
-use app\services\queue\jobs\TestJob;
+use Psr\Log\LoggerInterface;
 use Yii;
-use yii\base\Model;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 class SiteController extends Controller
 {
@@ -61,67 +53,33 @@ class SiteController extends Controller
             ],
         ];
     }
-    // public function actionIndex()
-    // {
-    //     $testPostData = [
-    //         'emails' => ["billypro6@gmail.com", "billypro6@gmail.com"],
-    //         'from' => ['tim-a@realtor.ru' => "test"],
-    //         'view' => 'presentation/index',
-    //         'viewArgv' => ['userMessage' => "comment"],
-    //         'subject' => 'Список предложений от Pennylane Realty',
-    //         // 'username' => "tim-a",
-    //         // 'password' => 'Vd$sor2'
-    //     ];
-
-    //     $testPostData['user_id'] = 3;
-    //     $model = new EmailSender();
-    //     $model->load($testPostData, '');
-    //     $model->validate();
-    //     // if (!$model->hasErrors()) {
-    //     //     $model->send();
-    //     // }
-    //     var_dump($model->getErrorSummary(false));
-    // }
+    public function dump($var): void
+    {
+        echo "<pre>";
+        print_r($var);
+    }
     public function actionIndex()
     {
-        $testPostData = [
-            'comment' => "fuck",
-            'contacts' => [
-                'billypro6@gmail.com'
-            ],
-            'offers' => [
-                [
-                    'object_id' => 10377,
-                    'type_id' => 2,
-                    'original_id' => 2938,
-                    'consultant' => "TIMUR"
-                ]
-            ],
-            'sendClientFlag' => true,
-            'step' => 1,
-            'wayOfSending' => [0],
-            'type' => UserSendedData::OBJECTS_SEND_FROM_TIMELINE_TYPE,
-            'description' => 'Отправил объекты на шаге "' . TimelineStep::STEPS[1] . '"',
-        ];
-
-        $testPostData['user_id'] = 3;
-        $model = new SendPresentation();
-        $model->load($testPostData, '');
-        $q = Yii::$app->queue;
-        $q->push(new SendPresentationJob([
-            'model' => $model
-        ]));
+        $one = require __DIR__ . "/../config/staging/web/config.php";
+        $two = require __DIR__ . "/../config/common/web/config.php";
+        $res = ArrayHelper::merge($two, $one);
+        // $res = require __DIR__ . "/../config/console.php";
+        unset($res['container']);
+        $this->dump($res);
     }
-    // public function actionIndex()
-    // {
-    //     // $appPath = Yii::getAlias("@app");
-    //     $pyScriptPath = "C:\Users\\tim-a\Desktop\pdfcompressor\pdf_compressor.py";
-    //     $inpath = "C:\Users\\tim-a\Desktop\presentation_218_rent.pdf";
-    //     $outpath = "C:\Users\\tim-a\Desktop\presentation_218_rent_compressed.pdf";
-    //     $pythonpath = "C:\Python310\python.exe";
-    //     $pythonCompresser = new PythonPdfCompress($pythonpath, $pyScriptPath, $inpath, $outpath);
-    //     $pythonCompresser->Compress();
-    //     $pythonCompresser->deleteOriginalFileAndChangeFileName();
-    //     return "fuck";
-    // }
+
+    public function array_merge_recursive_distinct(array &$array1, array &$array2)
+    {
+        $merged = $array1;
+
+        foreach ($array2 as $key => &$value) {
+            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
+                $merged[$key] = $this->array_merge_recursive_distinct($merged[$key], $value);
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+
+        return $merged;
+    }
 }

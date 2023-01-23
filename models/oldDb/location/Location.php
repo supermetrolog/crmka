@@ -103,4 +103,9 @@ class Location extends \yii\db\ActiveRecord
             'description' => 'Description',
         ];
     }
+
+    public function getHighwayRel()
+    {
+        return $this->hasOne(Highways::class, ['id' => 'highway']);
+    }
 }

@@ -3,9 +3,8 @@
 namespace app\services\queue\jobs;
 
 use app\events\NotificationEvent;
-use app\events\SendMessageEvent;
 use app\exceptions\ValidationErrorHttpException;
-use app\models\miniModels\TimelineStep;
+use app\models\letter\Letter;
 use app\models\Notification;
 use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
@@ -35,6 +34,54 @@ class SendPresentationJob extends BaseObject implements JobInterface
             throw new ValidationErrorHttpException($this->model->getErrorSummary(false));
         }
     }
+    public function execute($q)
+    {
+        try {
+            /** @var User $user */
+            $user = User::find()->with(['userProfile'])->where(['id' => $this->model->user_id])->limit(1)->one();
+            $data = [
+                'emails' => $this->getEmails($user),
+                'from' => $user->getEmailForSend(),
+                'view' => 'presentation/index',
+                'viewArgv' => ['userMessage' => $this->model->comment],
+                'subject' => $this->model->subject,
+                'username' => $user->getEmailUsername(),
+                'password' => $user->getEmailPassword(),
+                'files' => $this->getFiles($user)
+            ];
+            $emailSender = new EmailSender();
+            $emailSender->load($data, '');
+            $emailSender->validate();
+            if ($emailSender->hasErrors()) {
+                throw new Exception("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
+            }
+            if (!$emailSender->send()) {
+                throw new Exception("Email send error");
+            }
+
+            $this->removeAllPdfs();
+        } catch (\Throwable $th) {
+            $this->removeAllPdfs();
+            $this->notifyUser($th->getMessage());
+            $this->changeLetterStatus(Letter::STATUS_ERROR);
+            throw $th;
+        }
+    }
+    private function notifyUser($error)
+    {
+        Yii::$app->notify->notifyUser(new NotificationEvent([
+            'consultant_id' => $this->model->user_id,
+            'type' => Notification::TYPE_SYSTEM_DANGER,
+            'title' => 'ошибка',
+            'body' => "Ошибка отправки презентаций: {$error}. По контактам: " . implode(', ', $this->model->emails)
+        ]));
+    }
+    private function changeLetterStatus($status)
+    {
+        $model = Letter::findOne($this->model->letter_id);
+        $model->status = $status;
+        $model->save(false);
+    }
     private function generatePresentation($offer)
     {
         $model = new OffersPdf($offer);
@@ -42,10 +89,11 @@ class SendPresentationJob extends BaseObject implements JobInterface
         $options->set('isRemoteEnabled', true);
         $options->set('isJavascriptEnabled', true);
 
+        $pdfTmpDir = Yii::$app->params['pdf']['tmp_dir'];
+
+        $pdfManager = new PdfManager($options, date("His") . "_" .  $model->getPresentationName(), $pdfTmpDir);
+
         $appPath = Yii::getAlias('@app');
-
-        $pdfManager = new PdfManager($options, date("His") . "_" .  $model->getPresentationName(), $appPath . "/public_html/tmp/");
-
         $html = Yii::$app->controller->renderFile($appPath . '/views/pdf/presentation/index.php', ['model' => $model]);
 
         $pdfManager->loadHtml($html);
@@ -56,45 +104,18 @@ class SendPresentationJob extends BaseObject implements JobInterface
         $pyScriptPath = Yii::$app->params['compressorPath'];
         $pythonpath = Yii::$app->params['pythonPath'];
         $inpath = $pdfManager->getPdfPath();
-        $outpath = $appPath . "/public_html/tmp/" . Yii::$app->security->generateRandomString() . ".pdf";
+        $outpath = $pdfTmpDir . "/" . Yii::$app->security->generateRandomString() . ".pdf";
         $pythonCompresser = new PythonPdfCompress($pythonpath, $pyScriptPath, $inpath, $outpath);
         $pythonCompresser->Compress();
         // Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
         $pythonCompresser->deleteOriginalFileAndChangeFileName();
         return $pdfManager;
     }
-    private function getFrom($user)
-    {
-        $defaultFrom = [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
-        if (!$user['email_username'] || !$user['email_password']) {
-            return $defaultFrom;
-        }
-        if ($user['email']) {
-            return [$user['email'] => $user['userProfile']['short_name']];
-        }
-
-        return $defaultFrom;
-    }
-
-    private function getUsername($user)
-    {
-        if (!$user['email_username'] || !$user['email_password']) {
-            return Yii::$app->params['senderUsername'];
-        }
-        return $user['email_username'];
-    }
-
-    private function getPassword($user)
-    {
-        if (!$user['email_username'] || !$user['email_password']) {
-            return Yii::$app->params['senderPassword'];
-        }
-        return $user['email_password'];
-    }
-    private function getFiles()
+    private function getFiles($user)
     {
         $files = [];
         foreach ($this->model->offers as  $offer) {
+            $offer['consultant'] = $user->userProfile->mediumName;
             $pdf = $this->generatePresentation($offer);
             $files[] = $pdf->getPdfPath();
             $this->pdfs[] = $pdf;
@@ -109,80 +130,9 @@ class SendPresentationJob extends BaseObject implements JobInterface
     }
     private function getEmails($user)
     {
-        if ($user['email']) {
-            return array_merge($this->model->emails, [$user['email']]);
+        if ($user->email) {
+            return array_merge($this->model->emails, [$user->email]);
         }
         return $this->model->emails;
-    }
-    public function execute($q)
-    {
-        try {
-            $user = User::find()->with(['userProfile'])->where(['id' => $this->model->user_id])->limit(1)->one();
-            $user = $user->toArray([], ['userProfile']);
-
-            $data = [
-                'emails' => $this->getEmails($user),
-                'from' => $this->getFrom($user),
-                'view' => 'presentation/index',
-                'viewArgv' => ['userMessage' => $this->model->comment],
-                'subject' => 'Список предложений от Pennylane Realty',
-                'username' => $this->getUsername($user),
-                'password' => $this->getPassword($user),
-                'files' => $this->getFiles()
-            ];
-            if ($this->model->sendClientFlag) {
-                $emailSender = new EmailSender();
-                $emailSender->load($data, '');
-                $emailSender->validate();
-                if ($emailSender->hasErrors()) {
-                    throw new Exception("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
-                }
-                if (!$emailSender->send()) {
-                    throw new Exception("Email send error");
-                }
-            }
-
-            foreach ($this->model->wayOfSending as $way) {
-                if ($way == UserSendedData::EMAIL_CONTACT_TYPE) {
-                    foreach ($this->model->emails as $email) {
-                        $this->saveUserSendedData($email, $way);
-                    }
-                } else {
-                    foreach ($this->model->phones as $phone) {
-                        $this->saveUserSendedData($phone, $way);
-                    }
-                }
-            }
-
-            $this->removeAllPdfs();
-        } catch (\Throwable $th) {
-            $this->removeAllPdfs();
-            // TODO: Сдесь нужно послать ошибку пользователю по почте и на сайте
-            $this->notifyUser($th->getMessage());
-            throw $th;
-        }
-    }
-    private function notifyUser($error)
-    {
-        Yii::$app->notify->notifyUser(new NotificationEvent([
-            'consultant_id' => $this->model->user_id,
-            'type' => Notification::TYPE_SYSTEM_DANGER,
-            'title' => 'ошибка',
-            'body' => "Ошибка отправки презентаций: {$error}. По контактам: " . implode(', ', $this->model->emails)
-        ]));
-    }
-    private function saveUserSendedData($contact, $contactType)
-    {
-        $model = new UserSendedData([
-            'user_id' => $this->model->user_id,
-            'contact' => $contact,
-            'contact_type' => $contactType,
-            'type' => $this->model->type,
-            'description' => $this->model->description
-        ]);
-
-        if (!$model->save()) {
-            throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        }
     }
 }

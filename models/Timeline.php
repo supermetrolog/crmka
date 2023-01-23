@@ -80,10 +80,6 @@ class Timeline extends \yii\db\ActiveRecord
             $query->orderBy(['timeline_action_comment.created_at' => SORT_DESC]);
         }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id])->limit(1)->one();
 
-        // $data['timeline'] = self::find()->with(['timelineSteps.timelineStepObjects.offer.object', 'timelineSteps.timelineStepObjects.comments', 'timelineSteps.timelineStepFeedbackways', 'timelineSteps.timelineActionComments' => function ($query) {
-        //     $query->orderBy(['timeline_action_comment.created_at' => SORT_DESC]);
-        // }])->where(['timeline.request_id' => $request_id])->andWhere(['timeline.consultant_id' => $consultant_id])->limit(1)->one();
-
         $data['timelineList'] = self::getTimelineListInRequest($request_id);
         return $data;
     }
@@ -136,6 +132,15 @@ class Timeline extends \yii\db\ActiveRecord
             return true;
         }
         return self::createNewTimeline($request_id, $consultant_id);
+    }
+
+    public static function getActiveTimelineForRequest(int $request_id): ?self
+    {
+        return self::find()->where(['request_id' => $request_id, 'status' => self::STATUS_ACTIVE])->limit(1)->one();
+    }
+    public static function getTimelineByRequestAndConsultantID(int $request_id, int $consultant_id)
+    {
+        return self::find()->where(['request_id' => $request_id, 'consultant_id' => $consultant_id])->limit(1)->one();
     }
     /**
      * Gets query for [[Consultant]].

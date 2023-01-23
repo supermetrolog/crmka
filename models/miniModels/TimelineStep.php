@@ -307,11 +307,14 @@ class TimelineStep extends \yii\db\ActiveRecord
     public static function updateTimelineStep($id, $post_data)
     {
         $timelineStep = self::findModel($id);
+        $request = $timelineStep->timeline->request;
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
         try {
             $post_data['updated_at'] = date('Y-m-d H:i:s');
             if ($timelineStep->load($post_data, '') && $timelineStep->save()) {
+                $request->related_updated_at = $post_data['updated_at'];
+                $request->save(false);
                 $timelineStep->updateSpecificStep($post_data);
                 TimelineActionComment::addActionComments($post_data);
                 $transaction->commit();
@@ -332,11 +335,6 @@ class TimelineStep extends \yii\db\ActiveRecord
             }, $extraFields['timelineStepObjects'])));
             $newObjects = [];
             foreach ($extraFields['timelineStepObjects'] as $value) {
-                $offer_comments = [];
-                if ($offer = $value->offer) {
-                    $offer_comments = $offer->getTimelineComments($this->timeline_id)->all();
-                }
-
                 $object = $value->toArray([], [
                     'comments',
                     'offer.object',
@@ -344,11 +342,10 @@ class TimelineStep extends \yii\db\ActiveRecord
                 ], true);
 
 
-                if (key_exists('offer', $object)) {
-                    $object['offer']['comments'] = $offer_comments;
+                if ($object['offer'] !== null) {
+                    $object['offer']['comments'] = $object['comments'];
+                    $object['offer']['duplicate_count'] = $count[$object['offer_id']];
                 }
-
-
 
                 $object['duplicate_count'] = $count[$object['offer_id']];
                 $newObjects[$object['offer_id']] = $object;

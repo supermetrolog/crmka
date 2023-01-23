@@ -19,6 +19,10 @@ use yii\helpers\ArrayHelper;
  * @property string|null $last_name
  * @property string|null $caller_id Номер в системе Asterisk
  * @property string|null $avatar
+ * 
+ * @property string $fullName
+ * @property string $shortName
+ * @property string $mediumName
  *
  * @property CallList[] $callLists
  * @property User $user
@@ -122,29 +126,46 @@ class UserProfile extends \yii\db\ActiveRecord
             throw $th;
         }
     }
+
+    public function getFullName(): string
+    {
+        $fullName = $this->middle_name . " " . $this->first_name;
+        if ($this->last_name) {
+            $fullName .= " " . $this->last_name;
+        }
+        return $fullName;
+    }
+
+    public function getShortName(): string
+    {
+        $first_name = ucfirst(mb_substr($this->first_name, 0, 1)) . ".";
+
+        $last_name = "";
+
+        if ($this->last_name) {
+            $last_name = ucfirst(mb_substr($this->last_name, 0, 1)) . ".";
+        }
+
+        $short_name = "{$this->middle_name} $first_name $last_name";
+
+        return trim($short_name);
+    }
+
+    public function getMediumName(): string
+    {
+        return trim($this->first_name . " " . $this->middle_name);
+    }
     public function fields()
     {
         $fields = parent::fields();
-        $fields['full_name'] = function ($fields) {
-            $full_name = "{$fields['middle_name']} {$fields['first_name']}";
-            if ($fields['last_name']) {
-                $full_name .= " {$fields['last_name']}";
-            }
-            return trim($full_name);
+        $fields['full_name'] = function () {
+            return $this->fullName;
         };
-        $fields['short_name'] = function ($fields) {
-            $first_name = ucfirst(mb_substr($fields['first_name'], 0, 1)) . ".";
-            $last_name = "";
-            if ($fields['last_name']) {
-                $last_name = ucfirst(mb_substr($fields['last_name'], 0, 1)) . ".";
-            }
-            $short_name = "{$fields['middle_name']} $first_name $last_name";
-
-            return trim($short_name);
+        $fields['short_name'] = function () {
+            return $this->shortName;
         };
-        $fields['medium_name'] = function ($fields) {
-            $medium_name = "{$fields['first_name']} {$fields['middle_name']}";
-            return trim($medium_name);
+        $fields['medium_name'] = function () {
+            return $this->mediumName;
         };
         return $fields;
     }

@@ -13,6 +13,7 @@ use floor12\phone\PhoneFormatter;
  * @property int $contact_id
  * @property string $phone
  * @property string $exten
+ * @property int|null $isMain
  *
  * @property Contact $contact
  */
@@ -35,7 +36,7 @@ class Phone extends \yii\db\ActiveRecord
     {
         return [
             [['contact_id', 'phone'], 'required'],
-            [['contact_id'], 'integer'],
+            [['contact_id', 'isMain'], 'integer'],
             [['phone', 'exten'], 'string', 'max' => 255],
             [['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
         ];
@@ -51,7 +52,19 @@ class Phone extends \yii\db\ActiveRecord
             'contact_id' => 'Contact ID',
             'phone' => 'Phone',
             'exten' => 'Exten',
+            'isMain' => 'IsMain',
         ];
+    }
+    public static function isValidPhoneNumber(string $number): bool
+    {
+        if (strlen($number) !== 11) {
+            return false;
+        }
+        if ($number[0] != "7") {
+            return false;
+        }
+
+        return true;
     }
     public function beforeSave($insert)
     {
@@ -64,9 +77,17 @@ class Phone extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        $fields['phone'] = function ($fields) {
-            return PhoneFormatter::format($fields['phone']);
+        $fields['native_phone'] = function ($fields) {
+            return $fields['phone'];
         };
+        $fields['phone'] = function ($fields) {
+            if (self::isValidPhoneNumber($fields['phone'])) {
+                return PhoneFormatter::format($fields['phone']);
+                return PhoneFormatter::format($fields['phone']);
+            }
+            return $fields['phone'];
+        };
+
         return $fields;
     }
     /**

@@ -3,6 +3,8 @@
 namespace app\models\oldDb;
 
 use app\models\Company;
+use app\models\Deal;
+use app\models\oldDb\location\Location;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\HtmlPurifier;
@@ -527,6 +529,15 @@ class Objects extends \yii\db\ActiveRecord
         $fields['photo'] = function ($fields) {
             return json_decode($fields['photo']);
         };
+
+        $fields['thumb'] = function ($fields) {
+            $photos = json_decode($fields['photo'], true);
+            if ($photos && is_array($photos)) {
+                return Yii::$app->params['url']['objects'] . $photos[0];
+            }
+            return Yii::$app->params['url']['image_not_found'];
+        };
+
         $fields['calc_ceiling_height'] = function ($fields) {
             $maxes = [];
             foreach ($fields->objectFloors as $floor) {
@@ -601,7 +612,10 @@ class Objects extends \yii\db\ActiveRecord
         $offerMix = $extraFields->offerMix;
         return $offerMix[0];
     }
-
+    public function getComplex()
+    {
+        return $this->hasOne(Complex::class, ['id' => 'complex_id']);
+    }
     public function getBlocks()
     {
         return $this->hasMany(ObjectsBlock::class, ['object_id' => 'id']);
@@ -617,5 +631,13 @@ class Objects extends \yii\db\ActiveRecord
     public function getObjectFloors()
     {
         return $this->hasMany(ObjectFloors::class, ['object_id' => 'id']);
+    }
+    public function getDeals()
+    {
+        return $this->hasMany(Deal::class, ['object_id' => 'id']);
+    }
+    public function getArendators()
+    {
+        return $this->hasMany(Company::class, ['id' => 'company_id'])->via('deals');
     }
 }

@@ -359,6 +359,8 @@ class OfferMixSearch extends OfferMix
             // $query->where('0=1');
             return $dataProvider;
         }
+        // Этот запрос решает проблему дубликатов, но выполняется долго (около 7 секунд)
+        // $query->andWhere(new Expression("IF(c_industry_offers_mix.type_id = 2, JSON_LENGTH(c_industry_offers_mix.blocks) > 1 AND (SELECT COUNT(off.id) FROM c_industry_offers_mix as off WHERE off.type_id = 1 AND off.status = 1 AND FIND_IN_SET(off.id, REPLACE(REPLACE(TRIM(']' FROM TRIM('[' FROM c_industry_offers_mix.blocks->>\"$[*]\")), '\"', ''), ' ', '')) > 0) > 1,JSON_LENGTH(c_industry_offers_mix.blocks) IS NOT NULL OR JSON_LENGTH(c_industry_offers_mix.blocks) IS NULL)"));
 
         if ($this->withoutOffersFromQuery) {
             $withoutQuery = json_decode($this->withoutOffersFromQuery, true);
@@ -400,14 +402,24 @@ class OfferMixSearch extends OfferMix
             }
         }
 
-        $query->orFilterWhere(['c_industry_offers_mix.object_id' => $this->all])
-            ->orFilterWhere(['like', 'company.nameEng', $this->all])
-            ->orFilterWhere(['like', 'company.nameRu', $this->all])
-            ->orFilterWhere(['like', 'contact.first_name', $this->all])
-            ->orFilterWhere(['like', 'contact.middle_name', $this->all])
-            ->orFilterWhere(['like', 'contact.last_name', $this->all])
-            ->orFilterWhere(['like', 'phone.phone', $this->all])
-            ->orFilterWhere(['like', 'c_industry_offers_mix.address', $this->all]);
+        if ($this->all) {
+            $searchArray = ['and'];
+            $words = explode(" ", $this->all);
+            foreach ($words as $word) {
+                $searchArray[] = [
+                    'or',
+                    ['=', 'c_industry_offers_mix.object_id', $word],
+                    ['like', 'company.nameEng', $word],
+                    ['like', 'company.nameRu', $word],
+                    ['like', 'contact.first_name', $word],
+                    ['like', 'contact.middle_name', $word],
+                    ['like', 'contact.last_name', $word],
+                    ['like', 'phone.phone', $word],
+                    ['like', 'c_industry_offers_mix.address', $word]
+                ];
+            }
+            $query->orFilterWhere($searchArray);
+        }
 
         if ($this->recommended_sort) {
             if ($expression = $this->getRecommendedOrderExpression('DESC')) {
@@ -422,20 +434,28 @@ class OfferMixSearch extends OfferMix
         }
         // для релевантности
         if ($this->all) {
-            $query->orderBy(new Expression("
-                 (
-                    IF (`c_industry_offers_mix`.`object_id` LIKE '%{$this->all}%', 90, 0) 
-                    + IF (`c_industry_offers_mix`.`object_id` = '{$this->all}', 420, 0) 
-                    + IF (`phone`.`phone` LIKE '%{$this->all}%', 40, 0) 
-                    + IF (`company`.`nameRu` LIKE '%{$this->all}%', 50, 0) 
-                    + IF (`company`.`nameEng` LIKE '%{$this->all}%', 50, 0) 
-                    + IF (`contact`.`first_name` LIKE '%{$this->all}%', 30, 0) 
-                    + IF (`contact`.`middle_name` LIKE '%{$this->all}%', 30, 0) 
-                    + IF (`contact`.`last_name` LIKE '%{$this->all}%', 30, 0) 
-                    + IF (`c_industry_offers_mix`.`address` LIKE '%{$this->all}%', 30, 0) 
-                )
-                DESC
-            "));
+            $rangingQueryExp = "";
+            $words = explode(" ", $this->all);
+            $addressWeight = 30;
+            foreach ($words as $key => $word) {
+                if ($key > 0) {
+                    $rangingQueryExp .= "+";
+                    $addressWeight += 20;
+                }
+                $rangingQueryExp .= "(
+                    IF (`c_industry_offers_mix`.`object_id` LIKE '%{$word}%', 90, 0) 
+                    + IF (`c_industry_offers_mix`.`object_id` = '{$word}', 420, 0) 
+                    + IF (`phone`.`phone` LIKE '%{$word}%', 40, 0) 
+                    + IF (`company`.`nameRu` LIKE '%{$word}%', 50, 0) 
+                    + IF (`company`.`nameEng` LIKE '%{$word}%', 50, 0) 
+                    + IF (`contact`.`first_name` LIKE '%{$word}%', 30, 0) 
+                    + IF (`contact`.`middle_name` LIKE '%{$word}%', 30, 0) 
+                    + IF (`contact`.`last_name` LIKE '%{$word}%', 30, 0) 
+                    + IF (`c_industry_offers_mix`.`address` LIKE '%{$word}%', $addressWeight, 0) 
+                )";
+            }
+            $rangingQueryExp .= " DESC";
+            $query->orderBy(new Expression($rangingQueryExp));
         }
 
         // grid filtering conditions
@@ -711,14 +731,7 @@ class OfferMixSearch extends OfferMix
                 END)
             "), $this->sewage_central]);
         }
-        // if ($this->water !== null) {
-        //     $query->andFilterWhere(['in', new Expression("
-        //         (CASE WHEN c_industry_offers_mix.type_id = 1 THEN c_industry_blocks.water
-        //         WHEN c_industry_offers_mix.type_id = 2 THEN c_industry_offers_mix.water
-        //         ELSE c_industry_offers_mix.water
-        //         END)
-        //     "), $this->water]);
-        // }
+
         $query->andFilterWhere([
             'or',
             ['c_industry_offers_mix.district_moscow' => $this->district_moscow],
@@ -755,27 +768,7 @@ class OfferMixSearch extends OfferMix
         if ($this->objectsOnly) {
             $query->groupBy('object_id');
         }
-        // $query->andFilterWhere([
-        //     'and',
-        //     [
-        //         '<=',
-        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-        //             . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = "
-        //             . OfferMix::DEAL_TYPE_SALE
-        //             . " THEN price_sale_max ELSE price_safe_pallet_max END"),
-        //         $this->rangeMaxPricePerFloor
-        //     ],
-        //     [
-        //         '>=',
-        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-        //             . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max ) WHEN deal_type = "
-        //             . OfferMix::DEAL_TYPE_SALE
-        //             . " THEN price_sale_min ELSE price_safe_pallet_min END"),
-        //         $this->rangeMinPricePerFloor
-        //     ]
-        // ]);
+
         $rent_price_least = "IF(
             LEAST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max) 
             IS NULL,
@@ -810,27 +803,7 @@ class OfferMixSearch extends OfferMix
             ],
         ]);
 
-        // $query->andFilterWhere([
-        //     'and',
-        //     [
-        //         '<=',
-        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-        //             . "  THEN LEAST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min ) WHEN deal_type = "
-        //             . OfferMix::DEAL_TYPE_SALE
-        //             . " THEN LEAST(price_sale_min, price_sale_max) ELSE LEAST(price_safe_pallet_min, price_safe_pallet_max) END"),
-        //         $this->rangeMaxPricePerFloor
-        //     ],
-        //     [
-        //         '>=',
-        //         new Expression("CASE WHEN deal_type = " . OfferMix::DEAL_TYPE_RENT
-        //             . " OR deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-        //             . "  THEN GREATEST(price_mezzanine_min, price_mezzanine_max, price_floor_min, price_floor_max, price_office_max, price_office_min  ) WHEN deal_type = "
-        //             . OfferMix::DEAL_TYPE_SALE
-        //             . " THEN GREATEST(price_sale_max, price_sale_min) ELSE GREATEST(price_safe_pallet_max, price_safe_pallet_min) END"),
-        //         $this->rangeMinPricePerFloor
-        //     ],
-        // ]);
+
         if ($this->water !== null) {
             if ($this->water == 1) {
                 $query->andFilterWhere(['not in', 'c_industry_offers_mix.water', ['0', 'нет', '']]);
@@ -839,15 +812,6 @@ class OfferMixSearch extends OfferMix
                 $query->andFilterWhere(['c_industry_offers_mix.water' => ['0', 'нет', '']]);
             }
         }
-        // if ($this->noDuplicate) {
-        //     $query->andFilterWhere([
-        //         'or',
-        //         ['IS', 'c_industry_offers_mix.blocks_amount', new Expression("null")],
-        //         ['>', 'c_industry_offers_mix.blocks_amount', new Expression("
-        //             IF(c_industry_offers_mix.type_id = 2, 1, 0)
-        //         ")]
-        //     ]);
-        // }
 
         if ($this->status == null) {
             $query->andFilterWhere(
@@ -869,6 +833,7 @@ class OfferMixSearch extends OfferMix
                 ")]
             );
         }
+
         return $dataProvider;
     }
 }

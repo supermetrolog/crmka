@@ -26,7 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property int $updated_at
  * 
  * 
- * @property UserProfile[] $userProfiles
+ * @property UserProfile $userProfile
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -84,8 +84,29 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         ];
         return $behaviors;
     }
+    public function getEmailForSend(): array
+    {
+        $defaultFrom = [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
+        if (!$this->email_username || !$this->email_password || !$this->email) {
+            return $defaultFrom;
+        }
+        return [$this->email => $this->userProfile->shortName];
+    }
+    public function getEmailUsername(): string
+    {
+        if (!$this->email_username || !$this->email_password) {
+            return Yii::$app->params['senderUsername'];
+        }
+        return $this->email_username;
+    }
 
-
+    public function getEmailPassword(): string
+    {
+        if (!$this->email_username || !$this->email_password) {
+            return Yii::$app->params['senderPassword'];
+        }
+        return $this->email_password;
+    }
     public static function getUsers()
     {
         $dataProvider = new ActiveDataProvider([
@@ -114,8 +135,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             if ($model->load($post_data, '') && $user_id = $model->signUp()) {
                 $post_data['userProfile']['user_id'] = $user_id;
                 UserProfile::createUserProfile($post_data['userProfile'], $uploadFileModel);
-                // $transaction->rollBack();
-                // return $post_data;
 
                 $transaction->commit();
                 return ['message' => "Пользователь создан", 'data' => $user_id];
@@ -130,6 +149,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
+        $preventEmailPass = $user->email_password;
         try {
             $post_data['updated_at'] = time();
 
@@ -140,6 +160,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                     }
 
                     $user->setPassword($post_data['password']);
+                }
+                if (!ArrayHelper::keyExists("email_password", $post_data) || $post_data['email_password'] === null) {
+                    $user->email_password = $preventEmailPass;
                 }
                 if ($user->save()) {
                     UserProfile::updateUserProfile($post_data['userProfile'], $uploadFileModel);
@@ -156,7 +179,13 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function fields()
     {
         $fields = parent::fields();
-        unset($fields['auth_key'], $fields['password_hash'], $fields['password_reset_token'], $fields['access_token']);
+        unset(
+            $fields['auth_key'],
+            $fields['password_hash'],
+            $fields['password_reset_token'],
+            $fields['access_token'],
+            $fields['email_password']
+        );
         $fields['created_at_format'] = function ($fields) {
             return Yii::$app->formatter->format($fields['created_at'], 'datetime');
         };

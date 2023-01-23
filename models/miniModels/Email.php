@@ -12,6 +12,7 @@ use Yii;
  * @property int $id
  * @property int $contact_id
  * @property string $email
+ * @property int|null $isMain
  *
  * @property Contact $contact
  */
@@ -34,7 +35,7 @@ class Email extends \yii\db\ActiveRecord
     {
         return [
             [['contact_id', 'email'], 'required'],
-            [['contact_id'], 'integer'],
+            [['contact_id', 'isMain'], 'integer'],
             [['email'], 'string', 'max' => 255],
             [['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
         ];
@@ -49,6 +50,7 @@ class Email extends \yii\db\ActiveRecord
             'id' => 'ID',
             'contact_id' => 'Contact ID',
             'email' => 'Email',
+            'isMain' => 'IsMain',
         ];
     }
 

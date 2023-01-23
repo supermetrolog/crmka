@@ -1,6 +1,23 @@
+# *********** MY INGONRE SETTINGS BEGIN *************
+
+#uploaded files
+/public_html/uploads
+#for configure env
+/public_html/index.php
+#for configure env
+yii
+test.txt
+#secrets
+google_drive_secrets.json
+google_drive_token.json
+mysqlbackup_service_account_cred.json
+config/secrets.php
+
+# *********** MY INGONRE SETTINGS END *************
+
 # phpstorm project files
 .idea
-
+.vscode
 # netbeans project files
 nbproject
 
@@ -17,19 +34,7 @@ Thumbs.db
 
 # composer itself is not needed
 composer.phar
-config/db.php
-config/db_old.php
-config/params.php
 
-#uploaded files
-
-/public_html/uploads
-/public_html/index.php
-test.txt
-#secrets
-google_drive_secrets.json
-google_drive_token.json
-mysqlbackup_service_account_cred.json
 # Mac DS_Store Files
 .DS_Store
 

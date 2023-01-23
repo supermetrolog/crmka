@@ -11,11 +11,17 @@ class PdfManager extends Dompdf
 {
     public string $savePath;
     public string $filename;
-    public function __construct(Options $options, $name = null, $savePath = "tmp/")
+    public function __construct(Options $options, $name = null, $savePath)
     {
-        $this->savePath = $savePath;
+        $this->setSavePath($savePath);
         $this->filename = $name ? $name : $this->generateFilename();
         parent::__construct($options);
+    }
+    private function setSavePath($savePath)
+    {
+        $this->savePath = $savePath;
+        if (is_dir($this->savePath)) return;
+        mkdir($this->savePath, 0700);
     }
     public function save()
     {
@@ -37,6 +43,6 @@ class PdfManager extends Dompdf
             throw new Exception('File not found');
         }
 
-        return $this->savePath . $this->filename;
+        return $this->savePath . "/" . $this->filename;
     }
 }
