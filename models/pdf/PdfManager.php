@@ -21,7 +21,7 @@ class PdfManager extends Dompdf
     {
         $this->savePath = $savePath;
         if (is_dir($this->savePath)) return;
-        mkdir($this->savePath, 0700);
+        mkdir($this->savePath, 0700, true);
     }
     public function save()
     {

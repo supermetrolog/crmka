@@ -23,7 +23,7 @@ class Backup implements DbDumperInterface
     {
         $this->tmpPath = $tmpPath;
         if (is_dir($this->tmpPath)) return;
-        mkdir($this->tmpPath, 0700);
+        mkdir($this->tmpPath, 0700, true);
     }
     public function dump(): void
     {

@@ -1,7 +1,12 @@
 {
     "name": "yiisoft/yii2-app-basic",
     "description": "Yii 2 Basic Project Template",
-    "keywords": ["yii2", "framework", "basic", "project template"],
+    "keywords": [
+        "yii2",
+        "framework",
+        "basic",
+        "project template"
+    ],
     "homepage": "http://www.yiiframework.com/",
     "type": "project",
     "license": "BSD-3-Clause",
@@ -26,7 +31,7 @@
         "airani/yii2-telegram-log": "^1.0",
         "librasoft-fr/php-ssh-connection": "^3.1",
         "monolog/monolog": "^2.8",
-        "supermetrolog/synchronizer-local-to-ftp-builder": "^1.0"
+        "supermetrolog/synchronizer-local-to-ftp-builder": "^1.1"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -52,11 +57,13 @@
     },
     "extra": {
         "yii\\composer\\Installer::postCreateProject": {
-            "setPermission": [{
-                "runtime": "0777",
-                "web/assets": "0777",
-                "yii": "0755"
-            }]
+            "setPermission": [
+                {
+                    "runtime": "0777",
+                    "web/assets": "0777",
+                    "yii": "0755"
+                }
+            ]
         },
         "yii\\composer\\Installer::postInstall": {
             "generateCookieValidationKey": [
@@ -64,8 +71,10 @@
             ]
         }
     },
-    "repositories": [{
-        "type": "composer",
-        "url": "https://asset-packagist.org"
-    }]
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
 }

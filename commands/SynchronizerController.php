@@ -43,7 +43,7 @@ class SynchronizerController extends Controller
         $builder = $this->syncBuilder->create();
         $builder
             ->setLogger($this->logger)
-            ->setSourceRepo($params['source_repo_dir_path'])
+            ->setSourceRepo($params['source_repo_dir_path'], ['runtime'])
             ->setTargetRepo(
                 $params['target_repo_ftp_params']['host'],
                 $params['target_repo_ftp_params']['root'],
