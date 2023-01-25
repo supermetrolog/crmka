@@ -234,7 +234,7 @@ class Contact extends \yii\db\ActiveRecord
 
             $model->updateManyMiniModels([
                 Email::class =>  ArrayHelper::getValue($post_data, 'emails'),
-                Phone::class => ArrayHelper::merge(ArrayHelper::getValue($post_data, 'phones'), ArrayHelper::getValue($post_data, 'invalidPhones')),
+                Phone::class => ArrayHelper::merge(ArrayHelper::getValue($post_data, 'phones'), ArrayHelper::getValue($post_data, 'invalidPhones', [])),
                 Website::class => ArrayHelper::getValue($post_data, 'websites'),
                 WayOfInforming::class => ArrayHelper::getValue($post_data, 'wayOfInformings'),
             ]);
