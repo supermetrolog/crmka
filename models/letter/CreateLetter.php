@@ -12,12 +12,14 @@ class CreateLetter extends Letter
     public $offers;
     public $contacts;
     public $ways;
-
+    public $shipping_method;
     public Letter $letterModel;
 
     public function rules()
     {
         return  [
+            [['ways', 'contacts', 'shipping_method'], 'required'],
+            ['shipping_method', 'integer'],
             [['ways', 'contacts'], 'required'],
             [['offers', 'ways'], IsArrayValidator::class],
             ['contacts', 'validateContacts'],
@@ -26,8 +28,10 @@ class CreateLetter extends Letter
     }
     public function validateWays()
     {
-        if ($this->hasErrors())
+        if ($this->hasErrors()) {
             return;
+        }
+
         if (
             in_array(LetterWay::WAY_SMS, $this->ways) ||
             in_array(LetterWay::WAY_TELEGRAM, $this->ways) ||
@@ -38,12 +42,15 @@ class CreateLetter extends Letter
                 $this->addError('contacts', 'must be contain phone');
             }
         }
+
         if (in_array(LetterWay::WAY_EMAIL, $this->ways)) {
             if (!$this->contacts['emails']) {
                 $this->addError('contacts', 'must be contain emails');
             }
         } else {
-            $this->addError('ways', 'must contain email contact type, the rest are not supported yet');
+            if ($this->shipping_method == Letter::SHIPPING_FROM_SYSTEM_METHOD) {
+                $this->addError('ways', 'must contain email contact type, the rest are not supported yet');
+            }
         }
     }
     private function checkArrayField($array, $key)
