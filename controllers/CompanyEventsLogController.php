@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\behaviors\BaseControllerBehaviors;
+use app\models\company\eventslog\CompanyEventsLogSearch;
 use app\models\company\eventslog\CreateCompanyEvent;
 use Yii;
 use yii\filters\Cors;
@@ -34,9 +35,14 @@ class CompanyEventsLogController extends ActiveController
     {
         $actions = parent::actions();
         unset($actions['create']);
+        unset($actions['index']);
         return $actions;
     }
-
+    public function actionIndex()
+    {
+        $searchEventModel = new CompanyEventsLogSearch();
+        return $searchEventModel->search(Yii::$app->request->getQueryParams());
+    }
     public function actionCreate()
     {
         $createEventModel = new CreateCompanyEvent(Yii::$app->request->post());
