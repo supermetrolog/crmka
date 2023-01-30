@@ -52,9 +52,14 @@ class PresentationController extends Controller
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4');
         $dompdf->render();
-        $dompdf->stream(
+
+        return Yii::$app->response->sendContentAsFile(
+            $dompdf->output(['Attachment' => false]),
             $this->translit($model->getPresentationName()),
-            ['Attachment' => false]
+            [
+                'mimeType' => 'application/pdf',
+                'inline' => true,
+            ]
         );
     }
     public function actionFuck()
