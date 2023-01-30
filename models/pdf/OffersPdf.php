@@ -319,11 +319,6 @@ class OffersPdf extends Model
 
         if ($this->data->type_id == OfferMix::GENERAL_TYPE_ID)
             $this->data->video_control = $this->getVideoControlForGeneralModel($this->data);
-        // var_dump($this->data->video_control);
-        // echo "<pre>";
-        // print_r($this->data->miniOffersMix);
-        // echo "</pre>";
-        // die;
     }
 
     private function normalizeElevators()
@@ -1005,8 +1000,6 @@ class OffersPdf extends Model
     {
         $invalidParamsList = ["", null, 0, " ", "0", "  ", "0 "];
 
-        // $val = is_callable($value['value']) ? $value['value']() : $value['value'];
-        // var_dump($value);
         foreach ($invalidParamsList as $invalidParam) {
             if ($value === $invalidParam) {
                 return false;

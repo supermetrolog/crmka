@@ -48,14 +48,14 @@ class PresentationController extends Controller
         $options->set('isJavascriptEnabled', true);
         $dompdf = new Dompdf($options);
         $html = $this->renderPartial('index', ['model' => $model]);
-        // $html = $this->renderFile(Yii::getAlias('@app') . '/views/pdf/presentation/index.php', ['model' => $model]);
 
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4');
         $dompdf->render();
-        $dompdf->stream($this->translit($model->getPresentationName()), ['Attachment' => false]);
-
-        return $html;
+        $dompdf->stream(
+            $this->translit($model->getPresentationName()),
+            ['Attachment' => false]
+        );
     }
     public function actionFuck()
     {
