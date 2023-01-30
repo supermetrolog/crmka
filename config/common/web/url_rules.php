@@ -141,6 +141,11 @@ return
             'extraPatterns' => [
                 'POST,OPTIONS send' => 'send'
             ]
-
+        ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => ['company-events-log' => 'company-events-log'],
+            'except' => [],
+            'extraPatterns' => [],
         ],
     ];
