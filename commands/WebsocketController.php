@@ -8,38 +8,34 @@
 
 namespace app\commands;
 
+use app\components\ConsoleLogger;
 use yii\console\Controller;
-use yii\console\ExitCode;
 use app\daemons\ServerWS;
 use consik\yii2websocket\WebSocketServer;
-use Yii;
 
 class WebsocketController extends Controller
 {
     public function actionStart($expand = "caller,phoneFrom,phoneFrom.contact,phoneTo,phoneTo.contact")
     {
-        foreach (\Yii::$app->log->targets as $target) {
-            $target->setEnabled(false);
-        }
         $server = new ServerWS();
-        $server->port = 8010; //This port must be busy by WebServer and we handle an error
+        $server->port = 8010; // Default port
         $server->on(WebSocketServer::EVENT_WEBSOCKET_OPEN_ERROR, function ($e) use ($server) {
-            echo "Error opening port " . $server->port . "\n";
+            ConsoleLogger::info("error opening port " . $server->port);
             $server->port += 1; //Try next port to open
             $server->start();
         });
 
-        $server->on(WebSocketServer::EVENT_WEBSOCKET_OPEN, function ($e) use ($server) {
-            echo "Server started at port " . $server->port;
+        $server->on(WebSocketServer::EVENT_WEBSOCKET_OPEN, function () use ($server) {
+            ConsoleLogger::info("server started at port " . $server->port . "...");
         });
         $server->on(WebSocketServer::EVENT_CLIENT_CONNECTED, function ($e) use ($server) {
-            echo "\nCLIENT CONNECTED\n";
+            ConsoleLogger::info("client connected");
             $e->client->name = null;
             $e->client->send(json_encode(['message' => 'Client connected']));
         });
 
-        echo "Start server\n";
+        ConsoleLogger::info("start server");
         $server->start();
-        echo "\nStop server";
+        ConsoleLogger::info("stop server");
     }
 }

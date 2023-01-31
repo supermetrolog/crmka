@@ -2,6 +2,7 @@
 
 namespace app\daemons;
 
+use app\components\ConsoleLogger;
 use app\daemons\loops\CallsLoop;
 use app\models\CallList;
 use app\models\Notification;
@@ -52,33 +53,31 @@ class ServerWS extends WebSocketServer
 
         $loop = new NotifyLoop;
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            // echo "Timer Notify!\n";
             try {
                 $loop->run($this->_clients);
             } catch (yii\db\Exception $e) {
                 Yii::$app->db->close();
                 Yii::$app->db->open();
-                echo "exception \n";
+                ConsoleLogger::info($e->getMessage());
                 $loop->run($this->_clients);
             }
         });
 
         $loop = new CallsLoop;
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            // echo "Timer Calls!\n";
             try {
                 $loop->run($this->_clients);
             } catch (yii\db\Exception $e) {
                 Yii::$app->db->close();
                 Yii::$app->db->open();
-                echo "exception \n";
+                ConsoleLogger::info($e->getMessage());
                 $loop->run($this->_clients);
             }
         });
 
 
         $this->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) {
-            echo "\nCLIENT DISCONNECTED\n";
+            ConsoleLogger::info("client disconneted");
             $this->_clients->removeClient($e->client);
         });
     }

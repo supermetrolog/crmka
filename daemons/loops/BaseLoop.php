@@ -15,16 +15,12 @@ abstract class BaseLoop extends Model
 
     protected function getUsersIds()
     {
-        $users_ids = [];
-        foreach ($this->clients as $key => $value) {
-            $users_ids[] = $key;
-        }
-        return $users_ids;
+        return array_keys($this->clients);
     }
     protected function changeIndex($array, $index)
     {
         $newArray = [];
-        foreach ($array as $key => $value) {
+        foreach ($array as $value) {
             $newArray[$value[$index]][] = $value;
         }
         return $newArray;

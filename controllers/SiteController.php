@@ -2,45 +2,15 @@
 
 namespace app\controllers;
 
-use Psr\Log\LoggerInterface;
 use Yii;
-use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
+use app\components\ConsoleLogger;
+use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Exchange\AMQPExchangeType;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class SiteController extends Controller
 {
-
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ]
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function actions()
     {
         return [
@@ -53,33 +23,27 @@ class SiteController extends Controller
             ],
         ];
     }
-    public function dump($var): void
-    {
-        echo "<pre>";
-        print_r($var);
-    }
     public function actionIndex()
     {
-        $one = require __DIR__ . "/../config/staging/web/config.php";
-        $two = require __DIR__ . "/../config/common/web/config.php";
-        $res = ArrayHelper::merge($two, $one);
-        // $res = require __DIR__ . "/../config/console.php";
-        unset($res['container']);
-        $this->dump($res);
-    }
+        $queue = 'notifycations';
+        $exchange = 'notify_topic';
 
-    public function array_merge_recursive_distinct(array &$array1, array &$array2)
-    {
-        $merged = $array1;
+        $conn = new AMQPStreamConnection(
+            'localhost',
+            5672,
+            'guest',
+            'guest'
+        );
+        $channel = $conn->channel();
 
-        foreach ($array2 as $key => &$value) {
-            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
-                $merged[$key] = $this->array_merge_recursive_distinct($merged[$key], $value);
-            } else {
-                $merged[$key] = $value;
-            }
-        }
+        $channel->queue_declare($queue, false, true, false, false);
+        $channel->exchange_declare($exchange, AMQPExchangeType::DIRECT, false, true, false);
 
-        return $merged;
+        $channel->queue_bind($queue, $exchange);
+
+        $toSend = new AMQPMessage("SUKA NAHUI", ['nigger' => 2]);
+        $channel->basic_publish($toSend, $exchange);
+        $channel->close();
+        $conn->close();
     }
 }
