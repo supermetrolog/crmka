@@ -100,35 +100,15 @@ class ServerWS extends WebSocketServer
         $message->setBody("pong");
         return $this->_clients->sendClient($client, $message);
     }
-    // function commandCheckCall(ConnectionInterface $client, $msg)
-    // {
-    //     echo "\ncommandCheckCall!\n";
-    //     $result = self::MESSAGE_TEMPLATE;
-
-    //     $modelsForUpdate = CallList::find()->joinWith(['caller'])->where(['user_profile.user_id' => $client->name])->andWhere(['call_list.status' => null])->all();
-    //     $models = CallList::find()->joinWith(['caller', 'phoneFrom' => function ($query) {
-    //         $query->with(['contact']);
-    //     }, 'phoneTo' => function ($query) {
-    //         $query->with(['contact']);
-    //     }])->where(['user_profile.user_id' => $client->name])->andWhere(['call_list.status' => null])->asArray()->all();
-
-    //     foreach ($modelsForUpdate as $model) {
-    //         $model->changeViewed(CallList::VIEWED_REQUESTED);
-    //     }
-    //     // $data = ArrayHelper::toArray($models);
-    //     $result['action'] = 'current_calls';
-    //     $result['message'] = $models;
-    //     $client->send(json_encode($result));
-    // }
     function commandEcho(ConnectionInterface $client, $msg)
     {
-        echo "CommandEcho!";
+        ConsoleLogger::info('command echo');
         $client->send($msg);
     }
 
     function commandSendPool(ConnectionInterface $client, $msg)
     {
-        echo "SendPool!\n";
+        ConsoleLogger::info('send pool');
         $msg = json_decode($msg);
         $message = new Message();
         $message->setBody($msg->data->message);
@@ -138,7 +118,7 @@ class ServerWS extends WebSocketServer
     function commandSetUser(ConnectionInterface $client, $msg)
     {
         try {
-            echo "SetUser!";
+            ConsoleLogger::info('set user');
             $msg = json_decode($msg);
             $message = new Message();
             $message->setAction('user_setted');
@@ -152,7 +132,7 @@ class ServerWS extends WebSocketServer
             $message->setBody("You successfuly registered ({$client->name->user_id})");
             return $this->_clients->sendClient($client, $message);
         } catch (\Throwable $th) {
-            echo "PIZDEC: " . $th->getMessage();
+            ConsoleLogger::info($th->getMessage());
             throw $th;
         }
     }
