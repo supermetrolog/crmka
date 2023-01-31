@@ -39,7 +39,7 @@ return [
             [
                 'class' => 'yii\log\FileTarget',
                 'levels' => ['error', 'warning'],
-            ],
+            ]
         ]
     ],
     'db' => $common_db,

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a2fdc3c2223651c9c37fb0e713cfea7",
+    "content-hash": "dd4165adf801f401a545e26d77241707",
     "packages": [
         {
             "name": "airani/yii2-telegram-log",

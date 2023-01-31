@@ -2,6 +2,7 @@
 
 namespace app\daemons;
 
+use app\components\ConsoleLogger;
 use Ratchet\ConnectionInterface;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -13,13 +14,13 @@ class Clients extends Model
     public function setClient(ConnectionInterface $client)
     {
         $this->clients_pool[$client->name->user_id][] = $client;
-        echo "Setted User\n";
+        ConsoleLogger::info("setted user, ID: " . $client->name->user_id);
     }
 
     public function removeClient(ConnectionInterface $client)
     {
         if (!$this->clientExist($client)) {
-            echo "Do not removed client because him not exist!";
+            ConsoleLogger::info('do not removed client because him not exist!');
             return false;
         }
         $pool = $this->clients_pool[$client->name->user_id];
@@ -33,22 +34,21 @@ class Clients extends Model
         if (!count($this->clients_pool[$client->name->user_id])) {
             unset($this->clients_pool[$client->name->user_id]);
         }
-        echo "Removed User\n";
+        ConsoleLogger::info('removed user');
         return true;
     }
 
     public function sendClient(ConnectionInterface $client, Message $msg)
     {
-        // echo "Send Client!" . $msg->getData() . "\n";
         return $client->send($msg->getData());
     }
     public function sendClientPool(int $user_id, Message $msg, ConnectionInterface $notAsweredclient = null)
     {
         if (!ArrayHelper::keyExists($user_id, $this->clients_pool)) {
-            echo "Not exist pool!\n";
+            ConsoleLogger::info('not exist pool');
             return false;
         }
-        echo "Send client pool\n";
+        ConsoleLogger::info('send client pool');
         $pool = $this->clients_pool[$user_id];
         foreach ($pool as $_client) {
             if ($notAsweredclient) {
@@ -65,11 +65,11 @@ class Clients extends Model
 
     public function sendAllClients(Message $msg, ConnectionInterface $notAsweredclient = null)
     {
-        echo "Send ALl Clients\n";
+        ConsoleLogger::info('send all clients');
         foreach ($this->clients_pool as $user_id => $pool) {
             $this->sendClientPool($user_id, $msg);
         }
-        echo "Sended ALl Clients\n";
+        ConsoleLogger::info('sended all clients');
     }
     public function clientExist(ConnectionInterface $client)
     {
