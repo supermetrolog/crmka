@@ -25,7 +25,7 @@ class NotificationService  extends Component
         }
         /** @var NotificationsQueueService */
         $notifyQueue = Yii::$app->notifyQueue;
-        $message = new AMQPMessage(json_encode($model->getAttributes()), ['content_type' => 'application/json']);
+        $message = new AMQPMessage($model->getAttributes());
         $notifyQueue->publish($message);
         return true;
     }

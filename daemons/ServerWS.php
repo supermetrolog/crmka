@@ -3,16 +3,13 @@
 namespace app\daemons;
 
 use app\components\ConsoleLogger;
-use app\daemons\loops\CallsLoop;
-use app\models\CallList;
-use app\models\Notification;
+use app\daemons\loops\notification\NotifyLoop;
 use consik\yii2websocket\WebSocketServer;
 use Ratchet\ConnectionInterface;
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use consik\yii2websocket\events\ExceptionEvent;
-use app\daemons\loops\NotifyLoop;
 use Yii;
 
 class ServerWS extends WebSocketServer
@@ -62,19 +59,6 @@ class ServerWS extends WebSocketServer
             }
         });
 
-        // $loop = new CallsLoop;
-        // $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-        //     try {
-        //         $loop->run($this->_clients);
-        //     } catch (yii\db\Exception $e) {
-        //         Yii::$app->db->close();
-        //         Yii::$app->db->open();
-        //         ConsoleLogger::info($e->getMessage());
-        //         $loop->run($this->_clients);
-        //     }
-        // });
-
-
         $this->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) {
             ConsoleLogger::info("client disconneted");
             $this->_clients->removeClient($e->client);
@@ -85,12 +69,6 @@ class ServerWS extends WebSocketServer
         $request = json_decode($msg, true);
         return !empty($request['action']) ? $request['action'] : parent::getCommand($from, $msg);
     }
-
-    /**
-     * Implement command's method using "command" as prefix for method name
-     *
-     * method for user's command "ping"
-     */
 
     function commandPing(ConnectionInterface $client, $msg)
     {

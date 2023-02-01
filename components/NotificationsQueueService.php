@@ -59,12 +59,18 @@ class NotificationsQueueService extends Component
         $this->connection->close();
     }
 
-    public function get(): ?AMQPMessage
+    public function get(): ?NotifyQueueMessageDecorator
     {
-        return $this->channel->basic_get($this->queueName);
+        $message = $this->channel->basic_get($this->queueName);
+        if (!$message) {
+            return null;
+        }
+
+        return new NotifyQueueMessageDecorator($message);
     }
     public function publish(AMQPMessage $msg): void
     {
+        $msg->setBody(json_encode($msg->getBody()));
         $this->channel->basic_publish($msg, $this->exchangeName);
     }
 }
