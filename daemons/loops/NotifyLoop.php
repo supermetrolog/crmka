@@ -6,10 +6,7 @@ use app\daemons\Message;
 use app\models\Notification;
 use app\daemons\loops\BaseLoop;
 use app\components\ConsoleLogger;
-use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Exchange\AMQPExchangeType;
 use app\components\NotificationsQueueService;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class NotifyLoop extends BaseLoop
 {
@@ -23,22 +20,17 @@ class NotifyLoop extends BaseLoop
     public function processed()
     {
         ConsoleLogger::info('processed NOTIFY LOOP');
-        $users_ids = $this->clients->getClientsIds();
-        $models = Notification::find()->where(['notification.consultant_id' => $users_ids])->andWhere(['status' => Notification::NO_FETCHED_STATUS])->all();
-        $modelsArray = $this->changeIndex($models, 'consultant_id');
-        $message = new Message();
-        $message->setAction(Message::ACTION_NEW_NOTIFICATION);
-        foreach ($modelsArray as $user_id => $userNotify) {
-            $message->setBody(count($modelsArray[$user_id]));
-            $this->clients->sendClientPool($user_id, $message);
-        }
+        $webMessage = new Message();
+        $webMessage->setAction(Message::ACTION_NEW_NOTIFICATION);
+        while ($message = $this->notifyQueue->get()) {
+            $notif = json_decode($message->getBody());
+            ConsoleLogger::info("new notification for consultant with ID: " . $notif->consultant_id);
 
-
-        Notification::changeNoFetchedStatusToFetched($models);
-        $message = $this->notifyQueue->get();
-        if ($message) {
+            $webMessage->setBody(1);
+            if ($this->clients->isExistByUserID($notif->consultant_id)) {
+                $this->clients->sendClientPool($notif->consultant_id, $webMessage);
+            }
             $message->ack();
-            ConsoleLogger::info($message->body);
         }
     }
 }

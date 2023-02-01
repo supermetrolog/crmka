@@ -19,7 +19,7 @@ class ServerWS extends WebSocketServer
 {
 
     public const MESSAGE_TEMPLATE = ['message' => '', 'action' => 'info', 'error' => false, 'success' => false];
-    private $_clients;
+    private Clients $_clients;
     private $timeout = 2;
     public function start()
     {

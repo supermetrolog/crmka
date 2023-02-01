@@ -90,7 +90,10 @@ class Clients extends Model
 
         return false;
     }
-
+    public function isExistByUserID(int $id): bool
+    {
+        return ArrayHelper::keyExists($id, $this->clients_pool);
+    }
     public function getClientsIds()
     {
         $ids = [];

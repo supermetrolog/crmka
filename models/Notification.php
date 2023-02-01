@@ -126,7 +126,7 @@ class Notification extends \yii\db\ActiveRecord
     public static function changeNoViewedStatusToNoCount($models)
     {
         foreach ($models as $model) {
-            if ($model->status == self::NO_VIEWED_STATUS && $model->status != self::PROCESSED_STATUS) {
+            if (($model->status == self::NO_VIEWED_STATUS || $model->status == self::NO_FETCHED_STATUS) && $model->status != self::PROCESSED_STATUS) {
                 $model->status = self::NO_COUNT_STATUS;
                 $model->save();
             }
