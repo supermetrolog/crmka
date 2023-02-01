@@ -1,4 +1,5 @@
 <?php
+
 $common_params = require __DIR__ . "/params.php";
 $common_db = require __DIR__ . "/db.php";
 $common_db_old = require __DIR__ . "/db_old.php";
@@ -6,6 +7,15 @@ $common_db_old = require __DIR__ . "/db_old.php";
 return [
     'notify' => [
         'class' => app\components\NotificationService::class,
+    ],
+    'notifyQueue' => [
+        'class' => app\components\NotificationsQueueService::class,
+        'host' => 'localhost',
+        'port' => 5672,
+        'user' => $common_params['rabbit']['user'],
+        'password' => $common_params['rabbit']['password'],
+        'queueName' => $common_params['rabbit']['notify']['queueName'],
+        'exchangeName' => $common_params['rabbit']['notify']['exchangeName'],
     ],
     'queue' => [
         'class' => \yii\queue\amqp_interop\Queue::class,

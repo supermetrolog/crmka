@@ -14,7 +14,7 @@ class Clients extends Model
     public function setClient(ConnectionInterface $client)
     {
         $this->clients_pool[$client->name->user_id][] = $client;
-        ConsoleLogger::info("setted user, ID: " . $client->name->user_id);
+        ConsoleLogger::info("setted user with ID: " . $client->name->user_id);
     }
 
     public function removeClient(ConnectionInterface $client)

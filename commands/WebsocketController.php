@@ -20,9 +20,8 @@ class WebsocketController extends Controller
         $server = new ServerWS();
         $server->port = 8010; // Default port
         $server->on(WebSocketServer::EVENT_WEBSOCKET_OPEN_ERROR, function ($e) use ($server) {
-            ConsoleLogger::info("error opening port " . $server->port);
-            $server->port += 1; //Try next port to open
-            $server->start();
+            ConsoleLogger::info("error opening port " . $server->port . " with message: ");
+            throw $e->exception;
         });
 
         $server->on(WebSocketServer::EVENT_WEBSOCKET_OPEN, function () use ($server) {

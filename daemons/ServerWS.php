@@ -50,8 +50,7 @@ class ServerWS extends WebSocketServer
     {
         $this->_clients = new Clients();
 
-
-        $loop = new NotifyLoop;
+        $loop = new NotifyLoop(Yii::$app->notifyQueue);
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
             try {
                 $loop->run($this->_clients);
@@ -63,17 +62,17 @@ class ServerWS extends WebSocketServer
             }
         });
 
-        $loop = new CallsLoop;
-        $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            try {
-                $loop->run($this->_clients);
-            } catch (yii\db\Exception $e) {
-                Yii::$app->db->close();
-                Yii::$app->db->open();
-                ConsoleLogger::info($e->getMessage());
-                $loop->run($this->_clients);
-            }
-        });
+        // $loop = new CallsLoop;
+        // $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
+        //     try {
+        //         $loop->run($this->_clients);
+        //     } catch (yii\db\Exception $e) {
+        //         Yii::$app->db->close();
+        //         Yii::$app->db->open();
+        //         ConsoleLogger::info($e->getMessage());
+        //         $loop->run($this->_clients);
+        //     }
+        // });
 
 
         $this->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) {
@@ -108,7 +107,7 @@ class ServerWS extends WebSocketServer
 
     function commandSendPool(ConnectionInterface $client, $msg)
     {
-        ConsoleLogger::info('send pool');
+        ConsoleLogger::info('command: send pool');
         $msg = json_decode($msg);
         $message = new Message();
         $message->setBody($msg->data->message);
@@ -118,7 +117,7 @@ class ServerWS extends WebSocketServer
     function commandSetUser(ConnectionInterface $client, $msg)
     {
         try {
-            ConsoleLogger::info('set user');
+            ConsoleLogger::info('command: set user');
             $msg = json_decode($msg);
             $message = new Message();
             $message->setAction('user_setted');

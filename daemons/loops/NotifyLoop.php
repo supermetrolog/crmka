@@ -2,42 +2,23 @@
 
 namespace app\daemons\loops;
 
-use app\components\ConsoleLogger;
-use app\daemons\loops\BaseLoop;
 use app\daemons\Message;
 use app\models\Notification;
-use Interop\Amqp\Impl\AmqpBind;
-use Interop\Amqp\Impl\AmqpQueue;
-use Interop\Amqp\Impl\AmqpTopic;
+use app\daemons\loops\BaseLoop;
+use app\components\ConsoleLogger;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Exchange\AMQPExchangeType;
-use PhpAmqpLib\Message\AMQPMessage;
-use Yii;
+use app\components\NotificationsQueueService;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class NotifyLoop extends BaseLoop
 {
 
-    private AMQPChannel $channel;
+    private NotificationsQueueService $notifyQueue;
 
-    public function __construct()
+    public function __construct(NotificationsQueueService $notifyQueue)
     {
-        $queue = 'notifycations';
-        $exchange = 'notify_topic';
-
-        $conn = new AMQPStreamConnection(
-            'localhost',
-            5672,
-            'guest',
-            'guest'
-        );
-        $channel = $conn->channel();
-
-        $channel->queue_declare($queue, false, true, false, false);
-        $channel->exchange_declare($exchange, AMQPExchangeType::DIRECT, false, true, false);
-
-        $channel->queue_bind($queue, $exchange);
-        $this->channel = $channel;
+        $this->notifyQueue = $notifyQueue;
     }
     public function processed()
     {
@@ -54,7 +35,7 @@ class NotifyLoop extends BaseLoop
 
 
         Notification::changeNoFetchedStatusToFetched($models);
-        $message = $this->channel->basic_get('notifycations');
+        $message = $this->notifyQueue->get();
         if ($message) {
             $message->ack();
             ConsoleLogger::info($message->body);
