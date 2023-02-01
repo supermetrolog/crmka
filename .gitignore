@@ -2,11 +2,6 @@
 
 #uploaded files
 /public_html/uploads
-#for configure env
-/public_html/index.php
-#for configure env
-yii
-test.txt
 #secrets
 google_drive_secrets.json
 google_drive_token.json
