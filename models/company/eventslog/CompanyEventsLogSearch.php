@@ -40,7 +40,7 @@ class CompanyEventsLogSearch extends CompanyEventsLog
      */
     public function search($params)
     {
-        $query = CompanyEventsLog::find();
+        $query = CompanyEventsLog::find()->with(['user.userProfile']);
 
         // add conditions that should always apply here
 
