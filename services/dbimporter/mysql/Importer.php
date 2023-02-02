@@ -12,6 +12,7 @@ class Importer  implements DbImporterInterface
     private string $username;
     private string $password;
     private string $dbname;
+    private string $workdir;
     public function __construct(CommandExecutorInterface $commandExecutor, string $workdir, string $username, string $password, string $dbname)
     {
         $this->commandExecutor = $commandExecutor;
