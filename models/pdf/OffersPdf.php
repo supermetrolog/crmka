@@ -34,13 +34,37 @@ class OffersPdf extends Model
         if (!$this->data) {
             throw new Exception("This offer not found");
         }
+
         $array = [];
         $miniOffersMixModels = $this->data->miniOffersMix;
+
         if ($miniOffersMixModels) {
             foreach ($miniOffersMixModels as $miniOffersMix) {
-                $array[] = (object) array_merge($miniOffersMix->toArray(), ['block' => (object) array_merge($miniOffersMix->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['cranes']])->all(), 'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['elevators']])->all()])]);
+                if ($miniOffersMix->block) {
+                    $array[] = (object) array_merge(
+                        $miniOffersMix->toArray(),
+                        [
+                            'block' => (object) array_merge(
+                                $miniOffersMix->block->toArray(),
+                                [
+                                    'craness' => Crane::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['cranes']])->all(),
+                                    'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['elevators']])->all()
+                                ]
+                            )
+                        ]
+                    );
+                } else {
+                    $array[] = (object) array_merge(
+                        $miniOffersMix->toArray(),
+                        [
+                            'block' => null,
+                        ]
+                    );
+                }
             }
         }
+
+
         $block = $this->data->block ? (object) array_merge($this->data->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['cranes']])->all(), 'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['elevators']])->all()]) : null;
         $this->data = (object) array_merge($this->data->toArray(), [
             'miniOffersMix' => $array,
@@ -50,6 +74,7 @@ class OffersPdf extends Model
         if ($this->data->deal_type == OfferMix::DEAL_TYPE_RESPONSE_STORAGE) {
             throw new Exception("Для ОТВЕТ-ХРАНЕНИЯ презентация не реализована!");
         }
+        // offersMix.miniOffersMix.block offersMix.object offersMix.block
         $this->normalizeData();
     }
 
