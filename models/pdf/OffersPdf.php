@@ -25,11 +25,15 @@ class OffersPdf extends Model
         $this->validateOptions($options);
         $this->consultant = $options['consultant'];
         $this->normalizeConsultant();
-        $this->data = OfferMix::find()->where([
-            'object_id' => $options['object_id'],
-            'type_id' => $options['type_id'],
-            'original_id' => $options['original_id'],
-        ])->limit(1)->one();
+        $this->data = OfferMix::find()
+            ->with(['object', 'block', 'miniOffersMix.block'])
+            ->where([
+                'object_id' => $options['object_id'],
+                'type_id' => $options['type_id'],
+                'original_id' => $options['original_id'],
+            ])
+            ->limit(1)
+            ->one();
 
         if (!$this->data) {
             throw new Exception("This offer not found");
@@ -40,32 +44,36 @@ class OffersPdf extends Model
 
         if ($miniOffersMixModels) {
             foreach ($miniOffersMixModels as $miniOffersMix) {
+                $block = null;
                 if ($miniOffersMix->block) {
-                    $array[] = (object) array_merge(
-                        $miniOffersMix->toArray(),
+                    $block = (object) array_merge(
+                        $miniOffersMix->block->toArray(),
                         [
-                            'block' => (object) array_merge(
-                                $miniOffersMix->block->toArray(),
-                                [
-                                    'craness' => Crane::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['cranes']])->all(),
-                                    'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['elevators']])->all()
-                                ]
-                            )
-                        ]
-                    );
-                } else {
-                    $array[] = (object) array_merge(
-                        $miniOffersMix->toArray(),
-                        [
-                            'block' => null,
+                            'craness' => Crane::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['cranes']])->all(),
+                            'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['elevators']])->all()
                         ]
                     );
                 }
+                $array[] = (object) array_merge(
+                    $miniOffersMix->toArray(),
+                    [
+                        'block' => $block,
+                    ]
+                );
             }
         }
 
+        $block = null;
+        if ($this->data->block) {
+            $block = (object) array_merge(
+                $this->data->block->toArray(),
+                [
+                    'craness' => Crane::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['cranes']])->all(),
+                    'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['elevators']])->all()
+                ]
+            );
+        }
 
-        $block = $this->data->block ? (object) array_merge($this->data->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['cranes']])->all(), 'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['elevators']])->all()]) : null;
         $this->data = (object) array_merge($this->data->toArray(), [
             'miniOffersMix' => $array,
             'object' => (object) $this->data->object->toArray(),
@@ -74,7 +82,6 @@ class OffersPdf extends Model
         if ($this->data->deal_type == OfferMix::DEAL_TYPE_RESPONSE_STORAGE) {
             throw new Exception("Для ОТВЕТ-ХРАНЕНИЯ презентация не реализована!");
         }
-        // offersMix.miniOffersMix.block offersMix.object offersMix.block
         $this->normalizeData();
     }
 
