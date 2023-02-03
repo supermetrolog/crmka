@@ -629,14 +629,19 @@ class ObjectsBlock extends \yii\db\ActiveRecord
             'barrier' => 'Barrier',
         ];
     }
-
+    public function getCranesField()
+    {
+        return json_decode($this->cranes);
+    }
+    public function getElevatorsField()
+    {
+        return json_decode($this->elevators);
+    }
     public function fields()
     {
         $fields = parent::fields();
 
-        $fields['cranes'] = function ($fields) {
-            return json_decode($fields['cranes']);
-        };
+
         $fields['column_grids'] = function ($fields) {
             return json_decode($fields['column_grids']);
         };
@@ -646,10 +651,27 @@ class ObjectsBlock extends \yii\db\ActiveRecord
         $fields['ventilation'] = function ($fields) {
             return json_decode($fields['ventilation']);
         };
-        $fields['elevators'] = function ($fields) {
-            return json_decode($fields['elevators']);
+        $fields['elevators'] = function () {
+            return $this->getElevatorsField();
+        };
+        $fields['elevatorss'] = function () {
+            return Elevator::find()->where(['deleted' => 0, 'id' => $this->getElevatorsField()])->all();
+        };
+        $fields['cranes'] = function () {
+            return $this->getCranesField();
+        };
+        $fields['craness'] = function () {
+            return Crane::find()->where(['deleted' => 0, 'id' => $this->getCranesField()])->all();
         };
         return $fields;
+    }
+    public function extraFields()
+    {
+        $ef = parent::extraFields();
+        $ef['nigger'] = function ($ef) {
+            return "FUCK THE POLICE";
+        };
+        return $ef;
     }
     public function getObject()
     {

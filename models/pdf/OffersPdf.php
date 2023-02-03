@@ -2,6 +2,7 @@
 
 namespace app\models\pdf;
 
+use app\components\ConsoleLogger;
 use app\models\oldDb\Crane;
 use app\models\oldDb\Elevator;
 use app\models\oldDb\ObjectsBlock;
@@ -11,6 +12,7 @@ use Exception;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Console;
 
 class OffersPdf extends Model
 {
@@ -25,6 +27,7 @@ class OffersPdf extends Model
         $this->validateOptions($options);
         $this->consultant = $options['consultant'];
         $this->normalizeConsultant();
+
         $this->data = OfferMix::find()
             ->with(['object', 'block', 'miniOffersMix.block'])
             ->where([
@@ -36,49 +39,13 @@ class OffersPdf extends Model
             ->one();
 
         if (!$this->data) {
-            throw new Exception("This offer not found");
+            throw new Exception("Такое предложение не найдено");
         }
+        $this->data = $this->data->toArray([], ['object', 'block', 'miniOffersMix.block']);
 
-        $array = [];
-        $miniOffersMixModels = $this->data->miniOffersMix;
+        // array to object
+        $this->data = json_decode(json_encode($this->data));
 
-        if ($miniOffersMixModels) {
-            foreach ($miniOffersMixModels as $miniOffersMix) {
-                $block = null;
-                if ($miniOffersMix->block) {
-                    $block = (object) array_merge(
-                        $miniOffersMix->block->toArray(),
-                        [
-                            'craness' => Crane::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['cranes']])->all(),
-                            'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['elevators']])->all()
-                        ]
-                    );
-                }
-                $array[] = (object) array_merge(
-                    $miniOffersMix->toArray(),
-                    [
-                        'block' => $block,
-                    ]
-                );
-            }
-        }
-
-        $block = null;
-        if ($this->data->block) {
-            $block = (object) array_merge(
-                $this->data->block->toArray(),
-                [
-                    'craness' => Crane::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['cranes']])->all(),
-                    'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['elevators']])->all()
-                ]
-            );
-        }
-
-        $this->data = (object) array_merge($this->data->toArray(), [
-            'miniOffersMix' => $array,
-            'object' => (object) $this->data->object->toArray(),
-            'block' => $block
-        ]);
         if ($this->data->deal_type == OfferMix::DEAL_TYPE_RESPONSE_STORAGE) {
             throw new Exception("Для ОТВЕТ-ХРАНЕНИЯ презентация не реализована!");
         }
