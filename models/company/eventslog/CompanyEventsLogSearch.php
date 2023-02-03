@@ -46,6 +46,28 @@ class CompanyEventsLogSearch extends CompanyEventsLog
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'defaultPageSize' => 4
+            ],
+            'sort' => [
+                'enableMultiSort' => true,
+                'defaultOrder' => [
+                    'default' => SORT_DESC,
+                ],
+                'attributes' => [
+                    'created_at',
+                    'default' => [
+                        'asc' => [
+                            'created_at' => SORT_ASC,
+                        ],
+                        'desc' => [
+                            'created_at' => SORT_DESC
+                        ],
+                        'default' => SORT_DESC
+                    ]
+                ]
+
+            ]
         ]);
 
         $this->load($params, '');
