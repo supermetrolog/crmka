@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\behaviors\BaseControllerBehaviors;
+use app\models\company\eventslog\CompanyEventsLog;
 use app\models\company\eventslog\CompanyEventsLogSearch;
 use app\models\company\eventslog\CreateCompanyEvent;
 use Yii;
 use yii\filters\Cors;
 use yii\rest\ActiveController;
+use yii\web\NotFoundHttpException;
 
 class CompanyEventsLogController extends ActiveController
 {
@@ -47,6 +49,16 @@ class CompanyEventsLogController extends ActiveController
     {
         $createEventModel = new CreateCompanyEvent(Yii::$app->request->post());
         $createEventModel->create();
-        return ['message' => 'Событие создано', 'data' => $createEventModel->id];
+        $model = $this->findModel($createEventModel->id);
+        return ['message' => 'Событие создано', 'data' => $model->toArray([], ['user.userProfile'], true)];
+    }
+
+    private function findModel(int $id): CompanyEventsLog
+    {
+        if ($model = CompanyEventsLog::find()->with(['user.userProfile'])->where(['id' => $id])->limit(1)->one()) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException("company event log not found");
     }
 }
