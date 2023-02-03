@@ -2,9 +2,6 @@
 
 namespace app\models\pdf;
 
-use app\components\ConsoleLogger;
-use app\models\oldDb\Crane;
-use app\models\oldDb\Elevator;
 use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix;
 use app\models\UserProfile;
@@ -12,7 +9,6 @@ use Exception;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Console;
 
 class OffersPdf extends Model
 {
