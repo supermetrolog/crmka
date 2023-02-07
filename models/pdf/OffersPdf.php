@@ -77,7 +77,7 @@ class OffersPdf extends Model
         }
         $user_id = $this->consultant;
 
-        if ($this->is_new) {
+        if (!$this->is_new) {
             $user_id = OfferMix::USERS[$this->consultant];
         }
 
