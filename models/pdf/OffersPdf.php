@@ -15,7 +15,7 @@ class OffersPdf extends Model
 {
     public $data;
     public $consultant;
-    public $is_new;
+    public $is_new = 0;
     public $formatter;
     public $host;
     /** @var UserProfile */
@@ -61,7 +61,6 @@ class OffersPdf extends Model
             'type_id' => null,
             'original_id' => null,
             'consultant' => null,
-            'is_new' => null,
         ];
 
         $options = array_merge($_options, $options);
