@@ -83,7 +83,6 @@ class Phone extends \yii\db\ActiveRecord
         $fields['phone'] = function ($fields) {
             if (self::isValidPhoneNumber($fields['phone'])) {
                 return PhoneFormatter::format($fields['phone']);
-                return PhoneFormatter::format($fields['phone']);
             }
             return $fields['phone'];
         };

@@ -91,15 +91,15 @@ table {
 }
 
 .mt-header {
-    margin-top: 1.5cm!important;
+    margin-top: 1.5cm !important;
 }
 
 .mt-header-min {
-    margin-top: 1cm!important;
+    margin-top: 1cm !important;
 }
 
 .mt-header-min-min {
-    margin-top: .5cm!important;
+    margin-top: .5cm !important;
 }
 
 
@@ -123,15 +123,33 @@ table {
 }
 
 #header table td.consultant {
+    width: 500px;
     text-align: right;
 }
 
-#header table td.consultant>div {
+/* #header table td.consultant>div {
     border-right: 1px solid #982e06;
     padding-right: 10px;
     min-height: 35px;
     height: 35px;
     vertical-align: top;
+} */
+
+#header table td.consultant div {
+    display: inline-block;
+    border-right: 1px solid #982e06;
+    padding-right: 10px;
+    min-height: 35px;
+    height: 35px;
+    vertical-align: top;
+}
+
+#header table td.consultant div.phones {
+    vertical-align: top;
+    font-size: 13.5px;
+    line-height: 13px;
+    border-right: none;
+    padding-right: 0;
 }
 
 #header table td.consultant>div p.name {
@@ -266,7 +284,7 @@ table {
 
 .parameters .item table tr td:last-child p {
     font-weight: bold;
-    color: black!important;
+    color: black !important;
 }
 
 .parameters .item table tr td p {
@@ -467,7 +485,7 @@ table.digital-info-container {
     height: 78px;
     outline: 1px solid #8b2e0a;
     padding: 10px 15px;
-    padding-right: 0!important;
+    padding-right: 0 !important;
     margin-right: 4px;
     max-width: 298px;
     width: 298px;
@@ -828,7 +846,7 @@ table.digital-info-container {
 }
 
 .params-new td>div.params-title {
-    background-color: white!important;
+    background-color: white !important;
 }
 
 .params-new td>div p b {

@@ -6,6 +6,7 @@ use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix;
 use app\models\UserProfile;
 use Exception;
+use floor12\phone\PhoneFormatter;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -14,8 +15,11 @@ class OffersPdf extends Model
 {
     public $data;
     public $consultant;
+    public $is_new;
     public $formatter;
     public $host;
+    /** @var UserProfile */
+    public $userProfile;
     public function __construct($options, $host = null)
     {
         $this->host = $host ?? Yii::$app->params['url']['this_host'];
@@ -50,17 +54,51 @@ class OffersPdf extends Model
         }
         $this->normalizeData();
     }
+    private function validateOptions($options)
+    {
+        $_options = [
+            'object_id' => null,
+            'type_id' => null,
+            'original_id' => null,
+            'consultant' => null,
+            'is_new' => null,
+        ];
 
+        $options = array_merge($_options, $options);
+        foreach ($options as $key => $option) {
+            if ($option === null) {
+                throw new Exception("$key cannot be null!");
+            }
+        }
+    }
     private function normalizeConsultant()
     {
-        if (!is_numeric($this->consultant)) return;
-
-        $model = UserProfile::find()->where(['user_id' => OfferMix::USERS[$this->consultant]])->limit(1)->one();
-        if (!$model) {
+        if (!is_numeric($this->consultant)) {
             throw new Exception("Пользователя с таким ID не существует");
         }
-        $model = (object) $model->toArray();
-        $this->consultant = $model->medium_name;
+        $user_id = $this->consultant;
+
+        if ($this->is_new) {
+            $user_id = OfferMix::USERS[$this->consultant];
+        }
+
+        $this->userProfile = UserProfile::find()->where(['user_id' => $user_id])->limit(1)->one();
+        if (!$this->userProfile) {
+            throw new Exception("Пользователя с таким ID не существует");
+        }
+        $this->consultant = $this->userProfile->mediumName;
+    }
+    public function getCompanyPhone()
+    {
+        return '+7 (495) 150-03-23';
+    }
+    public function getMainConsultantPhone()
+    {
+        $phones = $this->userProfile->phones;
+        if (!count($phones)) {
+            return $this->getCompanyPhone();
+        }
+        return PhoneFormatter::format($phones[0]->phone);
     }
     private function getTownNameWithoutSpecialSymbols()
     {
@@ -98,6 +136,7 @@ class OffersPdf extends Model
         $this->normalizeGas();
         $this->normalizeSteam();
     }
+
     private function normalizeDescription()
     {
         $url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->data->original_id . '/' . $this->data->type_id . '?api=1';
@@ -679,22 +718,7 @@ class OffersPdf extends Model
             }
         }
     }
-    private function validateOptions($options)
-    {
-        $_options = [
-            'object_id' => null,
-            'type_id' => null,
-            'original_id' => null,
-            'consultant' => null,
-        ];
 
-        $options = array_merge($_options, $options);
-        foreach ($options as $key => $option) {
-            if ($option === null) {
-                throw new Exception("$key cannot be null!");
-            }
-        }
-    }
     public function getHost()
     {
         return $this->host;
