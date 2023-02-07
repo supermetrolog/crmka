@@ -26,6 +26,7 @@ class OffersPdf extends Model
         $this->formatter = Yii::$app->formatter;
         $this->validateOptions($options);
         $this->consultant = $options['consultant'];
+        $this->is_new = isset($options['is_new']) ? $options['is_new'] : 0;
         $this->normalizeConsultant();
 
         $this->data = OfferMix::find()
