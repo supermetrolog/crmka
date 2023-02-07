@@ -45,6 +45,9 @@ class OffersPdf extends Model
         if ($this->data->deal_type == OfferMix::DEAL_TYPE_RESPONSE_STORAGE) {
             throw new Exception("Для ОТВЕТ-ХРАНЕНИЯ презентация не реализована!");
         }
+        if ($this->data->type_id == 3) {
+            throw new Exception("Для объекта презентация не реализована!");
+        }
         $this->normalizeData();
     }
 
