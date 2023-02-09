@@ -3,15 +3,27 @@
 namespace tests\unit\models;
 
 use app\models\User;
+use app\tests\unit\fixtures\models\UserFixture;
 
 class UserTest extends \Codeception\Test\Unit
 {
+    /**
+     * @var \UnitTester
+     */
+    protected $tester;
+    public function _fixtures()
+    {
+        return [
+            'users' => UserFixture::class
+        ];
+    }
     public function testFindUserById()
     {
-        expect_that($user = User::findIdentity(1));
-        expect($user->username)->equals('admin');
-
-        expect_not(User::findIdentity(999));
+        verify($user = User::findIdentity(1))->notEmpty();
+        verify($user->username)->equals('nigger');
+        verify(User::findIdentity(999))->null();
+        verify($user = User::findIdentity(2))->notEmpty();
+        verify($user->username)->equals('napoleon');
     }
 
     // public function testFindUserByAccessToken()
