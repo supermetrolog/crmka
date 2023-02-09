@@ -1004,6 +1004,10 @@ class OfferMix extends \yii\db\ActiveRecord
     {
         return $this->hasOne(ObjectsBlock::class, ['id' => 'original_id']);
     }
+    public function getComplex()
+    {
+        return $this->hasOne(Complex::class, ['id' => 'complex_id']);
+    }
     public function getMiniOffersMix()
     {
         return $this->hasMany(self::class, ['object_id' => 'object_id', 'deal_type' => 'deal_type'])->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => self::MINI_TYPE_ID]);

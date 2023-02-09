@@ -278,8 +278,6 @@ class OfferMixSearch extends OfferMix
      */
     public function search($params)
     {
-        // $query = OfferMix::find()->distinct()->select(['c_industry_offers_mix.id', 'crmka.company.id as anal'])->from(['c_industry_offers_mix', 'crmka.company'])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails'])->andWhere(['deleted' => 0]);
-        // $query = OfferMix::find()->joinWith(['company.mainContact.phones'])->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails'])->andWhere(['deleted' => 0]);
         $joinedDbName = $this->getDsnAttribute('dbname', Company::getDb()->dsn);
         $query = OfferMix::find()->distinct()->joinWith(['company' => function ($query) use ($joinedDbName) {
             return $query->from("$joinedDbName.company")->joinWith(['contacts' => function ($query) use ($joinedDbName) {
@@ -287,7 +285,7 @@ class OfferMixSearch extends OfferMix
                     return $query->from("$joinedDbName.phone");
                 }]);
             }]);
-        }])->joinWith(['block']);
+        }])->joinWith(['block', 'complex']);
         // add conditions that should always apply here
         $this->load($params, '');
         $this->normalizeProps();
@@ -409,6 +407,7 @@ class OfferMixSearch extends OfferMix
                 $searchArray[] = [
                     'or',
                     ['=', 'c_industry_offers_mix.object_id', $word],
+                    ['like', 'c_industry_complex.title', $word],
                     ['like', 'company.nameEng', $word],
                     ['like', 'company.nameRu', $word],
                     ['like', 'contact.first_name', $word],
@@ -451,6 +450,7 @@ class OfferMixSearch extends OfferMix
                     + IF (`contact`.`first_name` LIKE '%{$word}%', 30, 0) 
                     + IF (`contact`.`middle_name` LIKE '%{$word}%', 30, 0) 
                     + IF (`contact`.`last_name` LIKE '%{$word}%', 30, 0) 
+                    + IF (`c_industry_complex`.`title` LIKE '%{$word}%', 30, 0) 
                     + IF (`c_industry_offers_mix`.`address` LIKE '%{$word}%', $addressWeight, 0) 
                 )";
             }
