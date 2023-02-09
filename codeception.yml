@@ -11,8 +11,7 @@ settings:
 modules:
     config:
         Yii2:
-            configFile: 'config/test.php'
-
+            configFile: "config/test_web.php"
 # To enable code coverage:
 #coverage:
 #    #c3_url: http://localhost:8080/index-test.php/

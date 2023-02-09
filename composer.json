@@ -1,13 +1,6 @@
 {
-    "name": "yiisoft/yii2-app-basic",
-    "description": "Yii 2 Basic Project Template",
-    "keywords": [
-        "yii2",
-        "framework",
-        "basic",
-        "project template"
-    ],
-    "homepage": "http://www.yiiframework.com/",
+    "name": "supermetrolog/crmka",
+    "description": "Pennylane CRM",
     "type": "project",
     "license": "BSD-3-Clause",
     "support": {
@@ -36,7 +29,15 @@
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
-        "yiisoft/yii2-gii": "~2.1.0"
+        "yiisoft/yii2-gii": "~2.1.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "codeception/codeception": "^4.0",
+        "codeception/verify": "~0.5.0 || ~1.1.0",
+        "codeception/specify": "~0.4.6",
+        "symfony/browser-kit": ">=2.7 <=4.2.4",
+        "codeception/module-filesystem": "^1.0.0",
+        "codeception/module-yii2": "^1.0.0",
+        "codeception/module-asserts": "^1.0.0"
     },
     "config": {
         "process-timeout": 1800,
@@ -54,7 +55,8 @@
         "post-create-project-cmd": [
             "yii\\composer\\Installer::postCreateProject",
             "yii\\composer\\Installer::postInstall"
-        ]
+        ],
+        "test": "./vendor/bin/codecept run"
     },
     "extra": {
         "yii\\composer\\Installer::postCreateProject": {

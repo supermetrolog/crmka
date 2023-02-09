@@ -23,7 +23,7 @@ class m220825_150111_update_timeline_id_in_timeline_step_object_comment_from_nul
         try {
             foreach ($models as $model) {
                 $model->timeline_id = $model->timelineStep->timeline_id;
-                if (!$model->save()) {
+                if (!$model->save(false)) {
                     throw new Exception("SaveModelError");
                 }
             }

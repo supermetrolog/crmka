@@ -28,7 +28,7 @@ class m220405_082430_add_admin_user_data_in_userProfile_table extends Migration
             'caller_id' => '102'
         ]);
 
-        if (!$model->save()) {
+        if (!$model->save(false)) {
             throw new Exception('Admin user not save');
         }
     }

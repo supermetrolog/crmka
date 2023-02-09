@@ -34,7 +34,7 @@ class m220923_124045_region_ids_transfer_from_old_db_to_region_table extends Mig
         $models = RequestRegion::find()->all();
         foreach ($models as  $model) {
             $model->region = $array[$model->region];
-            if (!$model->save()) {
+            if (!$model->save(false)) {
                 throw new Exception(json_encode($model->getErrorSummary(false)));
             }
         }
