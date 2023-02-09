@@ -285,7 +285,7 @@ class OfferMixSearch extends OfferMix
                     return $query->from("$joinedDbName.phone");
                 }]);
             }]);
-        }])->joinWith(['block', 'complex']);
+        }])->joinWith(['block']);
         // add conditions that should always apply here
         $this->load($params, '');
         $this->normalizeProps();
@@ -407,7 +407,7 @@ class OfferMixSearch extends OfferMix
                 $searchArray[] = [
                     'or',
                     ['=', 'c_industry_offers_mix.object_id', $word],
-                    ['like', 'c_industry_complex.title', $word],
+                    ['like', 'c_industry_offers_mix.title', $word],
                     ['like', 'company.nameEng', $word],
                     ['like', 'company.nameRu', $word],
                     ['like', 'contact.first_name', $word],
@@ -450,7 +450,7 @@ class OfferMixSearch extends OfferMix
                     + IF (`contact`.`first_name` LIKE '%{$word}%', 30, 0) 
                     + IF (`contact`.`middle_name` LIKE '%{$word}%', 30, 0) 
                     + IF (`contact`.`last_name` LIKE '%{$word}%', 30, 0) 
-                    + IF (`c_industry_complex`.`title` LIKE '%{$word}%', 30, 0) 
+                    + IF (`c_industry_offers_mix`.`title` LIKE '%{$word}%', 30, 0) 
                     + IF (`c_industry_offers_mix`.`address` LIKE '%{$word}%', $addressWeight, 0) 
                 )";
             }
