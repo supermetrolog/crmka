@@ -93,4 +93,23 @@ class Backup implements DbDumperInterface
             $this->fullpath
         );
     }
+
+    public static function getLastDumpFilename(string $tmpDir, string $dbName): ?string
+    {
+        $files = glob($tmpDir . '/*');
+        if ($files === false) {
+            return null;
+        }
+        $needle = null;
+        foreach ($files as $fullname) {
+            $filename = str_replace($tmpDir . '/', '', $fullname);
+            $pos = strpos($filename, $dbName);
+            if ($pos !== false) {
+                $needle = $filename;
+                break;
+            }
+        }
+
+        return $needle;
+    }
 }

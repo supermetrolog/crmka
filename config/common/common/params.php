@@ -66,11 +66,12 @@ return [
     ],
     'db_backup' => [
         'ftp_client_options' => $ftpOptionsForBackupsLoad,
-        'dump_tmp_dir' => YII_PROJECT_ROOT . "/runtime/backup_tmp",
         'db' => [
+            'dump_tmp_dir' => YII_PROJECT_ROOT . "/runtime/backup_tmp/db",
             'db_config_path' => __DIR__ . "/db.php"
         ],
         'db_old' => [
+            'dump_tmp_dir' => YII_PROJECT_ROOT . "/runtime/backup_tmp/db_old",
             'db_config_path' => __DIR__ . "/db_old.php"
         ],
     ],
