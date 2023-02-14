@@ -3,28 +3,20 @@
 namespace app\daemons\loops;
 
 use yii\base\Model;
+use app\daemons\Clients;
 
 abstract class BaseLoop extends Model
 {
-    protected $clients = null;
-    public function run($clients)
+    protected Clients $clients;
+    public function run(Clients $clients)
     {
         $this->clients = $clients;
         return $this->processed();
     }
-
-    protected function getUsersIds()
-    {
-        $users_ids = [];
-        foreach ($this->clients as $key => $value) {
-            $users_ids[] = $key;
-        }
-        return $users_ids;
-    }
     protected function changeIndex($array, $index)
     {
         $newArray = [];
-        foreach ($array as $key => $value) {
+        foreach ($array as $value) {
             $newArray[$value[$index]][] = $value;
         }
         return $newArray;

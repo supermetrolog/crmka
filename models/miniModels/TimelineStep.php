@@ -2,14 +2,10 @@
 
 namespace app\models\miniModels;
 
-use app\events\SendMessageEvent;
 use app\models\Timeline;
 use yii\web\NotFoundHttpException;
 use app\exceptions\ValidationErrorHttpException;
-use app\models\Deal;
-use app\models\oldDb\OfferMix;
 use app\models\Request;
-use app\models\UserSendedData;
 use Yii;
 use yii\helpers\ArrayHelper;
 

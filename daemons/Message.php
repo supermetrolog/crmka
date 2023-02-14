@@ -2,7 +2,6 @@
 
 namespace app\daemons;
 
-use yii\base\InvalidValueException;
 use yii\base\Model;
 
 class Message extends Model

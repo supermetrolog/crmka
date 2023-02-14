@@ -40,12 +40,34 @@ class CompanyEventsLogSearch extends CompanyEventsLog
      */
     public function search($params)
     {
-        $query = CompanyEventsLog::find();
+        $query = CompanyEventsLog::find()->with(['user.userProfile']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'defaultPageSize' => 50
+            ],
+            'sort' => [
+                'enableMultiSort' => true,
+                'defaultOrder' => [
+                    'default' => SORT_DESC,
+                ],
+                'attributes' => [
+                    'created_at',
+                    'default' => [
+                        'asc' => [
+                            'created_at' => SORT_ASC,
+                        ],
+                        'desc' => [
+                            'created_at' => SORT_DESC
+                        ],
+                        'default' => SORT_DESC
+                    ]
+                ]
+
+            ]
         ]);
 
         $this->load($params, '');

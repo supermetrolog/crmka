@@ -10,7 +10,6 @@ use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
 use app\models\SendPresentation;
 use app\models\User;
-use app\models\UserSendedData;
 use app\services\emailsender\EmailSender;
 use app\services\pythonpdfcompress\PythonPdfCompress;
 use Dompdf\Options;

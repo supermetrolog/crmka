@@ -1,6 +1,9 @@
 <?
 
+use app\models\pdf\OffersPdf;
 use app\models\oldDb\OfferMix;
+
+/** @var OffersPdf $model */
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
@@ -24,7 +27,10 @@ use app\models\oldDb\OfferMix;
                         <p class="name"><?= $model->consultant ?></p>
                         <p class="position"> <span class="danger">Ведущий консультант</span> </p>
                     </div>
-
+                    <div class="phones">
+                        <p class="userPhone"><?= $model->getMainConsultantPhone() ?></p>
+                        <p class="companyPhone"><?= $model->getCompanyPhone() ?></p>
+                    </div>
                 </td>
             </tr>
         </tbody>

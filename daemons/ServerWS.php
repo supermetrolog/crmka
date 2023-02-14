@@ -2,23 +2,21 @@
 
 namespace app\daemons;
 
-use app\daemons\loops\CallsLoop;
-use app\models\CallList;
-use app\models\Notification;
+use app\components\ConsoleLogger;
+use app\daemons\loops\notification\NotifyLoop;
 use consik\yii2websocket\WebSocketServer;
 use Ratchet\ConnectionInterface;
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use consik\yii2websocket\events\ExceptionEvent;
-use app\daemons\loops\NotifyLoop;
 use Yii;
 
 class ServerWS extends WebSocketServer
 {
 
     public const MESSAGE_TEMPLATE = ['message' => '', 'action' => 'info', 'error' => false, 'success' => false];
-    private $_clients;
+    private Clients $_clients;
     private $timeout = 2;
     public function start()
     {
@@ -49,36 +47,20 @@ class ServerWS extends WebSocketServer
     {
         $this->_clients = new Clients();
 
-
-        $loop = new NotifyLoop;
+        $loop = new NotifyLoop(Yii::$app->notifyQueue);
         $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            // echo "Timer Notify!\n";
             try {
                 $loop->run($this->_clients);
             } catch (yii\db\Exception $e) {
                 Yii::$app->db->close();
                 Yii::$app->db->open();
-                echo "exception \n";
+                ConsoleLogger::info($e->getMessage());
                 $loop->run($this->_clients);
             }
         });
-
-        $loop = new CallsLoop;
-        $this->server->loop->addPeriodicTimer($this->timeout, function () use ($loop) {
-            // echo "Timer Calls!\n";
-            try {
-                $loop->run($this->_clients);
-            } catch (yii\db\Exception $e) {
-                Yii::$app->db->close();
-                Yii::$app->db->open();
-                echo "exception \n";
-                $loop->run($this->_clients);
-            }
-        });
-
 
         $this->on(WebSocketServer::EVENT_CLIENT_DISCONNECTED, function ($e) {
-            echo "\nCLIENT DISCONNECTED\n";
+            ConsoleLogger::info("client disconneted");
             $this->_clients->removeClient($e->client);
         });
     }
@@ -88,12 +70,6 @@ class ServerWS extends WebSocketServer
         return !empty($request['action']) ? $request['action'] : parent::getCommand($from, $msg);
     }
 
-    /**
-     * Implement command's method using "command" as prefix for method name
-     *
-     * method for user's command "ping"
-     */
-
     function commandPing(ConnectionInterface $client, $msg)
     {
         $message = new Message();
@@ -101,35 +77,15 @@ class ServerWS extends WebSocketServer
         $message->setBody("pong");
         return $this->_clients->sendClient($client, $message);
     }
-    // function commandCheckCall(ConnectionInterface $client, $msg)
-    // {
-    //     echo "\ncommandCheckCall!\n";
-    //     $result = self::MESSAGE_TEMPLATE;
-
-    //     $modelsForUpdate = CallList::find()->joinWith(['caller'])->where(['user_profile.user_id' => $client->name])->andWhere(['call_list.status' => null])->all();
-    //     $models = CallList::find()->joinWith(['caller', 'phoneFrom' => function ($query) {
-    //         $query->with(['contact']);
-    //     }, 'phoneTo' => function ($query) {
-    //         $query->with(['contact']);
-    //     }])->where(['user_profile.user_id' => $client->name])->andWhere(['call_list.status' => null])->asArray()->all();
-
-    //     foreach ($modelsForUpdate as $model) {
-    //         $model->changeViewed(CallList::VIEWED_REQUESTED);
-    //     }
-    //     // $data = ArrayHelper::toArray($models);
-    //     $result['action'] = 'current_calls';
-    //     $result['message'] = $models;
-    //     $client->send(json_encode($result));
-    // }
     function commandEcho(ConnectionInterface $client, $msg)
     {
-        echo "CommandEcho!";
+        ConsoleLogger::info('command echo');
         $client->send($msg);
     }
 
     function commandSendPool(ConnectionInterface $client, $msg)
     {
-        echo "SendPool!\n";
+        ConsoleLogger::info('command: send pool');
         $msg = json_decode($msg);
         $message = new Message();
         $message->setBody($msg->data->message);
@@ -139,7 +95,7 @@ class ServerWS extends WebSocketServer
     function commandSetUser(ConnectionInterface $client, $msg)
     {
         try {
-            echo "SetUser!";
+            ConsoleLogger::info('command: set user');
             $msg = json_decode($msg);
             $message = new Message();
             $message->setAction('user_setted');
@@ -153,7 +109,7 @@ class ServerWS extends WebSocketServer
             $message->setBody("You successfuly registered ({$client->name->user_id})");
             return $this->_clients->sendClient($client, $message);
         } catch (\Throwable $th) {
-            echo "PIZDEC: " . $th->getMessage();
+            ConsoleLogger::info($th->getMessage());
             throw $th;
         }
     }

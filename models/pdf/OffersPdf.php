@@ -2,12 +2,11 @@
 
 namespace app\models\pdf;
 
-use app\models\oldDb\Crane;
-use app\models\oldDb\Elevator;
 use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix;
 use app\models\UserProfile;
 use Exception;
+use floor12\phone\PhoneFormatter;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -16,53 +15,90 @@ class OffersPdf extends Model
 {
     public $data;
     public $consultant;
+    public $is_new = 0;
     public $formatter;
     public $host;
+    /** @var UserProfile */
+    public $userProfile;
     public function __construct($options, $host = null)
     {
         $this->host = $host ?? Yii::$app->params['url']['this_host'];
         $this->formatter = Yii::$app->formatter;
         $this->validateOptions($options);
         $this->consultant = $options['consultant'];
+        $this->is_new = isset($options['is_new']) ? $options['is_new'] : 0;
         $this->normalizeConsultant();
-        $this->data = OfferMix::find()->where([
-            'object_id' => $options['object_id'],
-            'type_id' => $options['type_id'],
-            'original_id' => $options['original_id'],
-        ])->limit(1)->one();
+
+        $this->data = OfferMix::find()
+            ->with(['object', 'block', 'miniOffersMix.block'])
+            ->where([
+                'object_id' => $options['object_id'],
+                'type_id' => $options['type_id'],
+                'original_id' => $options['original_id'],
+            ])
+            ->limit(1)
+            ->one();
 
         if (!$this->data) {
-            throw new Exception("This offer not found");
+            throw new Exception("Такое предложение не найдено");
         }
-        $array = [];
-        $miniOffersMixModels = $this->data->miniOffersMix;
-        if ($miniOffersMixModels) {
-            foreach ($miniOffersMixModels as $miniOffersMix) {
-                $array[] = (object) array_merge($miniOffersMix->toArray(), ['block' => (object) array_merge($miniOffersMix->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['cranes']])->all(), 'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $miniOffersMix->block->toArray()['elevators']])->all()])]);
-            }
-        }
-        $block = $this->data->block ? (object) array_merge($this->data->block->toArray(), ['craness' => Crane::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['cranes']])->all(), 'elevatorss' => Elevator::find()->where(['deleted' => 0, 'id' => $this->data->block->toArray()['elevators']])->all()]) : null;
-        $this->data = (object) array_merge($this->data->toArray(), [
-            'miniOffersMix' => $array,
-            'object' => (object) $this->data->object->toArray(),
-            'block' => $block
-        ]);
+        $this->data = $this->data->toArray([], ['object', 'block', 'miniOffersMix.block']);
+
+        // array to object
+        $this->data = json_decode(json_encode($this->data));
+
         if ($this->data->deal_type == OfferMix::DEAL_TYPE_RESPONSE_STORAGE) {
             throw new Exception("Для ОТВЕТ-ХРАНЕНИЯ презентация не реализована!");
         }
+        if ($this->data->type_id == 3) {
+            throw new Exception("Для объекта презентация не реализована!");
+        }
         $this->normalizeData();
     }
+    private function validateOptions($options)
+    {
+        $_options = [
+            'object_id' => null,
+            'type_id' => null,
+            'original_id' => null,
+            'consultant' => null,
+        ];
 
+        $options = array_merge($_options, $options);
+        foreach ($options as $key => $option) {
+            if ($option === null) {
+                throw new Exception("$key cannot be null!");
+            }
+        }
+    }
     private function normalizeConsultant()
     {
-        if (!is_numeric($this->consultant)) return;
-
-        $model = UserProfile::find()->where(['user_id' => OfferMix::USERS[$this->consultant]])->limit(1)->one();
-        if (!$model) {
+        if (!is_numeric($this->consultant)) {
             throw new Exception("Пользователя с таким ID не существует");
         }
-        $model = (object) $model->toArray();
-        $this->consultant = $model->medium_name;
+        $user_id = $this->consultant;
+
+        if (!$this->is_new) {
+            $user_id = OfferMix::USERS[$this->consultant];
+        }
+
+        $this->userProfile = UserProfile::find()->where(['user_id' => $user_id])->limit(1)->one();
+        if (!$this->userProfile) {
+            throw new Exception("Пользователя с таким ID не существует");
+        }
+        $this->consultant = $this->userProfile->mediumName;
+    }
+    public function getCompanyPhone()
+    {
+        return '+7 (495) 150-03-23';
+    }
+    public function getMainConsultantPhone()
+    {
+        $phones = $this->userProfile->phones;
+        if (!count($phones)) {
+            return $this->getCompanyPhone();
+        }
+        return PhoneFormatter::format($phones[0]->phone);
     }
     private function getTownNameWithoutSpecialSymbols()
     {
@@ -100,6 +136,7 @@ class OffersPdf extends Model
         $this->normalizeGas();
         $this->normalizeSteam();
     }
+
     private function normalizeDescription()
     {
         $url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->data->original_id . '/' . $this->data->type_id . '?api=1';
@@ -681,22 +718,7 @@ class OffersPdf extends Model
             }
         }
     }
-    private function validateOptions($options)
-    {
-        $_options = [
-            'object_id' => null,
-            'type_id' => null,
-            'original_id' => null,
-            'consultant' => null,
-        ];
 
-        $options = array_merge($_options, $options);
-        foreach ($options as $key => $option) {
-            if ($option === null) {
-                throw new Exception("$key cannot be null!");
-            }
-        }
-    }
     public function getHost()
     {
         return $this->host;

@@ -23,7 +23,11 @@ return [
         'user' => $secrets['rabbit']['user'],
         'password' => $secrets['rabbit']['password'],
         'queueName' => "timeline_presentation_sender",
-        'exchangeName' => "timeline_presentation_sender_exchange"
+        'exchangeName' => "timeline_presentation_sender_exchange",
+        'notify' => [
+            'queueName' => 'notifications_queue',
+            'exchangeName' => 'notifications_exchange',
+        ]
     ],
     'pdf' => [
         'tmp_dir' => YII_PROJECT_ROOT . "/runtime/pdf_tmp",
