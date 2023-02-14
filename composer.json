@@ -59,7 +59,8 @@
             "yii\\composer\\Installer::postCreateProject",
             "yii\\composer\\Installer::postInstall"
         ],
-        "test": "./vendor/bin/codecept run"
+        "test": "./vendor/bin/codecept run",
+        "testd": "./vendor/bin/codecept run --debug"
     },
     "extra": {
         "yii\\composer\\Installer::postCreateProject": {

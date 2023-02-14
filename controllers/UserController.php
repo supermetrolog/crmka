@@ -76,6 +76,7 @@ class UserController extends ActiveController
         if (Yii::$app->user->isGuest) {
             return ['message' => 'Вы вышли из системы'];
         }
+        /** @var User */
         $model = User::findIdentityByAccessToken(Yii::$app->user->identity->access_token);
         $model->generateAccessToken();
         return ['message' => 'Вы вышли из аккаунта', 'data' => $model->save(false)];

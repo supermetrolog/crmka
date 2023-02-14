@@ -12,6 +12,7 @@ use app\models\UploadFile;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 use yii\filters\Cors;
+use yii\web\Response;
 
 class ObjectController extends ActiveController
 {
@@ -52,6 +53,9 @@ class ObjectController extends ActiveController
     public function actionOffers()
     {
         $searchModel = new OfferMixSearch();
+        $this->response->on(Response::EVENT_BEFORE_SEND, function () {
+            $this->response->headers->remove('link');
+        });
         return $searchModel->search(Yii::$app->request->queryParams);
     }
     public function actionView($id)

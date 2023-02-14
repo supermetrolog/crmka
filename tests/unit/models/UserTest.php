@@ -2,8 +2,15 @@
 
 namespace tests\unit\models;
 
+use app\exceptions\ValidationErrorHttpException;
+use app\models\UploadFile;
+use Yii;
 use app\models\User;
+use app\models\UserProfile;
 use app\tests\unit\fixtures\models\UserFixture;
+use app\tests\unit\fixtures\models\UserProfileFixture;
+
+use function Codeception\Extension\codecept_log;
 
 class UserTest extends \Codeception\Test\Unit
 {
@@ -14,7 +21,8 @@ class UserTest extends \Codeception\Test\Unit
     public function _fixtures()
     {
         return [
-            'users' => UserFixture::class
+            'users' => UserFixture::class,
+            'userProfiles' => UserProfileFixture::class
         ];
     }
     public function testFindUserById()
@@ -26,30 +34,40 @@ class UserTest extends \Codeception\Test\Unit
         verify($user->username)->equals('napoleon');
     }
 
-    // public function testFindUserByAccessToken()
-    // {
-    //     expect_that($user = User::findIdentityByAccessToken('100-token'));
-    //     expect($user->username)->equals('admin');
+    public function testGetEmailForSendWithEmailEmpty()
+    {
+        $user = User::findByUsername('nigger');
+        verify($user->getEmailForSend())->equals([Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']]);
+    }
+    public function testGetEmailForSendWithEmailNotEmpty()
+    {
+        $user = User::findByUsername('napoleon');
+        verify($user->getEmailForSend())->equals(['4mo@gmail.com' => 'ABC Н. О.']);
+    }
+    public function testCreateUserWithIncorrectUserData()
+    {
+        try {
+            User::createUser(['username' => 'sdaw'], $this->getUploadFileModel());
+            $this->expectException(
+                ValidationErrorHttpException::class
+            );
+        } catch (\Throwable $th) {
+            verify(json_decode($th->getMessage()))->equals([
+                'Необходимо заполнить «Password».',
+            ]);
+        }
+    }
+    public function testCreateUserWithCorrectUserDataAndIncorrectUserProfileData()
+    {
 
-    //     expect_not(User::findIdentityByAccessToken('non-existing'));
-    // }
+        $res = User::createUser(['username' => 'admin', 'password' => 'admin'], $this->getUploadFileModel());
+        verify($res)->equals(['message' => 'Пользователь создан', 'data' => 3]);
+    }
 
-    // public function testFindUserByUsername()
-    // {
-    //     expect_that($user = User::findByUsername('admin'));
-    //     expect_not(User::findByUsername('not-admin'));
-    // }
-
-    // /**
-    //  * @depends testFindUserByUsername
-    //  */
-    // public function testValidateUser($user)
-    // {
-    //     $user = User::findByUsername('admin');
-    //     expect_that($user->validateAuthKey('test100key'));
-    //     expect_not($user->validateAuthKey('test102key'));
-
-    //     expect_that($user->validatePassword('admin'));
-    //     expect_not($user->validatePassword('123456'));
-    // }
+    public function getUploadFileModel(): UploadFile
+    {
+        $uploadFileModel = new UploadFile();
+        $uploadFileModel->files = [];
+        return $uploadFileModel;
+    }
 }

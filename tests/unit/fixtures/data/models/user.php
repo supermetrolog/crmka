@@ -9,6 +9,8 @@ return [
     'user2' => [
         'username' => 'napoleon',
         'email' => '4mo@gmail.com',
+        'email_password' => '4moshnik',
+        'email_username' => '4moshnik_username',
         'auth_key' => 'dZlXsVnIDgIzFgX4EduAqkEPuphhOh9q',
         'password_hash' => '$2y$13$kkgpvJ8lnjKo8RuoR30ay.RjDf15bMcHIF7Vz1zz/6viYG5xJExU6',
     ],

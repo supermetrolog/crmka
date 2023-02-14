@@ -126,7 +126,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             $query->with(['phones', 'emails']);
         }])->where(['status' => self::STATUS_ACTIVE, 'id' => $id])->one();
     }
-    public static function createUser($post_data, $uploadFileModel)
+    public static function createUser($post_data, UploadFile $uploadFileModel)
     {
         $db = Yii::$app->db;
         $model = new SignUp();
