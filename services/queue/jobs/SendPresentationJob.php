@@ -114,7 +114,8 @@ class SendPresentationJob extends BaseObject implements JobInterface
     {
         $files = [];
         foreach ($this->model->offers as  $offer) {
-            $offer['consultant'] = $user->userProfile->mediumName;
+            $offer['consultant'] = $user->id;
+            $offer['is_new'] = 1;
             $pdf = $this->generatePresentation($offer);
             $files[] = $pdf->getPdfPath();
             $this->pdfs[] = $pdf;
