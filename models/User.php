@@ -40,7 +40,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     const ROLE_MODERATOR = 3;
     const ROLE_OWNER = 4;
     const ROLE_ADMIN = 5;
-    const ROLE_GOD = 6;
 
 
     /**
@@ -92,7 +91,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 self::ROLE_MODERATOR,
                 self::ROLE_OWNER,
                 self::ROLE_ADMIN,
-                self::ROLE_GOD,
             ]],
         ];
     }
