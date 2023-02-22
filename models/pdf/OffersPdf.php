@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
 
 class OffersPdf extends Model
 {
+    /** @var OfferMix $data */
     public $data;
     public $consultant;
     public $is_new = 0;
@@ -139,9 +140,14 @@ class OffersPdf extends Model
 
     private function normalizeDescription()
     {
-        $url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->data->original_id . '/' . $this->data->type_id . '?api=1';
+
         try {
-            $this->data->auto_desc = file_get_contents($url);
+            if ($this->data->type_id != 1 || !$this->data->block || !$this->data->block->description_manual_use) {
+                $url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->data->original_id . '/' . $this->data->type_id . '?api=1';
+                $this->data->auto_desc = file_get_contents($url);
+            } else {
+                $this->data->auto_desc = $this->data->block->description;
+            }
         } catch (\Throwable $th) {
             $this->data->auto_desc = null;
         }

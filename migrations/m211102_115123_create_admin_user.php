@@ -21,7 +21,7 @@ class m211102_115123_create_admin_user extends Migration
         $user->username = $username;
         $user->created_at = time();
         $user->updated_at = time();
-        $user->save();
+        $user->save(false);
     }
 
     /**

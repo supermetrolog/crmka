@@ -2,43 +2,72 @@
 
 namespace tests\unit\models;
 
+use app\exceptions\ValidationErrorHttpException;
+use app\models\UploadFile;
+use Yii;
 use app\models\User;
+use app\models\UserProfile;
+use app\tests\unit\fixtures\models\UserFixture;
+use app\tests\unit\fixtures\models\UserProfileFixture;
+
+use function Codeception\Extension\codecept_log;
 
 class UserTest extends \Codeception\Test\Unit
 {
+    /**
+     * @var \UnitTester
+     */
+    protected $tester;
+    public function _fixtures()
+    {
+        return [
+            'users' => UserFixture::class,
+            'userProfiles' => UserProfileFixture::class
+        ];
+    }
     public function testFindUserById()
     {
-        expect_that($user = User::findIdentity(100));
-        expect($user->username)->equals('admin');
-
-        expect_not(User::findIdentity(999));
+        verify($user = User::findIdentity(1))->notEmpty();
+        verify($user->username)->equals('nigger');
+        verify(User::findIdentity(999))->null();
+        verify($user = User::findIdentity(2))->notEmpty();
+        verify($user->username)->equals('napoleon');
     }
 
-    public function testFindUserByAccessToken()
+    public function testGetEmailForSendWithEmailEmpty()
     {
-        expect_that($user = User::findIdentityByAccessToken('100-token'));
-        expect($user->username)->equals('admin');
-
-        expect_not(User::findIdentityByAccessToken('non-existing'));        
+        $user = User::findByUsername('nigger');
+        verify($user->getEmailForSend())->equals([Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']]);
     }
-
-    public function testFindUserByUsername()
+    public function testGetEmailForSendWithEmailNotEmpty()
     {
-        expect_that($user = User::findByUsername('admin'));
-        expect_not(User::findByUsername('not-admin'));
+        $user = User::findByUsername('napoleon');
+        verify($user->getEmailForSend())->equals(['4mo@gmail.com' => 'ABC Н. О.']);
     }
-
-    /**
-     * @depends testFindUserByUsername
-     */
-    public function testValidateUser($user)
+    public function testCreateUserWithIncorrectUserData()
     {
-        $user = User::findByUsername('admin');
-        expect_that($user->validateAuthKey('test100key'));
-        expect_not($user->validateAuthKey('test102key'));
+        try {
+            User::createUser(['username' => 'sdaw'], $this->getUploadFileModel());
+            $this->expectException(
+                ValidationErrorHttpException::class
+            );
+        } catch (\Throwable $th) {
+            verify(json_decode($th->getMessage()))->equals([
+                'Необходимо заполнить «Password».',
+            ]);
+        }
+    }
+    public function testCreateUserWithCorrectUserDataAndIncorrectUserProfileData()
+    {
 
-        expect_that($user->validatePassword('admin'));
-        expect_not($user->validatePassword('123456'));        
+        $res = User::createUser(['username' => 'admin', 'password' => 'admin'], $this->getUploadFileModel());
+        verify($res)->equals(['message' => 'Пользователь создан', 'data' => 3]);
     }
 
+    public function getUploadFileModel(): UploadFile
+    {
+        $uploadFileModel = new UploadFile();
+        $uploadFileModel->files = [];
+        return $uploadFileModel;
+    }
 }

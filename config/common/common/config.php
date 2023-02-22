@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'basePath' => realpath(__DIR__ . "/../../../"),
+    'basePath' => YII_PROJECT_ROOT,
     'bootstrap' => ['log'],
     'timeZone' => 'Europe/Moscow',
     'language' => 'ru-RU',
