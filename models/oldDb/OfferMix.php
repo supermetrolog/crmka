@@ -1016,7 +1016,7 @@ class OfferMix extends \yii\db\ActiveRecord
     public function getGeneralOffersMix()
     {
         return $this->hasOne(self::class, ['original_id' => 'parent_id'])
-            ->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => self::MINI_TYPE_ID]);
+            ->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => self::GENERAL_TYPE_ID]);
     }
     public function getContact()
     {
