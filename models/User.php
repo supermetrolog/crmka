@@ -24,6 +24,7 @@ use yii\helpers\ArrayHelper;
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
+ * @property int $role
  * 
  * 
  * @property UserProfile $userProfile
@@ -33,6 +34,14 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
+
+    const ROLE_DEFAULT = 1;
+    const ROLE_CONSULTANT = 2;
+    const ROLE_MODERATOR = 3;
+    const ROLE_OWNER = 4;
+    const ROLE_ADMIN = 5;
+    const ROLE_GOD = 6;
+
 
     /**
      * {@inheritdoc}
@@ -48,13 +57,43 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'auth_key', 'password_hash', 'created_at', 'updated_at'], 'required'],
-            [['status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'access_token', 'email_password', 'email_username'], 'string', 'max' => 255],
+            [
+                [
+                    'username',
+                    'auth_key',
+                    'password_hash',
+                    'created_at',
+                    'updated_at',
+                    'role'
+                ],
+                'required'
+            ],
+            [['status', 'created_at', 'updated_at', 'role'], 'integer'],
+            [
+                [
+                    'username',
+                    'password_hash',
+                    'password_reset_token',
+                    'email',
+                    'access_token',
+                    'email_password',
+                    'email_username'
+                ],
+                'string',
+                'max' => 255
+            ],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
             [['email'], 'unique'],
             [['password_reset_token'], 'unique'],
+            ['role', 'in', 'range' => [
+                self::ROLE_DEFAULT,
+                self::ROLE_CONSULTANT,
+                self::ROLE_MODERATOR,
+                self::ROLE_OWNER,
+                self::ROLE_ADMIN,
+                self::ROLE_GOD,
+            ]],
         ];
     }
 
