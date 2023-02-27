@@ -16,6 +16,8 @@ use Yii;
  * @property int $user_id [СВЯЗЬ] с пользователями
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property int|null $question_id
+ * @property int|null $question_parent
  *
  * @property Company $company
  * @property User $user
@@ -23,6 +25,7 @@ use Yii;
 class CompanyEventsLog extends \yii\db\ActiveRecord
 {
     public const TYPE_DEFAULT = 1;
+    public const TYPE_ANSWER_TO_QUESTION = 2;
     /**
      * {@inheritdoc}
      */
@@ -38,7 +41,8 @@ class CompanyEventsLog extends \yii\db\ActiveRecord
     {
         return [
             [['message'], 'string', 'min' => 3],
-            ['type', 'in', 'range' => [self::TYPE_DEFAULT]],
+            ['type', 'in', 'range' => [self::TYPE_DEFAULT . self::TYPE_ANSWER_TO_QUESTION]],
+            [['question_id', 'question_parent'], 'validateQuestion'],
             [['type', 'company_id', 'user_id'], 'integer'],
             [['company_id', 'user_id', 'message', 'type'], 'required'],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
@@ -46,6 +50,20 @@ class CompanyEventsLog extends \yii\db\ActiveRecord
         ];
     }
 
+    public function validateQuestion($attr): void
+    {
+        if ($this->question_id === null && $this->question_parent === null) {
+            return;
+        }
+
+        if ($this->question_id === null || $this->question_parent === null) {
+            return $this->addError($attr, '"{attribute}" cannot be null');
+        }
+
+        if ($this->type !== self::TYPE_ANSWER_TO_QUESTION) {
+            return $this->addError($attr, '"{attribute}" must be answer to question type');
+        }
+    }
     /**
      * {@inheritdoc}
      */
