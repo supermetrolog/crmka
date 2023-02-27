@@ -57,11 +57,13 @@ class CompanyEventsLog extends \yii\db\ActiveRecord
         }
 
         if ($this->question_id === null || $this->question_parent === null) {
-            return $this->addError($attr, '"{attribute}" cannot be null');
+            $this->addError($attr, '"{attribute}" cannot be null');
+            return;
         }
 
         if ($this->type !== self::TYPE_ANSWER_TO_QUESTION) {
-            return $this->addError($attr, '"{attribute}" must be answer to question type');
+            $this->addError($attr, '"{attribute}" must be answer to question type');
+            return;
         }
     }
     /**
