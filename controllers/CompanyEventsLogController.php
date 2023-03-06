@@ -49,7 +49,6 @@ class CompanyEventsLogController extends ActiveController
     {
         $createEventModel = new CreateCompanyEvent(Yii::$app->request->post());
         $createEventModel->create();
-        return ['message' => 'Событие создано', 'data' => $createEventModel->id];
         $model = $this->findModel($createEventModel->id);
         return ['message' => 'Событие создано', 'data' => $model->toArray([], ['user.userProfile'], true)];
     }
