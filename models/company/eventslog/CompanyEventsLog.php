@@ -5,6 +5,7 @@ namespace app\models\company\eventslog;
 use app\models\Company;
 use app\models\User;
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "company_events_log".
@@ -22,7 +23,7 @@ use Yii;
  * @property Company $company
  * @property User $user
  */
-class CompanyEventsLog extends \yii\db\ActiveRecord
+class CompanyEventsLog extends ActiveRecord
 {
     public const TYPE_DEFAULT = 1;
     public const TYPE_ANSWER_TO_QUESTION = 2;
@@ -41,7 +42,7 @@ class CompanyEventsLog extends \yii\db\ActiveRecord
     {
         return [
             [['message'], 'string', 'min' => 3],
-            ['type', 'in', 'range' => [self::TYPE_DEFAULT . self::TYPE_ANSWER_TO_QUESTION]],
+            ['type', 'in', 'range' => [self::TYPE_DEFAULT, self::TYPE_ANSWER_TO_QUESTION]],
             [['question_id', 'question_parent'], 'validateQuestion'],
             [['type', 'company_id', 'user_id'], 'integer'],
             [['company_id', 'user_id', 'message', 'type'], 'required'],
