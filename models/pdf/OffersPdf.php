@@ -9,6 +9,7 @@ use Exception;
 use floor12\phone\PhoneFormatter;
 use Yii;
 use yii\base\Model;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 class OffersPdf extends Model
@@ -32,6 +33,10 @@ class OffersPdf extends Model
 
         $this->data = OfferMix::find()
             ->with(['object', 'block', 'miniOffersMix.block'])
+            ->with(['miniOffersMix' => function($query){
+                /** @var ActiveQuery $query */
+                return $query->andWhere(['status' => OfferMix::STATUS_ACTIVE]);
+            }])
             ->where([
                 'object_id' => $options['object_id'],
                 'type_id' => $options['type_id'],
@@ -911,10 +916,11 @@ class OffersPdf extends Model
             return null;
         }
         $area = [];
+        /** @var OfferMix $offerMix */
         foreach ($this->data->miniOffersMix as $offerMix) {
             $min = $offerMix->area_floor_min;
             $max = $offerMix->area_mezzanine_max + $offerMix->area_floor_max;
-            $area[] = max($min, $max);
+            $area[] = min($min, $max);
         }
         return $this->formatter->format(min($area), 'decimal');
     }

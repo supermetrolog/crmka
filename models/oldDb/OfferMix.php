@@ -264,6 +264,10 @@ use yii\helpers\ArrayHelper;
  */
 class OfferMix extends \yii\db\ActiveRecord
 {
+
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_PASSIVE = 2;
+
     public const DEAL_TYPE_RENT = 1;
     public const DEAL_TYPE_SALE = 2;
     public const DEAL_TYPE_RESPONSE_STORAGE = 3;
