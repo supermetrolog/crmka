@@ -463,7 +463,7 @@ class OfferMixSearch extends OfferMix
             'c_industry_offers_mix.id' => $this->id,
             'c_industry_offers_mix.original_id' => $this->original_id,
             'c_industry_offers_mix.type_id' => $this->type_id,
-            'c_industry_offers_mix.deal_type' => $this->deal_type,
+            // 'c_industry_offers_mix.deal_type' => $this->deal_type,
             // 'c_industry_offers_mix.status' => $this->status,
             'c_industry_offers_mix.object_id' => $this->object_id,
             'c_industry_offers_mix.complex_id' => $this->complex_id,
@@ -834,6 +834,14 @@ class OfferMixSearch extends OfferMix
             );
         }
 
+        if ($this->deal_type !== null) {
+           $query->andFilterWhere([
+                'or',
+                ['in', 'c_industry_offers_mix.deal_type', $this->deal_type],
+                ['is', 'c_industry_offers_mix.deal_type', new Expression('null')]
+            ]);
+        }
+        
         return $dataProvider;
     }
 }
