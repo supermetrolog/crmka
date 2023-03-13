@@ -873,6 +873,17 @@ class OffersPdf extends Model
             return max($this->calcPriceGeneralForSale($model));
         }
     }
+
+    public function getMinPrice($model)
+    {
+        if ($model->deal_type == 1) {
+            return min($this->calcPriceGeneralForRent($model));
+        }
+        if ($model->deal_type == 2) {
+            return min($this->calcPriceGeneralForSale($model));
+        }
+    }
+
     public function getTotalPrice($model)
     {
         $pricePerYear = (int) $this->getMaxPrice($model);

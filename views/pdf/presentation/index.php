@@ -355,7 +355,7 @@ use app\models\oldDb\OfferMix;
                         <td class="eight">
                             <div>
                                 <p>
-                                    <b><?= $model->getMaxPrice($block) ?></b> руб
+                                    <b><?= $model->getMinPrice($block) ?></b> руб
                                     <?= $model->getOpex($block) == 3 ? ' + OPEX' : '' ?>
                                     <?= $block->public_services == 3 ? ' + КУ' : '' ?>
                                 </p>
