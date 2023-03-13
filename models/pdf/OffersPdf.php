@@ -877,7 +877,7 @@ class OffersPdf extends Model
     public function getMinPrice($model)
     {
         if ($model->deal_type == 1) {
-            return min($this->calcPriceGeneralForRent($model));
+            return $model->price_floor_min;
         }
         if ($model->deal_type == 2) {
             return min($this->calcPriceGeneralForSale($model));
