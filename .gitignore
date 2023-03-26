@@ -7,7 +7,8 @@ google_drive_secrets.json
 google_drive_token.json
 mysqlbackup_service_account_cred.json
 config/secrets.php
-
+/docker/mysql/dump
+/docker/mysql/data
 # *********** MY INGONRE SETTINGS END *************
 
 # phpstorm project files
