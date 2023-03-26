@@ -8,6 +8,7 @@ return [
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+        '@yii/debug'   => '@vendor/yiisoft/yii2-debug/src'
     ],
     'container' => require __DIR__ . '/container.php',
     'components' => require __DIR__ . '/components.php',
