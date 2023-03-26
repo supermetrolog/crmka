@@ -30,11 +30,26 @@ services:
     working_dir: /var/www
     container_name: php
     volumes:
-      - .:/var/www
+      - .:/var/www/crmka.local
       - ./docker/php/conf/php.ini:/usr/local/etc/php/php.ini
     ports:
       - "${PHP_PORT}:9000"
     networks:
       - backend
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www/crmka.local
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/logs:/var/log/nginx/
+    depends_on:
+      - php
+      - db
+    networks:
+      backend:
 networks:
   backend:

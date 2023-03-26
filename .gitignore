@@ -9,6 +9,7 @@ mysqlbackup_service_account_cred.json
 config/secrets.php
 /docker/mysql/dump
 /docker/mysql/data
+/docker/nginx/logs
 # *********** MY INGONRE SETTINGS END *************
 
 # phpstorm project files
