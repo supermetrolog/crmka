@@ -9,6 +9,7 @@ services:
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
       - ./docker/mysql/logs:/var/log/mysql/
       - ./docker/mysql/dump:/docker-entrypoint-initdb.d
+    command: --sql_mode=""
     ports:
       - "${MYSQL_PORT}:3306"
     security_opt:
@@ -18,38 +19,38 @@ services:
       TZ: ${WORKSPACE_TIMEZONE}
     networks:
       - backend
-  php:
-    build:
-      context: ./docker/php
-      dockerfile: Dockerfile
-      args:
-        DOCKER_PHP_VERSION: '7.4'
-        DOCKER_PHP_ENABLE_XDEBUG: ${DOCKER_PHP_ENABLE_XDEBUG}
-        DOCKER_PHP_XDEBUG_VERSION: ${DOCKER_PHP_XDEBUG_VERSION}
-        TZ: ${WORKSPACE_TIMEZONE}
-    working_dir: /var/www
-    container_name: php
-    volumes:
-      - .:/var/www/crmka.local
-      - ./docker/php/conf/php.ini:/usr/local/etc/php/php.ini
-    ports:
-      - "${PHP_PORT}:9000"
-    networks:
-      - backend
-  nginx:
-    image: nginx:stable-alpine
-    container_name: nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - .:/var/www/crmka.local
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      - ./docker/nginx/logs:/var/log/nginx/
-    depends_on:
-      - php
-      - db
-    networks:
-      backend:
+  # php:
+  #   build:
+  #     context: ./docker/php
+  #     dockerfile: Dockerfile
+  #     args:
+  #       DOCKER_PHP_VERSION: '7.4'
+  #       DOCKER_PHP_ENABLE_XDEBUG: ${DOCKER_PHP_ENABLE_XDEBUG}
+  #       DOCKER_PHP_XDEBUG_VERSION: ${DOCKER_PHP_XDEBUG_VERSION}
+  #       TZ: ${WORKSPACE_TIMEZONE}
+  #   working_dir: /var/www
+  #   container_name: php
+  #   volumes:
+  #     - .:/var/www/crmka.local
+  #     - ./docker/php/conf/php.ini:/usr/local/etc/php/php.ini
+  #   ports:
+  #     - "${PHP_PORT}:9000"
+  #   networks:
+  #     - backend
+  # nginx:
+  #   image: nginx:stable-alpine
+  #   container_name: nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - .:/var/www/crmka.local
+  #     - ./docker/nginx/conf.d:/etc/nginx/conf.d
+  #     - ./docker/nginx/logs:/var/log/nginx/
+  #   depends_on:
+  #     - php
+  #     - db
+  #   networks:
+  #     backend:
 networks:
   backend:

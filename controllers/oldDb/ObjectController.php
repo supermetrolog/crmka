@@ -7,6 +7,7 @@ use yii\rest\ActiveController;
 use Yii;
 use app\models\Company;
 use app\models\oldDb\ObjectsSearch;
+use app\models\oldDb\OfferMixMapSearch;
 use app\models\oldDb\OfferMixSearch;
 use app\models\UploadFile;
 use yii\web\UploadedFile;
@@ -21,7 +22,7 @@ class ObjectController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view', 'offers']);
+        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view', 'offers', 'offers-map']);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
@@ -53,6 +54,14 @@ class ObjectController extends ActiveController
     public function actionOffers()
     {
         $searchModel = new OfferMixSearch();
+        $this->response->on(Response::EVENT_BEFORE_SEND, function () {
+            $this->response->headers->remove('link');
+        });
+        return $searchModel->search(Yii::$app->request->queryParams);
+    }
+    public function actionOffersMap()
+    {
+        $searchModel = new OfferMixMapSearch();
         $this->response->on(Response::EVENT_BEFORE_SEND, function () {
             $this->response->headers->remove('link');
         });

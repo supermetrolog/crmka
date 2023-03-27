@@ -107,6 +107,7 @@ return
             'except' => [],
             'extraPatterns' => [
                 'GET,OPTIONS offers' => 'offers',
+                'GET,OPTIONS offers-map' => 'offers-map',
             ],
         ],
         [

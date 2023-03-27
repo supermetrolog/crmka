@@ -9,13 +9,14 @@ use app\models\oldDb\location\Region;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\oldDb\OfferMix;
-use Yii;
+use app\models\Search;
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 
 /**
  * OfferMixSearch represents the model behind the search form of `app\models\oldDb\OfferMix`.
  */
-class OfferMixSearch extends OfferMix
+class OfferMixSearch extends Search
 {
     private const MIN_RECOMMENDED_WEIGHT_SUM = 400;
     private const APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD =  30;
@@ -45,6 +46,255 @@ class OfferMixSearch extends OfferMix
 
     public $noDuplicate;
     public $region_neardy;
+    // original attributes
+    public $id;
+    public $original_id;
+    public $visual_id;
+    public $type_id;
+    public $deal_type;
+    public $deal_type_name;
+    public $title;
+    public $status;
+    public $object_id;
+    public $complex_id;
+    public $parent_id;
+    public $company_id;
+    public $contact_id;
+    public $object_type;
+    public $purposes;
+    public $purposes_furl;
+    public $object_type_name;
+    public $year_built;
+    public $agent_id;
+    public $agent_visited;
+    public $agent_name;
+    public $is_land;
+    public $land_width;
+    public $land_length;
+    public $landscape_type;
+    public $land_use_restrictions;
+    public $address;
+    public $latitude;
+    public $class;
+    public $class_name;
+    public $longitude;
+    public $from_mkad;
+    public $region;
+    public $region_name;
+    public $cian_region;
+    public $outside_mkad;
+    public $near_mo;
+    public $town;
+    public $town_name;
+    public $district;
+    public $district_name;
+    public $district_moscow;
+    public $district_moscow_name;
+    public $direction;
+    public $direction_name;
+    public $highway;
+    public $highway_name;
+    public $highway_moscow;
+    public $highway_moscow_name;
+    public $metro;
+    public $metro_name;
+    public $from_metro_value;
+    public $from_metro;
+    public $railway_station;
+    public $from_station_value;
+    public $from_station;
+    public $blocks;
+    public $blocks_amount;
+    public $photos;
+    public $videos;
+    public $thumbs;
+    public $last_update;
+    public $commission_client;
+    public $commission_owner;
+    public $deposit;
+    public $pledge;
+    public $area_building;
+    public $area_floor_full;
+    public $area_mezzanine_full;
+    public $area_office_full;
+    public $area_min;
+    public $area_max;
+    public $area_floor_min;
+    public $area_floor_max;
+    public $area_mezzanine_min;
+    public $area_mezzanine_max;
+    public $area_mezzanine_add;
+    public $area_office_min;
+    public $area_office_max;
+    public $area_office_add;
+    public $area_tech_min;
+    public $area_tech_max;
+    public $area_field_min;
+    public $area_field_max;
+    public $pallet_place_min;
+    public $pallet_place_max;
+    public $cells_place_min;
+    public $cells_place_max;
+    public $tax_form;
+    public $inc_electricity;
+    public $inc_heating;
+    public $inc_water;
+    public $price_opex_inc;
+    public $price_opex;
+    public $price_opex_min;
+    public $price_opex_max;
+    public $price_public_services_inc;
+    public $price_public_services;
+    public $public_services;
+    public $price_public_services_min;
+    public $price_public_services_max;
+    public $price_floor_min;
+    public $price_floor_max;
+    public $price_floor_min_month;
+    public $price_floor_max_month;
+    public $price_min_month_all;
+    public $price_max_month_all;
+    public $price_floor_100_min;
+    public $price_floor_100_max;
+    public $price_mezzanine_min;
+    public $price_mezzanine_max;
+    public $price_office_min;
+    public $price_office_max;
+    public $price_sale_min;
+    public $price_sale_max;
+    public $price_safe_pallet_min;
+    public $price_safe_pallet_max;
+    public $price_safe_volume_min;
+    public $price_safe_volume_max;
+    public $price_safe_floor_min;
+    public $price_safe_floor_max;
+    public $price_safe_calc_min;
+    public $price_safe_calc_max;
+    public $price_safe_calc_month_min;
+    public $price_safe_calc_month_max;
+    public $price_sale_min_all;
+    public $price_sale_max_all;
+    public $ceiling_height_min;
+    public $ceiling_height_max;
+    public $temperature_min;
+    public $temperature_max;
+    public $load_floor_min;
+    public $load_floor_max;
+    public $load_mezzanine_min;
+    public $load_mezzanine_max;
+    public $safe_type;
+    public $safe_type_furl;
+    public $prepay;
+    public $floor_min;
+    public $floor_max;
+    public $floor_type;
+    public $floor_types;
+    public $self_leveling;
+    public $heated;
+    public $gates;
+    public $gate_type;
+    public $gate_num;
+    public $column_grid;
+    public $elevators_min;
+    public $elevators_max;
+    public $elevators_num;
+    public $has_cranes;
+    public $cranes_min;
+    public $cranes_max;
+    public $cranes_num;
+    public $cranes_railway_min;
+    public $cranes_railway_max;
+    public $cranes_railway_num;
+    public $cranes_gantry_min;
+    public $cranes_gantry_max;
+    public $cranes_gantry_num;
+    public $cranes_overhead_min;
+    public $cranes_overhead_max;
+    public $cranes_overhead_num;
+    public $cranes_cathead_min;
+    public $cranes_cathead_max;
+    public $cranes_cathead_num;
+    public $telphers_min;
+    public $telphers_max;
+    public $telphers_num;
+    public $railway;
+    public $railway_value;
+    public $power;
+    public $power_value;
+    public $steam;
+    public $steam_value;
+    public $gas;
+    public $gas_value;
+    public $phone;
+    public $internet;
+    public $heating;
+    public $facing;
+    public $ventilation;
+    public $water;
+    public $water_value;
+    public $sewage_central;
+    public $sewage_central_value;
+    public $sewage_rain;
+    public $guard;
+    public $firefighting;
+    public $firefighting_name;
+    public $video_control;
+    public $access_control;
+    public $security_alert;
+    public $fire_alert;
+    public $smoke_exhaust;
+    public $canteen;
+    public $hostel;
+    public $racks;
+    public $warehouse_equipment;
+    public $charging_room;
+    public $cross_docking;
+    public $cranes_runways;
+    public $cadastral_number;
+    public $cadastral_number_land;
+    public $field_allow_usage;
+    public $available_from;
+    public $own_type;
+    public $own_type_land;
+    public $land_category;
+    public $entry_territory;
+    public $parking_car;
+    public $parking_car_value;
+    public $parking_lorry;
+    public $parking_lorry_value;
+    public $parking_truck;
+    public $parking_truck_value;
+    public $built_to_suit;
+    public $built_to_suit_time;
+    public $built_to_suit_plan;
+    public $rent_business;
+    public $rent_business_fill;
+    public $rent_business_price;
+    public $rent_business_long_contracts;
+    public $rent_business_last_repair;
+    public $rent_business_payback;
+    public $rent_business_income;
+    public $rent_business_profit;
+    public $sale_company;
+    public $holidays;
+    public $ad_realtor;
+    public $ad_cian;
+    public $ad_cian_top3;
+    public $ad_cian_premium;
+    public $ad_cian_hl;
+    public $ad_yandex;
+    public $ad_yandex_raise;
+    public $ad_yandex_promotion;
+    public $ad_yandex_premium;
+    public $ad_arendator;
+    public $ad_free;
+    public $ad_special;
+    public $description;
+    public $deleted;
+    public $test_only;
+    public $is_exclusive;
+    public $deal_id;
+    public $hide_from_market;
 
     //Исключить офферы из этого запроса
     public $withoutOffersFromQuery;
@@ -68,6 +318,12 @@ class OfferMixSearch extends OfferMix
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
+
+    protected function getTableName(): string
+    {
+        return OfferMix::tableName();
+    }
+
     public function stringToArray($value)
     {
         if (is_string($value)) {
@@ -247,9 +503,9 @@ class OfferMixSearch extends OfferMix
                 $eb->addCondition(['like', 'gates', new Expression("'%\"{$gate}\"%'")], 35, 0);
             }
         }
-        if ($this->deal_type == self::DEAL_TYPE_RENT || $this->deal_type == self::DEAL_TYPE_SUBLEASE) {
+        if ($this->deal_type == OfferMix::DEAL_TYPE_RENT || $this->deal_type == OfferMix::DEAL_TYPE_SUBLEASE) {
             $eb->addCondition(['<=', 'GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max )', $this->pricePerFloor, false], 50, 0);
-        } elseif ($this->deal_type == self::DEAL_TYPE_SALE) {
+        } elseif ($this->deal_type == OfferMix::DEAL_TYPE_SALE) {
             $eb->addCondition(['<=', 'price_sale_max', $this->pricePerFloor], 50, 0);
         }
         $eb->addTablePrefix(OfferMix::tableName());
@@ -261,7 +517,7 @@ class OfferMixSearch extends OfferMix
         $eb->prepareToEnd($sort);
         return $eb->getConditionExpression();
     }
-    private function getDsnAttribute($name, $dsn)
+    protected function getDsnAttribute($name, $dsn)
     {
         if (preg_match('/' . $name . '=([^;]*)/', $dsn, $match)) {
             return $match[1];
@@ -269,96 +525,10 @@ class OfferMixSearch extends OfferMix
             return null;
         }
     }
-    /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
-     */
-    public function search($params)
+
+    public function setFilters(ActiveQuery $query): void
     {
         $joinedDbName = $this->getDsnAttribute('dbname', Company::getDb()->dsn);
-        $query = OfferMix::find()->distinct()->joinWith(['company' => function ($query) use ($joinedDbName) {
-            return $query->from("$joinedDbName.company")->joinWith(['contacts' => function ($query) use ($joinedDbName) {
-                return $query->from("$joinedDbName.contact")->joinWith(['phones' => function ($query) use ($joinedDbName) {
-                    return $query->from("$joinedDbName.phone");
-                }]);
-            }]);
-        }])->joinWith(['block']);
-        // add conditions that should always apply here
-        $this->load($params, '');
-        $this->normalizeProps();
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => [
-                'defaultPageSize' => 50,
-                'pageSizeLimit' => [0, 50],
-            ],
-            'sort' => [
-                'enableMultiSort' => true,
-                'defaultOrder' => [
-                    'default' => SORT_DESC
-                ],
-                'attributes' => [
-                    'last_update',
-                    'from_mkad',
-                    'price' => [
-                        'asc' => [
-                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END ASC")
-                        ],
-                        'desc' => [
-                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END DESC")
-                        ]
-                    ],
-                    'area' => [
-                        'asc' => [
-                            'area_max' => SORT_ASC
-                        ],
-                        'desc' => [
-                            'area_max' => SORT_DESC
-                        ]
-                    ],
-                    'status' => [
-                        'asc' => ['c_industry_offers_mix.status' => SORT_ASC],
-                        'desc' => ['c_industry_offers_mix.status' => SORT_DESC]
-                    ],
-                    'original_ids' => [
-                        'asc' => [
-                            new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) ASC"),
-                            'last_update' => SORT_ASC,
-                            'c_industry_offers_mix.status' => SORT_ASC
-                        ],
-                        'desc' => [
-                            new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) DESC"),
-                            'last_update' => SORT_DESC,
-                            'c_industry_offers_mix.status' => SORT_DESC
-                        ],
-                    ],
-                    'default' => [
-                        'asc' => [
-                            'last_update' => SORT_ASC,
-                            'c_industry_offers_mix.status' => SORT_ASC,
-                        ],
-                        'desc' => [
-                            'last_update' => SORT_DESC,
-                            'c_industry_offers_mix.status' => SORT_DESC,
-                        ],
-                    ]
-                ]
-            ]
-        ]);
-
-
-        if (!$this->validate()) {
-            throw new ValidationErrorHttpException($this->getErrorSummary(false));
-
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
-        // Этот запрос решает проблему дубликатов, но выполняется долго (около 7 секунд)
-        // $query->andWhere(new Expression("IF(c_industry_offers_mix.type_id = 2, JSON_LENGTH(c_industry_offers_mix.blocks) > 1 AND (SELECT COUNT(off.id) FROM c_industry_offers_mix as off WHERE off.type_id = 1 AND off.status = 1 AND FIND_IN_SET(off.id, REPLACE(REPLACE(TRIM(']' FROM TRIM('[' FROM c_industry_offers_mix.blocks->>\"$[*]\")), '\"', ''), ' ', '')) > 0) > 1,JSON_LENGTH(c_industry_offers_mix.blocks) IS NOT NULL OR JSON_LENGTH(c_industry_offers_mix.blocks) IS NULL)"));
 
         if ($this->withoutOffersFromQuery) {
             $withoutQuery = json_decode($this->withoutOffersFromQuery, true);
@@ -428,7 +598,7 @@ class OfferMixSearch extends OfferMix
                     'c_industry_offers_mix.deleted' => 0,
                     'c_industry_offers_mix.type_id' => [1, 2],
                 ]);
-                return $dataProvider;
+                return;
             }
         }
         // для релевантности
@@ -711,9 +881,9 @@ class OfferMixSearch extends OfferMix
             ->andFilterWhere(['<=', 'power_value', $this->rangeMaxElectricity]);
 
 
-        if ($this->deal_type == self::DEAL_TYPE_RENT || $this->deal_type == self::DEAL_TYPE_SUBLEASE) {
+        if ($this->deal_type == OfferMix::DEAL_TYPE_RENT || $this->deal_type == OfferMix::DEAL_TYPE_SUBLEASE) {
             $query->andFilterWhere(['<=', 'GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max )', $this->pricePerFloor]);
-        } elseif ($this->deal_type == self::DEAL_TYPE_SALE) {
+        } elseif ($this->deal_type == OfferMix::DEAL_TYPE_SALE) {
             $query->andFilterWhere(['<=', 'c_industry_offers_mix.price_sale_max', $this->pricePerFloor]);
         }
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.gates', $this->gates]);
@@ -766,7 +936,7 @@ class OfferMixSearch extends OfferMix
         ]);
 
         if ($this->objectsOnly) {
-            $query->groupBy('object_id');
+            $query->groupBy($this->getField('object_id'));
         }
 
         $rent_price_least = "IF(
@@ -835,13 +1005,100 @@ class OfferMixSearch extends OfferMix
         }
 
         if ($this->deal_type !== null) {
-           $query->andFilterWhere([
+            $query->andFilterWhere([
                 'or',
                 ['in', 'c_industry_offers_mix.deal_type', $this->deal_type],
                 ['is', 'c_industry_offers_mix.deal_type', new Expression('null')]
             ]);
         }
-        
+    }
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search(array $params): ActiveDataProvider
+    {
+        $query = OfferMix::find()->joinForSearch(true);
+        // add conditions that should always apply here
+        $this->load($params, '');
+        $this->normalizeProps();
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'defaultPageSize' => 50,
+                'pageSizeLimit' => [0, 50],
+            ],
+            'sort' => [
+                'enableMultiSort' => true,
+                'defaultOrder' => [
+                    'default' => SORT_DESC
+                ],
+                'attributes' => [
+                    'last_update',
+                    'from_mkad',
+                    'price' => [
+                        'asc' => [
+                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END ASC")
+                        ],
+                        'desc' => [
+                            new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END DESC")
+                        ]
+                    ],
+                    'area' => [
+                        'asc' => [
+                            'area_max' => SORT_ASC
+                        ],
+                        'desc' => [
+                            'area_max' => SORT_DESC
+                        ]
+                    ],
+                    'status' => [
+                        'asc' => ['c_industry_offers_mix.status' => SORT_ASC],
+                        'desc' => ['c_industry_offers_mix.status' => SORT_DESC]
+                    ],
+                    'original_ids' => [
+                        'asc' => [
+                            new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) ASC"),
+                            'last_update' => SORT_ASC,
+                            'c_industry_offers_mix.status' => SORT_ASC
+                        ],
+                        'desc' => [
+                            new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) DESC"),
+                            'last_update' => SORT_DESC,
+                            'c_industry_offers_mix.status' => SORT_DESC
+                        ],
+                    ],
+                    'default' => [
+                        'asc' => [
+                            'last_update' => SORT_ASC,
+                            'c_industry_offers_mix.status' => SORT_ASC,
+                        ],
+                        'desc' => [
+                            'last_update' => SORT_DESC,
+                            'c_industry_offers_mix.status' => SORT_DESC,
+                        ],
+                    ]
+                ]
+            ]
+        ]);
+
+
+        if (!$this->validate()) {
+            throw new ValidationErrorHttpException($this->getErrorSummary(false));
+
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $this->setFilters($query);
+        // Этот запрос решает проблему дубликатов, но выполняется долго (около 7 секунд)
+        // $query->andWhere(new Expression("IF(c_industry_offers_mix.type_id = 2, JSON_LENGTH(c_industry_offers_mix.blocks) > 1 AND (SELECT COUNT(off.id) FROM c_industry_offers_mix as off WHERE off.type_id = 1 AND off.status = 1 AND FIND_IN_SET(off.id, REPLACE(REPLACE(TRIM(']' FROM TRIM('[' FROM c_industry_offers_mix.blocks->>\"$[*]\")), '\"', ''), ' ', '')) > 0) > 1,JSON_LENGTH(c_industry_offers_mix.blocks) IS NOT NULL OR JSON_LENGTH(c_industry_offers_mix.blocks) IS NULL)"));
+
+
         return $dataProvider;
     }
 }

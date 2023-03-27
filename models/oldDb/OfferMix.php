@@ -2,6 +2,7 @@
 
 namespace app\models\oldDb;
 
+use app\models\ActiveQuery\oldDb\OfferMixQuery;
 use app\models\Company;
 use app\models\Contact;
 use app\models\miniModels\TimelineStepObjectComment;
@@ -1025,5 +1026,10 @@ class OfferMix extends \yii\db\ActiveRecord
     public function getContact()
     {
         return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
+    }
+
+    public static function find(): OfferMixQuery
+    {
+        return new OfferMixQuery(get_called_class());
     }
 }
