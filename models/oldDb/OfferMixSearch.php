@@ -4,6 +4,7 @@ namespace app\models\oldDb;
 
 use app\components\ExpressionBuilder;
 use app\exceptions\ValidationErrorHttpException;
+use app\helpers\DbHelper;
 use app\models\Company;
 use app\models\oldDb\location\Region;
 use yii\base\Model;
@@ -517,18 +518,10 @@ class OfferMixSearch extends Search
         $eb->prepareToEnd($sort);
         return $eb->getConditionExpression();
     }
-    protected function getDsnAttribute($name, $dsn)
-    {
-        if (preg_match('/' . $name . '=([^;]*)/', $dsn, $match)) {
-            return $match[1];
-        } else {
-            return null;
-        }
-    }
 
     public function setFilters(ActiveQuery $query): void
     {
-        $joinedDbName = $this->getDsnAttribute('dbname', Company::getDb()->dsn);
+        $joinedDbName = DbHelper::getDsnAttribute('dbname', Company::getDb()->dsn);
 
         if ($this->withoutOffersFromQuery) {
             $withoutQuery = json_decode($this->withoutOffersFromQuery, true);
@@ -1021,7 +1014,8 @@ class OfferMixSearch extends Search
      */
     public function search(array $params): ActiveDataProvider
     {
-        $query = OfferMix::find()->joinForSearch(true);
+        // $query = OfferMix::find()->joinForSearch(true)->groupBy($this->getField('id'))->asArray();
+        $query = OfferMix::find()->joinForSearch(true)->groupBy($this->getField('id'));
         // add conditions that should always apply here
         $this->load($params, '');
         $this->normalizeProps();
@@ -1037,7 +1031,7 @@ class OfferMixSearch extends Search
                     'default' => SORT_DESC
                 ],
                 'attributes' => [
-                    'last_update',
+                    $this->getField('last_update'),
                     'from_mkad',
                     'price' => [
                         'asc' => [
@@ -1062,22 +1056,22 @@ class OfferMixSearch extends Search
                     'original_ids' => [
                         'asc' => [
                             new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) ASC"),
-                            'last_update' => SORT_ASC,
+                            $this->getField('last_update') => SORT_ASC,
                             'c_industry_offers_mix.status' => SORT_ASC
                         ],
                         'desc' => [
                             new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) DESC"),
-                            'last_update' => SORT_DESC,
+                            $this->getField('last_update') => SORT_DESC,
                             'c_industry_offers_mix.status' => SORT_DESC
                         ],
                     ],
                     'default' => [
                         'asc' => [
-                            'last_update' => SORT_ASC,
+                            $this->getField('last_update') => SORT_ASC,
                             'c_industry_offers_mix.status' => SORT_ASC,
                         ],
                         'desc' => [
-                            'last_update' => SORT_DESC,
+                            $this->getField('last_update') => SORT_DESC,
                             'c_industry_offers_mix.status' => SORT_DESC,
                         ],
                     ]

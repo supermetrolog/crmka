@@ -899,7 +899,7 @@ class OfferMix extends \yii\db\ActiveRecord
         ];
         return $array[$data];
     }
-    public function normalizeAgentId($consultant_id)
+    public static function normalizeAgentId($consultant_id)
     {
         if ($consultant_id == null) {
             return null;
