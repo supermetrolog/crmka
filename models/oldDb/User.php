@@ -3,6 +3,7 @@
 namespace app\models\oldDb;
 
 use Yii;
+use app\models\UserProfile;
 
 /**
  * This is the model class for table "core_users".
@@ -171,5 +172,15 @@ class User extends \yii\db\ActiveRecord
             'emails' => 'Emails',
             'last_check_tasks' => 'Last Check Tasks',
         ];
+    }
+
+    /**
+     * Gets query for [[UserProfiles]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserProfile()
+    {
+        return $this->hasOne(UserProfile::className(), ['user_id' => 'user_id_new']);
     }
 }

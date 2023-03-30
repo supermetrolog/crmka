@@ -13,6 +13,7 @@ use app\models\oldDb\OfferMix;
 use app\models\Search;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * OfferMixSearch represents the model behind the search form of `app\models\oldDb\OfferMix`.
@@ -1005,6 +1006,192 @@ class OfferMixSearch extends Search
             ]);
         }
     }
+
+    public function getSelect(): array
+    {
+        $fields = (new OfferMix())->getAttributes();
+
+        unset($fields['year_built']);
+        unset($fields['agent_visited']);
+        unset($fields['land_width']);
+        unset($fields['land_length']);
+        unset($fields['landscape_type']);
+        unset($fields['land_use_restrictions']);
+        unset($fields['cian_region']);
+        unset($fields['videos']);
+        unset($fields['blocks_amount']);
+        unset($fields['highway_moscow']);
+        unset($fields['metro']);
+        unset($fields['metro_name']);
+        unset($fields['from_metro_value']);
+        unset($fields['from_metro']);
+        unset($fields['railway_station']);
+        unset($fields['from_station_value']);
+        unset($fields['from_station']);
+        // unset($fields['blocks']);
+        unset($fields['photos']);
+        unset($fields['thumbs']);
+        unset($fields['commission_client']);
+        unset($fields['commission_owner']);
+        unset($fields['deposit']);
+        unset($fields['pledge']);
+        unset($fields['area_floor_full']);
+        unset($fields['area_mezzanine_full']);
+        unset($fields['area_office_full']);
+        // unset($fields['area_min']);
+        // unset($fields['area_max']);
+        // unset($fields['area_floor_min']);
+        // unset($fields['area_floor_max']);
+        // unset($fields['area_mezzanine_min']);
+        // unset($fields['area_mezzanine_max']);
+        unset($fields['area_mezzanine_add']);
+        // unset($fields['area_office_min']);
+        // unset($fields['area_office_max']);
+        unset($fields['area_office_add']);
+        // unset($fields['area_tech_min']);
+        // unset($fields['area_tech_max']);
+        unset($fields['area_field_min']);
+        unset($fields['area_field_max']);
+        // unset($fields['pallet_place_min']);
+        // unset($fields['pallet_place_max']);
+        unset($fields['cells_place_min']);
+        unset($fields['cells_place_max']);
+        unset($fields['inc_electricity']);
+        unset($fields['inc_heating']);
+        unset($fields['inc_water']);
+        unset($fields['price_opex_inc']);
+        unset($fields['price_opex']);
+        unset($fields['price_opex_min']);
+        unset($fields['price_opex_max']);
+        unset($fields['price_public_services_inc']);
+        unset($fields['price_public_services']);
+        unset($fields['public_services']);
+        unset($fields['price_public_services_min']);
+        unset($fields['price_public_services_max']);
+        // unset($fields['price_floor_min']);
+        // unset($fields['price_floor_max']);
+        unset($fields['price_floor_min_month']);
+        unset($fields['price_floor_max_month']);
+        unset($fields['price_min_month_all']);
+        unset($fields['price_max_month_all']);
+        unset($fields['price_floor_100_min']);
+        unset($fields['price_floor_100_max']);
+        // unset($fields['price_mezzanine_min']);
+        // unset($fields['price_mezzanine_max']);
+        // unset($fields['price_office_min']);
+        // unset($fields['price_office_max']);
+        // unset($fields['price_safe_pallet_min']);
+        // unset($fields['price_safe_pallet_max']);
+        unset($fields['price_safe_volume_min']);
+        unset($fields['price_safe_volume_max']);
+        unset($fields['price_safe_floor_min']);
+        unset($fields['price_safe_floor_max']);
+        unset($fields['price_safe_calc_min']);
+        unset($fields['price_safe_calc_max']);
+        unset($fields['price_safe_calc_month_min']);
+        unset($fields['price_safe_calc_month_max']);
+        unset($fields['price_sale_min_all']);
+        unset($fields['price_sale_max_all']);
+        // unset($fields['load_mezzanine_min']);
+        // unset($fields['load_floor_max']);
+        // unset($fields['load_mezzanine_max']);
+        unset($fields['safe_type']);
+        unset($fields['safe_type_furl']);
+        unset($fields['prepay']);
+        // unset($fields['floor_min']);
+        // unset($fields['floor_max']);
+        unset($fields['column_grid']);
+        unset($fields['elevators_min']);
+        unset($fields['elevators_max']);
+        unset($fields['elevators_num']);
+        // unset($fields['cranes_min']);
+        // unset($fields['cranes_max']);
+        unset($fields['cranes_num']);
+        unset($fields['cranes_railway_min']);
+        unset($fields['cranes_railway_max']);
+        unset($fields['cranes_railway_num']);
+        // unset($fields['cranes_gantry_min']);
+        // unset($fields['cranes_gantry_max']);
+        unset($fields['cranes_gantry_num']);
+        unset($fields['cranes_overhead_min']);
+        unset($fields['cranes_overhead_max']);
+        unset($fields['cranes_overhead_num']);
+        unset($fields['cranes_cathead_min']);
+        unset($fields['cranes_cathead_max']);
+        unset($fields['cranes_cathead_num']);
+        unset($fields['telphers_min']);
+        unset($fields['telphers_max']);
+        unset($fields['telphers_num']);
+        unset($fields['railway_value']);
+        unset($fields['steam_value']);
+        unset($fields['gas_value']);
+        unset($fields['phone']);
+        unset($fields['internet']);
+        unset($fields['heating']);
+        unset($fields['facing']);
+        unset($fields['ventilation']);
+        unset($fields['water_value']);
+        unset($fields['sewage_central_value']);
+        unset($fields['sewage_rain']);
+        unset($fields['guard']);
+        unset($fields['firefighting']);
+        unset($fields['firefighting_name']);
+        unset($fields['video_control']);
+        unset($fields['access_control']);
+        unset($fields['security_alert']);
+        unset($fields['fire_alert']);
+        unset($fields['smoke_exhaust']);
+        unset($fields['canteen']);
+        unset($fields['hostel']);
+        unset($fields['warehouse_equipment']);
+        unset($fields['charging_room']);
+        unset($fields['cross_docking']);
+        unset($fields['cranes_runways']);
+        unset($fields['cadastral_number']);
+        unset($fields['cadastral_number_land']);
+        unset($fields['field_allow_usage']);
+        unset($fields['available_from']);
+        unset($fields['own_type']);
+        unset($fields['own_type_land']);
+        unset($fields['land_category']);
+        unset($fields['entry_territory']);
+        unset($fields['parking_car']);
+        unset($fields['parking_car_value']);
+        unset($fields['parking_lorry']);
+        unset($fields['parking_lorry_value']);
+        unset($fields['parking_truck']);
+        unset($fields['parking_truck_value']);
+        unset($fields['built_to_suit']);
+        unset($fields['built_to_suit_time']);
+        unset($fields['built_to_suit_plan']);
+        unset($fields['rent_business']);
+        unset($fields['rent_business_fill']);
+        unset($fields['rent_business_price']);
+        unset($fields['rent_business_long_contracts']);
+        unset($fields['rent_business_last_repair']);
+        unset($fields['rent_business_payback']);
+        unset($fields['rent_business_income']);
+        unset($fields['rent_business_profit']);
+        unset($fields['sale_company']);
+        unset($fields['holidays']);
+        unset($fields['ad_cian_hl']);
+        unset($fields['ad_yandex_raise']);
+        unset($fields['ad_yandex_promotion']);
+        unset($fields['ad_yandex_premium']);
+        unset($fields['ad_arendator']);
+        unset($fields['ad_special']);
+        unset($fields['is_exclusive']);
+        unset($fields['deal_id']);
+
+        $fields = array_keys($fields);
+
+        $select = array_map(function ($elem) {
+            return $this->getField($elem);
+        }, $fields);
+
+        return $select;
+    }
+
     /**
      * Creates data provider instance with search query applied
      *
@@ -1015,6 +1202,7 @@ class OfferMixSearch extends Search
     public function search(array $params): ActiveDataProvider
     {
         $query = OfferMix::find()
+            ->select($this->getSelect())
             ->joinForSearch(true)
             ->with([
                 'object.objectFloors',

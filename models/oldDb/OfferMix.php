@@ -6,6 +6,7 @@ use app\models\ActiveQuery\oldDb\OfferMixQuery;
 use app\models\Company;
 use app\models\Contact;
 use app\models\miniModels\TimelineStepObjectComment;
+use app\models\oldDb\User as OldDbUser;
 use app\models\Request;
 use app\models\User;
 use Yii;
@@ -710,12 +711,12 @@ class OfferMix extends \yii\db\ActiveRecord
             $max = $fields->area_mezzanine_max + $fields->area_floor_max;
             return $this->calcMinMaxArea($min, $max);
         };
-        $fields['calc_area_general'] = function ($fields) {
+        $fields['calc_area_general'] = function ($f) {
             // $area_warehouse_max = max([(int)$fields->area_floor_min, (int)($fields->area_mezzanine_max + $fields->area_floor_max)]);
             // $area_office = max([$fields->area_office_min, $fields->area_office_max]);
             // return Yii::$app->formatter->format($area_warehouse_max + $area_office, 'decimal');
 
-            return $this->calcMinMaxArea(min($fields->area_min, $fields->area_max), max($fields->area_min, $fields->area_max));
+            return $this->calcMinMaxArea(min($f->area_min, $f->area_max), max($f->area_min, $f->area_max));
         };
         $fields['calc_price_floor'] = function ($fields) {
             return $this->calcMinMaxArea($fields->price_floor_min, $fields->price_floor_max);
@@ -1020,10 +1021,13 @@ class OfferMix extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
     }
-
+    public function getAgent(): ActiveQuery
+    {
+        return $this->hasOne(OldDbUser::class, ['id' => 'agent_id']);
+    }
     public function getConsultant(): ActiveQuery
     {
-        return $this->hasOne(User::class, ['id' => 'user_id_new']);
+        return $this->hasOne(User::class, ['id' => 'user_id_new'])->via('agent');
     }
     public static function find(): OfferMixQuery
     {
