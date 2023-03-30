@@ -9,6 +9,7 @@ use app\models\miniModels\TimelineStepObjectComment;
 use app\models\Request;
 use app\models\User;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -628,15 +629,7 @@ class OfferMix extends \yii\db\ActiveRecord
     public  function extraFields()
     {
         $extraFields = parent::extraFields();
-        $extraFields['consultant'] = function () {
-            if (!ArrayHelper::keyExists($this->agent_id, self::USERS)) {
-                return null;
-            }
-            $user_id = self::USERS[$this->agent_id];
-            $query = User::find()->with(['userProfile'])->where(['user.id' => $user_id])->limit(1);
-            return $query->one();
-        };
-        $extraFields['object_small_info'] = function ($extraFields) {
+        $extraFields['object_small_info'] = function () {
             return ['photo' => json_decode($this->object->photo)];
         };
         return $extraFields;
@@ -1028,6 +1021,10 @@ class OfferMix extends \yii\db\ActiveRecord
         return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
     }
 
+    public function getConsultant(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id_new']);
+    }
     public static function find(): OfferMixQuery
     {
         return new OfferMixQuery(get_called_class());

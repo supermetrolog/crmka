@@ -21,14 +21,18 @@ class OfferMixMapSearch extends OfferMixSearch
             $this->getField('longitude'),
             $this->getField('address'),
             $this->getField('complex_id'),
+            $this->getField('object_id'),
+            $this->getField('type_id'),
+            $this->getField('original_id'),
             $this->getField('status'),
             $this->getField('id'),
+            $this->getField('photos'),
         ];
 
         return OfferMix::find()
             ->search()
             ->select($select)
-            ->asArray();
+            ->groupBy($this->getField('object_id'));
     }
 
     /**
@@ -38,7 +42,6 @@ class OfferMixMapSearch extends OfferMixSearch
     public function search(array $params): ActiveDataProvider
     {
         $query = $this->getQuery();
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [

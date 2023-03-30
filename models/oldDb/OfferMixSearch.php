@@ -1018,6 +1018,7 @@ class OfferMixSearch extends Search
             ->joinForSearch(true)
             ->with([
                 'object.objectFloors',
+                'consultant.userProfile'
             ])
             ->groupBy($this->getField('id'));
 

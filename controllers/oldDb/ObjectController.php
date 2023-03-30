@@ -53,6 +53,7 @@ class ObjectController extends ActiveController
 
     public function actionOffers()
     {
+        $this->response->format = Response::FORMAT_JSON;
         $searchModel = new OfferMixSearch();
         $this->response->on(Response::EVENT_BEFORE_SEND, function () {
             $this->response->headers->remove('link');

@@ -31,7 +31,7 @@ class OfferMixQuery extends ActiveQuery
 
     public function search()
     {
-        return $this->distinct()
+        return $this->groupBy(DbHelper::getField(OfferMix::tableName(), 'id'))
             ->with(['object'])
             ->joinForSearch();
     }
