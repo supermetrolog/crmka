@@ -1014,9 +1014,13 @@ class OfferMixSearch extends Search
      */
     public function search(array $params): ActiveDataProvider
     {
-        // $query = OfferMix::find()->joinForSearch(true)->groupBy($this->getField('id'))->asArray();
-        $query = OfferMix::find()->joinForSearch(true)->groupBy($this->getField('id'));
-        // add conditions that should always apply here
+        $query = OfferMix::find()
+            ->joinForSearch(true)
+            ->with([
+                'object.objectFloors',
+            ])
+            ->groupBy($this->getField('id'));
+
         $this->load($params, '');
         $this->normalizeProps();
         $dataProvider = new ActiveDataProvider([
@@ -1082,16 +1086,12 @@ class OfferMixSearch extends Search
 
         if (!$this->validate()) {
             throw new ValidationErrorHttpException($this->getErrorSummary(false));
-
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
             return $dataProvider;
         }
 
         $this->setFilters($query);
         // Этот запрос решает проблему дубликатов, но выполняется долго (около 7 секунд)
         // $query->andWhere(new Expression("IF(c_industry_offers_mix.type_id = 2, JSON_LENGTH(c_industry_offers_mix.blocks) > 1 AND (SELECT COUNT(off.id) FROM c_industry_offers_mix as off WHERE off.type_id = 1 AND off.status = 1 AND FIND_IN_SET(off.id, REPLACE(REPLACE(TRIM(']' FROM TRIM('[' FROM c_industry_offers_mix.blocks->>\"$[*]\")), '\"', ''), ' ', '')) > 0) > 1,JSON_LENGTH(c_industry_offers_mix.blocks) IS NOT NULL OR JSON_LENGTH(c_industry_offers_mix.blocks) IS NULL)"));
-
 
         return $dataProvider;
     }
