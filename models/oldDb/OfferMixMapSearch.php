@@ -17,6 +17,9 @@ class OfferMixMapSearch extends OfferMixSearch
      */
     public $polygon;
 
+    /**
+     * @return array
+     */
     public function rules(): array
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -24,11 +27,17 @@ class OfferMixMapSearch extends OfferMixSearch
         ]);
     }
 
+    /**
+     * @return string
+     */
     protected function getTableName(): string
     {
         return OfferMix::tableName();
     }
 
+    /**
+     * @return ActiveQuery
+     */
     private function getQuery(): ActiveQuery
     {
         $select = [
@@ -49,6 +58,10 @@ class OfferMixMapSearch extends OfferMixSearch
             ->select($select)
             ->groupBy($this->getField('object_id'));
     }
+
+    /**
+     * @return void
+     */
     public function normalizePolygon(): void
     {
         $polygon = $this->stringToArray($this->polygon);
@@ -63,11 +76,19 @@ class OfferMixMapSearch extends OfferMixSearch
         $this->polygon = $coordinates;
     }
 
+    /**
+     * @return void
+     */
     public function normalizeProps(): void
     {
         parent::normalizeProps();
         $this->normalizePolygon();
     }
+
+    /**
+     * @param ActiveQuery $query
+     * @return void
+     */
     public function setPolygonFilter(ActiveQuery $query): void
     {
         if (!$this->polygon) {
@@ -87,14 +108,22 @@ class OfferMixMapSearch extends OfferMixSearch
             EOF;
         $query->andWhere(new Expression($polygonCondition));
     }
+
+    /**
+     * @param ActiveQuery $query
+     * @return void
+     * @throws ValidationErrorHttpException
+     */
     public function setFilters(ActiveQuery $query): void
     {
         parent::setFilters($query);
         $this->setPolygonFilter($query);
     }
+
     /**
-     * @param  array $params
+     * @param array $params
      * @return ActiveDataProvider
+     * @throws ValidationErrorHttpException
      */
     public function search(array $params): ActiveDataProvider
     {
