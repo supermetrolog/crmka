@@ -4,11 +4,26 @@ declare(strict_types=1);
 
 namespace app\models\oldDb;
 
+use app\exceptions\ValidationErrorHttpException;
 use yii\db\ActiveQuery;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 class OfferMixMapSearch extends OfferMixSearch
 {
+    /**
+     *  @var string|array
+     */
+    public $polygon;
+
+    public function rules(): array
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            ['polygon', 'string']
+        ]);
+    }
+
     protected function getTableName(): string
     {
         return OfferMix::tableName();
@@ -34,7 +49,49 @@ class OfferMixMapSearch extends OfferMixSearch
             ->select($select)
             ->groupBy($this->getField('object_id'));
     }
+    public function normalizePolygon(): void
+    {
+        $polygon = $this->stringToArray($this->polygon);
+        if (!$polygon || !is_array($polygon) || count($polygon) % 2 !== 0) {
+            return;
+        }
+        $coordinates = [];
+        for ($i = 0; $i < count($polygon); $i = $i + 2) {
+            $coordinates[] = $polygon[$i] . ' ' . $polygon[$i + 1];
+        }
+        $coordinates[] = $coordinates[0];
+        $this->polygon = $coordinates;
+    }
 
+    public function normalizeProps(): void
+    {
+        parent::normalizeProps();
+        $this->normalizePolygon();
+    }
+    public function setPolygonFilter(ActiveQuery $query): void
+    {
+        if (!$this->polygon) {
+            return;
+        }
+
+        $coords = implode(", ", $this->polygon);
+        $polygonCondition = <<< EOF
+                ST_CONTAINS(
+                ST_GEOMFROMTEXT(
+                    'POLYGON(
+                ($coords)
+                )'
+                        ),
+                        POINT(c_industry_offers_mix.latitude, c_industry_offers_mix.longitude)
+                    )
+            EOF;
+        $query->andWhere(new Expression($polygonCondition));
+    }
+    public function setFilters(ActiveQuery $query): void
+    {
+        parent::setFilters($query);
+        $this->setPolygonFilter($query);
+    }
     /**
      * @param  array $params
      * @return ActiveDataProvider
@@ -51,8 +108,10 @@ class OfferMixMapSearch extends OfferMixSearch
         ]);
 
         $this->load($params, '');
+        if (!$this->validate()) {
+            throw new ValidationErrorHttpException('SSSS');
+        }
         $this->normalizeProps();
-
         $this->setFilters($query);
 
         return $dataProvider;
