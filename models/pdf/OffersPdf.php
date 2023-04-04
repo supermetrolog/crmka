@@ -801,8 +801,34 @@ class OffersPdf extends Model
     {
         return max($model->area_mezzanine_max, $model->area_mezzanine_min);
     }
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMinOfficeArea($model)
+    {
+        return min($model->area_office_max, $model->area_office_min);
+    }
 
-        /**
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMinFloorArea($model)
+    {
+        return min($model->area_floor_max, $model->area_floor_min);
+    }
+
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMinMezzanineArea($model)
+    {
+        return min($model->area_mezzanine_max, $model->area_mezzanine_min);
+    }
+
+    /**
      * @param OfferMix $model
      * @return OfferMix
      */
@@ -854,11 +880,13 @@ class OffersPdf extends Model
         if ($this->isPlot()) {
             return  $this->getAreaMinSplitForPlot($model);
         }
-        $min = $model->area_floor_min;
-        $max = $model->area_mezzanine_max + $model->area_floor_max;
+        $min = $this->getMinFloorArea($model);
+        $max = $this->getMaxFloorArea($model) + $this->getMaxMezzanineArea($model);
+
         if ($min == $max) {
             return false;
         }
+
         return min($min, $max);
     }
     public function getAreaMinSplitForPlot($model)

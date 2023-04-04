@@ -127,8 +127,8 @@ use app\models\oldDb\OfferMix;
                                     <div>
                                         <p><?= $model->getAreaLabel() ?></p>
                                         <p class="big"><?= $model->formatter->format($model->getArea($model->data), 'decimal')  ?> м<sup>2</sup></p>
-                                        <? if ($model->data->type_id == OfferMix::GENERAL_TYPE_ID && count($model->data->miniOffersMix) > 1) : ?>
-                                            <p class="small">Деление от <span class="danger"><?= $model->getBlocksMinArea() ?> м<sup>2</sup></span></p>
+                                        <? if ($model->data->type_id == OfferMix::GENERAL_TYPE_ID && $model->getAreaMinSplit($model->data)) : ?>
+                                            <p class="small">Деление от <span class="danger"><?= $model->getAreaMinSplit($model->data) ?> м<sup>2</sup></span></p>
                                         <? else : ?>
                                             <? if ($model->data->type_id == OfferMix::MINI_TYPE_ID && $model->getAreaMinSplit($model->data)) : ?>
                                                 <p class="small">Деление от <span class="danger"><?= $model->getAreaMinSplit($model->data) ?> м<sup>2</sup></span></p>

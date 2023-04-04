@@ -626,7 +626,58 @@ class OfferMix extends \yii\db\ActiveRecord
             'hide_from_market' => 'Hide From Market',
         ];
     }
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMaxOfficeArea()
+    {
+        return max($this->area_office_max, $this->area_office_min);
+    }
 
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMaxFloorArea()
+    {
+        return max($this->area_floor_max, $this->area_floor_min);
+    }
+
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMaxMezzanineArea()
+    {
+        return max($this->area_mezzanine_max, $this->area_mezzanine_min);
+    }
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMinOfficeArea()
+    {
+        return min($this->area_office_max, $this->area_office_min);
+    }
+
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMinFloorArea()
+    {
+        return min($this->area_floor_max, $this->area_floor_min);
+    }
+
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMinMezzanineArea()
+    {
+        return min($this->area_mezzanine_max, $this->area_mezzanine_min);
+    }
     public  function extraFields()
     {
         $extraFields = parent::extraFields();
@@ -715,7 +766,6 @@ class OfferMix extends \yii\db\ActiveRecord
             // $area_warehouse_max = max([(int)$fields->area_floor_min, (int)($fields->area_mezzanine_max + $fields->area_floor_max)]);
             // $area_office = max([$fields->area_office_min, $fields->area_office_max]);
             // return Yii::$app->formatter->format($area_warehouse_max + $area_office, 'decimal');
-
             return $this->calcMinMaxArea(min($f->area_min, $f->area_max), max($f->area_min, $f->area_max));
         };
         $fields['calc_price_floor'] = function ($fields) {
