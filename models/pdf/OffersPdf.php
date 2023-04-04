@@ -1005,6 +1005,9 @@ class OffersPdf extends Model
     }
     public function getTaxInfo($model)
     {
+        if ($model->tax_form == 'triple net'){
+            return 'БЕЗ НДС';
+        }
         $opex = $this->getOpex($model);
         $public_services_exist = $model->public_services == 1 || $model->public_services == 2;
         if ($opex == 1) {
