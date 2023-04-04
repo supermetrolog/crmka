@@ -774,6 +774,19 @@ class OffersPdf extends Model
         }
         return "ПЛОЩАДИ В АРЕНДУ";
     }
+
+    /**
+     * @param OfferMix $model
+     * @return OfferMix
+     */
+    public function getArea($model){
+//        if($this->isSplittingOffer()){
+//            return $this->getAreaMax($model);
+//        }
+        $maxArea = max($model->area_min, $model->area_max);
+        $minArea = min($model->area_max, $model->area_min);
+        return $maxArea;
+    }
     public function getAreaMax($model)
     {
         if ($this->isPlot()) {
