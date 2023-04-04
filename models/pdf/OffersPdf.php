@@ -777,15 +777,42 @@ class OffersPdf extends Model
 
     /**
      * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMaxOfficeArea($model)
+    {
+        return max($model->area_office_max, $model->area_office_min);
+    }
+
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMaxFloorArea($model)
+    {
+        return max($model->area_floor_max, $model->area_floor_min);
+    }
+
+    /**
+     * @param OfferMix $model
+     * @return mixed
+     */
+    public function getMaxMezzanineArea($model)
+    {
+        return max($model->area_mezzanine_max, $model->area_mezzanine_min);
+    }
+
+        /**
+     * @param OfferMix $model
      * @return OfferMix
      */
     public function getArea($model){
 //        if($this->isSplittingOffer()){
 //            return $this->getAreaMax($model);
 //        }
-        $maxArea = max($model->area_min, $model->area_max);
-        $minArea = min($model->area_max, $model->area_min);
-        return $maxArea;
+        return $this->getMaxMezzanineArea($model) +
+            $this->getMaxOfficeArea($model) +
+            $this->getMaxFloorArea($model);
     }
     public function getAreaMax($model)
     {
