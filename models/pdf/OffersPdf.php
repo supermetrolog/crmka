@@ -830,15 +830,18 @@ class OffersPdf extends Model
 
     /**
      * @param OfferMix $model
-     * @return OfferMix
+     * @return int
      */
-    public function getArea($model){
-//        if($this->isSplittingOffer()){
-//            return $this->getAreaMax($model);
-//        }
-        return $this->getMaxMezzanineArea($model) +
+    public function getArea($model)
+    {
+        $area = $this->getMaxMezzanineArea($model) +
             $this->getMaxOfficeArea($model) +
             $this->getMaxFloorArea($model);
+        if (!$area){
+            return $model->area_max;
+        }
+
+        return $area;
     }
     public function getAreaMax($model)
     {
