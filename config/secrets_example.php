@@ -47,12 +47,14 @@ return [
     ],
     // Доступы для основной базы данных этого проекта
     'db' => [
+        'host' => 'localhost',
         'dbname' => 'app',
         'username' => 'root',
         'password' => 'root'
     ],
     // Доступы для старой базы данных объектового проекта
     'db_old' => [
+        'host' => 'localhost',
         'dbname' => 'app',
         'username' => 'root',
         'password' => 'root'
