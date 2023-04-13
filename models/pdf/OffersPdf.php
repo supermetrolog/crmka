@@ -834,14 +834,16 @@ class OffersPdf extends Model
      */
     public function getArea($model)
     {
-        $area = $this->getMaxMezzanineArea($model) +
-            $this->getMaxOfficeArea($model) +
-            $this->getMaxFloorArea($model);
-        if (!$area){
-            return $model->area_max;
-        }
+//        $area = $this->getMaxMezzanineArea($model) +
+//            $this->getMaxOfficeArea($model) +
+//            $this->getMaxFloorArea($model);
+//        if (!$area){
+//            Sreturn $model->area_max;
+//        }
 
-        return $area;
+        return  max($model->area_max, $model->area_min);
+
+//        return $area;
     }
     public function getAreaMax($model)
     {
