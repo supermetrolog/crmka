@@ -790,7 +790,7 @@ class OffersPdf extends Model
      */
     public function getMaxFloorArea($model)
     {
-        return max($model->area_floor_max, $model->area_floor_min);
+        return max($model->area_max, $model->area_min);
     }
 
     /**
@@ -816,7 +816,7 @@ class OffersPdf extends Model
      */
     public function getMinFloorArea($model)
     {
-        return min($model->area_floor_max, $model->area_floor_min);
+        return min($model->area_max, $model->area_min);
     }
 
     /**
@@ -885,7 +885,6 @@ class OffersPdf extends Model
         if ($this->isPlot()) {
             return  $this->getAreaMinSplitForPlot($model);
         }
-
 
         $min = $this->getMinFloorArea($model);
         $max = $this->getMaxFloorArea($model);
