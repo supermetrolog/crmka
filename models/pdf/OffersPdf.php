@@ -883,8 +883,10 @@ class OffersPdf extends Model
         if ($this->isPlot()) {
             return  $this->getAreaMinSplitForPlot($model);
         }
+
+
         $min = $this->getMinFloorArea($model);
-        $max = $this->getMaxFloorArea($model) + $this->getMaxMezzanineArea($model);
+        $max = $this->getMaxFloorArea($model);
 
         if ($min == $max) {
             return false;
