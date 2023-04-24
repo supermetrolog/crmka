@@ -22,7 +22,7 @@ class ObjectController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view', 'offers', 'offers-map']);
+        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view']);
         $behaviors['corsFilter'] = [
             'class' => Cors::className(),
             'cors' => [
@@ -60,6 +60,29 @@ class ObjectController extends ActiveController
         });
         return $searchModel->search(Yii::$app->request->queryParams);
     }
+
+    public function actionOffersCount()
+    {
+        $this->response->format = Response::FORMAT_JSON;
+        $searchModel = new OfferMixSearch();
+        $this->response->on(Response::EVENT_BEFORE_SEND, function () {
+            $this->response->headers->remove('link');
+        });
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $dataProvider->query->count();
+    }
+
+    public function actionOffersMapCount()
+    {
+        $this->response->format = Response::FORMAT_JSON;
+        $searchModel = new OfferMixMapSearch();
+        $this->response->on(Response::EVENT_BEFORE_SEND, function () {
+            $this->response->headers->remove('link');
+        });
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $dataProvider->query->count();
+    }
+
     public function actionOffersMap()
     {
         $searchModel = new OfferMixMapSearch();
