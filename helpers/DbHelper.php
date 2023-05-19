@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use yii\base\ErrorException;
+
 class DbHelper
 {
     /**
-     * @param  string $name
-     * @param  string $dsn
+     * @param string $name
+     * @param string $dsn
      * @return string
+     * @throws ErrorException
      */
     public static function getDsnAttribute(string $name, string $dsn): string
     {
         if (preg_match('/' . $name . '=([^;]*)/', $dsn, $match)) {
             return $match[1];
-        } else {
-            return null;
         }
+
+        throw new ErrorException('invalid dsn');
     }
 
     /**
