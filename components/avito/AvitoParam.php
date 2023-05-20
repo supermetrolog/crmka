@@ -23,4 +23,5 @@ class AvitoParam
     public const RENTAL_TYPE = 'RentalType';
     public const LEASE_DEPOSIT = 'LeaseDeposit';
     public const LEASE_COMMISSION_SIZE = 'LeaseCommissionSize';
+    public const TRANSACTION_TYPE = 'TransactionType';
 }
