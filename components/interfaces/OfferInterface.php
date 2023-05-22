@@ -54,4 +54,11 @@ interface OfferInterface
     function isWarehouse(): bool;
     function isProduction(): bool;
     function hasDeposit(): bool;
+    function getFullConsultantName(): string;
+    function getContactPhone(): string;
+
+    /**
+     * @return string[]
+     */
+    function getImages(): array;
 }

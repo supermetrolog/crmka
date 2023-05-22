@@ -10,7 +10,31 @@ use yii\helpers\ArrayHelper;
 
 class DataMapper
 {
+    /**
+     * @param OfferInterface $offer
+     * @return array[]
+     */
+    public function getImages(OfferInterface $offer): array
+    {
+        $images = [];
 
+        foreach ($offer->getImages() as $image) {
+            $images[] = [
+                'tag' => 'Image',
+                'value' => '',
+                'attributes' => [
+                    'url' => $image
+                ]
+            ];
+        }
+
+        return $images;
+    }
+
+    /**
+     * @param OfferInterface $offer
+     * @return string
+     */
     public function getLeaseDeposit(OfferInterface $offer): string
     {
         if (!$offer->hasDeposit()) {

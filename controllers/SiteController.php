@@ -29,6 +29,7 @@ class SiteController extends Controller
         $avitoFeedGenerator = new AvitoFeedGenerator();
         $models = OfferMix::find()
             ->limit(5)
+            ->rentDealType()
             ->notDelete()
             ->active()
             ->offersType()

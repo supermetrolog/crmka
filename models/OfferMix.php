@@ -153,4 +153,28 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     {
         return !!$this->deposit;
     }
+
+    /**
+     * @return string
+     */
+    public function getFullConsultantName(): string
+    {
+        return $this->consultant->userProfile->getFullName();
+    }
+
+    /**
+     * @return string
+     */
+    public function getContactPhone(): string
+    {
+        return '+ 7 999 999 99 99'; // TODO: fix
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getImages(): array
+    {
+        return Json::decode($this->photos);
+    }
 }

@@ -82,7 +82,10 @@ class AvitoFeedGenerator
     private function setOptionElements(DOMElement $elem, array $options): void
     {
         foreach ($options as $option) {
-            $optEl = $this->xml->createElement('Option', $option);
+            $optEl = $this->xml->createElement($option['tag'], $option['value']);
+            foreach ($option['attributes'] as $attribute => $value) {
+                $optEl->setAttribute($attribute, $value);
+            }
             $elem->appendChild($optEl);
         }
     }

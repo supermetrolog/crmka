@@ -23,4 +23,8 @@ class AvitoParam
     public const LEASE_DEPOSIT = 'LeaseDeposit';
     public const LEASE_COMMISSION_SIZE = 'LeaseCommissionSize';
     public const TRANSACTION_TYPE = 'TransactionType';
+    public const AD_STATUS = 'AdStatus';
+    public const MANAGER_NAME = 'ManagerName';
+    public const CONTACT_PHONE = 'ContactPhone';
+    public const IMAGES = 'Images';
 }

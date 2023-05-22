@@ -51,4 +51,28 @@ class OfferMixQuery extends oldDb\OfferMixQuery
     {
         return $this->andWhere(['type_id' => [1, 2]]);
     }
+
+    /**
+     * @return self
+     */
+    public function saleDealType(): self
+    {
+        return $this->andWhere(['deal_type' => OfferMix::DEAL_TYPE_SALE]);
+    }
+
+    /**
+     * @return self
+     */
+    public function rentDealType(): self
+    {
+        return $this->andWhere(['deal_type' => OfferMix::DEAL_TYPE_RENT]);
+    }
+
+    /**
+     * @return self
+     */
+    public function rentAllDealType(): self
+    {
+        return $this->andWhere(['deal_type' => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE]]);
+    }
 }

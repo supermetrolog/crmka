@@ -65,6 +65,10 @@ class AvitoConnector
             new AvitoObject(AvitoParam::PRICE, $offer->getPrice()), // TODO: fix
             new AvitoObject(AvitoParam::OBJECT_TYPE, $this->dataMapper->getObjectType($offer)),
             new AvitoObject(AvitoParam::PROPERTY_RIGHTS, AvitoValue::PROPERTY_RIGHT_AGENT),
+            new AvitoObject(AvitoParam::MANAGER_NAME, $offer->getFullConsultantName()),
+            new AvitoObject(AvitoParam::CONTACT_PHONE, $offer->getContactPhone()),
+            new AvitoObject(AvitoParam::IMAGES, $this->dataMapper->getImages($offer)),
+//            new AvitoObject(AvitoParam::AD_STATUS, 'Highlight'), // TODO: for future
         ];
     }
 

@@ -265,6 +265,9 @@ use yii\helpers\ArrayHelper;
  * @property int|null $is_exclusive эксклюзив
  * @property int|null $deal_id номер сделки
  * @property int|null $hide_from_market скрыто от рынка
+ *
+ *
+ * @property User $consultant
  */
 class OfferMix extends ActiveRecord
 {
