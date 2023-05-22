@@ -2,13 +2,11 @@
 
 namespace app\commands;
 
-use app\components\avito\AvitoConnector;
 use app\components\avito\AvitoFeedGenerator;
-use app\models\Company;
+use app\components\connector\avito\AvitoConnector;
 use app\models\OfferMix;
 use DOMException;
 use yii\console\Controller;
-use yii\helpers\VarDumper;
 
 class FeedController extends Controller
 {

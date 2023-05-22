@@ -16,7 +16,6 @@ class AvitoParam
     public const PROPERTY_RIGHTS = 'PropertyRights';
     public const ENTRANCE = 'Entrance';
     public const FLOOR = 'Floor';
-    public const LAYOUT = 'Layout';
     public const SQUARE = 'Square';
     public const DECORATION = 'Decoration';
     public const PARKING_TYPE = 'ParkingType';

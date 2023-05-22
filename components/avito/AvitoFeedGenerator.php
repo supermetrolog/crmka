@@ -2,12 +2,10 @@
 
 namespace app\components\avito;
 
-use DOMAttr;
 use DOMDocument;
 use DOMElement;
 use DOMException;
-use InvalidArgumentException;
-use yii\helpers\VarDumper;
+use phpseclib3\Common\Functions\Strings;
 
 class AvitoFeedGenerator
 {
@@ -61,11 +59,31 @@ class AvitoFeedGenerator
             $ad = $this->xml->createElement('Ad');
 
             foreach ($obj as $item) {
-                $elem = $this->xml->createElement($item->name, $item->value);
+                $elem = $this->xml->createElement($item->name);
+                if(is_array($item->value)){
+                    $this->setOptionElements($elem, $item->value);
+                } else {
+                    $elem->nodeValue = $item->value;
+                }
+
                 $ad->appendChild($elem);
             }
 
             $ads->appendChild($ad);
+        }
+    }
+
+    /**
+     * @param DOMElement $elem
+     * @param array $options
+     * @return void
+     * @throws DOMException
+     */
+    private function setOptionElements(DOMElement $elem, array $options): void
+    {
+        foreach ($options as $option) {
+            $optEl = $this->xml->createElement('Option', $option);
+            $elem->appendChild($optEl);
         }
     }
 }

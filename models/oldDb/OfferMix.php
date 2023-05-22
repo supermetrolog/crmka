@@ -11,6 +11,7 @@ use app\models\Request;
 use app\models\User;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -265,7 +266,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null $deal_id номер сделки
  * @property int|null $hide_from_market скрыто от рынка
  */
-class OfferMix extends \yii\db\ActiveRecord
+class OfferMix extends ActiveRecord
 {
 
     public const STATUS_ACTIVE = 1;
