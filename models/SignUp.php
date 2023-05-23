@@ -71,6 +71,8 @@ class SignUp extends Model
             $user->email_password = $this->email_password;
             $user->created_at = time();
             $user->updated_at = time();
+            $user->role = User::ROLE_DEFAULT; // TODO: Получать с фронта роль
+
             if ($user->validate() && $user->save()) return $user->id;
             throw new ValidationErrorHttpException($user->getErrorSummary(false));
         }
