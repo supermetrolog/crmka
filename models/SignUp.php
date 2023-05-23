@@ -18,6 +18,7 @@ class SignUp extends Model
     public $email;
     public $email_username;
     public $email_password;
+    public $role;
     private $_user = false;
 
 
@@ -28,7 +29,7 @@ class SignUp extends Model
     {
         return [
             // username and password are both required
-            [['username', 'password'], 'required'],
+            [['username', 'password', 'role'], 'required'],
             ['password', 'string', 'min' => 4],
             ['username', 'string', 'min' => 4],
             [['email', 'email_password', 'email_username'], 'string', 'max' => 255],
@@ -56,10 +57,10 @@ class SignUp extends Model
     }
 
     /**
-     * Logs in a user using the provided username and password.
-     * @return bool whether the user is logged in successfully
+     * @return int
+     * @throws ValidationErrorHttpException
      */
-    public function signUp()
+    public function signUp(): int
     {
         if ($this->validate()) {
             $user = new User();
@@ -71,7 +72,7 @@ class SignUp extends Model
             $user->email_password = $this->email_password;
             $user->created_at = time();
             $user->updated_at = time();
-            $user->role = User::ROLE_DEFAULT; // TODO: Получать с фронта роль
+            $user->role = $this->role;
 
             if ($user->validate() && $user->save()) return $user->id;
             throw new ValidationErrorHttpException($user->getErrorSummary(false));
