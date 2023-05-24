@@ -61,4 +61,6 @@ interface OfferInterface
      * @return string[]
      */
     function getImages(): array;
+    function getCeilingHeight(): float;
+    function getPowerCapacity(): float;
 }

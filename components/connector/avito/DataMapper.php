@@ -5,6 +5,7 @@ namespace app\components\connector\avito;
 use app\components\avito\AvitoValue;
 use app\components\interfaces\OfferInterface;
 use InvalidArgumentException;
+use Yii;
 use yii\base\ErrorException;
 use yii\helpers\ArrayHelper;
 
@@ -23,7 +24,7 @@ class DataMapper
                 'tag' => 'Image',
                 'value' => '',
                 'attributes' => [
-                    'url' => $image
+                    'url' => Yii::$app->params['url']['objects'] . $image
                 ]
             ];
         }

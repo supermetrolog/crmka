@@ -15,8 +15,11 @@ class AvitoParam
     public const OBJECT_TYPE = 'ObjectType';
     public const PROPERTY_RIGHTS = 'PropertyRights';
     public const ENTRANCE = 'Entrance';
+    public const ENTRANCE_ADDITIONALLY = 'EntranceAdditionally';
     public const FLOOR = 'Floor';
+    public const FLOOR_ADDITIONALLY = 'FloorAdditionally';
     public const SQUARE = 'Square';
+    public const SQUARE_ADDITIONALLY = 'SquareAdditionally';
     public const DECORATION = 'Decoration';
     public const PARKING_TYPE = 'ParkingType';
     public const RENTAL_TYPE = 'RentalType';
@@ -27,4 +30,15 @@ class AvitoParam
     public const MANAGER_NAME = 'ManagerName';
     public const CONTACT_PHONE = 'ContactPhone';
     public const IMAGES = 'Images';
+    public const CONTACT_METHOD = 'ContactMethod';
+    public const CEILING_HEIGHT = 'CeilingHeight';
+    public const HEATING = 'Heating';
+    public const BUILDING_CLASS = 'BuildingClass';
+    public const RENTAL_HOLIDAYS = 'RentalHolidays';
+    public const LEASE_PRICE_OPTIONS = 'LeasePriceOptions';
+    public const PRICE_TYPE = 'PriceType';
+    public const POWER_GRID_CAPACITY = 'PowerGridCapacity';
+    public const POWER_GRID_ADDITIONALLY = 'PowerGridAdditionally';
+    public const LAND_AREA = 'LandArea';
+
 }

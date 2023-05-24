@@ -20,4 +20,19 @@ class AvitoValue
     public const RENTAL_TYPE_SUBLEASE = 'Субаренда';
     public const LEASE_DEPOSIT_NO_DEPOSIT = 'Без залога';
     public const TRANSACTION_TYPE_SALE = 'Продажа';
+    public const CONTACT_METHOD_PHONE_AND_MESSAGES = 'По телефону и в сообщениях';
+    public const SEVERAL_FLOORS = 'Несколько этажей';
+    public const SQUARE_ADDITIONAL_POSSIBLE_CUTTING = 'Возможная нарезка';
+    public const HEATING_HAS_NOT = 'Нет';
+    public const HEATING_CENTRAL = 'Центральное';
+    public const HEATING_AUTO = 'Автономное';
+    public const BUILDING_CLASS_A = 'A';
+    public const BUILDING_CLASS_B = 'B';
+    public const BUILDING_CLASS_C = 'C';
+    public const BUILDING_CLASS_D = 'D';
+    public const RENTAL_HOLIDAYS_HAS = 'Арендные каникулы';
+    public const PRICE_TYPE_PER_MONTH_PER_SQUARE_METER = 'в месяц за м2';
+    public const PRICE_TYPE_PER_MONTH_FOR_ALL = 'за всё';
+    public const ENTRANCE_ADDITIONALLY_SEPARATE = 'Отдельный вход';
+    public const POWER_GRID_ADDITIONALLY_POSSIBLE_INCREASE = 'Возможно увеличение мощности';
 }
