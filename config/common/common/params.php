@@ -12,6 +12,7 @@ $ftpOptionsForBackupsLoad = [
 $common_thisHost = "http://crmka/";
 
 return [
+    'company_phone' => '+7 (495) 150-03-23',
     'adminEmail' => $secrets['adminEmail'],
     'senderEmail' => $secrets['senderEmail'],
     'senderName' => 'PENNYLANE REALTY',

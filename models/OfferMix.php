@@ -2,12 +2,10 @@
 
 namespace app\models;
 
-use app\components\interfaces\floor;
 use app\components\interfaces\OfferInterface;
 use app\models\ActiveQuery\OfferMixQuery;
 use Throwable;
 use Yii;
-use yii\base\ErrorException;
 use yii\helpers\Json;
 
 class OfferMix extends oldDb\OfferMix implements OfferInterface
@@ -214,7 +212,7 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
      */
     public function getContactPhone(): string
     {
-        return '+ 7 999 999 99 99'; // TODO: fix
+        return Yii::$app->params['company_phone'];
     }
 
     /**

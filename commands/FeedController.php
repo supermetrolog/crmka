@@ -6,12 +6,17 @@ use app\components\avito\AvitoFeedGenerator;
 use app\components\connector\avito\AvitoConnector;
 use app\models\OfferMix;
 use DOMException;
+use Yii;
+use yii\base\ErrorException;
 use yii\console\Controller;
 
 class FeedController extends Controller
 {
     private AvitoFeedGenerator $avitoFeedGenerator;
 
+    /**
+     * @return void
+     */
     public function init()
     {
         parent::init();
@@ -21,22 +26,38 @@ class FeedController extends Controller
     /**
      * @return void
      * @throws DOMException
+     * @throws ErrorException
      */
     public function actionAvito(): void
     {
         $models = OfferMix::find()
-            ->limit(2)
             ->notDelete()
             ->active()
             ->offersType()
+            ->limit(20)
+            ->with(['block', 'offer', 'object'])
             ->all();
 
         $connector = new AvitoConnector($models);
 
         $this->avitoFeedGenerator->setAvitoObjects($connector->getData());
 
-        $res = $this->avitoFeedGenerator->generate();
+        $feed = $this->avitoFeedGenerator->generate();
 
-        echo $res;
+        $filename = Yii::getAlias('@web/feeds/') . 'avito.xml';
+        $this->saveFeed($feed, $filename);
+    }
+
+    /**
+     * @param string $feed
+     * @param $filename
+     * @return void
+     * @throws ErrorException
+     */
+    private function saveFeed(string $feed, $filename): void
+    {
+        if (!file_put_contents($filename, $feed)) {
+            throw new ErrorException('Save feed error');
+        }
     }
 }
