@@ -31,9 +31,11 @@ class FeedController extends Controller
     public function actionAvito(): void
     {
         $models = OfferMix::find()
+            ->distinct()
             ->notDelete()
             ->active()
-            ->offersType()
+            ->adAvito()
+            ->blockType()
             ->limit(20)
             ->with(['block', 'offer', 'object'])
             ->all();

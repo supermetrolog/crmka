@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models\ActiveQuery;
 
 use app\models\OfferMix;
+use app\models\oldDb\ObjectsBlock;
 use yii\db\ActiveRecord;
 
 class OfferMixQuery extends oldDb\OfferMixQuery
@@ -27,13 +28,21 @@ class OfferMixQuery extends oldDb\OfferMixQuery
         return parent::one($db);
     }
 
+    /**
+     * @param int $originalId
+     * @return self
+     */
+    public function byOriginalId(int $originalId): self
+    {
+        return $this->andWhere(['original_id' => $originalId]);
+    }
 
     /**
      * @return self
      */
     public function notDelete(): self
     {
-        return $this->andWhere(['!=', 'deleted', 1]);
+        return $this->andWhere(['!=', OfferMix::tableName() . '.deleted', 1]);
     }
 
     /**
@@ -41,9 +50,16 @@ class OfferMixQuery extends oldDb\OfferMixQuery
      */
     public function active(): self
     {
-        return $this->andWhere(['status' => 1]);
+        return $this->andWhere([OfferMix::tableName() . '.status' => 1]);
     }
 
+    /**
+     * @return self
+     */
+    public function blockType(): self
+    {
+        return $this->andWhere(['type_id' => OfferMix::MINI_TYPE_ID]);
+    }
     /**
      * @return self
      */
@@ -74,5 +90,14 @@ class OfferMixQuery extends oldDb\OfferMixQuery
     public function rentAllDealType(): self
     {
         return $this->andWhere(['deal_type' => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE]]);
+    }
+
+    /**
+     * @return self
+     */
+    public function adAvito(): self
+    {
+        $this->joinWith(['block']);
+        return $this->andWhere([ObjectsBlock::tableName() . '.ad_avito' => 1]);
     }
 }

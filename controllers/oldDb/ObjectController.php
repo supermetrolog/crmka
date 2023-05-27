@@ -3,6 +3,10 @@
 namespace app\controllers\oldDb;
 
 use app\behaviors\BaseControllerBehaviors;
+use app\exceptions\ValidationErrorHttpException;
+use app\models\OfferMix;
+use yii\base\ErrorException;
+use yii\data\ActiveDataProvider;
 use yii\rest\ActiveController;
 use Yii;
 use app\models\Company;
@@ -19,7 +23,10 @@ class ObjectController extends ActiveController
 {
     public $modelClass = 'app\models\Company';
 
-    public function behaviors()
+    /**
+     * @return array
+     */
+    public function behaviors(): array
     {
         $behaviors = parent::behaviors();
         $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view']);
@@ -35,7 +42,10 @@ class ObjectController extends ActiveController
         return $behaviors;
     }
 
-    public function actions()
+    /**
+     * @return array
+     */
+    public function actions(): array
     {
         $actions = parent::actions();
         unset($actions['index']);
@@ -45,13 +55,21 @@ class ObjectController extends ActiveController
         unset($actions['delete']);
         return $actions;
     }
-    public function actionIndex()
+
+    /**
+     * @return ActiveDataProvider
+     */
+    public function actionIndex(): ActiveDataProvider
     {
         $searchModel = new ObjectsSearch();
         return $searchModel->search(Yii::$app->request->queryParams);
     }
 
-    public function actionOffers()
+    /**
+     * @return ActiveDataProvider
+     * @throws ValidationErrorHttpException
+     */
+    public function actionOffers(): ActiveDataProvider
     {
         $this->response->format = Response::FORMAT_JSON;
         $searchModel = new OfferMixSearch();
@@ -61,6 +79,10 @@ class ObjectController extends ActiveController
         return $searchModel->search(Yii::$app->request->queryParams);
     }
 
+    /**
+     * @return int|string|null
+     * @throws ValidationErrorHttpException
+     */
     public function actionOffersCount()
     {
         $this->response->format = Response::FORMAT_JSON;
@@ -72,6 +94,10 @@ class ObjectController extends ActiveController
         return $dataProvider->query->count();
     }
 
+    /**
+     * @return int|string|null
+     * @throws ValidationErrorHttpException
+     */
     public function actionOffersMapCount()
     {
         $this->response->format = Response::FORMAT_JSON;
@@ -83,7 +109,11 @@ class ObjectController extends ActiveController
         return $dataProvider->query->count();
     }
 
-    public function actionOffersMap()
+    /**
+     * @return ActiveDataProvider
+     * @throws ValidationErrorHttpException
+     */
+    public function actionOffersMap(): ActiveDataProvider
     {
         $searchModel = new OfferMixMapSearch();
         $this->response->on(Response::EVENT_BEFORE_SEND, function () {
@@ -91,30 +121,36 @@ class ObjectController extends ActiveController
         });
         return $searchModel->search(Yii::$app->request->queryParams);
     }
-    public function actionView($id)
-    {
-        return Company::getCompanyInfo($id);
-    }
-    public function actionCreate()
-    {
-        $request = json_decode(Yii::$app->request->post('data'), true);
-        $model = new UploadFile();
-        $model->files = UploadedFile::getInstancesByName('files');
-        return Company::createCompany($request, $model);
-    }
-    public function actionUpdate($id)
-    {
-        $request = json_decode(Yii::$app->request->post('data'), true);
-        $model = new UploadFile();
 
-        $model->files = UploadedFile::getInstancesByName('files');
-        return Company::updateCompany($this->findModel($id), $request, $model);
-    }
-    protected function findModel($id)
+    /**
+     * @param int $originalId
+     * @return void
+     * @throws ErrorException
+     * @throws NotFoundHttpException
+     */
+    public function actionToggleAvitoAd(int $originalId): void
     {
-        if (($model = Company::findOne($id)) !== null) {
-            return $model;
+        $model = OfferMix::find()->byOriginalId($originalId)->one();
+
+        if (!$model) {
+            throw new NotFoundHttpException('Offer not found');
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+
+        $block = $model->block;
+
+        if (!$block) {
+            throw new NotFoundHttpException('Offer block not found');
+        }
+
+        $block->ad_avito = !$block->ad_avito;
+        if ($block->ad_avito) {
+            $block->ad_avito_date_start = date('Y-m-d H:i:s');
+        } else {
+            $block->ad_avito_date_start = null;
+        }
+
+        if (!$block->save()) {
+            throw new ErrorException('Block save error');
+        }
     }
 }

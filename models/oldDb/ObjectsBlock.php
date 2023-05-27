@@ -281,6 +281,8 @@ use Yii;
  * @property int|null $entire_only
  * @property int|null $fence
  * @property int|null $barrier
+ * @property int $ad_avito
+ * @property string|null $ad_avito_date_start
  */
 class ObjectsBlock extends \yii\db\ActiveRecord
 {

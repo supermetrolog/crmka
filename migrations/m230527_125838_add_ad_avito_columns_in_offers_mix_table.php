@@ -1,6 +1,7 @@
 <?php
 
 use app\models\OfferMix;
+use app\models\oldDb\ObjectsBlock;
 use yii\db\Migration;
 
 /**
@@ -20,13 +21,13 @@ class m230527_125838_add_ad_avito_columns_in_offers_mix_table extends Migration
     public function safeUp()
     {
         $this->addColumn(
-            OfferMix::tableName(),
+            ObjectsBlock::tableName(),
             'ad_avito',
             $this->tinyInteger()->notNull()->defaultValue(0),
         );
 
         $this->addColumn(
-            OfferMix::tableName(),
+            ObjectsBlock::tableName(),
             'ad_avito_date_start',
             $this->timestamp()
         );
@@ -37,9 +38,8 @@ class m230527_125838_add_ad_avito_columns_in_offers_mix_table extends Migration
      */
     public function safeDown()
     {
-        echo "m230527_125838_add_ad_avito_columns_in_offers_mix_table cannot be reverted.\n";
-
-        return false;
+        $this->dropColumn(ObjectsBlock::tableName(), 'ad_avito_date_start');
+        $this->dropColumn(ObjectsBlock::tableName(), 'ad_avito');
     }
 
     /*
