@@ -133,4 +133,5 @@ interface OfferInterface
     function getMaxPrice(): float;
     function getMaxArea(): float;
     function getMaxAreaPerSotka(): float;
+    function isSolid(): bool;
 }

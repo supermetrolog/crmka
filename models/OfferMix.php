@@ -380,4 +380,20 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     {
         return $this->getMaxArea() / 100;
     }
+
+    /**
+     * @return bool
+     */
+    public function isSolid(): bool
+    {
+        if ($this->isBlock() && $this->block) {
+            return !!$this->block->is_solid;
+        }
+
+        if ($this->isGeneral()) {
+            return true;
+        }
+
+        return false;
+    }
 }

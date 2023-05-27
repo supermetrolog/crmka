@@ -199,4 +199,17 @@ class DataMapper
 
         return $res;
     }
+
+    /**
+     * @param OfferInterface $offer
+     * @return string|null
+     */
+    public function getSquareAdditionally(OfferInterface $offer): ?string
+    {
+        if ($offer->isSolid()) {
+            return null;
+        }
+
+        return AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING;
+    }
 }
