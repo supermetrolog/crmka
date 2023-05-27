@@ -5,7 +5,9 @@ namespace app\components\avito;
 use DOMDocument;
 use DOMElement;
 use DOMException;
+use Exception;
 use phpseclib3\Common\Functions\Strings;
+use yii\helpers\ArrayHelper;
 
 class AvitoFeedGenerator
 {
@@ -78,12 +80,14 @@ class AvitoFeedGenerator
      * @param array $options
      * @return void
      * @throws DOMException
+     * @throws Exception
      */
     private function setOptionElements(DOMElement $elem, array $options): void
     {
         foreach ($options as $option) {
             $optEl = $this->xml->createElement($option['tag'], $option['value']);
-            foreach ($option['attributes'] as $attribute => $value) {
+            $attributes = ArrayHelper::getValue($option, 'attributes', []);
+            foreach ($attributes as $attribute => $value) {
                 $optEl->setAttribute($attribute, $value);
             }
             $elem->appendChild($optEl);

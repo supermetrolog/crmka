@@ -4,11 +4,18 @@ namespace app\models;
 
 use app\components\interfaces\OfferInterface;
 use app\models\ActiveQuery\OfferMixQuery;
+use Throwable;
+use Yii;
 use yii\base\ErrorException;
 use yii\helpers\Json;
 
 class OfferMix extends oldDb\OfferMix implements OfferInterface
 {
+    public const HEATING_CENTRAL_STRING = 'Центральное';
+    public const HEATING_AUTO_STRING = 'Автономное';
+    public const OPEX_INCLUDED = 1;
+    public const PUBLIC_SERVICE_INCLUDED = 1;
+
     /**
      * @return bool
      */
@@ -75,11 +82,44 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isBlock(): bool
+    {
+        return $this->type_id === self::MINI_TYPE_ID;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isGeneral(): bool
+    {
+        return $this->type_id === self::GENERAL_TYPE_ID;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isObject(): bool
+    {
+        return $this->type_id === self::OBJECT_TYPE_ID;
+    }
+
+    /**
      * @return string
      */
     function getDescription(): string
     {
-        return $this->description;
+        try {
+            if (!$this->isBlock() || !$this->block || !$this->block->description_manual_use) {
+                $url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->original_id . '/' . $this->type_id . '?api=1';
+                return file_get_contents($url);
+            } else {
+                return $this->block->description;
+            }
+        } catch (Throwable $th) {
+            return '';
+        }
     }
 
     /**
@@ -155,6 +195,29 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     }
 
     /**
+     * @return float
+     */
+    public function getDepositMonth(): float
+    {
+        if ($this->isBlock()) {
+            return $this->offer->deposit_value ?? 0;
+        }
+
+        if ($this->isGeneral()) {
+            $max = 0;
+            foreach ($this->miniOffersMix as $miniOffer) {
+                if (($miniOffer->offer->deposit_value ?? 0) > $max) {
+                    $max = $miniOffer->offer->deposit_value;
+                }
+            }
+
+            return $max;
+        }
+
+        return 0;
+    }
+
+    /**
      * @return string
      */
     public function getFullConsultantName(): string
@@ -176,5 +239,117 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     public function getImages(): array
     {
         return Json::decode($this->photos);
+    }
+
+    /**
+     * @return float
+     */
+    public function getCeilingHeightMin(): float
+    {
+        return min($this->ceiling_height_min, $this->ceiling_height_max);
+    }
+
+    /**
+     * @return float
+     */
+    public function getPower(): float
+    {
+        if ($this->isBlock()) {
+            if (!$this->block) return 0;
+            return (float) $this->block->power;
+        }
+
+        if ($this->isGeneral()) {
+            $power = 0;
+            if (!$this->miniOffersMix) return 0;
+            foreach ($this->miniOffersMix as  $miniOffer) {
+                if (!$miniOffer->block) return 0;
+                $power += (float)$miniOffer->block->power;
+            }
+
+            return $power;
+        }
+
+        return $this->power;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPowerCapacity(): float
+    {
+        return $this->getPower();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRentalHolidays(): bool
+    {
+        return !!$this->holidays;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFloorMin(): int
+    {
+        return min($this->floor_min, $this->floor_max);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSeveralFloors(): bool
+    {
+        return $this->floor_min !== $this->floor_max;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasHeating(): bool
+    {
+        return $this->heated === 1 && in_array($this->heating, [self::HEATING_CENTRAL_STRING, self::HEATING_AUTO_STRING]);
+    }
+
+    /**
+     * @return int
+     */
+    public function getHeatingType(): int
+    {
+        if ($this->heating === self::HEATING_CENTRAL_STRING) {
+            return self::HEATING_CENTRAL;
+        }
+
+        if ($this->heating === self::HEATING_AUTO_STRING) {
+            return self::HEATING_AUTO;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass(): string
+    {
+        return $this->class_name;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIncludeOPEX(): bool
+    {
+        return $this->price_opex === self::OPEX_INCLUDED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIncludePublicService(): bool
+    {
+        return $this->public_services === self::PUBLIC_SERVICE_INCLUDED;
     }
 }

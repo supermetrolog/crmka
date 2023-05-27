@@ -42,7 +42,17 @@ class DataMapper
             return AvitoValue::LEASE_DEPOSIT_NO_DEPOSIT;
         }
 
-        return AvitoValue::LEASE_DEPOSIT_NO_DEPOSIT; // TODO: FIX
+        $deposit = $offer->getDepositMonth();
+
+        if ($deposit < 1) {
+            return AvitoValue::LEASE_DEPOSIT_NO_DEPOSIT;
+        } else if ($deposit < 2) {
+            return 1;
+        } else if ($deposit < 3) {
+            return 2;
+        } else {
+            return 3;
+        }
     }
 
     /**
@@ -104,5 +114,89 @@ class DataMapper
         }
 
         throw new InvalidArgumentException("Key: $key not exists in array");
+    }
+
+    /**
+     * @param OfferInterface $offer
+     * @return string|null
+     */
+    public function getRentalHolidays(OfferInterface $offer): ?string
+    {
+        if ($offer->hasRentalHolidays()) {
+            return AvitoValue::RENTAL_HOLIDAYS_HAS;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param OfferInterface $offer
+     * @return array[]|null
+     */
+    public function getFloorAdditionally(OfferInterface $offer): ?array
+    {
+        if (!$offer->hasSeveralFloors()) {
+            return null;
+        }
+
+        return [[
+            'tag' => 'Option',
+            'value' => AvitoValue::SEVERAL_FLOORS
+        ]];
+    }
+
+    /**
+     * @param OfferInterface $offer
+     * @return string
+     */
+    public function getHeating(OfferInterface $offer): string
+    {
+        if (!$offer->hasHeating()) {
+            return AvitoValue::HEATING_HAS_NOT;
+        }
+
+        switch ($offer->getHeatingType()) {
+            case OfferInterface::HEATING_AUTO: return AvitoValue::HEATING_AUTO;
+            case OfferInterface::HEATING_CENTRAL: return AvitoValue::HEATING_CENTRAL;
+            default: return AvitoValue::HEATING_HAS_NOT;
+        }
+    }
+
+    /**
+     * @param OfferInterface $offer
+     * @return string|null
+     */
+    public function getBuildingClass(OfferInterface $offer): ?string
+    {
+        if (in_array($offer->getClass(), [AvitoValue::BUILDING_CLASS_A, AvitoValue::BUILDING_CLASS_B, AvitoValue::BUILDING_CLASS_C, AvitoValue::BUILDING_CLASS_D])) {
+            return $offer->getClass();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param OfferInterface $offer
+     * @return array|null
+     */
+    public function getLeasePriceOptions(OfferInterface $offer): ?array
+    {
+        $res = [];
+
+        if ($offer->isIncludePublicService()) {
+            $res[] = [
+                'tag' => 'Option',
+                'value' => AvitoValue::LEASE_PRICE_OPTION_PUBLIC_SERVICES_INCLUDED
+            ];
+        }
+
+        if ($offer->isIncludeOPEX()) {
+            $res[] = [
+                'tag' => 'Option',
+                'value' => AvitoValue::LEASE_PRICE_OPTION_OPEX_INCLUDED
+            ];
+        }
+
+        return $res;
     }
 }

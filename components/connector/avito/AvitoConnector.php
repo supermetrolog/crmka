@@ -46,7 +46,23 @@ class AvitoConnector
             $data[] = $offerData;
         }
 
-        return $data;
+        return $this->clean($data);
+    }
+
+    /**
+     * @param AvitoObject[] $data
+     * @return array
+     */
+    private function clean(array $data): array
+    {
+        $cleanedData = [];
+        foreach ($data as $item) {
+            if (!is_null($item->value)) {
+                $cleanedData[] = $item;
+            }
+        }
+
+        return $cleanedData;
     }
 
     /**
@@ -57,7 +73,7 @@ class AvitoConnector
     {
         return [
             new AvitoObject(AvitoParam::ID, $offer->getID()),
-            new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()), // TODO: get auto desc
+            new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()),
             new AvitoObject(AvitoParam::ADDRESS, $offer->getAddress()),
             new AvitoObject(AvitoParam::LATITUDE, $offer->getLatitude()),
             new AvitoObject(AvitoParam::LONGITUDE, $offer->getLongitude()),
@@ -70,7 +86,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::IMAGES, $this->dataMapper->getImages($offer)),
 //            new AvitoObject(AvitoParam::AD_STATUS, 'Highlight'), // TODO: for future
             new AvitoObject(AvitoParam::CONTACT_METHOD, AvitoValue::CONTACT_METHOD_PHONE_AND_MESSAGES),
-            new AvitoObject(AvitoParam::RENTAL_HOLIDAYS, AvitoValue::RENTAL_HOLIDAYS_HAS), // TODO: fix
+            new AvitoObject(AvitoParam::RENTAL_HOLIDAYS,  $this->dataMapper->getRentalHolidays($offer)),
         ];
     }
 
@@ -98,20 +114,20 @@ class AvitoConnector
         return [
             new AvitoObject(AvitoParam::OPERATION_TYPE, AvitoValue::OPERATION_TYPE_RENT),
             new AvitoObject(AvitoParam::RENTAL_TYPE, $this->dataMapper->getRentalType($offer)),
-            new AvitoObject(AvitoParam::LEASE_DEPOSIT,  $this->dataMapper->getLeaseDeposit($offer)), // TODO: fix
-            new AvitoObject(AvitoParam::LEASE_COMMISSION_SIZE, 0), // TODO: fix
+            new AvitoObject(AvitoParam::LEASE_DEPOSIT,  $this->dataMapper->getLeaseDeposit($offer)),
+            new AvitoObject(AvitoParam::LEASE_COMMISSION_SIZE, 0),
             new AvitoObject(AvitoParam::ENTRANCE, AvitoValue::ENTRANCE_FROM_STREET),
-            new AvitoObject(AvitoParam::FLOOR, 2), // TODO: fix
-            new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, ['option' => AvitoValue::SEVERAL_FLOORS]), // TODO: fix
+            new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
+            new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, $this->dataMapper->getFloorAdditionally($offer)),
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
             new AvitoObject(AvitoParam::SQUARE, 2000), // TODO: fix
             new AvitoObject(AvitoParam::SQUARE_ADDITIONALLY, AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING), // TODO: fix
-            new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeight()), // TODO: fix
-            new AvitoObject(AvitoParam::HEATING, AvitoValue::HEATING_HAS_NOT), // TODO: fix
-            new AvitoObject(AvitoParam::BUILDING_CLASS, AvitoValue::BUILDING_CLASS_A), // TODO: fix
-            new AvitoObject(AvitoParam::LEASE_PRICE_OPTIONS, ''), // TODO: fix
             new AvitoObject(AvitoParam::PRICE_TYPE, AvitoValue::PRICE_TYPE_PER_MONTH_PER_SQUARE_METER), // TODO: fix
-            new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE), // TODO: fix
+            new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMin()),
+            new AvitoObject(AvitoParam::HEATING,  $this->dataMapper->getHeating($offer)),
+            new AvitoObject(AvitoParam::BUILDING_CLASS, $this->dataMapper->getBuildingClass($offer)),
+            new AvitoObject(AvitoParam::LEASE_PRICE_OPTIONS, $this->dataMapper->getLeasePriceOptions($offer)),
+            new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE),
         ];
     }
 
@@ -154,11 +170,14 @@ class AvitoConnector
             new AvitoObject(AvitoParam::TRANSACTION_TYPE, AvitoValue::TRANSACTION_TYPE_SALE),
             new AvitoObject(AvitoParam::ENTRANCE, AvitoValue::ENTRANCE_FROM_STREET),
             new AvitoObject(AvitoParam::FLOOR, 2), // TODO: fix
-            new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, ['option' => AvitoValue::SEVERAL_FLOORS]), // TODO: fix
+            new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, [[
+                'tag' => 'Option',
+                'value' => AvitoValue::SEVERAL_FLOORS
+            ]]), // TODO: fix
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
             new AvitoObject(AvitoParam::SQUARE, 2000), // TODO: fix
             new AvitoObject(AvitoParam::SQUARE_ADDITIONALLY,AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING), // TODO: fix
-            new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeight()), // TODO: fix
+            new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMin()), // TODO: fix
             new AvitoObject(AvitoParam::HEATING, AvitoValue::HEATING_HAS_NOT), // TODO: fix
             new AvitoObject(AvitoParam::BUILDING_CLASS, AvitoValue::BUILDING_CLASS_A), // TODO: fix
             new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE), // TODO: fix

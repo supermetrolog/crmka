@@ -268,6 +268,10 @@ use yii\helpers\ArrayHelper;
  *
  *
  * @property User $consultant
+ * @property ObjectsBlock $block
+ * @property Objects $object
+ * @property $this[] $miniOffersMix
+ * @property Offers $offer
  */
 class OfferMix extends ActiveRecord
 {
@@ -289,6 +293,7 @@ class OfferMix extends ActiveRecord
 
     public const MINI_TYPE_ID = 1;
     public const GENERAL_TYPE_ID = 2;
+    public const OBJECT_TYPE_ID = 3;
 
 
     public const USERS = [
