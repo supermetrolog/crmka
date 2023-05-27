@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\interfaces\floor;
 use app\components\interfaces\OfferInterface;
 use app\models\ActiveQuery\OfferMixQuery;
 use Throwable;
@@ -38,23 +39,6 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     public function isSubleaseType(): bool
     {
         return $this->deal_type === self::DEAL_TYPE_SUBLEASE;
-    }
-
-    /**
-     * @return float
-     * @throws ErrorException
-     */
-    public function getPrice(): float
-    {
-        if ($this->isRentType() || $this->isSubleaseType()) {
-            return 1;
-        }
-
-        if ($this->isSaleType()) {
-            return 2;
-        }
-
-        throw new ErrorException('Unknown offer type');
     }
 
     /**
@@ -351,5 +335,33 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     public function isIncludePublicService(): bool
     {
         return $this->public_services === self::PUBLIC_SERVICE_INCLUDED;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaxRentPrice(): float
+    {
+        return max($this->price_floor_min, $this->price_floor_max);
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaxSalePrice(): float
+    {
+        return max($this->price_sale_min, $this->price_sale_max);
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaxPrice(): float
+    {
+        if ($this->isRentType() || $this->isSubleaseType()) {
+            return $this->getMaxRentPrice();
+        }
+
+        return $this->getMaxSalePrice();
     }
 }

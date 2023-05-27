@@ -84,7 +84,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::LATITUDE, $offer->getLatitude()),
             new AvitoObject(AvitoParam::LONGITUDE, $offer->getLongitude()),
             new AvitoObject(AvitoParam::CATEGORY,  $this->dataMapper->getCategory($offer)),
-            new AvitoObject(AvitoParam::PRICE, $offer->getPrice()), // TODO: fix
+            new AvitoObject(AvitoParam::PRICE, $offer->getMaxPrice()),
             new AvitoObject(AvitoParam::OBJECT_TYPE, $this->dataMapper->getObjectType($offer)),
             new AvitoObject(AvitoParam::PROPERTY_RIGHTS, AvitoValue::PROPERTY_RIGHT_AGENT),
             new AvitoObject(AvitoParam::MANAGER_NAME, $offer->getFullConsultantName()),
@@ -128,7 +128,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
             new AvitoObject(AvitoParam::SQUARE, 2000), // TODO: fix
             new AvitoObject(AvitoParam::SQUARE_ADDITIONALLY, AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING), // TODO: fix
-            new AvitoObject(AvitoParam::PRICE_TYPE, AvitoValue::PRICE_TYPE_PER_MONTH_PER_SQUARE_METER), // TODO: fix
+//            new AvitoObject(AvitoParam::PRICE_TYPE, AvitoValue::PRICE_TYPE_PER_MONTH_PER_SQUARE_METER), // TODO: fix
             new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMin()),
             new AvitoObject(AvitoParam::HEATING,  $this->dataMapper->getHeating($offer)),
             new AvitoObject(AvitoParam::BUILDING_CLASS, $this->dataMapper->getBuildingClass($offer)),

@@ -42,11 +42,6 @@ interface OfferInterface
     function getLongitude(): string;
 
     /**
-     * @return float
-     */
-    function getPrice(): float;
-
-    /**
      * @return array
      */
     function getObjectTypes(): array;
@@ -135,4 +130,5 @@ interface OfferInterface
     function getClass(): string;
     function isIncludeOPEX(): bool;
     function isIncludePublicService(): bool;
+    function getMaxPrice(): float;
 }
