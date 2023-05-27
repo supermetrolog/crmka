@@ -364,4 +364,20 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 
         return $this->getMaxSalePrice();
     }
+
+    /**
+     * @return float
+     */
+    public function getMaxArea(): float
+    {
+        return max($this->area_min, $this->area_max);
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaxAreaPerSotka(): float
+    {
+        return $this->getMaxArea() / 100;
+    }
 }

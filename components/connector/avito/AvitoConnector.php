@@ -126,7 +126,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
             new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, $this->dataMapper->getFloorAdditionally($offer)),
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
-            new AvitoObject(AvitoParam::SQUARE, 2000), // TODO: fix
+            new AvitoObject(AvitoParam::SQUARE, $offer->getMaxArea()),
             new AvitoObject(AvitoParam::SQUARE_ADDITIONALLY, AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING), // TODO: fix
 //            new AvitoObject(AvitoParam::PRICE_TYPE, AvitoValue::PRICE_TYPE_PER_MONTH_PER_SQUARE_METER), // TODO: fix
             new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMin()),
@@ -144,7 +144,7 @@ class AvitoConnector
     private function getDataForLandRent(OfferInterface $offer): array
     {
         return [
-            new AvitoObject(AvitoParam::LAND_AREA, 1), // TODO: fix
+            new AvitoObject(AvitoParam::LAND_AREA, $offer->getMaxAreaPerSotka()),
             new AvitoObject(AvitoParam::LEASE_COMMISSION_SIZE, 0),
             new AvitoObject(AvitoParam::LEASE_DEPOSIT,  $this->dataMapper->getLeaseDeposit($offer)),
         ];
@@ -178,7 +178,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
             new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, $this->dataMapper->getFloorAdditionally($offer)),
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
-            new AvitoObject(AvitoParam::SQUARE, 2000), // TODO: fix
+            new AvitoObject(AvitoParam::SQUARE, $offer->getMaxArea()),
             new AvitoObject(AvitoParam::SQUARE_ADDITIONALLY,AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING), // TODO: fix
             new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMin()),
             new AvitoObject(AvitoParam::HEATING,  $this->dataMapper->getHeating($offer)),

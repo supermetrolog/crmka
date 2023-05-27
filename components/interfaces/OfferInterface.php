@@ -131,4 +131,6 @@ interface OfferInterface
     function isIncludeOPEX(): bool;
     function isIncludePublicService(): bool;
     function getMaxPrice(): float;
+    function getMaxArea(): float;
+    function getMaxAreaPerSotka(): float;
 }
