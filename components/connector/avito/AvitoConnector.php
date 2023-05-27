@@ -50,16 +50,21 @@ class AvitoConnector
     }
 
     /**
-     * @param AvitoObject[] $data
+     * @param array<AvitoObject[]> $data
      * @return array
      */
     private function clean(array $data): array
     {
         $cleanedData = [];
-        foreach ($data as $item) {
-            if (!is_null($item->value)) {
-                $cleanedData[] = $item;
+        foreach ($data as $objects) {
+            $cleanedObjects = [];
+            foreach ($objects as $object) {
+                if (!is_null($object->value)) {
+                    $cleanedObjects[] = $object;
+                }
             }
+
+            $cleanedData[] = $cleanedObjects;
         }
 
         return $cleanedData;
@@ -74,6 +79,7 @@ class AvitoConnector
         return [
             new AvitoObject(AvitoParam::ID, $offer->getID()),
             new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()),
+//            new AvitoObject(AvitoParam::DATE_BEGIN, ''), // TODO: for future
             new AvitoObject(AvitoParam::ADDRESS, $offer->getAddress()),
             new AvitoObject(AvitoParam::LATITUDE, $offer->getLatitude()),
             new AvitoObject(AvitoParam::LONGITUDE, $offer->getLongitude()),
@@ -139,8 +145,8 @@ class AvitoConnector
     {
         return [
             new AvitoObject(AvitoParam::LAND_AREA, 1), // TODO: fix
-            new AvitoObject(AvitoParam::LEASE_COMMISSION_SIZE, 0), // TODO: fix
-            new AvitoObject(AvitoParam::LEASE_DEPOSIT,  $this->dataMapper->getLeaseDeposit($offer)), // TODO: fix
+            new AvitoObject(AvitoParam::LEASE_COMMISSION_SIZE, 0),
+            new AvitoObject(AvitoParam::LEASE_DEPOSIT,  $this->dataMapper->getLeaseDeposit($offer)),
         ];
     }
 
