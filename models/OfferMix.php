@@ -394,4 +394,16 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 
         return false;
     }
+
+    /**
+     * @return string
+     */
+    public function getAvitoAdStartDate(): string
+    {
+        if ($this->isBlock() && $this->block) {
+            return $this->block->ad_avito_date_start;
+        }
+
+        return '';
+    }
 }

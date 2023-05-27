@@ -79,7 +79,7 @@ class AvitoConnector
         return [
             new AvitoObject(AvitoParam::ID, $offer->getID()),
             new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()),
-//            new AvitoObject(AvitoParam::DATE_BEGIN, ''), // TODO: for future
+            new AvitoObject(AvitoParam::DATE_BEGIN, $offer->getAvitoAdStartDate()),
             new AvitoObject(AvitoParam::ADDRESS, $offer->getAddress()),
             new AvitoObject(AvitoParam::LATITUDE, $offer->getLatitude()),
             new AvitoObject(AvitoParam::LONGITUDE, $offer->getLongitude()),

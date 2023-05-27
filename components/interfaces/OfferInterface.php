@@ -125,13 +125,54 @@ interface OfferInterface
      * @return bool
      */
     function hasSeveralFloors(): bool;
+
+    /**
+     * @return bool
+     */
     function hasHeating(): bool;
+
+    /**
+     * @return int
+     */
     function getHeatingType(): int;
+
+    /**
+     * @return string
+     */
     function getClass(): string;
+
+    /**
+     * @return bool
+     */
     function isIncludeOPEX(): bool;
+
+    /**
+     * @return bool
+     */
     function isIncludePublicService(): bool;
+
+    /**
+     * @return float
+     */
     function getMaxPrice(): float;
+
+    /**
+     * @return float
+     */
     function getMaxArea(): float;
+
+    /**
+     * @return float
+     */
     function getMaxAreaPerSotka(): float;
+
+    /**
+     * @return bool
+     */
     function isSolid(): bool;
+
+    /**
+     * @return string
+     */
+    function getAvitoAdStartDate(): string;
 }
