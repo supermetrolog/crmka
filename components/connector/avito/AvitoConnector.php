@@ -169,20 +169,16 @@ class AvitoConnector
             new AvitoObject(AvitoParam::OPERATION_TYPE, AvitoValue::OPERATION_TYPE_SALE),
             new AvitoObject(AvitoParam::TRANSACTION_TYPE, AvitoValue::TRANSACTION_TYPE_SALE),
             new AvitoObject(AvitoParam::ENTRANCE, AvitoValue::ENTRANCE_FROM_STREET),
-            new AvitoObject(AvitoParam::FLOOR, 2), // TODO: fix
-            new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, [[
-                'tag' => 'Option',
-                'value' => AvitoValue::SEVERAL_FLOORS
-            ]]), // TODO: fix
+            new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
+            new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, $this->dataMapper->getFloorAdditionally($offer)),
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
             new AvitoObject(AvitoParam::SQUARE, 2000), // TODO: fix
             new AvitoObject(AvitoParam::SQUARE_ADDITIONALLY,AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING), // TODO: fix
-            new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMin()), // TODO: fix
-            new AvitoObject(AvitoParam::HEATING, AvitoValue::HEATING_HAS_NOT), // TODO: fix
-            new AvitoObject(AvitoParam::BUILDING_CLASS, AvitoValue::BUILDING_CLASS_A), // TODO: fix
-            new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE), // TODO: fix
-            new AvitoObject(AvitoParam::POWER_GRID_CAPACITY, $offer->getPowerCapacity()), // TODO: fix
-            new AvitoObject(AvitoParam::POWER_GRID_ADDITIONALLY, ['option' => AvitoValue::POWER_GRID_ADDITIONALLY_POSSIBLE_INCREASE]), // TODO: fix
+            new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMin()),
+            new AvitoObject(AvitoParam::HEATING,  $this->dataMapper->getHeating($offer)),
+            new AvitoObject(AvitoParam::BUILDING_CLASS, $this->dataMapper->getBuildingClass($offer)),
+            new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE),
+            new AvitoObject(AvitoParam::POWER_GRID_CAPACITY, $offer->getPowerCapacity()),
         ];
     }
 
