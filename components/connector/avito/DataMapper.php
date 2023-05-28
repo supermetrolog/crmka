@@ -212,4 +212,17 @@ class DataMapper
 
         return AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING;
     }
+
+    /**
+     * @param OfferInterface $offer
+     * @return string
+     */
+    public function getOperationType(OfferInterface $offer): string
+    {
+        if ($offer->isRentType() || $offer->isSubleaseType()) {
+            return AvitoValue::OPERATION_TYPE_RENT;
+        }
+
+        return AvitoValue::OPERATION_TYPE_SALE;
+    }
 }

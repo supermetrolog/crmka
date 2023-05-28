@@ -78,6 +78,7 @@ class AvitoConnector
     {
         return [
             new AvitoObject(AvitoParam::ID, $offer->getID()),
+            new AvitoObject(AvitoParam::OPERATION_TYPE, $this->dataMapper->getOperationType($offer)),
             new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()),
             new AvitoObject(AvitoParam::DATE_BEGIN, $offer->getAvitoAdStartDate()),
             new AvitoObject(AvitoParam::ADDRESS, $offer->getAddress()),
@@ -118,7 +119,6 @@ class AvitoConnector
     private function getDataForObjectRent(OfferInterface $offer): array
     {
         return [
-            new AvitoObject(AvitoParam::OPERATION_TYPE, AvitoValue::OPERATION_TYPE_RENT),
             new AvitoObject(AvitoParam::RENTAL_TYPE, $this->dataMapper->getRentalType($offer)),
             new AvitoObject(AvitoParam::LEASE_DEPOSIT,  $this->dataMapper->getLeaseDeposit($offer)),
             new AvitoObject(AvitoParam::LEASE_COMMISSION_SIZE, 0),
@@ -172,7 +172,6 @@ class AvitoConnector
     private function getDataForObjectSale(OfferInterface $offer): array
     {
         return [
-            new AvitoObject(AvitoParam::OPERATION_TYPE, AvitoValue::OPERATION_TYPE_SALE),
             new AvitoObject(AvitoParam::TRANSACTION_TYPE, AvitoValue::TRANSACTION_TYPE_SALE),
             new AvitoObject(AvitoParam::ENTRANCE, AvitoValue::ENTRANCE_FROM_STREET),
             new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
