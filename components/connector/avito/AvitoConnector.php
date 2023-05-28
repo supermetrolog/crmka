@@ -193,6 +193,8 @@ class AvitoConnector
      */
     private function getDataForLandSale(OfferInterface $offer): array
     {
-        return [];
+        return [
+            new AvitoObject(AvitoParam::LAND_AREA, $offer->getMaxAreaPerSotka()),
+        ];
     }
 }
