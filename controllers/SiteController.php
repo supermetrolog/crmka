@@ -2,10 +2,11 @@
 
 namespace app\controllers;
 
-use Yii;
+use app\components\avito\AvitoFeedGenerator;
+use app\components\connector\avito\AvitoConnector;
+use app\models\OfferMix;
 use yii\web\Controller;
-use PhpAmqpLib\Message\AMQPMessage;
-use app\components\NotificationsQueueService;
+use yii\web\Response;
 
 class SiteController extends Controller
 {
@@ -23,10 +24,23 @@ class SiteController extends Controller
     }
     public function actionIndex()
     {
-        /** @var NotificationsQueueService */
-        $notifyQueue = Yii::$app->notifyQueue;
+        $this->response->format = Response::FORMAT_XML;
 
-        $toSend = new AMQPMessage("SUKA NAHUI");
-        $notifyQueue->publish($toSend);
+        $avitoFeedGenerator = new AvitoFeedGenerator();
+        $models = OfferMix::find()
+            ->limit(5)
+            ->rentDealType()
+            ->notDelete()
+            ->active()
+            ->offersType()
+            ->all();
+
+        $connector = new AvitoConnector($models);
+
+        $avitoFeedGenerator->setAvitoObjects($connector->getData());
+
+        $res = $avitoFeedGenerator->generate();
+
+        $this->response->content = $res;
     }
 }

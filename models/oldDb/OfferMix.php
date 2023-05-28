@@ -11,6 +11,7 @@ use app\models\Request;
 use app\models\User;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -264,10 +265,16 @@ use yii\helpers\ArrayHelper;
  * @property int|null $is_exclusive эксклюзив
  * @property int|null $deal_id номер сделки
  * @property int|null $hide_from_market скрыто от рынка
+ *
+ *
+ * @property User $consultant
+ * @property ObjectsBlock $block
+ * @property Objects $object
+ * @property $this[] $miniOffersMix
+ * @property Offers $offer
  */
-class OfferMix extends \yii\db\ActiveRecord
+class OfferMix extends ActiveRecord
 {
-
     public const STATUS_ACTIVE = 1;
     public const STATUS_PASSIVE = 2;
 
@@ -285,6 +292,7 @@ class OfferMix extends \yii\db\ActiveRecord
 
     public const MINI_TYPE_ID = 1;
     public const GENERAL_TYPE_ID = 2;
+    public const OBJECT_TYPE_ID = 3;
 
 
     public const USERS = [
@@ -692,7 +700,13 @@ class OfferMix extends \yii\db\ActiveRecord
         $fields['last_update_format'] = function ($fields) {
             return $fields['last_update'] ? Yii::$app->formatter->format($fields['last_update'], 'datetime') : null;
         };
+        $fields['ad_avito'] = function ($fields) {
+            if (!$this->block) {
+                return 0;
+            }
 
+            return $this->block->ad_avito;
+        };
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);
         };

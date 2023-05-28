@@ -1,0 +1,59 @@
+<?php
+
+use app\models\OfferMix;
+use app\models\oldDb\ObjectsBlock;
+use yii\db\Migration;
+
+/**
+ * Class m230527_125838_add_ad_avito_columns_in_offers_mix_table
+ */
+class m230527_125838_add_ad_avito_columns_in_offers_mix_table extends Migration
+{
+    public function init()
+    {
+        parent::init();
+        $this->db = Yii::$app->db_old;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function safeUp()
+    {
+        $this->addColumn(
+            ObjectsBlock::tableName(),
+            'ad_avito',
+            $this->tinyInteger()->notNull()->defaultValue(0),
+        );
+
+        $this->addColumn(
+            ObjectsBlock::tableName(),
+            'ad_avito_date_start',
+            $this->timestamp()
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function safeDown()
+    {
+        $this->dropColumn(ObjectsBlock::tableName(), 'ad_avito_date_start');
+        $this->dropColumn(ObjectsBlock::tableName(), 'ad_avito');
+    }
+
+    /*
+    // Use up()/down() to run migration code without a transaction.
+    public function up()
+    {
+
+    }
+
+    public function down()
+    {
+        echo "m230527_125838_add_ad_avito_columns_in_offers_mix_table cannot be reverted.\n";
+
+        return false;
+    }
+    */
+}

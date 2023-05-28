@@ -6,8 +6,10 @@ namespace app\models\ActiveQuery\oldDb;
 
 use app\helpers\DbHelper;
 use app\models\Company;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 use app\models\oldDb\OfferMix;
+use yii\db\ActiveRecord;
 
 class OfferMixQuery extends ActiveQuery
 {
@@ -21,7 +23,7 @@ class OfferMixQuery extends ActiveQuery
     }
     /**
      * @param  mixed $db
-     * @return OfferMix|null
+     * @return OfferMix|null|ActiveRecord
      */
     public function one($db = null)
     {
@@ -29,13 +31,22 @@ class OfferMixQuery extends ActiveQuery
         return parent::one($db);
     }
 
-    public function search()
+    /**
+     * @return OfferMixQuery
+     * @throws ErrorException
+     */
+    public function search(): OfferMixQuery
     {
         return $this->groupBy(DbHelper::getField(OfferMix::tableName(), 'id'))
             ->with(['object'])
             ->joinForSearch();
     }
 
+    /**
+     * @param bool $eagerLoading
+     * @return self
+     * @throws ErrorException
+     */
     public function joinForSearch(bool $eagerLoading = false): self
     {
         $joinedDbName = DbHelper::getDsnAttribute('dbname', Company::getDb()->dsn);

@@ -25,7 +25,9 @@
         "librasoft-fr/php-ssh-connection": "^3.1",
         "monolog/monolog": "^2.8",
         "supermetrolog/synchronizer-local-to-ftp-builder": "^1.1",
-        "php-amqplib/php-amqplib": "^3.5"
+        "php-amqplib/php-amqplib": "^3.5",
+        "ext-dom": "*",
+        "ext-intl": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

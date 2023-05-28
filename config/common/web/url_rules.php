@@ -110,6 +110,7 @@ return
                 'GET,OPTIONS offers-map' => 'offers-map',
                 'GET,OPTIONS offers-count' => 'offers-count',
                 'GET,OPTIONS offers-map-count' => 'offers-map-count',
+                'POST,OPTIONS toggle-avito-ad/<originalId>' => 'toggle-avito-ad',
             ],
         ],
         [
