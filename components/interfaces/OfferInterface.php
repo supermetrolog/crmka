@@ -19,7 +19,7 @@ interface OfferInterface
     /**
      * @return int
      */
-    function getID(): int;
+    function getVisualId(): string;
 
     /**
      * @return string

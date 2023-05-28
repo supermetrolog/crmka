@@ -58,9 +58,9 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     /**
      * @return int
      */
-    function getID(): int
+    function getVisualId(): string
     {
-        return $this->original_id;
+        return $this->visual_id;
     }
 
     /**
