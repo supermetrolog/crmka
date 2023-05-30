@@ -36,7 +36,6 @@ class FeedController extends Controller
             ->active()
             ->adAvito()
             ->blockType()
-            ->limit(20)
             ->with(['block', 'offer', 'object'])
             ->all();
 
