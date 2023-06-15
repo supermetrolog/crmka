@@ -20,11 +20,36 @@ class m230527_125838_add_ad_avito_columns_in_offers_mix_table extends Migration
      */
     public function safeUp()
     {
+        $tableName = ObjectsBlock::tableName();
+
+        $sql = <<< EOF
+            SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = '$tableName' AND COLUMN_NAME = :column_name
+        EOF;
+
+        $exists = $this->db
+            ->createCommand($sql)
+            ->bindValue('column_name', 'ad_avito')
+            ->queryOne();
+
+        if ($exists) {
+            return;
+        }
+
         $this->addColumn(
             ObjectsBlock::tableName(),
             'ad_avito',
             $this->tinyInteger()->notNull()->defaultValue(0),
         );
+
+        $exists = $this->db
+            ->createCommand($sql)
+            ->bindValue('column_name', 'ad_avito_date_start')
+            ->queryOne();
+
+        if ($exists) {
+            return;
+        }
 
         $this->addColumn(
             ObjectsBlock::tableName(),

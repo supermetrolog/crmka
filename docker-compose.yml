@@ -2,7 +2,7 @@ version: '2'
 services:
   db:
     image: mysql
-    container_name: db
+    container_name: crmka_db
     restart: unless-stopped
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
@@ -29,7 +29,7 @@ services:
          DOCKER_PHP_XDEBUG_VERSION: ${DOCKER_PHP_XDEBUG_VERSION}
          TZ: ${WORKSPACE_TIMEZONE}
      working_dir: /var/www
-     container_name: php
+     container_name: crmka_php
      volumes:
        - .:/var/www/crmka.local
        - ./docker/php/conf/php.ini:/usr/local/etc/php/php.ini
@@ -39,7 +39,7 @@ services:
        - backend
   nginx:
      image: nginx:stable-alpine
-     container_name: nginx
+     container_name: crmka_nginx
      ports:
        - "80:80"
        - "443:443"
