@@ -152,4 +152,11 @@ return
             'except' => [],
             'extraPatterns' => [],
         ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => ['objects' => 'objects'],
+            'extraPatterns' => [
+                'GET' => 'index'
+            ],
+        ],
     ];
