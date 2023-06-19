@@ -22,6 +22,16 @@ class ComplexQuery extends ActiveQuery
      */
     public function one($db = null)
     {
+        $this->limit(1);
         return parent::one($db);
+    }
+
+    /**
+     * @param int $id
+     * @return self
+     */
+    public function byId(int $id): self
+    {
+        return $this->andWhere(['id' => $id]);
     }
 }

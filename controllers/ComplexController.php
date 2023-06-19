@@ -24,7 +24,7 @@ class ComplexController extends AppController
      */
     protected function findModel(int $id): Complex
     {
-        if ($model = Complex::find()->where(['id' => $id])->limit(1)->one()) {
+        if ($model = Complex::find()->with(['objects'])->byId($id)->one()) {
             return $model;
         }
 

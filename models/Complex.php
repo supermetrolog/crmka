@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\ActiveQuery\ComplexQuery;
+use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
 class Complex extends oldDb\Complex
@@ -33,5 +34,13 @@ class Complex extends oldDb\Complex
     public static function find(): ComplexQuery
     {
         return new ComplexQuery(get_called_class());
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getObjects(): ActiveQuery
+    {
+        return $this->hasMany(Objects::class, ['complex_id' => 'id']);
     }
 }
