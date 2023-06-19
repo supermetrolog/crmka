@@ -159,4 +159,11 @@ return
                 'GET' => 'index'
             ],
         ],
+        [
+            'class' => 'yii\rest\UrlRule',
+            'controller' => ['complex' => 'complex'],
+            'extraPatterns' => [
+                'GET <id>' => 'view'
+            ],
+        ],
     ];
