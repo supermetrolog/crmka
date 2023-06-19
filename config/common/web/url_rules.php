@@ -156,14 +156,14 @@ return
             'class' => 'yii\rest\UrlRule',
             'controller' => ['objects' => 'objects'],
             'extraPatterns' => [
-                'GET' => 'index'
+                'GET,OPTIONS' => 'index'
             ],
         ],
         [
             'class' => 'yii\rest\UrlRule',
             'controller' => ['complex' => 'complex'],
             'extraPatterns' => [
-                'GET <id>' => 'view'
+                'GET,OPTIONS <id>' => 'view'
             ],
         ],
     ];
