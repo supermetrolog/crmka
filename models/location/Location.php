@@ -93,4 +93,20 @@ class Location extends oldDb\location\Location
     {
         return $this->hasOne(DistrictMoscow::class, ['id' => 'district_moscow']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getTownRecord(): ActiveQuery
+    {
+        return $this->hasOne(Town::class, ['id' => 'town']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getTownCentralRecord(): ActiveQuery
+    {
+        return $this->hasOne(TownCentral::class, ['id' => 'town_central']);
+    }
 }
