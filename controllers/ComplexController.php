@@ -36,7 +36,9 @@ class ComplexController extends AppController
                 'location.townCentralRecord',
                 'location.metroRecord',
             ])
-            ->byId($id);
+            ->byId($id)
+            ->groupBy('id');
+
         if ($model = $query->one()) {
             return $model;
         }

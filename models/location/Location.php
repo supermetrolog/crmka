@@ -5,6 +5,8 @@ namespace app\models\location;
 use app\helpers\JsonFieldNormalizer;
 use app\models\oldDb;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
+use function React\Promise\all;
 
 class Location extends oldDb\location\Location
 {
@@ -55,6 +57,16 @@ class Location extends oldDb\location\Location
     }
 
     /**
+     * @return array
+     */
+    public function extraFields(): array
+    {
+        $fields = parent::extraFields();
+        $fields['highwayRelevantRecords'] = function () { return $this->getHighwayRelevantRecords(); };
+        return $fields;
+    }
+
+    /**
      * @return ActiveQuery
      */
     public function getRegionRecord(): ActiveQuery
@@ -67,7 +79,7 @@ class Location extends oldDb\location\Location
      */
     public function getHighwayRecord(): ActiveQuery
     {
-        return $this->hasOne(Highways::class, ['id' => 'highway']);
+        return $this->hasOne(Highway::class, ['id' => 'highway']);
     }
 
     /**
@@ -117,4 +129,13 @@ class Location extends oldDb\location\Location
     {
         return $this->hasOne(Metro::class, ['id' => 'metro']);
     }
+
+    /**
+     * @return Highway[]
+     */
+    public function getHighwayRelevantRecords(): array
+    {
+        return Highway::find()->byIds($this->getHighwayRelevant())->all();
+    }
+
 }

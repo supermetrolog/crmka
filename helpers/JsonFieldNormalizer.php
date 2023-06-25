@@ -7,11 +7,15 @@ use yii\helpers\Json;
 class JsonFieldNormalizer
 {
     /**
-     * @param string $value
+     * @param mixed $value
      * @return array
      */
-    public static function jsonToArrayWithIntElements(string $value): array
+    public static function jsonToArrayWithIntElements($value): array
     {
+        if (!is_string($value)) {
+            return [];
+        }
+
         $decoded = Json::decode($value);
 
         if (!is_array($decoded)) {

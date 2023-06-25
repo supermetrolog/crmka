@@ -32,6 +32,6 @@ class ComplexQuery extends ActiveQuery
      */
     public function byId(int $id): self
     {
-        return $this->andWhere(['id' => $id]);
+        return $this->andWhere([Complex::tableName() .  '.id' => $id]);
     }
 }
