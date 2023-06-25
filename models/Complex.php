@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\JsonFieldNormalizer;
 use app\models\ActiveQuery\ComplexQuery;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
@@ -20,11 +21,49 @@ class Complex extends oldDb\Complex
     /**
      * @return array
      */
+    public function getInternetType(): array
+    {
+        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->internet_type);
+    }
+
+    /**
+     * @return array
+     */
+    public function getGuardType(): array
+    {
+        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->guard_type);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCranesGantry(): array
+    {
+        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_gantry);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCranesRailway(): array
+    {
+        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_railway);
+    }
+
+
+
+    /**
+     * @return array
+     */
     public function fields(): array
     {
         $fields = parent::fields();
         unset($fields['photo']);
         $fields['photos'] = function () { return $this->getPhotos(); };
+        $fields['internet_type'] = function () { return $this->getInternetType(); };
+        $fields['guard_type'] = function () { return $this->getGuardType(); };
+        $fields['cranes_gantry'] = function () { return $this->getCranesGantry(); };
+        $fields['cranes_railway'] = function () { return $this->getCranesRailway(); };
         return $fields;
     }
 
