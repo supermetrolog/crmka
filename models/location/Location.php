@@ -109,4 +109,12 @@ class Location extends oldDb\location\Location
     {
         return $this->hasOne(TownCentral::class, ['id' => 'town_central']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getMetroRecord(): ActiveQuery
+    {
+        return $this->hasOne(Metro::class, ['id' => 'metro']);
+    }
 }

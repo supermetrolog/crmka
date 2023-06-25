@@ -34,6 +34,7 @@ class ComplexController extends AppController
                 'location.districtMoscowRecord',
                 'location.townRecord.townTypeRecord',
                 'location.townCentralRecord',
+                'location.metroRecord',
             ])
             ->byId($id);
         if ($model = $query->one()) {
