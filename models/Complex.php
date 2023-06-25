@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
 use app\models\ActiveQuery\ComplexQuery;
+use app\models\location\Location;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
@@ -81,5 +82,13 @@ class Complex extends oldDb\Complex
     public function getObjects(): ActiveQuery
     {
         return $this->hasMany(Objects::class, ['complex_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getLocation(): ActiveQuery
+    {
+        return $this->hasOne(Location::class, ['id' => 'location_id']);
     }
 }

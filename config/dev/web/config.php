@@ -13,6 +13,7 @@ return ArrayHelper::merge(
             ],
             'gii' => [
                 'class' => 'yii\gii\Module',
+                'allowedIPs' => ["*"],
                 'generators' => [
                     'jobs' => yii\queue\gii\Generator::class,
                 ],
