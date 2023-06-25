@@ -56,15 +56,15 @@ class Location extends oldDb\location\Location
         return $fields;
     }
 
-    /**
-     * @return array
-     */
-    public function extraFields(): array
-    {
-        $fields = parent::extraFields();
-        $fields['highwayRelevantRecords'] = function () { return $this->getHighwayRelevantRecords(); };
-        return $fields;
-    }
+//    /**
+//     * @return array
+//     */
+//    public function extraFields(): array
+//    {
+//        $fields = parent::extraFields();
+//        $fields['highwayRelevantRecords'] = function () { return $this->getHighwayRelevantRecords(); };
+//        return $fields;
+//    }
 
     /**
      * @return ActiveQuery
