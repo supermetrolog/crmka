@@ -4,6 +4,7 @@ namespace app\models\location;
 
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveRecord;
 use yii\db\Connection;
 
 /**
@@ -35,7 +36,7 @@ use yii\db\Connection;
  * @property int|null $exclude
  * @property int|null $deleted
  */
-class Direction extends \yii\db\ActiveRecord
+class Direction extends ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -99,6 +100,23 @@ class Direction extends \yii\db\ActiveRecord
             'activity' => 'Activity',
             'exclude' => 'Exclude',
             'deleted' => 'Deleted',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function fields(): array
+    {
+        $fields = parent::fields();
+
+        return [
+            'id' => $fields['id'],
+            'title' => $fields['title'],
+            'title_short' => $fields['title_short'],
+            'title_en' => $fields['title_en'],
+            'activity' => $fields['activity'],
+            'deleted' => $fields['deleted'],
         ];
     }
 }

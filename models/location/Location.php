@@ -69,4 +69,12 @@ class Location extends oldDb\location\Location
     {
         return $this->hasOne(Highways::class, ['id' => 'highway']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getDirectionRecord(): ActiveQuery
+    {
+        return $this->hasOne(Direction::class, ['id' => 'direction']);
+    }
 }

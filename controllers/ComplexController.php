@@ -29,6 +29,7 @@ class ComplexController extends AppController
                 'objects',
                 'location.regionRecord',
                 'location.highwayRecord',
+                'location.directionRecord',
             ])
             ->byId($id);
         if ($model = $query->one()) {
