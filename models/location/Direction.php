@@ -114,8 +114,8 @@ class Direction extends ActiveRecord
             'id' => $fields['id'],
             'title' => $fields['title'],
             'title_short' => $fields['title_short'],
-            'title_en' => $fields['title_en'],
-            'activity' => $fields['activity'],
+            'title_eng' => $fields['title_eng'],
+            'exclude' => $fields['exclude'],
             'deleted' => $fields['deleted'],
         ];
     }

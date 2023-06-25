@@ -77,4 +77,12 @@ class Location extends oldDb\location\Location
     {
         return $this->hasOne(Direction::class, ['id' => 'direction']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getDistrictRecord(): ActiveQuery
+    {
+        return $this->hasOne(District::class, ['id' => 'district']);
+    }
 }
