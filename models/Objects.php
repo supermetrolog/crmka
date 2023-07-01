@@ -47,6 +47,22 @@ class Objects extends oldDb\Objects
     /**
      * @return array
      */
+    public function getCranesGantry(): array
+    {
+        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_gantry);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCranesRailway(): array
+    {
+        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_railway);
+    }
+
+    /**
+     * @return array
+     */
     public function fields(): array
     {
         $fields = parent::fields();
@@ -56,6 +72,8 @@ class Objects extends oldDb\Objects
         $fields['floors_building'] = function () { return $this->getFloorBuildings(); };
         $fields['purposes'] = function () { return $this->getPurposes(); };
         $fields['object_class_text'] = function () { return $this->objectClassRecord->title; };
+        $fields['cranes_gantry'] = function () { return $this->getCranesGantry(); };
+        $fields['cranes_railway'] = function () { return $this->getCranesRailway(); };
 
         return $fields;
     }
