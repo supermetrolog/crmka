@@ -5,6 +5,7 @@ namespace app\models;
 use app\helpers\JsonFieldNormalizer;
 use app\models\ActiveQuery\ComplexQuery;
 use app\models\location\Location;
+use app\models\oldDb\User as OldDbUser;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
@@ -90,5 +91,29 @@ class Complex extends oldDb\Complex
     public function getLocation(): ActiveQuery
     {
         return $this->hasOne(Location::class, ['id' => 'location_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getOldUser(): ActiveQuery
+    {
+        return $this->hasOne(OldDbUser::class, ['id' => 'author_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getAuthor(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id_new'])->via('oldUser');
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getAgent(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id_new'])->via('oldUser');
     }
 }
