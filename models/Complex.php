@@ -7,6 +7,7 @@ use app\models\ActiveQuery\ComplexQuery;
 use app\models\location\Location;
 use app\models\oldDb\User as OldDbUser;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\Json;
 
 class Complex extends oldDb\Complex
@@ -69,6 +70,19 @@ class Complex extends oldDb\Complex
         return $fields;
     }
 
+
+    /**
+     * @return array
+     */
+    public function extraFields(): array
+    {
+        $f = parent::extraFields();
+
+        $f['guardTypes'] = 'guardTypes';
+        $f['internetTypes'] = 'internetTypes';
+        return $f;
+    }
+
     /**
      * @return ComplexQuery
      */
@@ -115,5 +129,21 @@ class Complex extends oldDb\Complex
     public function getAgent(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id_new'])->via('oldUser');
+    }
+
+    /**
+     * @return GuardType[]
+     */
+    public function getGuardTypes(): array
+    {
+        return GuardType::find()->andWhere(['id' => $this->getGuardType()])->all();
+    }
+
+    /**
+     * @return GuardType[]
+     */
+    public function getInternetTypes(): array
+    {
+        return InternetType::find()->andWhere(['id' => $this->getInternetType()])->all();
     }
 }

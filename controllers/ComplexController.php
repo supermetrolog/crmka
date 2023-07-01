@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Complex;
+use yii\db\ActiveQuery;
 use yii\web\NotFoundHttpException;
 
 class ComplexController extends AppController
