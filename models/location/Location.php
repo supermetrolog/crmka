@@ -3,6 +3,7 @@
 namespace app\models\location;
 
 use app\helpers\JsonFieldNormalizer;
+use app\models\DistrictType;
 use app\models\oldDb;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
@@ -136,6 +137,14 @@ class Location extends oldDb\location\Location
     public function getHighwayRelevantRecords(): array
     {
         return Highway::find()->byIds($this->getHighwayRelevant())->all();
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getDistrictTypeRecord(): ActiveQuery
+    {
+        return $this->hasOne(DistrictType::class, ['id' => 'district_type']);
     }
 
 }
