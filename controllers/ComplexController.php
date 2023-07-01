@@ -27,7 +27,17 @@ class ComplexController extends AppController
     {
         $query = Complex::find()
             ->with([
-                'objects',
+                'objects.company.consultant.userProfile',
+                'objects.objectClassRecord',
+                'objects.firefightingType',
+                'objects.location.regionRecord',
+                'objects.location.highwayRecord',
+                'objects.location.directionRecord',
+                'objects.location.districtRecord',
+                'objects.location.districtMoscowRecord',
+                'objects.location.townRecord.townTypeRecord',
+                'objects.location.townCentralRecord',
+                'objects.location.metroRecord',
                 'location.regionRecord',
                 'location.highwayRecord',
                 'location.directionRecord',
