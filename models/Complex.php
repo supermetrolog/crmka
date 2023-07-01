@@ -53,7 +53,13 @@ class Complex extends oldDb\Complex
         return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_railway);
     }
 
-
+    /**
+     * @return array
+     */
+    public function getWaterType(): array
+    {
+        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->water_type);
+    }
 
     /**
      * @return array
@@ -67,6 +73,7 @@ class Complex extends oldDb\Complex
         $fields['guard_type'] = function () { return $this->getGuardType(); };
         $fields['cranes_gantry'] = function () { return $this->getCranesGantry(); };
         $fields['cranes_railway'] = function () { return $this->getCranesRailway(); };
+        $fields['water_type'] = function () { return $this->getWaterType(); };
         return $fields;
     }
 
@@ -80,6 +87,7 @@ class Complex extends oldDb\Complex
 
         $f['guardTypes'] = 'guardTypes';
         $f['internetTypes'] = 'internetTypes';
+        $f['waterTypes'] = 'waterTypes';
         return $f;
     }
 
@@ -140,10 +148,18 @@ class Complex extends oldDb\Complex
     }
 
     /**
-     * @return GuardType[]
+     * @return InternetType[]
      */
     public function getInternetTypes(): array
     {
         return InternetType::find()->andWhere(['id' => $this->getInternetType()])->all();
+    }
+
+    /**
+     * @return WaterType[]
+     */
+    public function getWaterTypes(): array
+    {
+        return WaterType::find()->andWhere(['id' => $this->getWaterType()])->all();
     }
 }
