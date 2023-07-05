@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
+use app\models\crane\Crane;
 use app\models\location\Location;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
@@ -172,5 +173,13 @@ class Objects extends oldDb\Objects
     public function getFloorsRecords(): ActiveQuery
     {
         return $this->hasMany(Floor::class, ['object_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCranes(): ActiveQuery
+    {
+        return $this->hasMany(Crane::class, ['object_id' => 'id']);
     }
 }

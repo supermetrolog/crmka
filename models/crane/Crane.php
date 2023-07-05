@@ -2,10 +2,13 @@
 
 namespace app\models\crane;
 
+use app\helpers\JsonFieldNormalizer;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Connection;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "l_cranes".
@@ -98,5 +101,94 @@ class Crane extends ActiveRecord
             'publ_time' => 'Publ Time',
             'last_update' => 'Last Update',
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getControls(): array
+    {
+        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->crane_controls);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPhotos(): array
+    {
+        return Json::decode($this->photo) ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function fields(): array
+    {
+        $f = parent::fields();
+
+        $f['crane_controls'] = function () { return $this->getControls(); };
+        $f['photo'] = function () { return $this->getPhotos(); };
+
+        return $f;
+    }
+
+    /**
+     * @return array
+     */
+    public function extraFields(): array
+    {
+        $f = parent::extraFields();
+
+        $f['controls'] = function () { CraneControll::find()->where(['id' => $this->getControls()])->all(); };
+
+        return $f;
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getBeam(): ActiveQuery
+    {
+        return $this->hasOne(CraneBeam::class, ['id' => 'crane_beam']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getBeamAmount(): ActiveQuery
+    {
+        return $this->hasOne(CraneBeamAmount::class, ['id' => 'crane_beam_amount']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getState(): ActiveQuery
+    {
+        return $this->hasOne(CraneState::class, ['id' => 'crane_condition']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getLocation(): ActiveQuery
+    {
+        return $this->hasOne(CraneLocation::class, ['id' => 'crane_location']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getType(): ActiveQuery
+    {
+        return $this->hasOne(CraneType::class, ['id' => 'crane_type']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getHoisting(): ActiveQuery
+    {
+        return $this->hasOne(CraneHoisting::class, ['id' => 'crane_hoisting']);
     }
 }

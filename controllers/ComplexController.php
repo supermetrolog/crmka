@@ -44,6 +44,12 @@ class ComplexController extends AppController
                 'objects.commercialOffers.dealTypeRecord',
                 'objects.floorsRecords.number',
                 'objects.floorsRecords.parts',
+                'objects.cranes.state',
+                'objects.cranes.beam',
+                'objects.cranes.beamAmount',
+                'objects.cranes.hoisting',
+                'objects.cranes.location',
+                'objects.cranes.type',
             ])
             ->byId($id)
             ->groupBy('id');
