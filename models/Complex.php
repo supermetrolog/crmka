@@ -64,6 +64,22 @@ class Complex extends oldDb\Complex
     /**
      * @return array
      */
+    public function getBuildingLayout(): array
+    {
+        return Json::decode($this->building_layouts) ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getBuildingPresentation(): array
+    {
+        return Json::decode($this->building_presentations) ?? [];
+    }
+
+    /**
+     * @return array
+     */
     public function fields(): array
     {
         $fields = parent::fields();
@@ -74,6 +90,9 @@ class Complex extends oldDb\Complex
         $fields['cranes_gantry'] = function () { return $this->getCranesGantry(); };
         $fields['cranes_railway'] = function () { return $this->getCranesRailway(); };
         $fields['water_type'] = function () { return $this->getWaterType(); };
+        $fields['building_layouts'] = function () { return $this->getBuildingLayout(); };
+        $fields['building_presentations'] = function () { return $this->getBuildingPresentation(); };
+
         return $fields;
     }
 

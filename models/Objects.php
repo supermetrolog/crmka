@@ -5,6 +5,7 @@ namespace app\models;
 use app\helpers\JsonFieldNormalizer;
 use app\models\location\Location;
 use yii\db\ActiveQuery;
+use yii\helpers\Json;
 
 /**
  * @property ObjectClass $objectClassRecord
@@ -60,6 +61,31 @@ class Objects extends oldDb\Objects
         return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_railway);
     }
 
+
+    /**
+     * @return array
+     */
+    public function getPhotos(): array
+    {
+        return Json::decode($this->photo) ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getBuildingLayout(): array
+    {
+        return Json::decode($this->building_layouts) ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getBuildingPresentation(): array
+    {
+        return Json::decode($this->building_presentations) ?? [];
+    }
+
     /**
      * @return array
      */
@@ -74,6 +100,9 @@ class Objects extends oldDb\Objects
         $fields['object_class_text'] = function () { return $this->objectClassRecord->title; };
         $fields['cranes_gantry'] = function () { return $this->getCranesGantry(); };
         $fields['cranes_railway'] = function () { return $this->getCranesRailway(); };
+        $fields['photo'] = function () { return $this->getPhotos(); };
+        $fields['building_layouts'] = function () { return $this->getBuildingLayout(); };
+        $fields['building_presentations'] = function () { return $this->getBuildingPresentation(); };
 
         return $fields;
     }
