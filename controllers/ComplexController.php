@@ -41,7 +41,9 @@ class ComplexController extends AppController
                 'location.districtTypeRecord',
                 'author.userProfile',
                 'agent.userProfile',
-                'objects.commercialOffers.dealTypeRecord'
+                'objects.commercialOffers.dealTypeRecord',
+                'objects.floorsRecords.number',
+                'objects.floorsRecords.parts',
             ])
             ->byId($id)
             ->groupBy('id');

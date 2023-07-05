@@ -165,4 +165,12 @@ class Objects extends oldDb\Objects
     {
         return $this->hasMany(CommercialOffer::class, ['object_id' => 'id']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getFloorsRecords(): ActiveQuery
+    {
+        return $this->hasMany(Floor::class, ['object_id' => 'id']);
+    }
 }
