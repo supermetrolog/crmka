@@ -157,4 +157,12 @@ class Objects extends oldDb\Objects
     {
         return $this->hasOne(FirefightingType::class, ['id' => 'firefighting_type']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCommercialOffers(): ActiveQuery
+    {
+        return $this->hasMany(CommercialOffer::class, ['object_id' => 'id']);
+    }
 }

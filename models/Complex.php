@@ -7,7 +7,6 @@ use app\models\ActiveQuery\ComplexQuery;
 use app\models\location\Location;
 use app\models\oldDb\User as OldDbUser;
 use yii\db\ActiveQuery;
-use yii\db\Expression;
 use yii\helpers\Json;
 
 class Complex extends oldDb\Complex
