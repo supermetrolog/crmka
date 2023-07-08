@@ -42,6 +42,8 @@ class ComplexController extends AppController
                 'author.userProfile',
                 'agent.userProfile',
                 'objects.commercialOffers.dealTypeRecord',
+                'objects.commercialOffers.companyRecord.consultant.userProfile',
+                'objects.commercialOffers.companyRecord.mainContact',
                 'objects.floorsRecords.number',
                 'objects.floorsRecords.parts',
                 'objects.cranes.state',

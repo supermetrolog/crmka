@@ -213,22 +213,29 @@ class Company extends \yii\db\ActiveRecord
     }
 
 
-    public function extraFields()
+    /**
+     * @return array
+     */
+    public function extraFields(): array
     {
         $extraFields = parent::extraFields();
-        $extraFields['contacts_count'] = function ($efields) {
-            return count($efields['contacts']);
+
+        $extraFields['contacts_count'] = function () {
+            return (int) $this->getContacts()->count();
         };
-        $extraFields['requests_count'] = function ($efields) {
-            return count($efields['requests']);
+        $extraFields['requests_count'] = function () {
+            return (int) $this->getRequests()->count();
         };
-        $extraFields['objects_count'] = function ($efields) {
-            return count($efields['objects']);
+        $extraFields['objects_count'] = function () {
+            return (int)  $this->getObjects()->count();
         };
+
+        // TODO:
         $extraFields['offers_count'] = function ($efields) {
             $offers = $efields->getOffers()->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => 2])->all();
             return count($offers);
         };
+
         return $extraFields;
     }
 

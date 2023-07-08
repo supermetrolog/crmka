@@ -3,6 +3,9 @@
 namespace app\models\oldDb;
 
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\db\ActiveRecord;
+use yii\db\Connection;
 
 /**
  * This is the model class for table "c_industry_offers".
@@ -127,20 +130,21 @@ use Yii;
  * @property string|null $title_empty_financial
  * @property int|null $hide_from_market
  */
-class Offers extends \yii\db\ActiveRecord
+class Offers extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'c_industry_offers';
     }
 
     /**
-     * @return \yii\db\Connection the database connection used by this AR class.
+     * @return Connection
+     * @throws InvalidConfigException
      */
-    public static function getDb()
+    public static function getDb(): Connection
     {
         return Yii::$app->get('db_old');
     }
@@ -148,7 +152,7 @@ class Offers extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['company_id', 'object_id', 'agent_id', 'contact_id', 'agent_visited', 'deal_type', 'status', 'status_id', 'pledge', 'deposit_value', 'deposit', 'holidays', 'holidays_pay', 'holidays_value_min', 'holidays_value_max', 'pay_through_holidays', 'dont_pay', 'pay_guarantee', 'price_opex', 'price_opex_min', 'price_opex_value', 'price_public_services', 'public_services', 'commission_owner', 'commission_owner_type', 'commission_client', 'commission_agent', 'site_price_hide', 'ad_realtor', 'ad_realtor_top', 'description_manual_use', 'description_complex', 'order_row', 'activity', 'publ_time', 'last_update', 'deleted', 'empty_line', 'tax_form', 'ad_free', 'ad_cian', 'ad_cian_top3', 'ad_cian_hl', 'ad_cian_premium', 'ad_arendator', 'ad_yandex', 'ad_yandex_raise', 'ad_yandex_promotion', 'ad_yandex_premium', 'demolition', 'contract_is_signed', 'contract_is_signed_type', 'sale_object', 'sale_company', 'built_to_suit', 'built_to_suit_time', 'built_to_suit_plan', 'built_to_suit_group', 'rent_business', 'rent_business_fill', 'rent_business_price', 'rent_business_long_contracts', 'rent_business_last_repair', 'rent_business_payback', 'rent_business_income', 'rent_business_profit', 'safe_service_handling', 'safe_service_cross_docking', 'safe_service_packs_counting', 'safe_service_culling', 'safe_service_repacking', 'safe_service_palleting', 'safe_service_winding', 'safe_service_accounting_batch', 'safe_service_accounting_serials', 'safe_service_accounting_fifo', 'safe_service_selection', 'safe_service_give_pallets', 'safe_service_complement', 'safe_service_stickers', 'safe_service_packing', 'safe_service_co_packing', 'safe_service_documents', 'safe_service_inventory', 'safe_service_reports', 'safe_service_recycling', 'safe_service_managing_stocks', 'safe_service_managing_returns', 'safe_service_repair', 'safe_service_archive', 'safe_service_3pl', 'safe_service_delivery_town', 'safe_service_delivery_region', 'safe_service_delivery_russia', 'is_exclusive', 'ad_special', 'area_field_full', 'area_floor_full', 'area_mezzanine_full', 'area_office_full', 'offer_stats', 'hide_from_market'], 'integer'],
@@ -163,7 +167,7 @@ class Offers extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
