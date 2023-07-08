@@ -64,10 +64,10 @@ class ComplexController extends AppController
         throw new NotFoundHttpException('Complex not found');
     }
 
-    /*
-     * 'objects.commercialOffers.companyRecord.consultant.userProfile',
-                'objects.commercialOffers.companyRecord.mainContact',
-                'objects.commercialOffers.blocks',
-     * objects.commercialOffers.blocks.floorNumbers
-     */
+
+objects.commercialOffers.companyRecord.consultant.userProfile,
+objects.commercialOffers.companyRecord.mainContact,
+objects.commercialOffers.blocks,
+objects.commercialOffers.blocks.partsRecords.floor.number
+
 }

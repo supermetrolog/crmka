@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
+use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
 class Block extends oldDb\ObjectsBlock
@@ -99,6 +100,7 @@ class Block extends oldDb\ObjectsBlock
         $f = parent::extraFields();
 
         $f['floorNumbers'] = 'floorNumbers';
+        $f['partsRecords'] = function () { return $this->getPartsRecords()->asArray()->all(); };
 
         return $f;
     }
@@ -109,5 +111,15 @@ class Block extends oldDb\ObjectsBlock
     public function getFloorNumbers(): array
     {
         return FloorNumber::find()->andWhere(['sign' => $this->getFloors()])->all();
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getPartsRecords(): ActiveQuery
+    {
+        return FloorPart::find()
+            ->andWhere(['id' => $this->getParts()])
+            ->with(['floor.number']);
     }
 }

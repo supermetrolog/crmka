@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Connection;
 use yii\helpers\Json;
@@ -334,5 +335,13 @@ class FloorPart extends ActiveRecord
         $f['photos'] = function() { return $this->getPhotos(); };
 
         return $f;
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getFloor(): ActiveQuery
+    {
+        return $this->hasOne(Floor::class, ['id' => 'floor_id']);
     }
 }
