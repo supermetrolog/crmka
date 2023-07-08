@@ -22,4 +22,12 @@ class CommercialOffer extends Offers
     {
         return $this->hasOne(Company::class, ['id' => 'company_id']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getBlocks(): ActiveQuery
+    {
+        return $this->hasMany(Block::class, ['offer_id' => 'id']);
+    }
 }

@@ -41,9 +41,6 @@ class ComplexController extends AppController
                 'location.districtTypeRecord',
                 'author.userProfile',
                 'agent.userProfile',
-                'objects.commercialOffers.dealTypeRecord',
-                'objects.commercialOffers.companyRecord.consultant.userProfile',
-                'objects.commercialOffers.companyRecord.mainContact',
                 'objects.floorsRecords.number',
                 'objects.floorsRecords.parts',
                 'objects.cranes.state',
@@ -52,6 +49,10 @@ class ComplexController extends AppController
                 'objects.cranes.hoisting',
                 'objects.cranes.location',
                 'objects.cranes.type',
+                'objects.commercialOffers.dealTypeRecord',
+                'objects.commercialOffers.companyRecord.consultant.userProfile',
+                'objects.commercialOffers.companyRecord.mainContact',
+                'objects.commercialOffers.blocks',
             ])
             ->byId($id)
             ->groupBy('id');
@@ -62,4 +63,11 @@ class ComplexController extends AppController
 
         throw new NotFoundHttpException('Complex not found');
     }
+
+    /*
+     * 'objects.commercialOffers.companyRecord.consultant.userProfile',
+                'objects.commercialOffers.companyRecord.mainContact',
+                'objects.commercialOffers.blocks',
+     * objects.commercialOffers.blocks.floorNumbers
+     */
 }
