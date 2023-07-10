@@ -65,9 +65,9 @@ class ComplexController extends AppController
     }
 
 
-objects.commercialOffers.companyRecord.consultant.userProfile,
-objects.commercialOffers.companyRecord.mainContact,
-objects.commercialOffers.blocks,
-objects.commercialOffers.blocks.partsRecords.floor.number
+//objects.commercialOffers.companyRecord.consultant.userProfile,
+//objects.commercialOffers.companyRecord.mainContact,
+//objects.commercialOffers.blocks,
+//objects.commercialOffers.blocks.partsRecords.floor.number
 
 }
