@@ -17,7 +17,7 @@ class Complex extends oldDb\Complex
      */
     public function getPhotos(): array
     {
-        return Json::decode($this->photo);
+        return Json::decode($this->photo) ?? [];
     }
 
     /**

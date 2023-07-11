@@ -122,4 +122,12 @@ class Block extends oldDb\ObjectsBlock
             ->andWhere(['id' => $this->getParts()])
             ->with(['floor.number']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getDeal(): ActiveQuery
+    {
+        return $this->hasOne(Deal::class, ['original_id' => 'id']);
+    }
 }

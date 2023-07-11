@@ -2,9 +2,12 @@
 
 namespace app\models;
 
+use app\models\ActiveQuery\DealQuery;
 use Yii;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\oldDb\OfferMix;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "deal".
@@ -22,6 +25,7 @@ use app\models\oldDb\OfferMix;
  * @property string|null $description описание
  * @property string|null $name название сделки
  * @property int|null $object_id ID объекта из старой базы
+ * @property int|null $original_id ID Block
  * @property int|null $complex_id ID комплекса из старой базы
  * @property string|null $competitor_name Название компании конкурента
  * @property int|null $is_our принадлежит ли сделка нашей компании
@@ -36,13 +40,13 @@ use app\models\oldDb\OfferMix;
  * @property User $consultant
  * @property Request $request
  */
-class Deal extends \yii\db\ActiveRecord
+class Deal extends ActiveRecord
 {
     public const STATUS_DELETED = -1;
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'deal';
     }
@@ -208,5 +212,21 @@ class Deal extends \yii\db\ActiveRecord
     public function getOffer()
     {
         return $this->hasOne(OfferMix::class, ['object_id' => 'object_id', 'original_id' => 'original_id', 'type_id' => 'type_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getBlock(): ActiveQuery
+    {
+        return $this->hasOne(Block::class, ['id' => 'original_id']);
+    }
+
+    /**
+     * @return DealQuery
+     */
+    public static function find(): DealQuery
+    {
+        return new DealQuery(get_called_class());
     }
 }

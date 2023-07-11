@@ -51,11 +51,11 @@ class ComplexController extends AppController
                 'objects.cranes.type',
                 'objects.commercialOffers.dealTypeRecord',
                 'objects.commercialOffers.companyRecord.consultant.userProfile',
-                'objects.commercialOffers.blocks',
                 'objects.company.mainContact.phones',
                 'objects.company.mainContact.emails',
                 'objects.commercialOffers.companyRecord.mainContact.phones',
                 'objects.commercialOffers.companyRecord.mainContact.emails',
+                'objects.commercialOffers.blocks.deal',
             ])
             ->byId($id)
             ->groupBy('id');
@@ -66,11 +66,4 @@ class ComplexController extends AppController
 
         throw new NotFoundHttpException('Complex not found');
     }
-
-
-//objects.commercialOffers.companyRecord.consultant.userProfile,
-//objects.commercialOffers.companyRecord.mainContact,
-//objects.commercialOffers.blocks,
-//objects.commercialOffers.blocks.partsRecords.floor.number
-
 }

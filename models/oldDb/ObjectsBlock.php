@@ -3,6 +3,8 @@
 namespace app\models\oldDb;
 
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\db\Connection;
 
 /**
  * This is the model class for table "c_industry_blocks".
@@ -322,9 +324,10 @@ class ObjectsBlock extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\Connection the database connection used by this AR class.
+     * @return Connection
+     * @throws InvalidConfigException
      */
-    public static function getDb()
+    public static function getDb(): Connection
     {
         return Yii::$app->get('db_old');
     }

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\DbHelper;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
@@ -335,6 +336,34 @@ class FloorPart extends ActiveRecord
         $f['photos'] = function() { return $this->getPhotos(); };
 
         return $f;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function extraFields(): array
+    {
+        $f = parent::extraFields();
+
+        $f['lastDeal'] = 'lastDeal';
+
+        return $f;
+    }
+
+    /**
+     * @return Deal|null
+     */
+    public function getLastDeal(): ?Deal
+    {
+        return Deal::find()->joinWith(['block' => function (ActiveQuery $query) {
+            return $query->from(['block' => DbHelper::getDsnAttribute('dbname', Block::getDb()->dsn) . '.' . Block::tableName()])
+                ->andWhere(['LIKE', 'block.parts', "\"{$this->id}\""])
+                ->with(['company']);
+        }], false)
+            ->with(['company'])
+            ->orderBy(['id' => SORT_DESC])
+            ->one();
     }
 
     /**
