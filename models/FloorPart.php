@@ -334,6 +334,7 @@ class FloorPart extends ActiveRecord
         $f = parent::fields();
 
         $f['photos'] = function() { return $this->getPhotos(); };
+        $f['is_active'] = function () { return $this->isActive(); };
 
         return $f;
     }
@@ -364,6 +365,14 @@ class FloorPart extends ActiveRecord
             ->with(['company'])
             ->orderBy(['id' => SORT_DESC])
             ->one();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return (int) Block::find()->select('deal_id')->orderBy(['id' => SORT_DESC])->andWhere(['LIKE', 'parts', "\"{$this->id}\""])->scalar() <= 0;
     }
 
     /**
