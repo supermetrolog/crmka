@@ -51,8 +51,11 @@ class ComplexController extends AppController
                 'objects.cranes.type',
                 'objects.commercialOffers.dealTypeRecord',
                 'objects.commercialOffers.companyRecord.consultant.userProfile',
-                'objects.commercialOffers.companyRecord.mainContact',
                 'objects.commercialOffers.blocks',
+                'objects.company.mainContact.phones',
+                'objects.company.mainContact.emails',
+                'objects.commercialOffers.companyRecord.mainContact.phones',
+                'objects.commercialOffers.companyRecord.mainContact.emails',
             ])
             ->byId($id)
             ->groupBy('id');

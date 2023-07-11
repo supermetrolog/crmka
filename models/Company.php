@@ -4,12 +4,15 @@ namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\events\NotificationEvent;
+use Throwable;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\CompanyFile;
 use app\models\oldDb\Objects;
 use app\models\oldDb\OfferMix;
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -57,7 +60,7 @@ use yii\db\Expression;
  * @property Companygroup $companyGroup
  * @property User $consultant
  */
-class Company extends \yii\db\ActiveRecord
+class Company extends ActiveRecord
 {
     public const FORM_OF_ORGANIZATION_LIST = [
         0 => 'ООО',
@@ -357,7 +360,7 @@ class Company extends \yii\db\ActiveRecord
                 return ['message' => "Компания создана", 'data' => $model->id];
             }
             throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $transaction->rollBack();
             throw $th;
         }
@@ -396,7 +399,7 @@ class Company extends \yii\db\ActiveRecord
                 return ['message' => "Компания изменена", 'data' => $model->id];
             }
             throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $transaction->rollBack();
             throw $th;
         }
@@ -404,7 +407,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Broker]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getBroker()
     {
@@ -414,7 +417,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[CompanyGroup]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCompanyGroup()
     {
@@ -424,7 +427,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Consultant]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getConsultant()
     {
@@ -433,7 +436,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Files]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getFiles()
     {
@@ -442,7 +445,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Contacts]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getContacts()
     {
@@ -452,17 +455,18 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[MainContact]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getMainContact()
+    public function getMainContact(): ActiveQuery
     {
         return $this->hasOne(Contact::className(), ['company_id' => 'id'])
             ->where(['contact.type' => Contact::DEFAULT_CONTACT_TYPE, 'contact.isMain' => Contact::IS_MAIN_CONTACT]);
     }
+
     /**
      * Gets query for [[Deals]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getDeals()
     {
@@ -471,7 +475,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Deals]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getDealsRequestEmpty()
     {
@@ -480,7 +484,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[categories]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCategories()
     {
@@ -489,7 +493,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[productRanges]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getProductRanges()
     {
@@ -500,7 +504,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Objects]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getObjects()
     {
@@ -509,7 +513,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[OfferMix]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getOffers()
     {
@@ -518,7 +522,7 @@ class Company extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Contacts]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRequests()
     {
