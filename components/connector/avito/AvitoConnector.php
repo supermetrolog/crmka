@@ -134,6 +134,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::BUILDING_CLASS, $this->dataMapper->getBuildingClass($offer)),
             new AvitoObject(AvitoParam::LEASE_PRICE_OPTIONS, $this->dataMapper->getLeasePriceOptions($offer)),
             new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE),
+            new AvitoObject(AvitoParam::BUILDING_TYPE, AvitoValue::BUILDING_TYPE_OTHER),
         ];
     }
 
@@ -184,6 +185,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::BUILDING_CLASS, $this->dataMapper->getBuildingClass($offer)),
             new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE),
             new AvitoObject(AvitoParam::POWER_GRID_CAPACITY, $offer->getPowerCapacity()),
+            new AvitoObject(AvitoParam::BUILDING_TYPE, AvitoValue::BUILDING_TYPE_OTHER),
         ];
     }
 
