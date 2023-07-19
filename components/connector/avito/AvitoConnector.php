@@ -80,7 +80,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::ID, $offer->getVisualId()),
             new AvitoObject(AvitoParam::OPERATION_TYPE, $this->dataMapper->getOperationType($offer)),
             new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()),
-            new AvitoObject(AvitoParam::DATE_BEGIN, $offer->getAvitoAdStartDate()),
+//            new AvitoObject(AvitoParam::DATE_BEGIN, $offer->getAvitoAdStartDate()),
             new AvitoObject(AvitoParam::ADDRESS, $offer->getAddress()),
             new AvitoObject(AvitoParam::LATITUDE, $offer->getLatitude()),
             new AvitoObject(AvitoParam::LONGITUDE, $offer->getLongitude()),
