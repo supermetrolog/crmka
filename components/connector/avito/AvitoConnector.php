@@ -90,7 +90,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::LATITUDE, $offer->getLatitude()),
             new AvitoObject(AvitoParam::LONGITUDE, $offer->getLongitude()),
             new AvitoObject(AvitoParam::CATEGORY,  $this->dataMapper->getCategory($offer)),
-            new AvitoObject(AvitoParam::PRICE, $offer->getMaxPrice()),
+            new AvitoObject(AvitoParam::PRICE, $this->dataMapper->getPrice($offer)),
             new AvitoObject(AvitoParam::OBJECT_TYPE, $this->dataMapper->getObjectType($offer)),
             new AvitoObject(AvitoParam::PROPERTY_RIGHTS, AvitoValue::PROPERTY_RIGHT_AGENT),
             new AvitoObject(AvitoParam::MANAGER_NAME, $offer->getFullConsultantName()),

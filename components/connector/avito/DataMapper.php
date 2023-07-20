@@ -245,4 +245,17 @@ class DataMapper
 
         return AvitoValue::OPERATION_TYPE_SALE;
     }
+
+    /**
+     * @param OfferInterface $offer
+     * @return float
+     */
+    public function getPrice(OfferInterface $offer): float
+    {
+        if ($offer->isRentType() || $offer->isSubleaseType()) {
+            return $offer->getMaxPrice() * $offer->getMaxArea() / 12;
+        }
+
+        return $offer->getMaxPrice() * $offer->getMaxArea();
+    }
 }

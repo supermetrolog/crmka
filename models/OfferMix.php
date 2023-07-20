@@ -369,10 +369,10 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     public function getMaxPrice(): float
     {
         if ($this->isRentType() || $this->isSubleaseType()) {
-            return $this->getMaxRentPrice() * $this->getMaxArea();
+            return $this->getMaxRentPrice();
         }
 
-        return $this->getMaxSalePrice() * $this->getMaxArea();
+        return $this->getMaxSalePrice();
     }
 
     /**
