@@ -418,4 +418,12 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 
         return '';
     }
+
+    /**
+     * @return string
+     */
+    public function getUniqueId(): string
+    {
+        return $this->original_id . '-' . $this->getVisualId();
+    }
 }

@@ -17,9 +17,14 @@ interface OfferInterface
     function getVisibleID(): string;
 
     /**
-     * @return int
+     * @return string
      */
     function getVisualId(): string;
+
+    /**
+     * @return string
+     */
+    function getUniqueId(): string;
 
     /**
      * @return string

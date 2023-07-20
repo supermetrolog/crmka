@@ -82,7 +82,7 @@ class AvitoConnector
     private function getGeneralData(OfferInterface $offer): array
     {
         return [
-            new AvitoObject(AvitoParam::ID, $offer->getVisualId()),
+            new AvitoObject(AvitoParam::ID, $offer->getUniqueId()),
             new AvitoObject(AvitoParam::OPERATION_TYPE, $this->dataMapper->getOperationType($offer)),
             new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()),
 //            new AvitoObject(AvitoParam::DATE_BEGIN, $offer->getAvitoAdStartDate()),
