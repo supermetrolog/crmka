@@ -80,7 +80,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::ID, $offer->getVisualId()),
             new AvitoObject(AvitoParam::OPERATION_TYPE, $this->dataMapper->getOperationType($offer)),
             new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()),
-            new AvitoObject(AvitoParam::DATE_BEGIN, $offer->getAvitoAdStartDate()),
+//            new AvitoObject(AvitoParam::DATE_BEGIN, $offer->getAvitoAdStartDate()),
             new AvitoObject(AvitoParam::ADDRESS, $offer->getAddress()),
             new AvitoObject(AvitoParam::LATITUDE, $offer->getLatitude()),
             new AvitoObject(AvitoParam::LONGITUDE, $offer->getLongitude()),
@@ -134,6 +134,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::BUILDING_CLASS, $this->dataMapper->getBuildingClass($offer)),
             new AvitoObject(AvitoParam::LEASE_PRICE_OPTIONS, $this->dataMapper->getLeasePriceOptions($offer)),
             new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE),
+            new AvitoObject(AvitoParam::BUILDING_TYPE, AvitoValue::BUILDING_TYPE_OTHER),
         ];
     }
 
@@ -184,6 +185,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::BUILDING_CLASS, $this->dataMapper->getBuildingClass($offer)),
             new AvitoObject(AvitoParam::ENTRANCE_ADDITIONALLY, AvitoValue::ENTRANCE_ADDITIONALLY_SEPARATE),
             new AvitoObject(AvitoParam::POWER_GRID_CAPACITY, $offer->getPowerCapacity()),
+            new AvitoObject(AvitoParam::BUILDING_TYPE, AvitoValue::BUILDING_TYPE_OTHER),
         ];
     }
 

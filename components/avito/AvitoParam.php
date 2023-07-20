@@ -41,4 +41,5 @@ class AvitoParam
     public const POWER_GRID_ADDITIONALLY = 'PowerGridAdditionally';
     public const LAND_AREA = 'LandArea';
     public const DATE_BEGIN = 'DateBegin';
+    public const BUILDING_TYPE = 'BuildingType';
 }

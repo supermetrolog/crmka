@@ -45,7 +45,7 @@ class FeedController extends Controller
 
         $feed = $this->avitoFeedGenerator->generate();
 
-        $filename = Yii::getAlias('@web/feeds/') . 'avito.xml';
+        $filename = Yii::getAlias('@web/feeds/avito.xml');
         $this->saveFeed($feed, $filename);
     }
 

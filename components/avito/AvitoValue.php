@@ -37,4 +37,5 @@ class AvitoValue
     public const POWER_GRID_ADDITIONALLY_POSSIBLE_INCREASE = 'Возможно увеличение мощности';
     public const LEASE_PRICE_OPTION_PUBLIC_SERVICES_INCLUDED = 'Коммунальные услуги включены';
     public const LEASE_PRICE_OPTION_OPEX_INCLUDED = 'Эксплуатационные расходы включены';
+    public const BUILDING_TYPE_OTHER = 'Другой';
 }

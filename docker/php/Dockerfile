@@ -114,6 +114,6 @@ RUN docker-php-ext-install sockets
 
 USER www-data:www-data
 
-WORKDIR /var/www/
+WORKDIR /var/www/crmka.local
 
 # CMD bash -c "cd api.ru && composer install --no-interaction && php yii migrate --interactive=0"
