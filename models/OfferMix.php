@@ -133,7 +133,7 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
      */
     function getObjectTypes(): array
     {
-        return Json::decode($this->object_type);
+        return Json::decode($this->object_type) ?? [];
     }
 
     /**
