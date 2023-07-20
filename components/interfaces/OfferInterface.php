@@ -54,6 +54,11 @@ interface OfferInterface
     /**
      * @return bool
      */
+    function isResponseStorageType(): bool;
+
+    /**
+     * @return bool
+     */
     function isSubleaseType(): bool;
 
     /**

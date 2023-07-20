@@ -33,6 +33,11 @@ class AvitoConnector
         $data = [];
 
         foreach ($this->data as $offer) {
+            // TODO: implemented avito connector for response storage deal type
+            if ($offer->isResponseStorageType()) {
+                continue;
+            }
+
             $offerData = $this->getGeneralData($offer);
 
             if ($offer->isRentType() || $offer->isSubleaseType()) {

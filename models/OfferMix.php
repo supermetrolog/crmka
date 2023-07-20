@@ -34,6 +34,14 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     /**
      * @return bool
      */
+    function isResponseStorageType(): bool
+    {
+        return $this->deal_type === self::DEAL_TYPE_RESPONSE_STORAGE;
+    }
+
+    /**
+     * @return bool
+     */
     public function isSubleaseType(): bool
     {
         return $this->deal_type === self::DEAL_TYPE_SUBLEASE;
@@ -92,8 +100,12 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
      */
     function getDescription(): string
     {
+        if ($this->isGeneral()) {
+            return $this->description ?? '';
+        }
+
         try {
-            if (!$this->isBlock() || !$this->block || !$this->block->description_manual_use) {
+            if ($this->isBlock() || $this->block || !$this->block->description_manual_use) {
                 $url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->original_id . '/' . $this->type_id . '?api=1';
                 return file_get_contents($url);
             } else {
