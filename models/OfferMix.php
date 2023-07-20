@@ -340,7 +340,7 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
      */
     public function getMaxRentPrice(): float
     {
-        return max($this->price_floor_min, $this->price_floor_max);
+        return max($this->price_floor_min, $this->price_floor_max) ?? 0;
     }
 
     /**
@@ -348,7 +348,7 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
      */
     public function getMaxSalePrice(): float
     {
-        return max($this->price_sale_min, $this->price_sale_max);
+        return max($this->price_sale_min, $this->price_sale_max) ?? 0;
     }
 
     /**
@@ -368,7 +368,7 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
      */
     public function getMaxArea(): float
     {
-        return max($this->area_min, $this->area_max);
+        return max($this->area_min, $this->area_max) ?? 0;
     }
 
     /**
