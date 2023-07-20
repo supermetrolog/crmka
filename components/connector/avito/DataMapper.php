@@ -2,6 +2,7 @@
 
 namespace app\components\connector\avito;
 
+use app\components\avito\AvitoFeedGenerator;
 use app\components\avito\AvitoValue;
 use app\components\interfaces\OfferInterface;
 use InvalidArgumentException;
@@ -18,8 +19,14 @@ class DataMapper
     public function getImages(OfferInterface $offer): array
     {
         $images = [];
-
+        $count = 0;
         foreach ($offer->getImages() as $image) {
+            if ($count >= AvitoFeedGenerator::MAX_IMAGES_COUNT) {
+                break;
+            }
+
+            $count++;
+
             $images[] = [
                 'tag' => 'Image',
                 'value' => '',
