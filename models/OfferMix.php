@@ -360,7 +360,7 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
             return $this->getMaxRentPrice();
         }
 
-        return $this->getMaxSalePrice();
+        return $this->getMaxSalePrice() * $this->getMaxArea();
     }
 
     /**
