@@ -128,7 +128,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::LEASE_DEPOSIT,  $this->dataMapper->getLeaseDeposit($offer)),
             new AvitoObject(AvitoParam::LEASE_COMMISSION_SIZE, 0),
             new AvitoObject(AvitoParam::ENTRANCE, AvitoValue::ENTRANCE_FROM_STREET),
-            new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
+            new AvitoObject(AvitoParam::FLOOR, $this->dataMapper->getFloor($offer)),
             new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, $this->dataMapper->getFloorAdditionally($offer)),
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
             new AvitoObject(AvitoParam::SQUARE, $offer->getMaxArea()),
@@ -180,7 +180,7 @@ class AvitoConnector
         return [
             new AvitoObject(AvitoParam::TRANSACTION_TYPE, AvitoValue::TRANSACTION_TYPE_SALE),
             new AvitoObject(AvitoParam::ENTRANCE, AvitoValue::ENTRANCE_FROM_STREET),
-            new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
+            new AvitoObject(AvitoParam::FLOOR, $this->dataMapper->getFloor($offer)),
             new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, $this->dataMapper->getFloorAdditionally($offer)),
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
             new AvitoObject(AvitoParam::SQUARE, $offer->getMaxArea()),

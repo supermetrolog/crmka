@@ -22,6 +22,7 @@ class AvitoValue
     public const TRANSACTION_TYPE_SALE = 'Продажа';
     public const CONTACT_METHOD_PHONE_AND_MESSAGES = 'По телефону и в сообщениях';
     public const SEVERAL_FLOORS = 'Несколько этажей';
+    public const FLOOR_BASEMENT = 'Подвальный';
     public const SQUARE_ADDITIONAL_POSSIBLE_CUTTING = 'Возможная нарезка';
     public const HEATING_HAS_NOT = 'Нет';
     public const HEATING_CENTRAL = 'Центральное';

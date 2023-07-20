@@ -138,6 +138,19 @@ class DataMapper
 
     /**
      * @param OfferInterface $offer
+     * @return string
+     */
+    public function getFloor(OfferInterface $offer): string
+    {
+        if ($offer->getFloorMin() < 0) {
+            return AvitoValue::FLOOR_BASEMENT;
+        }
+
+        return $offer->getFloorMin();
+    }
+
+    /**
+     * @param OfferInterface $offer
      * @return array[]|null
      */
     public function getFloorAdditionally(OfferInterface $offer): ?array
