@@ -39,6 +39,8 @@ class FeedController extends Controller
             ->with(['block', 'offer', 'object'])
             ->all();
 
+        $this->stdout("COUNT: " . count($models) . "\n");
+
         $connector = new AvitoConnector($models);
 
         $this->avitoFeedGenerator->setAvitoObjects($connector->getData());
