@@ -36,6 +36,7 @@ class FeedController extends Controller
             ->active()
             ->adAvito()
             ->blockType()
+            ->notResponseStorageDealType()
             ->with(['block', 'offer', 'object'])
             ->all();
 

@@ -95,6 +95,14 @@ class OfferMixQuery extends oldDb\OfferMixQuery
     /**
      * @return self
      */
+    public function notResponseStorageDealType(): self
+    {
+        return $this->andWhere(['!=', 'deal_type', OfferMix::DEAL_TYPE_RESPONSE_STORAGE]);
+    }
+
+    /**
+     * @return self
+     */
     public function adAvito(): self
     {
         $this->joinWith(['block']);
