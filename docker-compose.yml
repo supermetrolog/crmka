@@ -28,7 +28,7 @@ services:
          DOCKER_PHP_ENABLE_XDEBUG: ${DOCKER_PHP_ENABLE_XDEBUG}
          DOCKER_PHP_XDEBUG_VERSION: ${DOCKER_PHP_XDEBUG_VERSION}
          TZ: ${WORKSPACE_TIMEZONE}
-     working_dir: /var/www
+     working_dir: /var/www/crmka.local
      container_name: crmka_php
      volumes:
        - .:/var/www/crmka.local
