@@ -650,7 +650,7 @@ class OfferMixSearch extends Search
 
         // grid filtering conditions
         $query->andFilterWhere([
-            ObjectsBlock::tableName() . '.ad_avito' => $this->ad_avito,
+//            ObjectsBlock::tableName() . '.ad_avito' => $this->ad_avito,
             'c_industry_offers_mix.id' => $this->id,
             'c_industry_offers_mix.original_id' => $this->original_id,
             'c_industry_offers_mix.type_id' => $this->type_id,
@@ -827,6 +827,7 @@ class OfferMixSearch extends Search
             'c_industry_offers_mix.ad_cian_premium' => $this->ad_cian_premium,
             'c_industry_offers_mix.ad_cian_hl' => $this->ad_cian_hl,
             'c_industry_offers_mix.ad_yandex' => $this->ad_yandex,
+            'c_industry_offers_mix.ad_avito' => $this->ad_avito,
             'c_industry_offers_mix.ad_yandex_raise' => $this->ad_yandex_raise,
             'c_industry_offers_mix.ad_yandex_promotion' => $this->ad_yandex_promotion,
             'c_industry_offers_mix.ad_yandex_premium' => $this->ad_yandex_premium,
