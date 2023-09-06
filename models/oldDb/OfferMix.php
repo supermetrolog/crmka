@@ -702,13 +702,6 @@ class OfferMix extends ActiveRecord
         $fields['last_update_format'] = function ($fields) {
             return $fields['last_update'] ? Yii::$app->formatter->format($fields['last_update'], 'datetime') : null;
         };
-        $fields['ad_avito'] = function ($fields) {
-            if (!$this->block) {
-                return 0;
-            }
-
-            return $this->block->ad_avito;
-        };
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);
         };
