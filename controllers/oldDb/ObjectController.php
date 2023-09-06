@@ -125,7 +125,6 @@ class ObjectController extends ActiveController
     /**
      * @param int $originalId
      * @return void
-     * @throws ErrorException
      * @throws NotFoundHttpException
      */
     public function actionToggleAvitoAd(int $originalId): void
@@ -143,14 +142,41 @@ class ObjectController extends ActiveController
         }
 
         $block->ad_avito = !$block->ad_avito;
+        $model->ad_avito = $block->ad_avito;
+
         if ($block->ad_avito) {
             $block->ad_avito_date_start = date('Y-m-d H:i:s');
         } else {
             $block->ad_avito_date_start = null;
         }
 
-        if (!$block->save()) {
-            throw new ErrorException('Block save error');
+        $model->save(false);
+        $block->save(false);
+    }
+
+    /**
+     * @param int $originalId
+     * @return void
+     * @throws NotFoundHttpException
+     */
+    public function actionToggleIsFake(int $originalId): void
+    {
+        $model = OfferMix::find()->byOriginalId($originalId)->one();
+
+        if (!$model) {
+            throw new NotFoundHttpException('Offer not found');
         }
+
+        $block = $model->block;
+
+        if (!$block) {
+            throw new NotFoundHttpException('Offer block not found');
+        }
+
+        $block->is_fake = !$block->is_fake;
+        $model->is_fake = $block->is_fake;
+
+        $model->save(false);
+        $block->save(false);
     }
 }
