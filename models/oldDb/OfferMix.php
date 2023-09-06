@@ -265,7 +265,8 @@ use yii\helpers\ArrayHelper;
  * @property int|null $is_exclusive эксклюзив
  * @property int|null $deal_id номер сделки
  * @property int|null $hide_from_market скрыто от рынка
- *
+ * @property int $ad_avito
+ * @property int $is_fake
  *
  * @property User $consultant
  * @property ObjectsBlock $block
