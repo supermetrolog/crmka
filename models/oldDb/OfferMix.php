@@ -702,6 +702,15 @@ class OfferMix extends ActiveRecord
         $fields['last_update_format'] = function ($fields) {
             return $fields['last_update'] ? Yii::$app->formatter->format($fields['last_update'], 'datetime') : null;
         };
+        $fields['is_fake'] = function ($fields) {
+            if ($this->type_id === self::MINI_TYPE_ID || !$this->miniOffersMix) {
+                return $this->is_fake;
+            }
+
+            return max(array_map(function(OfferMix $model) {
+                return $model->is_fake;
+            }, $this->miniOffersMix));
+        };
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);
         };
