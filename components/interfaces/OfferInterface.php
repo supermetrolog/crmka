@@ -130,6 +130,7 @@ interface OfferInterface
      * @return int
      */
     function getFloorMin(): int;
+    function getFloorMax(): int;
 
     /**
      * @return bool

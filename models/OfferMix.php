@@ -292,6 +292,14 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
     }
 
     /**
+     * @return int
+     */
+    public function getFloorMax(): int
+    {
+        return max($this->floor_min, $this->floor_max);
+    }
+
+    /**
      * @return bool
      */
     public function hasSeveralFloors(): bool

@@ -142,11 +142,11 @@ class DataMapper
      */
     public function getFloor(OfferInterface $offer): string
     {
-        if ($offer->getFloorMin() < 0) {
+        if ($offer->getFloorMax() < 0) {
             return AvitoValue::FLOOR_BASEMENT;
         }
 
-        return $offer->getFloorMin();
+        return $offer->getFloorMax();
     }
 
     /**
