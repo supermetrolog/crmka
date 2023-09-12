@@ -60,6 +60,15 @@ class OfferMixQuery extends oldDb\OfferMixQuery
     {
         return $this->andWhere(['type_id' => OfferMix::MINI_TYPE_ID]);
     }
+
+    /**
+     * @return self
+     */
+    public function generalType(): self
+    {
+        return $this->andWhere(['type_id' => OfferMix::GENERAL_TYPE_ID]);
+    }
+
     /**
      * @return self
      */
