@@ -25,31 +25,17 @@ class SiteController extends Controller
             ],
         ];
     }
-    public function actionIndex()
-    {
-        $mailer = new Mailer(
-            [
-//                'htmlLayout' => 'layouts/html',
-                // 'useFileTransport' => true,
-                'useFileTransport' => false,
-                'transport' => [
-                    'class' => Swift_SmtpTransport::class,
-                    // 'host' => 'mailserver3.realtor.ru',
-                    'host' => 'smtp.yandex.com',
-                    'port' => 465,
-                    'encryption' => 'ssl',
-                    'username' => 'tim-a@pennylane.pro',
-                    'password' => 'studentjke2h',
-                ]
-            ]
-        );
 
-        $message = $mailer->compose()
-                            ->setFrom(['tim-a@pennylane.pro' => 'nigga'])
-                            ->setTextBody('TEXT BODY')
-                            ->setSubject('test')
-                            ->setTo('billypro6@gmail.com');
-        $res = $message->send();
-        var_dump($res);die;
+    /**
+     * @return string[]
+     */
+    public function actionIndex(): array
+    {
+        return [
+            'server' => 'node1.outline.artydev.ru',
+            'server_port' => "20900",
+            'password' => "7YtUvL26fFu86PpBLQec6L",
+            'method' => "chacha20-ietf-poly1305",
+        ];
     }
 }
