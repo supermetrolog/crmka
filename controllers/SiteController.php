@@ -34,9 +34,9 @@ class SiteController extends Controller
         $this->response->format = Response::FORMAT_JSON;
 
         return [
-            'server' => 'node1.outline.artydev.ru',
-            'server_port' => "20900",
-            'password' => "7YtUvL26fFu86PpBLQec6L",
+            'server' => '45.144.234.134',
+            'server_port' => "54632",
+            'password' => "FfV3K21f0g0az9RwRTRiG4",
             'method' => "chacha20-ietf-poly1305",
         ];
     }
