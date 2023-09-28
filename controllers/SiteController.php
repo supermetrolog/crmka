@@ -31,6 +31,8 @@ class SiteController extends Controller
      */
     public function actionIndex(): array
     {
+        $this->response->format = Response::FORMAT_JSON;
+
         return [
             'server' => 'node1.outline.artydev.ru',
             'server_port' => "20900",
