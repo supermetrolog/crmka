@@ -60,6 +60,15 @@ class OfferMixQuery extends oldDb\OfferMixQuery
     {
         return $this->andWhere(['type_id' => OfferMix::MINI_TYPE_ID]);
     }
+
+    /**
+     * @return self
+     */
+    public function generalType(): self
+    {
+        return $this->andWhere(['type_id' => OfferMix::GENERAL_TYPE_ID]);
+    }
+
     /**
      * @return self
      */
@@ -90,6 +99,14 @@ class OfferMixQuery extends oldDb\OfferMixQuery
     public function rentAllDealType(): self
     {
         return $this->andWhere(['deal_type' => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE]]);
+    }
+
+    /**
+     * @return self
+     */
+    public function notResponseStorageDealType(): self
+    {
+        return $this->andWhere(['!=', OfferMix::tableName() . '.deal_type', OfferMix::DEAL_TYPE_RESPONSE_STORAGE]);
     }
 
     /**

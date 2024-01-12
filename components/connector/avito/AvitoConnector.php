@@ -33,6 +33,11 @@ class AvitoConnector
         $data = [];
 
         foreach ($this->data as $offer) {
+            // TODO: implemented avito connector for response storage deal type
+            if ($offer->isResponseStorageType()) {
+                continue;
+            }
+
             $offerData = $this->getGeneralData($offer);
 
             if ($offer->isRentType() || $offer->isSubleaseType()) {
@@ -77,7 +82,7 @@ class AvitoConnector
     private function getGeneralData(OfferInterface $offer): array
     {
         return [
-            new AvitoObject(AvitoParam::ID, $offer->getVisualId()),
+            new AvitoObject(AvitoParam::ID, $offer->getUniqueId()),
             new AvitoObject(AvitoParam::OPERATION_TYPE, $this->dataMapper->getOperationType($offer)),
             new AvitoObject(AvitoParam::DESCRIPTION, $offer->getDescription()),
 //            new AvitoObject(AvitoParam::DATE_BEGIN, $offer->getAvitoAdStartDate()),
@@ -85,7 +90,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::LATITUDE, $offer->getLatitude()),
             new AvitoObject(AvitoParam::LONGITUDE, $offer->getLongitude()),
             new AvitoObject(AvitoParam::CATEGORY,  $this->dataMapper->getCategory($offer)),
-            new AvitoObject(AvitoParam::PRICE, $offer->getMaxPrice()),
+            new AvitoObject(AvitoParam::PRICE, $this->dataMapper->getPrice($offer)),
             new AvitoObject(AvitoParam::OBJECT_TYPE, $this->dataMapper->getObjectType($offer)),
             new AvitoObject(AvitoParam::PROPERTY_RIGHTS, AvitoValue::PROPERTY_RIGHT_AGENT),
             new AvitoObject(AvitoParam::MANAGER_NAME, $offer->getFullConsultantName()),
@@ -123,7 +128,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::LEASE_DEPOSIT,  $this->dataMapper->getLeaseDeposit($offer)),
             new AvitoObject(AvitoParam::LEASE_COMMISSION_SIZE, 0),
             new AvitoObject(AvitoParam::ENTRANCE, AvitoValue::ENTRANCE_FROM_STREET),
-            new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
+            new AvitoObject(AvitoParam::FLOOR, $this->dataMapper->getFloor($offer)),
             new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, $this->dataMapper->getFloorAdditionally($offer)),
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
             new AvitoObject(AvitoParam::SQUARE, $offer->getMaxArea()),
@@ -175,7 +180,7 @@ class AvitoConnector
         return [
             new AvitoObject(AvitoParam::TRANSACTION_TYPE, AvitoValue::TRANSACTION_TYPE_SALE),
             new AvitoObject(AvitoParam::ENTRANCE, AvitoValue::ENTRANCE_FROM_STREET),
-            new AvitoObject(AvitoParam::FLOOR, $offer->getFloorMin()),
+            new AvitoObject(AvitoParam::FLOOR, $this->dataMapper->getFloor($offer)),
             new AvitoObject(AvitoParam::FLOOR_ADDITIONALLY, $this->dataMapper->getFloorAdditionally($offer)),
             new AvitoObject(AvitoParam::PARKING_TYPE, AvitoValue::PARKING_TYPE_IN_THE_STREET),
             new AvitoObject(AvitoParam::SQUARE, $offer->getMaxArea()),

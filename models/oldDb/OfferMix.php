@@ -265,7 +265,8 @@ use yii\helpers\ArrayHelper;
  * @property int|null $is_exclusive эксклюзив
  * @property int|null $deal_id номер сделки
  * @property int|null $hide_from_market скрыто от рынка
- *
+ * @property int $ad_avito
+ * @property int $is_fake
  *
  * @property User $consultant
  * @property ObjectsBlock $block
@@ -335,7 +336,8 @@ class OfferMix extends ActiveRecord
         '332' => 67,
         '333' => 3,
         '334' => 68,
-        '335' => 69
+        '335' => 69,
+        '338' => 72,
     ];
 
 
@@ -700,12 +702,14 @@ class OfferMix extends ActiveRecord
         $fields['last_update_format'] = function ($fields) {
             return $fields['last_update'] ? Yii::$app->formatter->format($fields['last_update'], 'datetime') : null;
         };
-        $fields['ad_avito'] = function ($fields) {
-            if (!$this->block) {
-                return 0;
+        $fields['is_fake'] = function ($fields) {
+            if ($this->type_id === self::MINI_TYPE_ID || !$this->miniOffersMix) {
+                return $this->is_fake;
             }
 
-            return $this->block->ad_avito;
+            return max(array_map(function(OfferMix $model) {
+                return $model->is_fake;
+            }, $this->miniOffersMix));
         };
         $fields['photos'] = function ($fields) {
             return json_decode($fields['photos']);

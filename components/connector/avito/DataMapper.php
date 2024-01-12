@@ -2,6 +2,7 @@
 
 namespace app\components\connector\avito;
 
+use app\components\avito\AvitoFeedGenerator;
 use app\components\avito\AvitoValue;
 use app\components\interfaces\OfferInterface;
 use InvalidArgumentException;
@@ -18,8 +19,14 @@ class DataMapper
     public function getImages(OfferInterface $offer): array
     {
         $images = [];
-
+        $count = 0;
         foreach ($offer->getImages() as $image) {
+            if ($count >= AvitoFeedGenerator::MAX_IMAGES_COUNT) {
+                break;
+            }
+
+            $count++;
+
             $images[] = [
                 'tag' => 'Image',
                 'value' => '',
@@ -131,6 +138,19 @@ class DataMapper
 
     /**
      * @param OfferInterface $offer
+     * @return string
+     */
+    public function getFloor(OfferInterface $offer): string
+    {
+        if ($offer->getFloorMax() < 0) {
+            return AvitoValue::FLOOR_BASEMENT;
+        }
+
+        return $offer->getFloorMax();
+    }
+
+    /**
+     * @param OfferInterface $offer
      * @return array[]|null
      */
     public function getFloorAdditionally(OfferInterface $offer): ?array
@@ -224,5 +244,18 @@ class DataMapper
         }
 
         return AvitoValue::OPERATION_TYPE_SALE;
+    }
+
+    /**
+     * @param OfferInterface $offer
+     * @return float
+     */
+    public function getPrice(OfferInterface $offer): float
+    {
+        if ($offer->isRentType() || $offer->isSubleaseType()) {
+            return $offer->getMaxPrice() * $offer->getMaxArea() / 12;
+        }
+
+        return $offer->getMaxPrice() * $offer->getMaxArea();
     }
 }

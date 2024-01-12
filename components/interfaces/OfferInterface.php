@@ -17,9 +17,14 @@ interface OfferInterface
     function getVisibleID(): string;
 
     /**
-     * @return int
+     * @return string
      */
     function getVisualId(): string;
+
+    /**
+     * @return string
+     */
+    function getUniqueId(): string;
 
     /**
      * @return string
@@ -50,6 +55,11 @@ interface OfferInterface
      * @return bool
      */
     function isRentType(): bool;
+
+    /**
+     * @return bool
+     */
+    function isResponseStorageType(): bool;
 
     /**
      * @return bool
@@ -120,6 +130,7 @@ interface OfferInterface
      * @return int
      */
     function getFloorMin(): int;
+    function getFloorMax(): int;
 
     /**
      * @return bool

@@ -11,6 +11,8 @@ use yii\helpers\ArrayHelper;
 
 class AvitoFeedGenerator
 {
+    public const MAX_IMAGES_COUNT = 40;
+
     /** @var array<AvitoObject[]>  */
     private array $data = [];
     private DOMDocument $xml;

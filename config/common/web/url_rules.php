@@ -99,7 +99,6 @@ return
             'class' => 'yii\rest\UrlRule',
             'controller' => 'site',
             'except' => [],
-
         ],
         [
             'class' => 'yii\rest\UrlRule',
@@ -111,6 +110,7 @@ return
                 'GET,OPTIONS offers-count' => 'offers-count',
                 'GET,OPTIONS offers-map-count' => 'offers-map-count',
                 'POST,OPTIONS toggle-avito-ad/<originalId>' => 'toggle-avito-ad',
+                'POST,OPTIONS toggle-is-fake/<originalId>' => 'toggle-is-fake',
             ],
         ],
         [

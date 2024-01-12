@@ -112,8 +112,4 @@ RUN mv composer.phar /usr/local/bin/composer
 #  Install php extensions
 RUN docker-php-ext-install sockets
 
-USER www-data:www-data
-
 WORKDIR /var/www/crmka.local
-
-# CMD bash -c "cd api.ru && composer install --no-interaction && php yii migrate --interactive=0"

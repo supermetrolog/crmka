@@ -5,6 +5,7 @@ namespace app\commands;
 use app\components\avito\AvitoFeedGenerator;
 use app\components\connector\avito\AvitoConnector;
 use app\models\OfferMix;
+use DateTime;
 use DOMException;
 use Yii;
 use yii\base\ErrorException;
@@ -30,14 +31,23 @@ class FeedController extends Controller
      */
     public function actionAvito(): void
     {
+        $currentHours = (new DateTime())->format('H');
+
+        if ($currentHours < 10 || $currentHours >= 20) {
+            return;
+        }
+
         $models = OfferMix::find()
             ->distinct()
             ->notDelete()
             ->active()
             ->adAvito()
             ->blockType()
+            ->notResponseStorageDealType()
             ->with(['block', 'offer', 'object'])
             ->all();
+
+        $this->stdout("COUNT: " . count($models) . "\n");
 
         $connector = new AvitoConnector($models);
 

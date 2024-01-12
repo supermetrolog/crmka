@@ -51,13 +51,12 @@ class EmailSender  extends Model
         return new Mailer(
             [
                 'htmlLayout' => 'layouts/html',
-                // 'useFileTransport' => true,
                 'useFileTransport' => false,
                 'transport' => [
                     'class' => 'Swift_SmtpTransport',
-                    // 'host' => 'mailserver3.realtor.ru',
-                    'host' => 'mailserver.realtor.ru',
-                    'port' => 25,
+                    'host' => 'smtp.yandex.com',
+                    'port' => 465,
+                    'encryption' => 'ssl',
                     'username' => $this->username,
                     'password' => $this->password,
                 ]

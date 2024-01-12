@@ -2,9 +2,6 @@
 
 namespace app\controllers;
 
-use app\components\avito\AvitoFeedGenerator;
-use app\components\connector\avito\AvitoConnector;
-use app\models\OfferMix;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -22,25 +19,19 @@ class SiteController extends Controller
             ],
         ];
     }
-    public function actionIndex()
+
+    /**
+     * @return string[]
+     */
+    public function actionIndex(): array
     {
-        $this->response->format = Response::FORMAT_XML;
+        $this->response->format = Response::FORMAT_JSON;
 
-        $avitoFeedGenerator = new AvitoFeedGenerator();
-        $models = OfferMix::find()
-            ->limit(5)
-            ->rentDealType()
-            ->notDelete()
-            ->active()
-            ->offersType()
-            ->all();
-
-        $connector = new AvitoConnector($models);
-
-        $avitoFeedGenerator->setAvitoObjects($connector->getData());
-
-        $res = $avitoFeedGenerator->generate();
-
-        $this->response->content = $res;
+        return [
+            'server' => '45.144.234.134',
+            'server_port' => "54632",
+            'password' => "FfV3K21f0g0az9RwRTRiG4",
+            'method' => "chacha20-ietf-poly1305",
+        ];
     }
 }
