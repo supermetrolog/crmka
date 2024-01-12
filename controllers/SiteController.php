@@ -2,12 +2,6 @@
 
 namespace app\controllers;
 
-use app\components\avito\AvitoFeedGenerator;
-use app\components\connector\avito\AvitoConnector;
-use app\models\OfferMix;
-use app\services\emailsender\EmailSender;
-use Swift_SmtpTransport;
-use yii\swiftmailer\Mailer;
 use yii\web\Controller;
 use yii\web\Response;
 
