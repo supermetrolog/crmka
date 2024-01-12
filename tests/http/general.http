@@ -1,0 +1,3 @@
+GET {{url}}/complex/1
+Content-Type: application/json
+Accept: application/json

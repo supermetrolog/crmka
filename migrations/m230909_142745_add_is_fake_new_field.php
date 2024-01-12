@@ -18,13 +18,13 @@ class m230909_142745_add_is_fake_new_field extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn(
-            'c_industry_blocks',
-            'is_fake_new',
-            $this->tinyInteger(1)->notNull()->defaultValue(0)
-        );
-
-
+        if (YII_ENV !== 'staging') {
+            $this->addColumn(
+                'c_industry_blocks',
+                'is_fake_new',
+                $this->tinyInteger(1)->notNull()->defaultValue(0)
+            );
+        }
     }
 
     /**

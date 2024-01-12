@@ -18,11 +18,13 @@ class m230903_152846_add_ad_avito_column_in_offers_mix_table extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn(
-            'c_industry_offers_mix',
-            'ad_avito',
-            $this->tinyInteger()->notNull()->defaultValue(0)
-        );
+        if (YII_ENV !== 'staging') {
+            $this->addColumn(
+                'c_industry_offers_mix',
+                'ad_avito',
+                $this->tinyInteger()->notNull()->defaultValue(0)
+            );
+        }
     }
 
     /**

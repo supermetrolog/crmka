@@ -18,11 +18,13 @@ class m230905_202117_add_is_fake_column_in_offers_mix_table_and_blocks_table ext
      */
     public function safeUp()
     {
-        $this->addColumn(
-            'c_industry_offers_mix',
-            'is_fake',
-            $this->boolean()->notNull()->defaultValue(false)
-        );
+        if (YII_ENV !== 'staging') {
+            $this->addColumn(
+                'c_industry_offers_mix',
+                'is_fake',
+                $this->boolean()->notNull()->defaultValue(false)
+            );
+        }
     }
 
     /**
