@@ -98,7 +98,7 @@ class Objects extends oldDb\Objects
         $fields['object_type'] = function () { return $this->getObjectType(); };
         $fields['floors_building'] = function () { return $this->getFloorBuildings(); };
         $fields['purposes'] = function () { return $this->getPurposes(); };
-        $fields['object_class_text'] = function () { return $this->objectClassRecord->title; };
+        $fields['object_class_text'] = function () { return $this->objectClassRecord ? $this->objectClassRecord->title : null; };
         $fields['cranes_gantry'] = function () { return $this->getCranesGantry(); };
         $fields['cranes_railway'] = function () { return $this->getCranesRailway(); };
         $fields['photo'] = function () { return $this->getPhotos(); };
