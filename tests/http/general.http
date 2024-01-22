@@ -1,3 +1,4 @@
-GET {{url}}/complex/1
+GET {{url}}/complex/1?expand=objects.company.consultant.userProfile,objects.objectClassRecord, objects.firefightingType, objects.location.regionRecord, location.regionRecord, location.highwayRecord,location.directionRecord, location.districtRecord, location.districtMoscowRecord, location.townRecord.townTypeRecord, location.townCentralRecord,location.metroRecord, location.districtTypeRecord, author.userProfile, agent.userProfile, objects.floorsRecords.number,objects.floorsRecords.parts, objects.cranes.state, objects.cranes.beam, objects.cranes.beamAmount, objects.cranes.hoisting,objects.cranes.location, objects.cranes.type, objects.commercialOffers.dealTypeRecord, objects.commercialOffers.companyRecord.consultant.userProfile, objects.company.mainContact.phones,objects.company.mainContact.emails, objects.commercialOffers.companyRecord.mainContact.phones, objects.commercialOffers.companyRecord.mainContact.emails, objects.commercialOffers.blocks.deal
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer {{token}}

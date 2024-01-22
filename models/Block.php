@@ -80,6 +80,8 @@ class Block extends oldDb\ObjectsBlock
     {
         $f = parent::fields();
 
+        unset($f['photo_block']);
+
         $f['photos'] = function () { return $this->getPhotos(); };
         $f['purposes_block'] = function () { return $this->getPurposesBlock(); };
         $f['floor'] = function () { return $this->getFloors(); };
