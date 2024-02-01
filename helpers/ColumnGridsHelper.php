@@ -19,6 +19,7 @@ class ColumnGridsHelper
 		10 => '12x12',
 		11 => '12x18',
 		12 => '12x24',
+		13 => 'Без колонн',
 	];
 
 	public static function toHumanReadable(array $column_grids): array
