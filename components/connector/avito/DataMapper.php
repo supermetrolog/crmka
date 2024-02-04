@@ -252,10 +252,12 @@ class DataMapper
      */
     public function getPrice(OfferInterface $offer): float
     {
+		$priceForAllArea = $offer->getMaxPrice() * $offer->getMaxArea();
+
         if ($offer->isRentType() || $offer->isSubleaseType()) {
-            return $offer->getMaxPrice() * $offer->getMaxArea() / 12;
+            return $priceForAllArea / 12;
         }
 
-        return $offer->getMaxPrice() * $offer->getMaxArea();
+        return $priceForAllArea;
     }
 }
