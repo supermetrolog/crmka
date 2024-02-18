@@ -223,4 +223,9 @@ class Objects extends oldDb\Objects
 	{
 		return $this->hasMany(Crane::class, ['object_id' => 'id']);
 	}
+
+	public function getElevatorsRecords(): ActiveQuery
+	{
+		return $this->hasMany(Elevator::class, ['object_id' => 'id']);
+	}
 }
