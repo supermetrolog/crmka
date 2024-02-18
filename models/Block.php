@@ -14,7 +14,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getPhotos(): array
 	{
-		return Json::decode($this->photo_block) ?? [];
+		return JsonFieldNormalizer::jsonToArrayStringElements($this->photo_block);
 	}
 
 	/**
@@ -124,6 +124,13 @@ class Block extends oldDb\ObjectsBlock
 	/**
 	 * @return array
 	 */
+	public function getRackTypes(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->rack_types);
+	}
+	/**
+	 * @return array
+	 */
 	public function fields(): array
 	{
 		$f = parent::fields();
@@ -169,8 +176,11 @@ class Block extends oldDb\ObjectsBlock
 		$f['safe_type']         = function () {
 			return $this->getSafeType();
 		};
-		$f['lighting']         = function () {
+		$f['lighting']          = function () {
 			return $this->getLighting();
+		};
+		$f['rack_types']          = function () {
+			return $this->getRackTypes();
 		};
 
 		return $f;

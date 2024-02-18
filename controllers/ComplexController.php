@@ -56,7 +56,7 @@ class ComplexController extends AppController
                 'objects.commercialOffers.companyRecord.mainContact.phones',
                 'objects.commercialOffers.companyRecord.mainContact.emails',
                 'objects.commercialOffers.blocks.deal',
-                'objects.elevatorsRecords.elevatorType',
+                'objects.elevatorsRecords.elevatorType'
             ])
             ->byId($id)
             ->groupBy('id');

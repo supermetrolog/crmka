@@ -36,4 +36,19 @@ class JsonFieldNormalizer
 
         return array_filter(array_map($mapCallback, $decoded), $filterCallback);
     }
+
+	public static function jsonToArrayStringElements($value): array
+	{
+		$rawPhotos = Json::decode($value) ?? [];
+
+		return array_filter(array_map(function ($photo) {
+			if ($photo == '[]') {
+				return null;
+			}
+
+			return $photo;
+		}, $rawPhotos), function ($elem) {
+			return $elem !== null;
+		});
+	}
 }

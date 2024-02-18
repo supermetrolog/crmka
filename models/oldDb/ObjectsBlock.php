@@ -4,6 +4,7 @@ namespace app\models\oldDb;
 
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
 use yii\db\Connection;
 
 /**
@@ -670,15 +671,8 @@ class ObjectsBlock extends \yii\db\ActiveRecord
         };
         return $fields;
     }
-    public function extraFields()
-    {
-        $ef = parent::extraFields();
-        $ef['nigger'] = function ($ef) {
-            return "FUCK THE POLICE";
-        };
-        return $ef;
-    }
-    public function getObject()
+
+    public function getObject(): ActiveQuery
     {
         return $this->hasOne(Objects::class, ['id' => 'object_id']);
     }
