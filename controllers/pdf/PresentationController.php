@@ -2,70 +2,66 @@
 
 namespace app\controllers\pdf;
 
+use app\helpers\TranslateHelper;
+use Exception;
 use yii\web\Controller;
 use app\behaviors\BaseControllerBehaviors;
 use app\models\pdf\OffersPdf;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Yii;
+use yii\web\RangeNotSatisfiableHttpException;
+use yii\web\Response;
 
 class PresentationController extends Controller
 {
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
-    }
-    private function translit($value)
-    {
-        $converter = array(
-            'а' => 'a',    'б' => 'b',    'в' => 'v',    'г' => 'g',    'д' => 'd',
-            'е' => 'e',    'ё' => 'e',    'ж' => 'zh',   'з' => 'z',    'и' => 'i',
-            'й' => 'y',    'к' => 'k',    'л' => 'l',    'м' => 'm',    'н' => 'n',
-            'о' => 'o',    'п' => 'p',    'р' => 'r',    'с' => 's',    'т' => 't',
-            'у' => 'u',    'ф' => 'f',    'х' => 'h',    'ц' => 'c',    'ч' => 'ch',
-            'ш' => 'sh',   'щ' => 'sch',  'ь' => '',     'ы' => 'y',    'ъ' => '',
-            'э' => 'e',    'ю' => 'yu',   'я' => 'ya',
+	public function behaviors()
+	{
+		$behaviors = parent::behaviors();
 
-            'А' => 'A',    'Б' => 'B',    'В' => 'V',    'Г' => 'G',    'Д' => 'D',
-            'Е' => 'E',    'Ё' => 'E',    'Ж' => 'Zh',   'З' => 'Z',    'И' => 'I',
-            'Й' => 'Y',    'К' => 'K',    'Л' => 'L',    'М' => 'M',    'Н' => 'N',
-            'О' => 'O',    'П' => 'P',    'Р' => 'R',    'С' => 'S',    'Т' => 'T',
-            'У' => 'U',    'Ф' => 'F',    'Х' => 'H',    'Ц' => 'C',    'Ч' => 'Ch',
-            'Ш' => 'Sh',   'Щ' => 'Sch',  'Ь' => '',     'Ы' => 'Y',    'Ъ' => '',
-            'Э' => 'E',    'Ю' => 'Yu',   'Я' => 'Ya',
-        );
+		return BaseControllerBehaviors::getBaseBehaviors($behaviors);
+	}
 
-        $value = strtr($value, $converter);
-        return $value;
-    }
-    public function actionIndex()
-    {
-        $model = new OffersPdf(Yii::$app->request->queryParams);
+	private function translate(string $text): string
+	{
+		return TranslateHelper::simpleTranslate($text);
+	}
 
-        $options = new Options();
-        $options->set('isRemoteEnabled', true);
-        $options->set('isJavascriptEnabled', true);
-        $dompdf = new Dompdf($options);
-        $html = $this->renderPartial('index', ['model' => $model]);
+	/**
+	 * @throws RangeNotSatisfiableHttpException
+	 * @throws Exception
+	 */
+	public function actionIndex(): Response
+	{
+		$model = new OffersPdf($this->request->get(), $this->request->getHostInfo());
 
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4');
-        $dompdf->render();
+		$options = new Options();
+		$options->set('isRemoteEnabled', true);
+		$options->set('isJavascriptEnabled', true);
+		$dompdf = new Dompdf($options);
+		$html   = $this->renderPartial('index', ['model' => $model]);
 
-        return Yii::$app->response->sendContentAsFile(
-            $dompdf->output(['Attachment' => false]),
-            $this->translit($model->getPresentationName()),
-            [
-                'mimeType' => 'application/pdf',
-                'inline' => true,
-            ]
-        );
-    }
-    public function actionFuck()
-    {
-        $model = new OffersPdf(Yii::$app->request->queryParams);
-        $html = $this->renderPartial('index', ['model' => $model]);
-        return $html;
-    }
+		$dompdf->loadHtml($html);
+		$dompdf->setPaper('A4');
+		$dompdf->render();
+
+		return Yii::$app->response->sendContentAsFile(
+			$dompdf->output(['Attachment' => false]),
+			$this->translate($model->getPresentationName()),
+			[
+				'mimeType' => 'application/pdf',
+				'inline'   => true,
+			]
+		);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function actionHtml(): string
+	{
+		$model = new OffersPdf($this->request->get(), $this->request->getHostInfo());
+
+		return $this->renderPartial('index', ['model' => $model]);
+	}
 }

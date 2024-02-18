@@ -22,8 +22,11 @@ class OffersPdf extends Model
     public $host;
     /** @var UserProfile */
     public $userProfile;
+
     public function __construct($options, $host = null)
     {
+		parent::__construct([]);
+
         $this->host = $host ?? Yii::$app->params['url']['this_host'];
         $this->formatter = Yii::$app->formatter;
         $this->validateOptions($options);
