@@ -389,6 +389,13 @@ class FloorPart extends ActiveRecord
 		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->internet_type);
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getFloorTypesLand(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types_land);
+	}
 
 	/**
 	 * @return array
@@ -429,6 +436,9 @@ class FloorPart extends ActiveRecord
 		};
 		$f['internet_type']               = function () {
 			return $this->getInternetType();
+		};
+		$f['floor_types_land']               = function () {
+			return $this->getFloorTypesLand();
 		};
 
 		return $f;

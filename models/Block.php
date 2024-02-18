@@ -100,6 +100,30 @@ class Block extends oldDb\ObjectsBlock
 	/**
 	 * @return array
 	 */
+	public function getFloorTypesLand(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types_land);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getSafeType(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->safe_type);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLighting(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->lighting);
+	}
+
+	/**
+	 * @return array
+	 */
 	public function fields(): array
 	{
 		$f = parent::fields();
@@ -138,6 +162,15 @@ class Block extends oldDb\ObjectsBlock
 		};
 		$f['gates']             = function () {
 			return $this->getGates();
+		};
+		$f['floor_types_land']  = function () {
+			return $this->getFloorTypesLand();
+		};
+		$f['safe_type']         = function () {
+			return $this->getSafeType();
+		};
+		$f['lighting']         = function () {
+			return $this->getLighting();
 		};
 
 		return $f;

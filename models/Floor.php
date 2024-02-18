@@ -225,6 +225,14 @@ class Floor extends ActiveRecord
 	/**
 	 * @return array
 	 */
+	public function getFloorTypesLand(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types_land);
+	}
+
+	/**
+	 * @return array
+	 */
 	public function fields(): array
 	{
 		$f = parent::fields();
@@ -236,6 +244,9 @@ class Floor extends ActiveRecord
 		};
 		$f['photos']      = function () {
 			return $this->getPhotos();
+		};
+		$f['floor_types_land']      = function () {
+			return $this->getFloorTypesLand();
 		};
 
 		return $f;
