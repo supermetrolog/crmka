@@ -3,6 +3,8 @@
 namespace app\controllers\pdf;
 
 use app\helpers\TranslateHelper;
+use app\models\pdf\PdfManager;
+use app\services\pythonpdfcompress\PythonPdfCompress;
 use Exception;
 use yii\web\Controller;
 use app\behaviors\BaseControllerBehaviors;
@@ -27,26 +29,50 @@ class PresentationController extends Controller
 		return TranslateHelper::simpleTranslate($text);
 	}
 
+
+	private function compressPdf()
+	{
+		$pdfCompressor = new PdfManager();
+	}
+
+
 	/**
 	 * @throws RangeNotSatisfiableHttpException
 	 * @throws Exception
 	 */
 	public function actionIndex(): Response
 	{
-		$model = new OffersPdf($this->request->get(), $this->request->getHostInfo());
+		$pdfTmpDir = Yii::$app->params['pdf']['tmp_dir'];
+
+		$model = new OffersPdf($this->request->get(), 'https://api.pennylane.pro/');
 
 		$options = new Options();
 		$options->set('isRemoteEnabled', true);
 		$options->set('isJavascriptEnabled', true);
-		$dompdf = new Dompdf($options);
+
+		$pdfManager = new PdfManager($options, $this->translate($model->getPresentationName()), $pdfTmpDir);
+
 		$html   = $this->renderPartial('index', ['model' => $model]);
 
-		$dompdf->loadHtml($html);
-		$dompdf->setPaper('A4');
-		$dompdf->render();
+		$pdfManager->loadHtml($html);
+		$pdfManager->setPaper('A4');
+		$pdfManager->render();
+		$pdfManager->save();
+
+		$pyScriptPath = Yii::$app->params['compressorPath'];
+		$pythonPath = Yii::$app->params['pythonPath'];
+		$inPath = $pdfManager->getPdfPath();
+		$outPath = $pdfTmpDir . "/" . Yii::$app->security->generateRandomString() . ".pdf";
+		$pythonCompressor = new PythonPdfCompress($pythonPath, $pyScriptPath, $inPath, $outPath);
+		$pythonCompressor->Compress();
+		// Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
+		$pythonCompressor->deleteOriginalFileAndChangeFileName();
+		$pdfContent = file_get_contents($pdfManager->getPdfPath());
+
+		$pdfManager->removeFile();
 
 		return Yii::$app->response->sendContentAsFile(
-			$dompdf->output(['Attachment' => false]),
+			$pdfContent,
 			$this->translate($model->getPresentationName()),
 			[
 				'mimeType' => 'application/pdf',

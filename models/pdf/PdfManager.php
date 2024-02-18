@@ -11,10 +11,11 @@ class PdfManager extends Dompdf
 {
     public string $savePath;
     public string $filename;
-    public function __construct(Options $options, $name = null, $savePath)
+
+    public function __construct(Options $options, string $name, string $savePath)
     {
         $this->setSavePath($savePath);
-        $this->filename = $name ? $name : $this->generateFilename();
+        $this->filename = $name ?: $this->generateFilename();
         parent::__construct($options);
     }
     private function setSavePath($savePath)
@@ -23,21 +24,32 @@ class PdfManager extends Dompdf
         if (is_dir($this->savePath)) return;
         mkdir($this->savePath, 0700, true);
     }
-    public function save()
+
+	/**
+	 * @throws Exception
+	 */
+	public function save()
     {
         return file_put_contents($this->getPdfPath(), $this->output());
     }
 
-    public function removeFile()
+	/**
+	 * @throws Exception
+	 */
+	public function removeFile(): bool
     {
         return unlink($this->getPdfPath());
     }
-    private function generateFilename()
+    private function generateFilename(): string
     {
         $randomString = Yii::$app->getSecurity()->generateRandomString(15);
         return $randomString . '.pdf';
     }
-    public function getPdfPath()
+
+	/**
+	 * @throws Exception
+	 */
+	public function getPdfPath(): string
     {
         if (!$this->savePath || !$this->filename) {
             throw new Exception('File not found');
