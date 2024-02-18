@@ -128,6 +128,15 @@ class Block extends oldDb\ObjectsBlock
 	{
 		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->rack_types);
 	}
+
+	/**
+	 * @return array
+	 */
+	public function getTelphers(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->telphers);
+	}
+
 	/**
 	 * @return array
 	 */
@@ -181,6 +190,10 @@ class Block extends oldDb\ObjectsBlock
 		};
 		$f['rack_types']          = function () {
 			return $this->getRackTypes();
+		};
+
+		$f['telphers']          = function () {
+			return $this->getTelphers();
 		};
 
 		return $f;
