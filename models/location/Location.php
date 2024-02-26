@@ -16,7 +16,7 @@ class Location extends oldDb\location\Location
      */
     public function getHighwayRelevant(): array
     {
-        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->highways_relevant);
+        return JsonFieldNormalizer::jsonToArrayIntElements($this->highways_relevant);
     }
 
     /**
@@ -24,7 +24,7 @@ class Location extends oldDb\location\Location
      */
     public function getHighwayMoscowRelevant(): array
     {
-        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->highways_moscow_relevant);
+        return JsonFieldNormalizer::jsonToArrayIntElements($this->highways_moscow_relevant);
     }
 
     /**
@@ -32,7 +32,7 @@ class Location extends oldDb\location\Location
      */
     public function getTownsRelevant(): array
     {
-        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->towns_relevant);
+        return JsonFieldNormalizer::jsonToArrayIntElements($this->towns_relevant);
     }
 
     /**
@@ -40,7 +40,7 @@ class Location extends oldDb\location\Location
      */
     public function getDirectionRelevant(): array
     {
-        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->direction_relevant);
+        return JsonFieldNormalizer::jsonToArrayIntElements($this->direction_relevant);
     }
 
     /**

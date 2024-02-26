@@ -18,7 +18,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getOwners(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->owners);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->owners);
 	}
 
 	/**
@@ -26,7 +26,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getObjectType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->object_type);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->object_type);
 	}
 
 	/**
@@ -34,7 +34,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getFloorBuildings(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floors_building);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->floors_building);
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getPurposes(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->purposes);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->purposes);
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getCranesGantry(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_gantry);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->cranes_gantry);
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getCranesRailway(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_railway);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->cranes_railway);
 	}
 
 
@@ -91,7 +91,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getBuildingOnTerritoryId(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->buildings_on_territory_id);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->buildings_on_territory_id);
 	}
 
 	public function getInternetType(): ?int

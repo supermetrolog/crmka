@@ -10,7 +10,7 @@ class JsonFieldNormalizer
      * @param mixed $value
      * @return array
      */
-    public static function jsonToArrayWithIntElements($value): array
+    public static function jsonToArrayIntElements($value): array
     {
         if (!is_string($value)) {
             return [];

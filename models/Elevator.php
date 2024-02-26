@@ -13,7 +13,7 @@ class Elevator extends oldDb\Elevator
 
 	public function getElevatorControls(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->elevator_controls);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->elevator_controls);
 	}
 
 	public function getPhotos(): array

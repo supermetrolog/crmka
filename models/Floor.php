@@ -211,7 +211,7 @@ class Floor extends ActiveRecord
 	 */
 	public function getFloorTypes(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->floor_types);
 	}
 
 	/**
@@ -227,7 +227,7 @@ class Floor extends ActiveRecord
 	 */
 	public function getFloorTypesLand(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types_land);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->floor_types_land);
 	}
 
 	/**
