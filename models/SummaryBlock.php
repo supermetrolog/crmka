@@ -39,7 +39,7 @@ class SummaryBlock extends Block
 			$result = ArrayHelper::merge($result, JsonFieldNormalizer::jsonToArrayStringElements($value));
 		}
 
-		return $result;
+		return array_unique($result);
 	}
 
 	protected function jsonToArrayIntElements($values): array
@@ -54,7 +54,7 @@ class SummaryBlock extends Block
 			$result = ArrayHelper::merge($result, JsonFieldNormalizer::jsonToArrayIntElements($value));
 		}
 
-		return $result;
+		return array_unique($result);
 	}
 
 	public static function find(?int $offer_id = null): ActiveQuery
@@ -164,11 +164,6 @@ class SummaryBlock extends Block
 	{
 		$f = parent::fields();
 
-		unset($f['photos']);
-		$f['photos'] = function () {
-			return $this->jsonToArrayStringElements($this->photo_block);
-		};
-
 		$f['racks_exists'] = function () {
 			return $this->racks_exists;
 		};
@@ -218,7 +213,6 @@ class SummaryBlock extends Block
 		$f['cranes_runways_exists']      = function () {
 			return $this->cranes_runways_exists;
 		};
-
 		$f['elevators_exists'] = function () {
 			return !!$this->getElevators();
 		};

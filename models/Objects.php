@@ -67,7 +67,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getPhotos(): array
 	{
-		return Json::decode($this->photo) ?? [];
+		return JsonFieldNormalizer::jsonToArrayStringElements($this->photo);
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getBuildingLayout(): array
 	{
-		return Json::decode($this->building_layouts) ?? [];
+		return JsonFieldNormalizer::jsonToArrayStringElements($this->building_layouts);
 	}
 
 	/**
@@ -83,7 +83,7 @@ class Objects extends oldDb\Objects
 	 */
 	public function getBuildingPresentation(): array
 	{
-		return Json::decode($this->building_presentations) ?? [];
+		return JsonFieldNormalizer::jsonToArrayStringElements($this->building_presentations);
 	}
 
 	/**
@@ -97,6 +97,11 @@ class Objects extends oldDb\Objects
 	public function getInternetType(): ?int
 	{
 		return $this->internet_type !== null ? (int)$this->internet_type : null;
+	}
+
+	public function getPower(): ?int
+	{
+		return $this->power !== null ? (int)$this->power : null;
 	}
 
 	/**
@@ -142,6 +147,9 @@ class Objects extends oldDb\Objects
 
 		$fields['internet_type'] = function () {
 			return $this->getInternetType();
+		};
+		$fields['power'] = function () {
+			return $this->getPower();
 		};
 
 

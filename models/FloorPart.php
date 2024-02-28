@@ -400,6 +400,15 @@ class FloorPart extends ActiveRecord
 	/**
 	 * @return array
 	 */
+	public function getElevators(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->elevators);
+	}
+
+
+	/**
+	 * @return array
+	 */
 	public function fields(): array
 	{
 		$f = parent::fields();
@@ -439,6 +448,9 @@ class FloorPart extends ActiveRecord
 		};
 		$f['floor_types_land']               = function () {
 			return $this->getFloorTypesLand();
+		};
+		$f['elevators']               = function () {
+			return $this->getElevators();
 		};
 
 		return $f;
