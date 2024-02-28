@@ -9,12 +9,13 @@ use app\components\archiver\File;
 use SplFileInfo;
 use Yii;
 use yii\base\ErrorException;
-use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\RangeNotSatisfiableHttpException;
 
-class ArchiverController extends Controller
+class ArchiverController extends AppController
 {
+	protected array $exceptAuthActions = ['download'];
+
 	private ArchiverFactory $archiverFactory;
 
 	public function __construct($id, $module, ArchiverFactory $archiverFactory, array $config = [])
