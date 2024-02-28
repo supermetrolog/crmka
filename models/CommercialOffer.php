@@ -32,6 +32,11 @@ class CommercialOffer extends Offers
 		return $this->hasMany(Block::class, ['offer_id' => 'id']);
 	}
 
+	public function getConsultant(): ActiveQuery
+	{
+		return $this->hasOne(User::class, ['user_id_old' => 'agent_id']);
+	}
+
 	/**
 	 * @return ActiveQuery
 	 */

@@ -35,7 +35,8 @@ GET {{url}}/complex/54?
            objects.commercialOffers.blocks.deal,
            objects.floorsRecords.parts.floorTypes,
            objects.elevatorsRecords.elevatorType,
-           objects.commercialOffers.summaryBlock
+           objects.commercialOffers.summaryBlock.partsRecords,
+           objects.commercialOffers.consultant.userProfile,
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
