@@ -11,3 +11,5 @@ long_query_time = 10
 
 wait_timeout = 604800 
 # 28800
+
+group_concat_max_len=100000

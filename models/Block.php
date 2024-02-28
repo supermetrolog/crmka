@@ -138,12 +138,19 @@ class Block extends oldDb\ObjectsBlock
 		return $this->jsonToArrayIntElements($this->rack_types);
 	}
 
-	/**
-	 * @return array
-	 */
 	public function getTelphers(): array
 	{
 		return $this->jsonToArrayIntElements($this->telphers);
+	}
+
+	public function getElevators(): array
+	{
+		return $this->jsonToArrayIntElements($this->elevators);
+	}
+
+	public function getCranes(): array
+	{
+		return $this->jsonToArrayIntElements($this->cranes);
 	}
 
 	/**
@@ -202,6 +209,12 @@ class Block extends oldDb\ObjectsBlock
 		};
 		$f['telphers']          = function () {
 			return $this->getTelphers();
+		};
+		$f['elevators'] = function () {
+			return $this->getElevators();
+		};
+		$f['cranes']    = function () {
+			return $this->getCranes();
 		};
 
 		return $f;
