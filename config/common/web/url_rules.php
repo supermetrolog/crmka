@@ -166,4 +166,11 @@ return
                 'GET,OPTIONS <id>' => 'view'
             ],
         ],
+        [
+	        'class' => 'yii\rest\UrlRule',
+	        'controller' => ['archiver' => 'archiver'],
+	        'extraPatterns' => [
+		        'GET,OPTIONS download' => 'download'
+	        ],
+        ],
     ];
