@@ -225,4 +225,17 @@ class SummaryBlock extends Block
 
 		return $f;
 	}
+
+	public function extraFields(): array
+	{
+		$f = parent::extraFields();
+
+		$f['partsRecords'] = function () {
+			return FloorPart::find()
+			                ->andWhere(['id' => $this->getParts()])
+			                ->all();
+		};
+
+		return $f;
+	}
 }

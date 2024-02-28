@@ -46,7 +46,7 @@ Authorization: Bearer {{token}}
 GET {{url}}/complex/54?
     expand=
            objects.commercialOffers.blocks,
-           objects.commercialOffers.summaryBlock
+           objects.commercialOffers.summaryBlock.partsRecords
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
