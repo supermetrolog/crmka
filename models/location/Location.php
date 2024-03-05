@@ -3,6 +3,8 @@
 namespace app\models\location;
 
 use app\helpers\JsonFieldNormalizer;
+use app\models\ActiveQuery\DistrictFormerQuery;
+use app\models\DistrictFormer;
 use app\models\DistrictType;
 use app\models\oldDb;
 use yii\db\ActiveQuery;
@@ -167,6 +169,14 @@ class Location extends oldDb\location\Location
 	public function getDistrictTypeRecord(): ActiveQuery
 	{
 		return $this->hasOne(DistrictType::class, ['id' => 'district_type']);
+	}
+
+	/**
+	 * @return DistrictFormerQuery|ActiveQuery
+	 */
+	public function getDistrictFormerRecord(): DistrictFormerQuery
+	{
+		return $this->hasOne(DistrictFormer::class, ['id' => 'district_former']);
 	}
 
 }

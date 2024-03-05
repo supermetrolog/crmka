@@ -39,6 +39,7 @@ class ComplexController extends AppController
                 'location.townCentralRecord',
                 'location.metroRecord',
                 'location.districtTypeRecord',
+                'location.districtFormerRecord',
                 'author.userProfile',
                 'agent.userProfile',
                 'objects.floorsRecords.number',
