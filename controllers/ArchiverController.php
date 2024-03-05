@@ -37,6 +37,8 @@ class ArchiverController extends AppController
 			throw new BadRequestHttpException('Query param "files" must be array');
 		}
 
+		$name = $this->request->get('name', hash('md5', implode('_', $files)));
+
 		// Важная штука. Если не валидировать ссылку можно передать просто путь к файлам исходиников
 		array_walk($files, function ($file) {
 			if (!filter_var($file, FILTER_VALIDATE_URL)) {
@@ -44,7 +46,7 @@ class ArchiverController extends AppController
 			}
 		});
 
-		$zipFilename = hash('md5', implode('_', $files)) . '.zip';
+		$zipFilename = $name . '.zip';
 
 		$filename = Yii::getAlias('@runtime/' . $zipFilename);
 
