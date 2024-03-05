@@ -4,6 +4,7 @@ namespace app\models\oldDb;
 
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
 use yii\db\Connection;
 
 /**
@@ -339,12 +340,13 @@ class ObjectsBlock extends \yii\db\ActiveRecord
     {
         return [
             [['id_visual', 'object_id', 'offer_id', 'deal_id', 'is_land', 'land', 'land_width', 'land_length', 'is_solid', 'area_floor', 'area_floor_min', 'area_floor_max', 'area', 'area_min', 'area_max', 'area_warehouse', 'area_warehouse_min', 'area_warehouse_max', 'racks', 'rack_levels', 'pallet_place', 'pallet_place_min', 'pallet_place_max', 'cells_place', 'cells_place_min', 'cells_place_max', 'area_mezzanine', 'area_mezzanine_min', 'area_mezzanine_max', 'area_office', 'area_office_min', 'area_office_max', 'area_tech', 'area_tech_min', 'area_tech_max', 'floor_min', 'floor_max', 'floor_id', 'ceiling_height', 'temperature', 'temperature_min', 'temperature_max', 'climate_control', 'gas', 'steam', 'internet', 'phone_line', 'smoke_exhaust', 'video_control', 'access_control', 'security_alert', 'fire_alert', 'public_service_price', 'operating_price', 'price_sub_min', 'price_sub_max', 'price_sub_two_min', 'price_sub_two_max', 'price_sub_three_min', 'price_sub_three_max', 'price', 'price_floor', 'price_floor_min', 'price_floor_max', 'price_floor_two_min', 'price_floor_two_max', 'price_floor_three_min', 'price_floor_three_max', 'price_floor_four_min', 'price_floor_four_max', 'price_floor_five_min', 'price_floor_five_max', 'price_floor_six_min', 'price_floor_six_max', 'rent_price', 'price_sale', 'price_sale_min', 'price_sale_max', 'price_safe_cell_small', 'price_safe_cell_small_min', 'price_safe_cell_small_max', 'price_safe_cell_middle', 'price_safe_cell_middle_min', 'price_safe_cell_middle_max', 'price_safe_cell_big', 'price_safe_cell_big_min', 'price_safe_cell_big_max', 'price_mezzanine', 'price_mezzanine_min', 'price_mezzanine_max', 'price_mezzanine_two_min', 'price_mezzanine_two_max', 'price_mezzanine_three_min', 'price_mezzanine_three_max', 'price_mezzanine_four_min', 'price_mezzanine_four_max', 'price_office', 'price_office_min', 'price_office_max', 'price_tech', 'price_tech_min', 'price_tech_max', 'price_field', 'price_field_min', 'price_field_max', 'description_manual_use', 'description_complex', 'deleted', 'deal_type', 'heated', 'water', 'sewage', 'gates_number', 'gate_type', 'warehouse_equipment', 'import_cian', 'import_cian_hl', 'import_cian_top3', 'import_cian_premium', 'import_yandex', 'import_free', 'cranes_num', 'elevators_num', 'elevators_min', 'elevators_max', 'result', 'onsite_noprice', 'publ_time', 'last_update', 'order_row', 'activity', 'status_id', 'ad_realtor', 'ad_cian', 'ad_cian_top3', 'ad_cian_premium', 'ad_cian_hl', 'ad_yandex', 'ad_yandex_raise', 'ad_yandex_promotion', 'ad_yandex_premium', 'ad_arendator', 'ad_free', 'charging_room', 'cranes_runways', 'cross_docking', 'status', 'status_reason', 'available_from', 'title_empty_main', 'title_empty_price_rent', 'title_empty_price_sale', 'title_empty_price_safe', 'title_empty_price_safe_in', 'title_empty_price_safe_out', 'title_empty_price_safe_extra', 'price_safe_volume', 'price_safe_volume_min', 'price_safe_volume_max', 'price_safe_floor', 'price_safe_floor_min', 'price_safe_floor_max', 'price_safe_pallet_eu', 'price_safe_pallet_eu_in', 'price_safe_pallet_eu_out', 'price_safe_pallet_eu_min', 'price_safe_pallet_eu_max', 'price_safe_pallet_fin', 'price_safe_pallet_fin_in', 'price_safe_pallet_fin_out', 'price_safe_pallet_fin_min', 'price_safe_pallet_fin_max', 'price_safe_pallet_us', 'price_safe_pallet_us_in', 'price_safe_pallet_us_out', 'price_safe_pallet_us_min', 'price_safe_pallet_us_max', 'price_safe_pallet_oversized', 'price_safe_pallet_oversized_in', 'price_safe_pallet_oversized_out', 'price_safe_pallet_oversized_min', 'price_safe_pallet_oversized_max', 'price_safe_pallet_oversized_middle_in', 'price_safe_pallet_oversized_middle_out', 'price_safe_pallet_oversized_big_in', 'price_safe_pallet_oversized_big_out', 'price_safe_pack_small_in', 'price_safe_pack_small_out', 'price_safe_pack_middle_in', 'price_safe_pack_middle_out', 'price_safe_pack_big_in', 'price_safe_pack_big_out', 'price_safe_pack_small_complement', 'price_safe_pack_middle_complement', 'price_safe_pack_big_complement', 'price_safe_service_inventory', 'price_safe_service_winding', 'price_safe_service_document', 'price_safe_service_report', 'price_safe_service_pallet', 'price_safe_service_stickers', 'price_safe_service_packing_pallet', 'price_safe_service_packing_pack', 'price_safe_service_recycling', 'price_safe_service_sealing', 'landscape_type', 'area_mezzanine_add', 'area_office_add', 'area_tech_add', 'cells', 'enterance_block', 'area_field', 'area_field_min', 'area_field_max', 'ad_special', 'is_fake', 'stack_strict', 'partition_area', 'prices', 'offer_stats', 'offer_blocks', 'entire_only', 'fence', 'barrier'], 'integer'],
-            [['photo_block', 'photos', 'description_auto', 'description', 'photo_small', 'payinc', 'photo', 'empty_line', 'empty_title_underline_mech', 'empty_title_underline_manual', 'empty_title_underline_complement', 'photos_360_block', 'building_presentations_block', 'rack_types', 'price_multi'], 'string'],
+            [['photos', 'description_auto', 'description', 'photo_small', 'payinc', 'photo', 'empty_line', 'empty_title_underline_mech', 'empty_title_underline_manual', 'empty_title_underline_complement', 'photos_360_block', 'building_presentations_block', 'rack_types', 'price_multi'], 'string'],
             [['ceiling_height_min', 'ceiling_height_max', 'floor_level', 'power', 'load_floor', 'load_floor_min', 'load_floor_max', 'load_mezzanine', 'load_mezzanine_min', 'load_mezzanine_max', 'cranes_min', 'cranes_max'], 'number'],
             [['title', 'purposes_block', 'column_grids', 'telphers', 'cranes'], 'string', 'max' => 200],
             [['building_layouts_block', 'gates', 'elevators', 'parts'], 'string', 'max' => 500],
             [['excluded_areas'], 'string', 'max' => 1000],
             [['floor'], 'string', 'max' => 50],
+            [['photo_block', 'photos'], 'safe'],
             [['floor_types', 'floor_types_land', 'firefighting_type', 'inc_services', 'lighting', 'ventilation'], 'string', 'max' => 100],
             [['finishing'], 'string', 'max' => 10],
             [['cranes_cathead', 'cranes_overhead', 'status_description'], 'string', 'max' => 300],
@@ -670,15 +672,8 @@ class ObjectsBlock extends \yii\db\ActiveRecord
         };
         return $fields;
     }
-    public function extraFields()
-    {
-        $ef = parent::extraFields();
-        $ef['nigger'] = function ($ef) {
-            return "FUCK THE POLICE";
-        };
-        return $ef;
-    }
-    public function getObject()
+
+    public function getObject(): ActiveQuery
     {
         return $this->hasOne(Objects::class, ['id' => 'object_id']);
     }

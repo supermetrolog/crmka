@@ -330,7 +330,7 @@ class FloorPart extends ActiveRecord
 
 	public function getFloorTypes(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->floor_types);
 	}
 
 	/**
@@ -338,7 +338,7 @@ class FloorPart extends ActiveRecord
 	 */
 	public function getColumnGrids(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->column_grids);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->column_grids);
 	}
 
 	/**
@@ -346,7 +346,7 @@ class FloorPart extends ActiveRecord
 	 */
 	public function getCranesCatHead(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_cathead);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->cranes_cathead);
 	}
 
 	/**
@@ -354,7 +354,7 @@ class FloorPart extends ActiveRecord
 	 */
 	public function getCranesOverHead(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_overhead);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->cranes_overhead);
 	}
 
 	/**
@@ -362,7 +362,7 @@ class FloorPart extends ActiveRecord
 	 */
 	public function getGates(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->gates);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->gates);
 	}
 
 	/**
@@ -370,7 +370,7 @@ class FloorPart extends ActiveRecord
 	 */
 	public function getPurposesBlock(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->purposes_block);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->purposes_block);
 	}
 
 	/**
@@ -378,7 +378,7 @@ class FloorPart extends ActiveRecord
 	 */
 	public function getTelphers(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->telphers);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->telphers);
 	}
 
 	/**
@@ -386,7 +386,7 @@ class FloorPart extends ActiveRecord
 	 */
 	public function getInternetType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->internet_type);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->internet_type);
 	}
 
 	/**
@@ -394,8 +394,17 @@ class FloorPart extends ActiveRecord
 	 */
 	public function getFloorTypesLand(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types_land);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->floor_types_land);
 	}
+
+	/**
+	 * @return array
+	 */
+	public function getElevators(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->elevators);
+	}
+
 
 	/**
 	 * @return array
@@ -439,6 +448,9 @@ class FloorPart extends ActiveRecord
 		};
 		$f['floor_types_land']               = function () {
 			return $this->getFloorTypesLand();
+		};
+		$f['elevators']               = function () {
+			return $this->getElevators();
 		};
 
 		return $f;

@@ -25,7 +25,7 @@ class Complex extends oldDb\Complex
 	 */
 	public function getInternetType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->internet_type);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->internet_type);
 	}
 
 	/**
@@ -33,7 +33,7 @@ class Complex extends oldDb\Complex
 	 */
 	public function getGuardType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->guard_type);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->guard_type);
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Complex extends oldDb\Complex
 	 */
 	public function getCranesGantry(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_gantry);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->cranes_gantry);
 	}
 
 	/**
@@ -49,7 +49,7 @@ class Complex extends oldDb\Complex
 	 */
 	public function getCranesRailway(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_railway);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->cranes_railway);
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Complex extends oldDb\Complex
 	 */
 	public function getWaterType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->water_type);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->water_type);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Complex extends oldDb\Complex
 	 */
 	public function getHeatingAutonomousType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->heating_autonomous_type);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->heating_autonomous_type);
 	}
 
 	/**
@@ -89,7 +89,7 @@ class Complex extends oldDb\Complex
 	 */
 	public function getMixerParts(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->mixer_parts);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->mixer_parts);
 	}
 
 	/**

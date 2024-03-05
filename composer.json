@@ -27,7 +27,8 @@
         "supermetrolog/synchronizer-local-to-ftp-builder": "^1.1",
         "php-amqplib/php-amqplib": "^3.5",
         "ext-dom": "*",
-        "ext-intl": "*"
+        "ext-intl": "*",
+      "ext-zip": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

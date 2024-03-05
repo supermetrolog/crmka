@@ -1,4 +1,4 @@
-GET {{url}}/complex/2884?
+GET {{url}}/complex/54?
     expand=guardTypes,
            internetTypes,
            waterTypes,
@@ -34,7 +34,22 @@ GET {{url}}/complex/2884?
            objects.cranes.type,
            objects.commercialOffers.blocks.deal,
            objects.floorsRecords.parts.floorTypes,
-           objects.elevatorsRecords.elevatorType
+           objects.elevatorsRecords.elevatorType,
+           objects.commercialOffers.summaryBlock.partsRecords,
+           objects.commercialOffers.consultant.userProfile,
+           location.highwayRelevantRecords,
+           location.townsRelevantRecords
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+
+GET {{url}}/complex/54?
+    expand=
+           objects.commercialOffers.blocks,
+           objects.commercialOffers.summaryBlock.partsRecords
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}

@@ -108,7 +108,7 @@ class Crane extends ActiveRecord
      */
     public function getControls(): array
     {
-        return JsonFieldNormalizer::jsonToArrayWithIntElements($this->crane_controls);
+        return JsonFieldNormalizer::jsonToArrayIntElements($this->crane_controls);
     }
 
     /**

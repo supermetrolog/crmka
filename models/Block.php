@@ -8,13 +8,22 @@ use yii\helpers\Json;
 
 class Block extends oldDb\ObjectsBlock
 {
+	protected function jsonToArrayStringElements($value): array
+	{
+		return JsonFieldNormalizer::jsonToArrayStringElements($value);
+	}
+
+	protected function jsonToArrayIntElements($value): array
+	{
+		return JsonFieldNormalizer::jsonToArrayIntElements($value);
+	}
 
 	/**
 	 * @return array
 	 */
 	public function getPhotos(): array
 	{
-		return Json::decode($this->photo_block) ?? [];
+		return $this->jsonToArrayStringElements($this->photo_block);
 	}
 
 	/**
@@ -22,7 +31,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getPurposesBlock(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->purposes_block);
+		return $this->jsonToArrayIntElements($this->purposes_block);
 	}
 
 	/**
@@ -30,7 +39,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getFloors(): array
 	{
-		return Json::decode($this->floor) ?? [];
+		return $this->jsonToArrayIntElements($this->floor);
 	}
 
 	/**
@@ -38,7 +47,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getFloorTypes(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types);
+		return $this->jsonToArrayIntElements($this->floor_types);
 	}
 
 	/**
@@ -46,7 +55,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getFirefightingType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->firefighting_type);
+		return $this->jsonToArrayIntElements($this->firefighting_type);
 	}
 
 	/**
@@ -54,7 +63,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getVentilation(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->ventilation);
+		return $this->jsonToArrayIntElements($this->ventilation);
 	}
 
 	/**
@@ -62,7 +71,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getColumnGrids(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->column_grids);
+		return $this->jsonToArrayIntElements($this->column_grids);
 	}
 
 	/**
@@ -70,7 +79,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getParts(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->parts);
+		return $this->jsonToArrayIntElements($this->parts);
 	}
 
 	/**
@@ -78,7 +87,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getCranesCatHead(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_cathead);
+		return $this->jsonToArrayIntElements($this->cranes_cathead);
 	}
 
 	/**
@@ -86,7 +95,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getCranesOverHead(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->cranes_overhead);
+		return $this->jsonToArrayIntElements($this->cranes_overhead);
 	}
 
 	/**
@@ -94,7 +103,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getGates(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->gates);
+		return $this->jsonToArrayIntElements($this->gates);
 	}
 
 	/**
@@ -102,7 +111,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getFloorTypesLand(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->floor_types_land);
+		return $this->jsonToArrayIntElements($this->floor_types_land);
 	}
 
 	/**
@@ -110,7 +119,7 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getSafeType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->safe_type);
+		return $this->jsonToArrayIntElements($this->safe_type);
 	}
 
 	/**
@@ -118,7 +127,30 @@ class Block extends oldDb\ObjectsBlock
 	 */
 	public function getLighting(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->lighting);
+		return $this->jsonToArrayIntElements($this->lighting);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getRackTypes(): array
+	{
+		return $this->jsonToArrayIntElements($this->rack_types);
+	}
+
+	public function getTelphers(): array
+	{
+		return $this->jsonToArrayIntElements($this->telphers);
+	}
+
+	public function getElevators(): array
+	{
+		return $this->jsonToArrayIntElements($this->elevators);
+	}
+
+	public function getCranes(): array
+	{
+		return $this->jsonToArrayIntElements($this->cranes);
 	}
 
 	/**
@@ -169,8 +201,20 @@ class Block extends oldDb\ObjectsBlock
 		$f['safe_type']         = function () {
 			return $this->getSafeType();
 		};
-		$f['lighting']         = function () {
+		$f['lighting']          = function () {
 			return $this->getLighting();
+		};
+		$f['rack_types']        = function () {
+			return $this->getRackTypes();
+		};
+		$f['telphers']          = function () {
+			return $this->getTelphers();
+		};
+		$f['elevators'] = function () {
+			return $this->getElevators();
+		};
+		$f['cranes']    = function () {
+			return $this->getCranes();
 		};
 
 		return $f;

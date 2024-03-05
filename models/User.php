@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property int $created_at
  * @property int $updated_at
  * @property int $role
+ * @property int $user_id_old
  * 
  * 
  * @property UserProfile $userProfile

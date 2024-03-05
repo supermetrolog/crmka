@@ -32,14 +32,27 @@ class CommercialOffer extends Offers
 		return $this->hasMany(Block::class, ['offer_id' => 'id']);
 	}
 
+	public function getConsultant(): ActiveQuery
+	{
+		return $this->hasOne(User::class, ['user_id_old' => 'agent_id']);
+	}
+
+	/**
+	 * @return ActiveQuery
+	 */
+	public function getSummaryBlock(): ActiveQuery
+	{
+		return SummaryBlock::find($this->id);
+	}
+
 	public function getIncType(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->inc_opex);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->inc_opex);
 	}
 
 	public function getIncServices(): array
 	{
-		return JsonFieldNormalizer::jsonToArrayWithIntElements($this->inc_services);
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->inc_services);
 	}
 
 	public function fields()
@@ -54,6 +67,16 @@ class CommercialOffer extends Offers
 			return $this->getIncServices();
 		};
 
+		return $f;
+	}
+
+	public function extraFields()
+	{
+		$f = parent::extraFields();
+
+		$f['summaryBlock'] = function () {
+			return $this->getSummaryBlock()->one();
+		};
 
 		return $f;
 	}

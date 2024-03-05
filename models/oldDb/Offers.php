@@ -4,6 +4,7 @@ namespace app\models\oldDb;
 
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Connection;
 
