@@ -66,6 +66,7 @@ class SummaryBlock extends Block
 		}
 
 		$query->andWhere(['offer_id' => $offer_id])
+		      ->andWhere(['status' => 1])
 		      ->groupBy('offer_id');
 
 		$query->select([
@@ -213,7 +214,7 @@ class SummaryBlock extends Block
 		$f['cranes_runways_exists']      = function () {
 			return $this->cranes_runways_exists;
 		};
-		$f['elevators_exists'] = function () {
+		$f['elevators_exists']           = function () {
 			return !!$this->getElevators();
 		};
 
