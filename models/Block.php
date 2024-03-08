@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
+use app\models\ActiveQuery\BlockQuery;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
@@ -259,5 +260,10 @@ class Block extends oldDb\ObjectsBlock
 	public function getDeal(): ActiveQuery
 	{
 		return $this->hasOne(Deal::class, ['original_id' => 'id']);
+	}
+
+	public static function find(): BlockQuery
+	{
+		return new BlockQuery(get_called_class());
 	}
 }
