@@ -16,6 +16,12 @@ return ArrayHelper::merge(
                 'allowedIPs' => ["*"],
                 'generators' => [
                     'jobs' => yii\queue\gii\Generator::class,
+                    'model' => [
+						'class' => \yii\gii\generators\model\Generator::class,
+						'templates' => [
+							'custom' => '@app/kernel/common/gii/views/model'
+						]
+                    ]
                 ],
             ]
         ]

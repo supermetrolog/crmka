@@ -4,6 +4,7 @@ namespace app\models\oldDb;
 
 use app\models\oldDb\location\Location;
 use Yii;
+use yii\db\Connection;
 
 /**
  * This is the model class for table "c_industry_complex".
@@ -181,7 +182,7 @@ class Complex extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\Connection the database connection used by this AR class.
+     * @return Connection the database connection used by this AR class.
      */
     public static function getDb()
     {

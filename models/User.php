@@ -2,7 +2,10 @@
 
 namespace app\models;
 
+use Throwable;
 use Yii;
+use yii\db\ActiveRecord;
+use yii\db\Exception;
 use yii\web\IdentityInterface;
 use yii\filters\auth\HttpBearerAuth;
 use yii\data\ActiveDataProvider;
@@ -30,7 +33,7 @@ use yii\helpers\ArrayHelper;
  * 
  * @property UserProfile $userProfile
  */
-class User extends \yii\db\ActiveRecord implements IdentityInterface
+class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
@@ -46,7 +49,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'user';
     }
@@ -54,7 +57,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [
@@ -99,7 +102,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -114,7 +117,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'updated_at' => 'Updated At',
         ];
     }
-    public function behaviors()
+    public function behaviors(): array
     {
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
@@ -145,7 +148,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         }
         return $this->email_password;
     }
-    public static function getUsers()
+    public static function getUsers(): ActiveDataProvider
     {
         $dataProvider = new ActiveDataProvider([
             'query' => self::find()->distinct()->with(['userProfile' => function ($query) {
@@ -164,7 +167,13 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             $query->with(['phones', 'emails']);
         }])->where(['status' => self::STATUS_ACTIVE, 'id' => $id])->one();
     }
-    public static function createUser($post_data, UploadFile $uploadFileModel)
+
+	/**
+	 * @throws Throwable
+	 * @throws ValidationErrorHttpException
+	 * @throws Exception
+	 */
+	public static function createUser($post_data, UploadFile $uploadFileModel): array
     {
         $db = Yii::$app->db;
         $model = new SignUp();
@@ -178,12 +187,18 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 return ['message' => "Пользователь создан", 'data' => $user_id];
             }
             throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $transaction->rollBack();
             throw $th;
         }
     }
-    public static function updateUser(User $user, $post_data, $uploadFileModel)
+
+	/**
+	 * @throws Throwable
+	 * @throws Exception
+	 * @throws ValidationErrorHttpException
+	 */
+	public static function updateUser(User $user, $post_data, $uploadFileModel): array
     {
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
@@ -209,7 +224,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 }
             }
             throw new ValidationErrorHttpException($user->getErrorSummary(false));
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $transaction->rollBack();
             throw $th;
         }
@@ -242,9 +257,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
     }
-
-
-
 
     /**
      * Gets query for [[Contacts]].
