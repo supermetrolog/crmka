@@ -6,18 +6,25 @@ namespace app\kernel\common\models;
 
 use app\exceptions\domain\model\SaveModelException;
 use app\helpers\DbHelper;
-use app\models\ChatMember;
-use app\models\User;
+use DateTime;
 use Exception;
 use Throwable;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
 
 class AR extends ActiveRecord
 {
+	public const SOFT_DELETE_ATTRIBUTE = 'deleted_at';
+	public const SOFT_UPDATE_ATTRIBUTE = 'updated_at';
+
+	protected bool $useSoftDelete = false;
+	protected bool $useSoftUpdate = false;
+
+
 	/**
 	 * @throws ErrorException
 	 */
@@ -29,7 +36,7 @@ class AR extends ActiveRecord
 	/**
 	 * @throws ErrorException
 	 */
-	public static function getField(string $field): string
+	public static function getColumn(string $field): string
 	{
 		return DbHelper::getDBField(static::dbName(), static::tableName(), $field);
 	}
@@ -37,7 +44,7 @@ class AR extends ActiveRecord
 	/**
 	 * @throws ErrorException
 	 */
-	public static function getTablePath(): string
+	public static function getTable(): string
 	{
 		return DbHelper::getTablePath(static::dbName(), static::tableName());
 	}
@@ -65,6 +72,91 @@ class AR extends ActiveRecord
 	}
 
 	/**
+	 * @param bool        $runValidation
+	 * @param string|null $attributeNames
+	 *
+	 * @return bool
+	 * @throws ErrorException
+	 */
+	public function save($runValidation = true, $attributeNames = null): bool
+	{
+		if ($this->useSoftUpdate && !$this->hasAttribute(self::SOFT_UPDATE_ATTRIBUTE)) {
+			throw new ErrorException('Soft update attribute (' . self::SOFT_UPDATE_ATTRIBUTE . ') not exist');
+		}
+
+		if ($this->useSoftUpdate) {
+			$this->setAttribute(self::SOFT_UPDATE_ATTRIBUTE, (new DateTime())->format('Y-m-d H:i:s'));
+		}
+
+		return parent::save($runValidation, $attributeNames);
+	}
+
+	/**
+	 * @return void
+	 * @throws Throwable
+	 * @throws StaleObjectException
+	 */
+	public function delete(): void
+	{
+		if ($this->useSoftDelete) {
+			$this->softDelete();
+		} else {
+			if (!parent::delete()) {
+				throw new ErrorException('Delete model error');
+			}
+		}
+	}
+
+	/**
+	 * @return void
+	 * @throws ErrorException
+	 * @throws SaveModelException
+	 */
+	protected function softDelete(): void
+	{
+		if (!$this->hasAttribute(self::SOFT_DELETE_ATTRIBUTE)) {
+			throw new ErrorException('Soft delete attribute (' . self::SOFT_DELETE_ATTRIBUTE . ') not exist');
+		}
+
+		$this->setAttribute(self::SOFT_DELETE_ATTRIBUTE, (new DateTime())->format('Y-m-d H:i:s'));
+		$this->saveOrThrow();
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function exceptFields(): array
+	{
+		return [];
+	}
+
+	/**
+	 * @return array<string,Closure>
+	 */
+	protected function addFields(): array
+	{
+		return [];
+	}
+
+	/**
+	 * @return array
+	 */
+	public function fields(): array
+	{
+		$fields = parent::fields();
+
+		foreach ($this->exceptFields() as $exceptField) {
+			unset($fields[$exceptField]);
+		}
+
+		foreach ($this->addFields() as $key => $addField) {
+			$fields[$key] = $addField;
+		}
+
+		return $fields;
+	}
+
+	/**
 	 * @param string|AR $class
 	 * @param string    $column
 	 * @param string    $name
@@ -77,9 +169,9 @@ class AR extends ActiveRecord
 		$type = $name . '_type';
 		$id   = $name . '_id';
 
-		return $this->hasOne($class, [$column => $id])->innerJoin(static::getTablePath(), [
-			static::getField($id)   => new Expression($class::getField($column)),
-			static::getField($type) => $class::tableName()
+		return $this->hasOne($class, [$column => $id])->innerJoin(static::getTable(), [
+			static::getColumn($id)   => new Expression($class::getColumn($column)),
+			static::getColumn($type) => $class::tableName()
 		]);
 	}
 
@@ -97,6 +189,6 @@ class AR extends ActiveRecord
 		$id   = $name . '_id';
 
 		return $this->hasOne($class, [$id => $column])
-		            ->andOnCondition([$class::getField($type) => static::tableName()]);
+		            ->andOnCondition([$class::getColumn($type) => static::tableName()]);
 	}
 }

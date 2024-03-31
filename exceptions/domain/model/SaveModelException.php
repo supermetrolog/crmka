@@ -16,6 +16,14 @@ class SaveModelException extends ModelException
 	 */
 	public function __construct(AR $model, Throwable $previous = null)
 	{
-		parent::__construct($model, $model->getAnyError(), 0, $previous);
+		$message = $model->getAnyError();
+
+		if (!$message && $previous) {
+			$message = $previous->getMessage();
+		} else {
+			$message = 'Unknown error';
+		}
+
+		parent::__construct($model, $message, 0, $previous);
 	}
 }
