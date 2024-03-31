@@ -2,6 +2,7 @@
 
 namespace app\models\oldDb;
 
+use app\kernel\common\models\AR;
 use app\models\ActiveQuery\oldDb\OfferMixQuery;
 use app\models\Company;
 use app\models\Contact;
@@ -274,7 +275,7 @@ use yii\helpers\ArrayHelper;
  * @property $this[]      $miniOffersMix
  * @property Offers       $offer
  */
-class OfferMix extends ActiveRecord
+class OfferMix extends AR
 {
 	public const STATUS_ACTIVE  = 1;
 	public const STATUS_PASSIVE = 2;

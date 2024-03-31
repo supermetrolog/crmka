@@ -456,7 +456,8 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	 */
 	public function getChatMember(): ChatMemberQuery
 	{
-		return $this->hasOne(ChatMember::class, ['model_id' => 'id'])
-		            ->andOnCondition([DbHelper::getDsnAttribute('dbname', ChatMember::getDb()->dsn) . '.' . ChatMember::tableName() . '.model_type' => self::tableName()]);
+		return $this->morphHasOne(ChatMember::class, 'original_id');
+//		return $this->hasOne(ChatMember::class, ['model_id' => 'id'])
+//		            ->andOnCondition([DbHelper::getDsnAttribute('dbname', ChatMember::getDb()->dsn) . '.' . ChatMember::tableName() . '.model_type' => self::tableName()]);
 	}
 }

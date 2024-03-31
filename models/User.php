@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use app\helpers\DbHelper;
+use app\kernel\common\models\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use Throwable;
 use Yii;
@@ -37,7 +37,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property UserProfile $userProfile
  */
-class User extends ActiveRecord implements IdentityInterface
+class User extends AR implements IdentityInterface
 {
 	const STATUS_DELETED  = 0;
 	const STATUS_INACTIVE = 9;
@@ -435,15 +435,14 @@ class User extends ActiveRecord implements IdentityInterface
 
 	/**
 	 * Generates new token for email verification
+	 *
+	 * @throws \yii\base\Exception
 	 */
 	public function generateAccessToken()
 	{
 		$this->access_token = Yii::$app->security->generateRandomString() . '_' . time();
 	}
 
-	/**
-	 * Removes password reset token
-	 */
 	public function removePasswordResetToken()
 	{
 		$this->password_reset_token = null;
@@ -455,7 +454,6 @@ class User extends ActiveRecord implements IdentityInterface
 	 */
 	public function getChatMember(): ChatMemberQuery
 	{
-		return $this->hasOne(ChatMember::class, ['model_id' => 'id'])
-		            ->andOnCondition([DbHelper::getDsnAttribute('dbname', ChatMember::getDb()->dsn) . '.' . ChatMember::tableName() . '.model_type' => self::tableName()]);
+		return $this->morphHasOne(ChatMember::class);
 	}
 }

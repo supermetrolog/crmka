@@ -8,7 +8,10 @@ use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use Exception;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "chat_member".
@@ -22,7 +25,7 @@ use yii\db\ActiveQuery;
  * @property ChatMemberMessage[] $chatFromMemberMessages
  * @property ChatMemberMessage[] $chatToMemberMessages0
  * @property User|OfferMix       $model
- * @property OfferMix          $offerMix
+ * @property OfferMix            $offerMix
  * @property User                $user
  *
  */
@@ -73,12 +76,12 @@ class ChatMember extends AR
 	}
 
 	/**
-	 * @throws Exception
-	 */
-	public function getModel(): ActiveQuery
-	{
-		return $this->hasOne($this->getMorphClass(), ['id' => 'model_id']);
-	}
+	 * //     * @throws Exception
+	 * //     */
+//	public function getModel(): ActiveQuery
+//	{
+//		return $this->hasOne($this->getMorphClass(), ['id' => 'model_id']);
+//	}
 
 	/**
 	 * @throws Exception
@@ -93,22 +96,25 @@ class ChatMember extends AR
 
 	/**
 	 * @return OfferMixQuery|ActiveQuery
+	 * @throws ErrorException
 	 */
 	public function getOfferMix(): OfferMixQuery
 	{
-		return $this->hasOne(OfferMix::class, ['id' => 'model_id'])->innerJoinWith(['chatMember' => function (ChatMemberQuery $query) {
-			$query->from('crmka.chat_member');
-		}]);
+		return $this->morphBelongTo(OfferMix::class, 'original_id');
 	}
 
 	/**
 	 * @return ActiveQuery
+	 * @throws ErrorException
 	 */
 	public function getUser(): ActiveQuery
 	{
-		return $this->hasOne(User::class, ['id' => 'model_id'])->innerJoinWith(['chatMember' => function (ChatMemberQuery $query) {
-			$query->from('crmka.chat_member');
-		}]);
+		return $this->morphBelongTo(User::class);
+	}
+
+	public function getModel(): ActiveRecord
+	{
+		return $this->user ?? $this->offerMix;
 	}
 
 	public static function find(): ChatMemberQuery

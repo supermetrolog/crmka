@@ -29,7 +29,7 @@ class SiteController extends Controller
 	    $members = ChatMember::find()->orderBy(['id' => SORT_DESC])->with(['offerMix', 'user'])->all();
 
 	    foreach ($members as $member) {
-		    dump($member->id, $member->model_id, $member->model_type, $member->offerMix, $member->user);
+		    dump($member->id, $member->model_id, $member->model_type, $member->model);
 //		    dump($member->id, $member->model_type, $member->model->id, get_class($member->model));
 	    }
 
