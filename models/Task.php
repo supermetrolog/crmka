@@ -20,12 +20,20 @@ use yii\db\ActiveQuery;
  * @property int                     $created_by_id
  * @property string                  $created_at
  * @property string                  $updated_at
+ * @property string                  $deleted_at
  *
  * @property ChatMemberMessageTask[] $chatMemberMessageTasks
  * @property User                    $user
  */
 class Task extends AR
 {
+	public const STATUS_CREATED    = 1;
+	public const STATUS_ACCEPTED   = 2;
+	public const STATUS_DONE       = 3;
+	public const STATUS_IMPOSSIBLE = 4;
+
+	protected bool $useSoftDelete = true;
+
 
 	public static function tableName(): string
 	{
@@ -40,6 +48,7 @@ class Task extends AR
 			[['message'], 'string'],
 			[['start', 'end', 'created_at', 'updated_at'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
+			['status', 'in', 'range' => [self::getStatuses()]],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
@@ -57,6 +66,16 @@ class Task extends AR
 			'created_by_id'   => 'Created By ID',
 			'created_at'      => 'Created At',
 			'updated_at'      => 'Updated At',
+		];
+	}
+
+	public static function getStatuses(): array
+	{
+		return [
+			self::STATUS_CREATED,
+			self::STATUS_ACCEPTED,
+			self::STATUS_DONE,
+			self::STATUS_IMPOSSIBLE,
 		];
 	}
 

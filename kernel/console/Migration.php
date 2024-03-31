@@ -18,6 +18,13 @@ class Migration extends \yii\db\Migration
 		];
 	}
 
+	public function softDelete(): array
+	{
+		return [
+			'deleted_at' => $this->timestamp()->null(),
+		];
+	}
+
 	public function morph(string $name = 'model', bool $nullable = false): array
 	{
 		$type = $name . '_type';
