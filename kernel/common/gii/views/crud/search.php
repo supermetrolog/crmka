@@ -24,47 +24,30 @@ echo "<?php\n";
 
 namespace <?= StringHelper::dirname(ltrim($generator->searchModelClass, '\\')) ?>;
 
-use yii\base\Model;
+use app\exceptions\domain\model\ValidateException;
+use app\kernel\common\models\Form;
 use yii\data\ActiveDataProvider;
 use <?= ltrim($generator->modelClass, '\\') . (isset($modelAlias) ? " as $modelAlias" : "") ?>;
 
-/**
- * <?= $searchModelClass ?> represents the model behind the search form of `<?= $generator->modelClass ?>`.
- */
-class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $modelClass ?>
-
+class <?= $searchModelClass ?> extends Form
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+	<?php foreach ($searchAttributes as $attribute): ?>
+public $<?= $attribute ?>;
+	<?php endforeach; ?>
+
+    public function rules(): array
     {
         return [
             <?= implode(",\n            ", $rules) ?>,
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function scenarios()
+	/**
+	 * @throws ValidateException
+	 */
+    public function search(array $params): ActiveDataProvider
     {
-        // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
-    }
-
-    /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
-     */
-    public function search($params)
-    {
-        $query = <?= isset($modelAlias) ? $modelAlias : $modelClass ?>::find();
-
-        // add conditions that should always apply here
+        $query = <?= $modelAlias ?? $modelClass ?>::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -72,13 +55,8 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
 
         $this->load($params);
 
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
+		$this->validateOrThrow();
 
-        // grid filtering conditions
         <?= implode("\n        ", $searchConditions) ?>
 
         return $dataProvider;

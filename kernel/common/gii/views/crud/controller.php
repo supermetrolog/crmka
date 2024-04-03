@@ -30,6 +30,7 @@ echo "<?php\n";
 namespace <?= StringHelper::dirname(ltrim($generator->controllerClass, '\\')) ?>;
 
 use app\exceptions\domain\model\SaveModelException;
+use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
 <?php if (!empty($generator->searchModelClass)): ?>
 use <?= ltrim($generator->searchModelClass, '\\') . (isset($searchModelAlias) ? " as $searchModelAlias" : "") ?>;
@@ -45,29 +46,27 @@ use yii\web\NotFoundHttpException;
 
 class <?= $controllerClass ?> extends AppController
 {
-
+	/**
+	 * @throws ValidateException
+	 */
     public function actionIndex(): ActiveDataProvider
     {
 <?php if (!empty($generator->searchModelClass)): ?>
         $searchModel = new <?= $searchModelAlias ?? $searchModelClass ?>();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-		return $dataProvider;
+        return $searchModel->search(Yii::$app->request->queryParams);
 <?php else: ?>
-        $dataProvider = new ActiveDataProvider([
+        return new ActiveDataProvider([
             'query' => <?= $modelClass ?>::find(),
         ]);
-
-        return $dataProvider;
 <?php endif; ?>
     }
 
 	/**
 	 * @throws NotFoundHttpException
 	 */
-    public function actionView(int <?= $actionParams ?>): <?= $modelClass ?>
+    public function actionView(int <?= $actionParams ?>): <?= $modelClass . "\n" ?>
     {
-		$this->findModel(<?= $actionParams ?>);
+		return $this->findModel(<?= $actionParams ?>);
     }
 
 	/**
@@ -111,7 +110,7 @@ class <?= $controllerClass ?> extends AppController
 	/**
 	 * @throws NotFoundHttpException
 	 */
-    protected function findModel(int <?= $actionParams ?>)
+    protected function findModel(int <?= $actionParams ?>): ?<?= $modelClass . "\n" ?>
     {
 		if (($model = <?= $modelClass ?>::findOne(<?= $actionParams ?>)) !== null) {
 			return $model;
