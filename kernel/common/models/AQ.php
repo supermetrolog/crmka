@@ -8,5 +8,8 @@ use yii\db\ActiveQuery;
 
 class AQ extends ActiveQuery
 {
-
+	public function field(string $column): string
+	{
+		return $this->modelClass::tableName() . '.' . $column;
+	}
 }

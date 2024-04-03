@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace app\kernel\common\models;
 
 use app\exceptions\domain\model\SaveModelException;
+use app\exceptions\domain\model\ValidateException;
+use app\helpers\DateTimeHelper;
 use app\helpers\DbHelper;
 use DateTime;
 use Exception;
@@ -72,6 +74,16 @@ class AR extends ActiveRecord
 	}
 
 	/**
+	 * @throws ValidateException
+	 */
+	public function validateOrThrow(array $attributes = [], bool $clearError = true): void
+	{
+		if (!$this->validate($attributes, $clearError)) {
+			throw new ValidateException($this);
+		}
+	}
+
+	/**
 	 * @param bool        $runValidation
 	 * @param string|null $attributeNames
 	 *
@@ -85,7 +97,7 @@ class AR extends ActiveRecord
 		}
 
 		if ($this->useSoftUpdate) {
-			$this->setAttribute(self::SOFT_UPDATE_ATTRIBUTE, (new DateTime())->format('Y-m-d H:i:s'));
+			$this->setAttribute(self::SOFT_UPDATE_ATTRIBUTE, DateTimeHelper::nowf());
 		}
 
 		return parent::save($runValidation, $attributeNames);

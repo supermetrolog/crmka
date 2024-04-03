@@ -33,6 +33,7 @@ class Task extends AR
 	public const STATUS_IMPOSSIBLE = 4;
 
 	protected bool $useSoftDelete = true;
+	protected bool $useSoftUpdate = true;
 
 
 	public static function tableName(): string
