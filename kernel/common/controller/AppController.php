@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\kernel\common\controller;
 
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;

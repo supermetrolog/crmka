@@ -241,7 +241,7 @@ class User extends AR implements IdentityInterface
 		}
 	}
 
-	public function fields()
+	public function fields(): array
 	{
 		$fields = parent::fields();
 		unset(
