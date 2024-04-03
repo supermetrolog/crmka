@@ -35,8 +35,13 @@ class TaskQuery extends AQ
 		return $this->andWhere([$this->field('created_by_type') => $type]);
 	}
 
-	public function byMorph(int $id, int $type): self
+	public function byMorph(int $id, string $type): self
 	{
 		return $this->byCreatedByType($type)->byCreatedById($id);
+	}
+
+	public function byId(int $id): self
+	{
+		return $this->andWhere([$this->field('id') => $id]);
 	}
 }

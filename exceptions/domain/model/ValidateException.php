@@ -7,7 +7,6 @@ namespace app\exceptions\domain\model;
 use Exception;
 use Throwable;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
 
 class ValidateException extends ModelException
 {
@@ -16,6 +15,9 @@ class ValidateException extends ModelException
 	 */
 	public function __construct(Model $model, Throwable $previous = null)
 	{
-		parent::__construct($model, ArrayHelper::getValue($model->getFirstErrors(), 0), 0, $previous);
+		$errors = $model->getFirstErrors();
+		$error  = array_pop($errors) ?? 'Unknown validate error';
+
+		parent::__construct($model, $error, 0, $previous);
 	}
 }

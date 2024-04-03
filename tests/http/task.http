@@ -1,0 +1,34 @@
+GET {{url}}/tasks
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/tasks
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "message": "ANAL",
+  "status": 1,
+  "created_by_type": "user",
+  "created_by_id": 3
+}
+###
+
+PUT {{url}}/tasks/1?expand=createdBy
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "message": "ANAL2",
+  "status": 1,
+  "created_by_type": "user",
+  "created_by_id": 3
+}
+###

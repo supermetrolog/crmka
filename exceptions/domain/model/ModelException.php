@@ -12,7 +12,7 @@ class ModelException extends Exception
 {
 	private Model $model;
 
-	public function __construct(Model $model, $message = "", $code = 0, Throwable $previous = null)
+	public function __construct(Model $model, string $message = "", int $code = 0, Throwable $previous = null)
 	{
 		$this->model = $model;
 		parent::__construct($message, $code, $previous);

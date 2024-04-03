@@ -5,6 +5,7 @@ namespace app\models;
 use app\kernel\common\models\AR;
 use app\models\ActiveQuery\ChatMemberMessageTaskQuery;
 use app\models\ActiveQuery\TaskQuery;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
@@ -24,6 +25,8 @@ use yii\db\ActiveQuery;
  *
  * @property ChatMemberMessageTask[] $chatMemberMessageTasks
  * @property User                    $user
+ * @property User                    $createdByUser
+ * @property User                    $createdBy
  */
 class Task extends AR
 {
@@ -41,16 +44,20 @@ class Task extends AR
 		return 'task';
 	}
 
+	public function formName(): string
+	{
+		return '';
+	}
+
 	public function rules(): array
 	{
 		return [
 			[['user_id', 'message', 'status', 'created_by_type', 'created_by_id'], 'required'],
 			[['user_id', 'status', 'created_by_id'], 'integer'],
 			[['message'], 'string'],
-			[['start', 'end', 'created_at', 'updated_at'], 'date', 'format' => 'Y-m-d H:i:s'],
 			[['start', 'end', 'created_at', 'updated_at'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
-			['status', 'in', 'range' => [self::getStatuses()]],
+			['status', 'in', 'range' => self::getStatuses()],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
@@ -92,6 +99,19 @@ class Task extends AR
 	public function getUser(): ActiveQuery
 	{
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getCreatedByUser(): ActiveQuery
+	{
+		return $this->morphBelongTo(User::class, 'id', 'created_by');
+	}
+
+	public function getCreatedBy(): AR
+	{
+		return $this->createdByUser;
 	}
 
 

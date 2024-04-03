@@ -9,13 +9,14 @@ use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
 use app\models\search\TaskSearch;
 use app\models\Task;
-use app\models\User;
+use app\resources\TaskResource;
 use app\usecases\TaskService;
 use Throwable;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
+use yii\web\User;
 
 class TaskController extends AppController
 {
@@ -26,7 +27,7 @@ class TaskController extends AppController
 	{
 		$this->service = $service;
 
-		$this->user = Yii::$app->user->identity;
+		$this->user = Yii::$app->user;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -44,47 +45,47 @@ class TaskController extends AppController
 	/**
 	 * @throws NotFoundHttpException
 	 */
-	public function actionView(int $id): Task
+	public function actionView(int $id): TaskResource
 	{
-		return $this->findModel($id);
+		return new TaskResource($this->findModel($id));
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 */
-	public function actionCreate(): Task
+	public function actionCreate(): TaskResource
 	{
 		$model = new Task();
 
-		$model->load(Yii::$app->request->post());
+		$model->load($this->request->post());
 		$model->validateOrThrow();
 
-		$this->service->create(new CreateTaskDto([
+		$model = $this->service->create(new CreateTaskDto([
 			'user'            => $model->user,
 			'message'         => $model->message,
-			'status'          => $model->status,
+			'status'          => Task::STATUS_CREATED,
 			'start'           => $model->start,
 			'end'             => $model->end,
-			'created_by_type' => User::class,
+			'created_by_type' => \app\models\User::tableName(),
 			'created_by_id'   => $this->user->id,
 		]));
 
-		return $model;
+		return new TaskResource($model);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws NotFoundHttpException
 	 */
-	public function actionUpdate(int $id): Task
+	public function actionUpdate(int $id): TaskResource
 	{
 		$model = $this->findModel($id);
 
 		$model->load(Yii::$app->request->post());
 		$model->saveOrThrow();
 
-		$this->service->update(new UpdateTaskDto([
+		$model = $this->service->update($model, new UpdateTaskDto([
 			'user'    => $model->user,
 			'message' => $model->message,
 			'status'  => $model->status,
@@ -92,7 +93,8 @@ class TaskController extends AppController
 			'end'     => $model->end
 		]));
 
-		return $model;
+
+		return new TaskResource($model);
 	}
 
 	/**
@@ -111,7 +113,7 @@ class TaskController extends AppController
 	 */
 	protected function findModel(int $id): ?Task
 	{
-		if (($model = Task::find()->byMorph($id, User::class)->one()) !== null) {
+		if (($model = Task::find()->byId($id)->byMorph($this->user->id, \app\models\User::tableName())->one()) !== null) {
 			return $model;
 		}
 

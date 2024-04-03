@@ -38,9 +38,9 @@ class TaskService
 	/**
 	 * @throws SaveModelException
 	 */
-	public function update(UpdateTaskDto $dto): Task
+	public function update(Task $task, UpdateTaskDto $dto): Task
 	{
-		$task = new Task([
+		$task->load([
 			'user_id'    => $dto->user->id,
 			'message'    => $dto->message,
 			'status'     => $dto->status,
