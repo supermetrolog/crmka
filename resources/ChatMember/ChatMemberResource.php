@@ -14,7 +14,6 @@ use app\resources\Request\RequestResource;
 use app\resources\UserResource;
 use UnexpectedValueException;
 use yii\data\ActiveDataProvider;
-use yii\helpers\VarDumper;
 
 class ChatMemberResource extends JsonResource
 {

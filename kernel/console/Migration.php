@@ -44,6 +44,18 @@ class Migration extends \yii\db\Migration
 		];
 	}
 
+	public function addMorphColumn(string $table, string $value, string $name = 'morph'): void
+	{
+		$this->addColumn($table, $name, $this->string()->notNull()->defaultValue($value));
+
+		$this->index($table, [$name]);
+	}
+
+	public function dropMorphColumns(string $table): void
+	{
+		$this->dropColumn($table, 'morph');
+	}
+
 	public function table(string $table, array ...$columns): void
 	{
 		$this->createTable($table, array_merge(...$columns));

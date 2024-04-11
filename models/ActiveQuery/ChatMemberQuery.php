@@ -7,9 +7,7 @@ use app\models\ChatMember;
 use yii\db\ActiveRecord;
 
 /**
- * This is the ActiveQuery class for [[\app\models\ChatMember]].
- *
- * @see \app\models\ChatMember
+ * @see ChatMember
  */
 class ChatMemberQuery extends AQ
 {

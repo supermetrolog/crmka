@@ -178,18 +178,18 @@ class AR extends ActiveRecord
 	 * @param string|AR $class
 	 * @param string    $column
 	 * @param string    $name
+	 * @param string    $ownerColumn
 	 *
 	 * @return ActiveQuery
-	 * @throws ErrorException
 	 */
-	public function morphBelongTo(string $class, string $column = 'id', string $name = 'model'): ActiveQuery
+	public function morphBelongTo(string $class, string $column = 'id', string $name = 'model', string $ownerColumn = 'morph'): ActiveQuery
 	{
 		$type = $name . '_type';
 		$id   = $name . '_id';
 
-		return $this->hasOne($class, [$column => $id])->innerJoin(static::getTable(), [
-			static::getColumn($id)   => new Expression($class::getColumn($column)),
-			static::getColumn($type) => $class::tableName()
+		return $this->hasOne($class, [
+			$column      => $id,
+			$ownerColumn => $type
 		]);
 	}
 
@@ -197,17 +197,19 @@ class AR extends ActiveRecord
 	 * @param string|AR $class
 	 * @param string    $column
 	 * @param string    $name
+	 * @param string    $localColumn
 	 *
 	 * @return ActiveQuery
-	 * @throws ErrorException
 	 */
-	public function morphHasOne(string $class, string $column = 'id', string $name = 'model'): ActiveQuery
+	public function morphHasOne(string $class, string $column = 'id', string $name = 'model', string $localColumn = 'morph'): ActiveQuery
 	{
 		$type = $name . '_type';
 		$id   = $name . '_id';
 
-		return $this->hasOne($class, [$id => $column])
-		            ->andOnCondition([$class::getColumn($type) => static::tableName()]);
+		return $this->hasOne($class, [
+			$id   => $column,
+			$type => $localColumn
+		]);
 	}
 
 	/**
