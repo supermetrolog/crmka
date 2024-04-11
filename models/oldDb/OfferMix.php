@@ -708,7 +708,7 @@ class OfferMix extends AR
 		return $extraFields;
 	}
 
-	public function fields()
+	public function fields(): array
 	{
 		$fields                           = parent::fields();
 		$fields['last_update_format']     = function ($fields) {

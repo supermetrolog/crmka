@@ -3,6 +3,10 @@
 namespace app\models;
 
 use app\exceptions\ValidationErrorHttpException;
+use app\kernel\common\models\AR;
+use app\models\ActiveQuery\ChatMemberQuery;
+use yii\base\ErrorException;
+use yii\db\ActiveQuery;
 use yii\web\NotFoundHttpException;
 use app\models\miniModels\RequestDeal;
 use Yii;
@@ -69,7 +73,7 @@ use app\models\miniModels\TimelineStep;
  * @property RequestRegion[] $requestRegions
  * @property Timeline[] $timelines
  */
-class Request extends \yii\db\ActiveRecord
+class Request extends AR
 {
     public const STATUS_ACTIVE = 1;
     public const STATUS_PASSIVE = 0;
@@ -279,7 +283,7 @@ class Request extends \yii\db\ActiveRecord
         }
     }
 
-    public function fields()
+    public function fields(): array
     {
         $fields = parent::fields();
         $fields['movingDate'] = function ($fields) {
@@ -334,115 +338,91 @@ class Request extends \yii\db\ActiveRecord
         return $extraFields;
     }
     /**
-     * Gets query for [[Company]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCompany()
+    public function getCompany(): ActiveQuery
     {
         return $this->hasOne(Company::className(), ['id' => 'company_id']);
     }
     /**
-     * Gets query for [[Contacts]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getContacts()
+    public function getContacts(): ActiveQuery
     {
         return $this->hasMany(Contact::className(), ['request_id' => 'id']);
     }
     /**
-     * Gets query for [[Consultant]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getConsultant()
+    public function getConsultant(): ActiveQuery
     {
         return $this->hasOne(User::className(), ['id' => 'consultant_id']);
     }
 
     /**
-     * Gets query for [[RequestDeal]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getDeal()
+    public function getDeal(): ActiveQuery
     {
         return $this->hasOne(Deal::className(), ['request_id' => 'id']);
     }
     /**
-     * Gets query for [[Contact]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getContact()
+    public function getContact(): ActiveQuery
     {
         return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
     }
     /**
-     * Gets query for [[RequestDirections]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getDirections()
+    public function getDirections(): ActiveQuery
     {
         return $this->hasMany(RequestDirection::className(), ['request_id' => 'id']);
     }
 
     /**
-     * Gets query for [[RequestDistricts]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getDistricts()
+    public function getDistricts(): ActiveQuery
     {
         return $this->hasMany(RequestDistrict::className(), ['request_id' => 'id']);
     }
 
     /**
-     * Gets query for [[RequestGateTypes]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getGateTypes()
+    public function getGateTypes(): ActiveQuery
     {
         return $this->hasMany(RequestGateType::className(), ['request_id' => 'id']);
     }
 
     /**
-     * Gets query for [[RequestObjectClasses]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getObjectClasses()
+    public function getObjectClasses(): ActiveQuery
     {
         return $this->hasMany(RequestObjectClass::className(), ['request_id' => 'id']);
     }
 
     /**
-     * Gets query for [[RequestObjectTypes]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getObjectTypes()
+    public function getObjectTypes(): ActiveQuery
     {
         return $this->hasMany(RequestObjectType::className(), ['request_id' => 'id']);
     }
     /**
-     * Gets query for [[RequestObjectTypesGeneral]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getObjectTypesGeneral()
+    public function getObjectTypesGeneral(): ActiveQuery
     {
         return $this->hasMany(RequestObjectTypeGeneral::className(), ['request_id' => 'id']);
     }
     /**
-     * Gets query for [[RequestRegions]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getRegions()
+    public function getRegions(): ActiveQuery
     {
         return $this->hasMany(RequestRegion::className(), ['request_id' => 'id']);
     }
@@ -450,10 +430,19 @@ class Request extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Timelines]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTimelines()
+    public function getTimelines(): ActiveQuery
     {
         return $this->hasMany(Timeline::className(), ['request_id' => 'id']);
     }
+
+	/**
+	 * @return ChatMemberQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getChatMember(): ChatMemberQuery
+	{
+		return $this->morphHasOne(ChatMember::class);
+	}
 }

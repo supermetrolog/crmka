@@ -16,18 +16,18 @@ use yii\db\Expression;
 /**
  * This is the model class for table "chat_member".
  *
- * @property int                 $id
- * @property string              $model_type
- * @property int                 $model_id
- * @property string              $created_at
- * @property string              $updated_at
+ * @property int                   $id
+ * @property string                $model_type
+ * @property int                   $model_id
+ * @property string                $created_at
+ * @property string                $updated_at
  *
- * @property ChatMemberMessage[] $chatFromMemberMessages
- * @property ChatMemberMessage[] $chatToMemberMessages0
- * @property User|OfferMix       $model
- * @property OfferMix            $offerMix
- * @property User                $user
- *
+ * @property ChatMemberMessage[]   $chatFromMemberMessages
+ * @property ChatMemberMessage[]   $chatToMemberMessages0
+ * @property User|OfferMix|Request $model
+ * @property OfferMix              $offerMix
+ * @property User                  $user
+ * @property Request               $request
  */
 class ChatMember extends AR
 {
@@ -104,6 +104,14 @@ class ChatMember extends AR
 	}
 
 	/**
+	 * @throws ErrorException
+	 */
+	public function getRequest(): ActiveQuery
+	{
+		return $this->morphBelongTo(Request::class);
+	}
+
+	/**
 	 * @return ActiveQuery
 	 * @throws ErrorException
 	 */
@@ -114,7 +122,7 @@ class ChatMember extends AR
 
 	public function getModel(): ActiveRecord
 	{
-		return $this->user ?? $this->offerMix;
+		return $this->request ?? $this->user ?? $this->offerMix;
 	}
 
 	public static function find(): ChatMemberQuery
