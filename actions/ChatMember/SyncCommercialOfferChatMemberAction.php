@@ -6,11 +6,12 @@ namespace app\actions\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberDto;
 use app\kernel\common\actions\Action;
+use app\models\CommercialOffer;
 use app\models\Request;
 use app\usecases\ChatMemberService;
 use yii\db\Exception;
 
-class SyncRequestChatMemberAction extends Action
+class SyncCommercialOfferChatMemberAction extends Action
 {
 	private ChatMemberService $service;
 
@@ -25,16 +26,16 @@ class SyncRequestChatMemberAction extends Action
 	 */
 	public function run(): void
 	{
-		$query = Request::find();
+		$query = CommercialOffer::find();
 
-		/** @var Request $request */
+		/** @var CommercialOffer $request */
 		foreach ($query->each(1000) as $request) {
 			$this->service->upsert(new CreateChatMemberDto([
 				'model_id'   => $request->id,
-				'model_type' => Request::getMorphClass()
+				'model_type' => CommercialOffer::getMorphClass()
 			]));
 
-			$this->info(sprintf('Created request with ID: %d', $request->id));
+			$this->info(sprintf('Created commercial offer with ID: %d', $request->id));
 		}
 	}
 }

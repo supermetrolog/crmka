@@ -18,8 +18,11 @@ class ChatMemberController extends AppController
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
+		// TODO: Сделать разные поиски для разны типов моделей так как они будут сильно отличаться!
+
 		$searchModel  = new ChatMemberSearch();
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+		$dataProvider = $searchModel->search($this->request->get());
 
 		return ChatMemberResource::fromDataProvider($dataProvider);
 	}

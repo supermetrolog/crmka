@@ -28,6 +28,7 @@ use yii\db\Expression;
  * @property OfferMix              $offerMix
  * @property User                  $user
  * @property Request               $request
+ * @property CommercialOffer       $commercialOffer
  */
 class ChatMember extends AR
 {
@@ -104,7 +105,7 @@ class ChatMember extends AR
 	}
 
 	/**
-	 * @throws ErrorException
+	 * @return ActiveQuery
 	 */
 	public function getRequest(): ActiveQuery
 	{
@@ -113,7 +114,14 @@ class ChatMember extends AR
 
 	/**
 	 * @return ActiveQuery
-	 * @throws ErrorException
+	 */
+	public function getCommercialOffer(): ActiveQuery
+	{
+		return $this->morphBelongTo(CommercialOffer::class);
+	}
+
+	/**
+	 * @return ActiveQuery
 	 */
 	public function getUser(): ActiveQuery
 	{
@@ -122,7 +130,7 @@ class ChatMember extends AR
 
 	public function getModel(): ActiveRecord
 	{
-		return $this->request ?? $this->user ?? $this->offerMix;
+		return $this->request ?? $this->commercialOffer ?? $this->user ?? $this->offerMix;
 	}
 
 	public static function find(): ChatMemberQuery

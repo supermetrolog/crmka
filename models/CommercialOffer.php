@@ -8,6 +8,11 @@ use yii\db\ActiveQuery;
 
 class CommercialOffer extends Offers
 {
+	public static function getMorphClass(): string
+	{
+		return 'commercial_offer';
+	}
+
 	/**
 	 * @return ActiveQuery
 	 */

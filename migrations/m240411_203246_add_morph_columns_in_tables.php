@@ -1,6 +1,10 @@
 <?php
 
 use app\kernel\console\Migration;
+use app\models\CommercialOffer;
+use app\models\OfferMix;
+use app\models\Request;
+use app\models\User;
 
 /**
  * Class m240411_203246_add_morph_columns_in_tables
@@ -12,12 +16,13 @@ class m240411_203246_add_morph_columns_in_tables extends Migration
 	 */
 	public function safeUp()
 	{
-		$this->addMorphColumn('user', 'user');
-		$this->addMorphColumn('request', 'request');
+		$this->addMorphColumn('user', User::getMorphClass());
+		$this->addMorphColumn('request', Request::getMorphClass());
 
 		$this->db = Yii::$app->db_old;
 
-		$this->addMorphColumn('c_industry_offers_mix', 'c_industry_offers_mix');
+		$this->addMorphColumn('c_industry_offers_mix', OfferMix::getMorphName());
+		$this->addMorphColumn('c_industry_offers', CommercialOffer::getMorphClass());
 	}
 
 	/**
@@ -30,6 +35,7 @@ class m240411_203246_add_morph_columns_in_tables extends Migration
 
 		$this->db = Yii::$app->db_old;
 		$this->dropMorphColumns('c_industry_offers_mix');
+		$this->dropMorphColumns('c_industry_offers');
 	}
 
 	/*

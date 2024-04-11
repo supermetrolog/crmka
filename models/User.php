@@ -54,6 +54,11 @@ class User extends AR implements IdentityInterface
 		return 'user';
 	}
 
+	public static function getMorphClass(): string
+	{
+		return 'user';
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

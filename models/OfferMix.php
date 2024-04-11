@@ -22,6 +22,11 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	public const OPEX_INCLUDED           = 1;
 	public const PUBLIC_SERVICE_INCLUDED = 1;
 
+	public static function getMorphName(): string
+	{
+		return 'offer_mix';
+	}
+
 	/**
 	 * @return bool
 	 */

@@ -24,11 +24,21 @@ class ChatMemberSearch extends Form
 	}
 
 	/**
+	 * TODO: add in generator template
+	 *
+	 * @return string
+	 */
+	public function formName(): string
+	{
+		return '';
+	}
+
+	/**
 	 * @throws ValidateException
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = ChatMember::find()->with(['request']);
+		$query = ChatMember::find()->with(['commercialOffer', 'request']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -41,11 +51,10 @@ class ChatMemberSearch extends Form
 		$query->andFilterWhere([
 			'id'         => $this->id,
 			'model_id'   => $this->model_id,
+			'model_type' => $this->model_type,
 			'created_at' => $this->created_at,
 			'updated_at' => $this->updated_at,
 		]);
-
-		$query->andFilterWhere(['like', 'model_type', $this->model_type]);
 
 		return $dataProvider;
 	}
