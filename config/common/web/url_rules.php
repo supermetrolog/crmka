@@ -185,4 +185,11 @@ return
 				'GET,OPTIONS download' => 'download'
 			],
 		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => ['chat-members' => 'ChatMember/chat-member'],
+			'extraPatterns' => [
+				'GET,OPTIONS' => 'index'
+			],
+		],
 	];

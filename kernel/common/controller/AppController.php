@@ -55,8 +55,11 @@ class AppController extends Controller
 	}
 
 	/**
+	 * @param       $id
+	 * @param array $params
+	 *
+	 * @return array|mixed|null
 	 * @throws InvalidRouteException
-	 * @throws ValidateHttpException
 	 */
 	public function runAction($id, $params = [])
 	{
@@ -66,6 +69,8 @@ class AppController extends Controller
 			if ($res instanceof JsonResource) {
 				return $res->toArray();
 			}
+
+			return $res;
 		} catch (ValidateException|SaveModelException $e) {
 			$this->response->setStatusCode(422);
 

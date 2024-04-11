@@ -56,7 +56,9 @@ class AR extends ActiveRecord
 	 */
 	public function getAnyError(): ?string
 	{
-		return ArrayHelper::getValue($this->getFirstErrors(), 0);
+		$errors = $this->getFirstErrors();
+
+		return array_pop($errors);
 	}
 
 	/**
@@ -69,6 +71,10 @@ class AR extends ActiveRecord
 				throw new SaveModelException($this);
 			}
 		} catch (Throwable $th) {
+			if ($th instanceof SaveModelException) {
+				throw $th;
+			}
+
 			throw new SaveModelException($this, $th);
 		}
 	}
@@ -202,5 +208,18 @@ class AR extends ActiveRecord
 
 		return $this->hasOne($class, [$id => $column])
 		            ->andOnCondition([$class::getColumn($type) => static::tableName()]);
+	}
+
+	/**
+	 * @param string     $tableName
+	 * @param array      $insertColumns
+	 * @param array|bool $updateColumns
+	 *
+	 * @return void
+	 * @throws \yii\db\Exception
+	 */
+	public static function upsert(string $tableName, array $insertColumns, $updateColumns = true): void
+	{
+		self::getDb()->createCommand()->upsert($tableName, $insertColumns, $updateColumns)->execute();
 	}
 }

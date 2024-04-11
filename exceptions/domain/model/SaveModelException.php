@@ -20,7 +20,7 @@ class SaveModelException extends ModelException
 
 		if (!$message && $previous) {
 			$message = $previous->getMessage();
-		} else {
+		} else if (!$message) {
 			$message = 'Unknown error';
 		}
 
