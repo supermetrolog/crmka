@@ -8,7 +8,7 @@ use app\dto\ChatMember\CreateChatMemberDto;
 use app\kernel\common\actions\Action;
 use app\models\ChatMember;
 use app\models\Request;
-use app\usecases\ChatMemberService;
+use app\usecases\ChatMember\ChatMemberService;
 use yii\base\ErrorException;
 use yii\db\Exception;
 

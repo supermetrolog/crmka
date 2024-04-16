@@ -4,6 +4,7 @@ namespace app\controllers\ChatMember;
 
 use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ChatMember;
 use app\models\search\ChatMemberSearch;
 use app\resources\ChatMember\ChatMemberResource;
@@ -20,7 +21,7 @@ class ChatMemberController extends AppController
 	{
 		// TODO: Сделать разные поиски для разны типов моделей так как они будут сильно отличаться!
 
-		$searchModel  = new ChatMemberSearch();
+		$searchModel = new ChatMemberSearch();
 
 		$dataProvider = $searchModel->search($this->request->get());
 
@@ -32,7 +33,7 @@ class ChatMemberController extends AppController
 	 */
 	public function actionView(int $id): ChatMemberResource
 	{
-		return new ChatMemberResource($this->findModel($id));
+		return ChatMemberResource::make($this->findModel($id));
 	}
 
 	/**
@@ -40,10 +41,19 @@ class ChatMemberController extends AppController
 	 */
 	protected function findModel(int $id): ?ChatMember
 	{
-		if (($model = ChatMember::findOne($id)) !== null) {
+		// TODO: add in generator
+
+		$model = ChatMember::find()
+		                   ->byId($id)
+		                   ->with(['messages' => function (ChatMemberMessageQuery $query) {
+			                   $query->notDeleted();
+		                   }])
+		                   ->one();
+
+		if ($model) {
 			return $model;
 		}
 
-		throw new NotFoundHttpException('The requested page does not exist.');
+		throw new NotFoundHttpException('The requested model does not exist.');
 	}
 }

@@ -35,8 +35,8 @@ use yii\helpers\ArrayHelper;
  * @property int         $role
  * @property int         $user_id_old
  *
- *
  * @property UserProfile $userProfile
+ * @property ChatMember  $chatMember
  */
 class User extends AR implements IdentityInterface
 {

@@ -21,10 +21,12 @@ use yii\helpers\ArrayHelper;
 class AR extends ActiveRecord
 {
 	public const SOFT_DELETE_ATTRIBUTE = 'deleted_at';
+	public const SOFT_CREATE_ATTRIBUTE = 'created_at';
 	public const SOFT_UPDATE_ATTRIBUTE = 'updated_at';
 
 	protected bool $useSoftDelete = false;
 	protected bool $useSoftUpdate = false;
+	protected bool $useSoftCreate = false;
 
 
 	/**
@@ -104,6 +106,14 @@ class AR extends ActiveRecord
 			$this->setAttribute(self::SOFT_UPDATE_ATTRIBUTE, DateTimeHelper::nowf());
 		}
 
+		if ($this->useSoftCreate && !$this->hasAttribute(self::SOFT_CREATE_ATTRIBUTE)) {
+			throw new ErrorException('Soft create attribute (' . self::SOFT_CREATE_ATTRIBUTE . ') not exist');
+		}
+
+		if ($this->useSoftCreate) {
+			$this->setAttribute(self::SOFT_CREATE_ATTRIBUTE, DateTimeHelper::nowf());
+		}
+
 		return parent::save($runValidation, $attributeNames);
 	}
 
@@ -134,7 +144,8 @@ class AR extends ActiveRecord
 			throw new ErrorException('Soft delete attribute (' . self::SOFT_DELETE_ATTRIBUTE . ') not exist');
 		}
 
-		$this->setAttribute(self::SOFT_DELETE_ATTRIBUTE, (new DateTime())->format('Y-m-d H:i:s'));
+		$this->setAttribute(self::SOFT_DELETE_ATTRIBUTE, DateTimeHelper::nowf());
+
 		$this->saveOrThrow();
 	}
 

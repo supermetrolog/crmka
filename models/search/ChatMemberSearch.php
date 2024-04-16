@@ -4,6 +4,7 @@ namespace app\models\search;
 
 use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\models\Form;
+use app\models\ActiveQuery\ChatMemberMessageQuery;
 use yii\data\ActiveDataProvider;
 use app\models\ChatMember;
 
@@ -38,7 +39,11 @@ class ChatMemberSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = ChatMember::find()->with(['commercialOffer', 'request']);
+		$query = ChatMember::find()
+		                   ->with(['messages' => function (ChatMemberMessageQuery $query) {
+			                   $query->notDeleted();
+		                   }])
+		                   ->with(['toChatMemberMessages', 'commercialOffer', 'request']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,

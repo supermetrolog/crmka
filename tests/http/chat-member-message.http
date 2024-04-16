@@ -1,0 +1,18 @@
+GET {{url}}/chat-member-messages
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/chat-member-messages
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "message": "IDI NA HUI",
+  "to_chat_member_id": 1
+}
+
+###

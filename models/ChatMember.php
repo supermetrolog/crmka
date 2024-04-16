@@ -22,8 +22,9 @@ use yii\db\Expression;
  * @property string                $created_at
  * @property string                $updated_at
  *
- * @property ChatMemberMessage[]   $chatFromMemberMessages
- * @property ChatMemberMessage[]   $chatToMemberMessages0
+ * @property ChatMemberMessage[]   $fromChatMemberMessages
+ * @property ChatMemberMessage[]   $toChatMemberMessages
+ * @property ChatMemberMessage[]   $messages
  * @property User|OfferMix|Request $model
  * @property OfferMix              $offerMix
  * @property User                  $user
@@ -32,6 +33,8 @@ use yii\db\Expression;
  */
 class ChatMember extends AR
 {
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
 
 	public static function tableName(): string
 	{
@@ -71,33 +74,21 @@ class ChatMember extends AR
 	/**
 	 * @return ActiveQuery|ChatMemberMessageQuery
 	 */
-	public function getToChatMemberMessages0(): ChatMemberMessageQuery
+	public function getToChatMemberMessages(): ChatMemberMessageQuery
 	{
 		return $this->hasMany(ChatMemberMessage::className(), ['to_chat_member_id' => 'id']);
 	}
 
 	/**
-	 * //     * @throws Exception
-	 * //     */
-//	public function getModel(): ActiveQuery
-//	{
-//		return $this->hasOne($this->getMorphClass(), ['id' => 'model_id']);
-//	}
-
-	/**
-	 * @throws Exception
+	 * @return ActiveQuery|ChatMemberMessageQuery
 	 */
-	public function getMorphClass(): string
+	public function getMessages(): ChatMemberMessageQuery
 	{
-		return MatchHelper::match([
-			User::tableName()     => User::class,
-			OfferMix::tableName() => OfferMix::class,
-		], $this->model_type);
+		return $this->hasMany(ChatMemberMessage::class, ['to_chat_member_id' => 'id']);
 	}
 
 	/**
 	 * @return OfferMixQuery|ActiveQuery
-	 * @throws ErrorException
 	 */
 	public function getOfferMix(): OfferMixQuery
 	{

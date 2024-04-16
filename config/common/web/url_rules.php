@@ -4,18 +4,6 @@ return
 	[
 		[
 			'class'         => 'yii\rest\UrlRule',
-			'controller'    => 'task',
-			'except'        => [],
-			'extraPatterns' => [
-				'GET,OPTIONS'         => 'index',
-				'GET,OPTIONS <id>'    => 'index',
-				'POST,OPTIONS'        => 'create',
-				'PUT,OPTIONS <id>'    => 'update',
-				'DELETE,OPTIONS <id>' => 'delete',
-			],
-		],
-		[
-			'class'         => 'yii\rest\UrlRule',
 			'controller'    => 'user',
 			'except'        => [],
 			'extraPatterns' => [
@@ -187,9 +175,30 @@ return
 		],
 		[
 			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'task',
+			'except'        => [],
+			'extraPatterns' => [
+				'GET,OPTIONS'         => 'index',
+				'GET,OPTIONS <id>'    => 'index',
+				'POST,OPTIONS'        => 'create',
+				'PUT,OPTIONS <id>'    => 'update',
+				'DELETE,OPTIONS <id>' => 'delete',
+			],
+		],
+		[
+			'class'         => 'yii\rest\UrlRule',
 			'controller'    => ['chat-members' => 'ChatMember/chat-member'],
 			'extraPatterns' => [
 				'GET,OPTIONS' => 'index'
+			],
+		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => ['chat-member-messages' => 'ChatMember/chat-member-message'],
+			'extraPatterns' => [
+				'POST,OPTIONS'   => 'create',
+				'PUT,OPTIONS'    => 'update',
+				'DELETE,OPTIONS' => 'delete',
 			],
 		],
 	];

@@ -11,9 +11,14 @@ class AQ extends ActiveQuery
 {
 	protected function field(string $column): string
 	{
-		return $this->modelClass::tableName() . '.' . $column;
+		return $this->getPrimaryTableName() . '.' . $column;
 	}
 
+	/**
+	 * @param string $column
+	 *
+	 * @return $this
+	 */
 	public function andWhereNull(string $column): self
 	{
 		return $this->andWhere([$column => null]);
@@ -32,5 +37,15 @@ class AQ extends ActiveQuery
 	public function getSql(?Connection $db = null): string
 	{
 		return $this->createCommand($db)->getSql();
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return $this
+	 */
+	public function byId(int $id): self
+	{
+		return $this->andWhere([$this->field('id') => $id]);
 	}
 }

@@ -6,6 +6,7 @@ use app\exceptions\domain\model\SaveModelException;
 use app\exceptions\domain\model\ValidateException;
 use app\exceptions\http\ValidateHttpException;
 use app\kernel\web\http\resources\JsonResource;
+use Yii;
 use yii\base\InvalidRouteException;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;
@@ -14,10 +15,19 @@ use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
 use yii\rest\Controller;
 use yii\web\Response;
+use yii\web\User;
 
 class AppController extends Controller
 {
+	protected User  $user;
 	protected array $exceptAuthActions = [];
+
+	public function __construct($id, $module, $config = [])
+	{
+		$this->user = Yii::$app->user;
+
+		parent::__construct($id, $module, $config);
+	}
 
 	/**
 	 * @return array
@@ -76,7 +86,7 @@ class AppController extends Controller
 
 			return [
 				'success' => false,
-				'errors' => $e->getModel()->getErrors()
+				'errors'  => $e->getModel()->getErrors()
 			];
 		}
 	}

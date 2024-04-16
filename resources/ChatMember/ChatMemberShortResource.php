@@ -17,7 +17,7 @@ use app\resources\UserResource;
 use UnexpectedValueException;
 use yii\data\ActiveDataProvider;
 
-class ChatMemberResource extends JsonResource
+class ChatMemberShortResource extends JsonResource
 {
 	private ChatMember $resource;
 
@@ -35,7 +35,6 @@ class ChatMemberResource extends JsonResource
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'model'      => $this->getModel()->toArray(),
-			'messages'   => ChatMemberMessageResource::collection($this->resource->messages)
 		];
 	}
 

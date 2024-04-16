@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\usecases;
+namespace app\usecases\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberDto;
 use app\exceptions\domain\model\SaveModelException;

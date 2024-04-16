@@ -13,6 +13,27 @@ class Form extends Model
 {
 
 	/**
+	 * @return array
+	 */
+	public function rules(): array
+	{
+		return parent::rules();
+	}
+
+	/**
+	 * @return array
+	 */
+	public function scenarios(): array
+	{
+		return parent::scenarios();
+	}
+
+	public function formName(): string
+	{
+		return '';
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	public function getAnyError(): ?string
@@ -23,7 +44,7 @@ class Form extends Model
 	/**
 	 * @throws ValidateException
 	 */
-	public function validateOrThrow(array $attributes = [], bool $clearError = true): void
+	public function validateOrThrow(?array $attributes = null, bool $clearError = true): void
 	{
 		if (!$this->validate($attributes, $clearError)) {
 			throw new ValidateException($this);

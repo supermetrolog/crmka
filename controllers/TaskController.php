@@ -21,13 +21,10 @@ use yii\web\User;
 class TaskController extends AppController
 {
 	private TaskService $service;
-	private User        $user;
 
 	public function __construct($id, $module, TaskService $service, array $config = [])
 	{
 		$this->service = $service;
-
-		$this->user = Yii::$app->user;
 
 		parent::__construct($id, $module, $config);
 	}
