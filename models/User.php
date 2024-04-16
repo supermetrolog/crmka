@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\kernel\common\models\AQ;
 use app\kernel\common\models\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use Throwable;
@@ -460,5 +461,10 @@ class User extends AR implements IdentityInterface
 	public function getChatMember(): ChatMemberQuery
 	{
 		return $this->morphHasOne(ChatMember::class);
+	}
+
+	public static function find(): AQ
+	{
+		return new AQ(get_called_class());
 	}
 }

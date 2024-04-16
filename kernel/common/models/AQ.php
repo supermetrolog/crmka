@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\kernel\common\models;
 
 use yii\db\ActiveQuery;
+use yii\db\Connection;
 
 class AQ extends ActiveQuery
 {
@@ -21,5 +22,15 @@ class AQ extends ActiveQuery
 	public function andWhereNotNull(string $column): self
 	{
 		return $this->andWhere(['IS NOT', $column, null]);
+	}
+
+	public function getRawSql(?Connection $db = null): string
+	{
+		return $this->createCommand($db)->getRawSql();
+	}
+
+	public function getSql(?Connection $db = null): string
+	{
+		return $this->createCommand($db)->getSql();
 	}
 }
