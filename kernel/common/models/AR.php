@@ -32,7 +32,7 @@ class AR extends ActiveRecord
 	 */
 	public static function dbName(): string
 	{
-		return DbHelper::getDBName(static::getDb()->dsn);
+		return DbHelper::getDbName(static::getDb());
 	}
 
 	/**
@@ -40,7 +40,7 @@ class AR extends ActiveRecord
 	 */
 	public static function getColumn(string $field): string
 	{
-		return DbHelper::getDBField(static::dbName(), static::tableName(), $field);
+		return DbHelper::getFullPathAR(static::class, $field);
 	}
 
 	/**
@@ -70,11 +70,9 @@ class AR extends ActiveRecord
 			if (!$this->save($runValidation)) {
 				throw new SaveModelException($this);
 			}
+		} catch (SaveModelException $th) {
+			throw $th;
 		} catch (Throwable $th) {
-			if ($th instanceof SaveModelException) {
-				throw $th;
-			}
-
 			throw new SaveModelException($this, $th);
 		}
 	}
@@ -200,6 +198,7 @@ class AR extends ActiveRecord
 	 * @param string    $localColumn
 	 *
 	 * @return ActiveQuery
+	 * @throws ErrorException
 	 */
 	public function morphHasOne(string $class, string $column = 'id', string $name = 'model', string $localColumn = 'morph'): ActiveQuery
 	{
@@ -209,7 +208,7 @@ class AR extends ActiveRecord
 		return $this->hasOne($class, [
 			$id   => $column,
 			$type => $localColumn
-		]);
+		])->from([$class::tableName() => $class::getTable()]);
 	}
 
 	/**
@@ -223,5 +222,13 @@ class AR extends ActiveRecord
 	public static function upsert(string $tableName, array $insertColumns, $updateColumns = true): void
 	{
 		self::getDb()->createCommand()->upsert($tableName, $insertColumns, $updateColumns)->execute();
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public static function field(string $name): string
+	{
+		return static::getColumn($name);
 	}
 }

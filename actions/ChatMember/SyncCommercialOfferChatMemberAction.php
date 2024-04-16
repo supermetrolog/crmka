@@ -6,9 +6,11 @@ namespace app\actions\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberDto;
 use app\kernel\common\actions\Action;
+use app\models\ChatMember;
 use app\models\CommercialOffer;
 use app\models\Request;
 use app\usecases\ChatMemberService;
+use yii\base\ErrorException;
 use yii\db\Exception;
 
 class SyncCommercialOfferChatMemberAction extends Action
@@ -23,10 +25,13 @@ class SyncCommercialOfferChatMemberAction extends Action
 
 	/**
 	 * @throws Exception
+	 * @throws ErrorException
 	 */
 	public function run(): void
 	{
-		$query = CommercialOffer::find();
+		$query = CommercialOffer::find()
+		                        ->joinWith(['chatMember'])
+		                        ->andWhereNull(ChatMember::field('id'));
 
 		/** @var CommercialOffer $request */
 		foreach ($query->each(1000) as $request) {

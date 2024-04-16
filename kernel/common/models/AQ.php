@@ -8,8 +8,18 @@ use yii\db\ActiveQuery;
 
 class AQ extends ActiveQuery
 {
-	public function field(string $column): string
+	protected function field(string $column): string
 	{
 		return $this->modelClass::tableName() . '.' . $column;
+	}
+
+	public function andWhereNull(string $column): self
+	{
+		return $this->andWhere([$column => null]);
+	}
+
+	public function andWhereNotNull(string $column): self
+	{
+		return $this->andWhere(['IS NOT', $column, null]);
 	}
 }

@@ -6,8 +6,10 @@ namespace app\actions\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberDto;
 use app\kernel\common\actions\Action;
+use app\models\ChatMember;
 use app\models\Request;
 use app\usecases\ChatMemberService;
+use yii\base\ErrorException;
 use yii\db\Exception;
 
 class SyncRequestChatMemberAction extends Action
@@ -22,10 +24,13 @@ class SyncRequestChatMemberAction extends Action
 
 	/**
 	 * @throws Exception
+	 * @throws ErrorException
 	 */
 	public function run(): void
 	{
-		$query = Request::find();
+		$query = Request::find()
+		                ->joinWith(['chatMember'])
+		                ->andWhereNull(ChatMember::field('id'));
 
 		/** @var Request $request */
 		foreach ($query->each(1000) as $request) {
@@ -34,7 +39,7 @@ class SyncRequestChatMemberAction extends Action
 				'model_type' => Request::getMorphClass()
 			]));
 
-			$this->info(sprintf('Created request with ID: %d', $request->id));
+			$this->infof('Created request with ID: %d', $request->id);
 		}
 	}
 }

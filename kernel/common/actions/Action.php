@@ -13,6 +13,11 @@ class Action extends \yii\base\Action
 		$this->controller->stdout($message . PHP_EOL, BaseConsole::FG_CYAN);
 	}
 
+	public function infof(string $message, ...$values): void
+	{
+		$this->controller->stdout(sprintf($message, ...$values) . PHP_EOL, BaseConsole::FG_CYAN);
+	}
+
 	public function error(string $message): void
 	{
 		$this->controller->stdout($message . PHP_EOL, BaseConsole::FG_RED);

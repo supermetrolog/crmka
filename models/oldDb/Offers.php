@@ -2,6 +2,7 @@
 
 namespace app\models\oldDb;
 
+use app\kernel\common\models\AR;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
@@ -131,7 +132,7 @@ use yii\db\Connection;
  * @property string|null $title_empty_financial
  * @property int|null $hide_from_market
  */
-class Offers extends ActiveRecord
+class Offers extends AR
 {
     /**
      * {@inheritdoc}

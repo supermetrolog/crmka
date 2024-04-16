@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\exceptions\ValidationErrorHttpException;
+use app\kernel\common\models\AQ;
 use app\kernel\common\models\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use yii\base\ErrorException;
@@ -475,5 +476,10 @@ class Request extends AR
 	public function getChatMember(): ChatMemberQuery
 	{
 		return $this->morphHasOne(ChatMember::class);
+	}
+
+	public static function find(): AQ
+	{
+		return new AQ(get_called_class());
 	}
 }

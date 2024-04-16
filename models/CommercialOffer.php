@@ -3,6 +3,9 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
+use app\kernel\common\models\AQ;
+use app\kernel\common\models\AR;
+use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\oldDb\Offers;
 use yii\db\ActiveQuery;
 
@@ -60,7 +63,7 @@ class CommercialOffer extends Offers
 		return JsonFieldNormalizer::jsonToArrayIntElements($this->inc_services);
 	}
 
-	public function fields()
+	public function fields(): array
 	{
 		$f = parent::fields();
 
@@ -84,5 +87,18 @@ class CommercialOffer extends Offers
 		};
 
 		return $f;
+	}
+
+	/**
+	 * @return ChatMemberQuery|ActiveQuery
+	 */
+	public function getChatMember(): ChatMemberQuery
+	{
+		return $this->morphHasOne(ChatMember::class);
+	}
+
+	public static function find(): AQ
+	{
+		return new AQ(get_called_class());
 	}
 }
