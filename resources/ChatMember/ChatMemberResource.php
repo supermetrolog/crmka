@@ -7,11 +7,13 @@ namespace app\resources\ChatMember;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
 use app\models\CommercialOffer;
+use app\models\ObjectChatMember;
 use app\models\Objects;
 use app\models\OfferMix;
 use app\models\Request;
 use app\models\User;
 use app\resources\ActiveRecordResource;
+use app\resources\Object\ObjectChatMemberResource;
 use app\resources\Object\ObjectResource;
 use app\resources\OfferMixResource;
 use app\resources\Request\RequestResource;
@@ -49,8 +51,8 @@ class ChatMemberResource extends JsonResource
 			return new RequestResource($model);
 		}
 
-		if ($model instanceof Objects) {
-			return new ObjectResource($model);
+		if ($model instanceof ObjectChatMember) {
+			return new ObjectChatMemberResource($model);
 		}
 
 //		if ($model instanceof CommercialOffer) {

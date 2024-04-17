@@ -24,7 +24,7 @@ Authorization: Bearer {{token}}
 
 {
   "user_id": 3,
-  "message": "SUKA",
+  "message": "SUKA2",
   "status": 1
 }
 

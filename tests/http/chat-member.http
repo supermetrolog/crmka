@@ -1,4 +1,4 @@
-GET {{url}}/chat-members
+GET {{url}}/chat-members?model_type=object
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}

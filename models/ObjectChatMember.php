@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\kernel\common\models\AQ;
 use app\kernel\common\models\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ObjectChatMemberQuery;
@@ -9,11 +10,14 @@ use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
- * @property int    $id
- * @property int    $object_id
- * @property string $type
- * @property string $created_at
- * @property string $updated_at
+ * @property int     $id
+ * @property int     $object_id
+ * @property string  $type
+ * @property string  $created_at
+ * @property string  $updated_at
+ * @property string  $morph
+ *
+ * @property Objects $object
  */
 class ObjectChatMember extends AR
 {
@@ -34,7 +38,7 @@ class ObjectChatMember extends AR
 			[['object_id', 'type'], 'required'],
 			[['object_id'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
-			[['type'], 'string', 'max' => 255],
+			[['type', 'morph'], 'string', 'max' => 255],
 			[['object_id', 'type'], 'unique', 'targetAttribute' => ['object_id', 'type']],
 		];
 	}
@@ -63,5 +67,13 @@ class ObjectChatMember extends AR
 	public function getChatMember(): ChatMemberQuery
 	{
 		return $this->morphHasOne(ChatMember::class);
+	}
+
+	/**
+	 * @return AQ|ActiveQuery
+	 */
+	public function getObject(): AQ
+	{
+		return $this->hasOne(Objects::class, ['id' => 'object_id']);
 	}
 }

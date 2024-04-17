@@ -138,10 +138,9 @@ class ChatMember extends AR
 		return $this->morphBelongTo(User::class);
 	}
 
-	public function getModel(): ActiveRecord
+	public function getModel(): AR
 	{
-//		return $this->request ?? $this->commercialOffer ?? $this->user ?? $this->offerMix;
-		return $this->request ?? $this->object ?? $this->user;
+		return $this->request ?? $this->objectChatMember ?? $this->user;
 	}
 
 	public static function find(): ChatMemberQuery
