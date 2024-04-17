@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
+use app\kernel\common\models\AQ;
 use app\models\crane\Crane;
 use app\models\location\Location;
 use yii\db\ActiveQuery;
@@ -13,6 +14,10 @@ use yii\helpers\Json;
  */
 class Objects extends oldDb\Objects
 {
+	public bool $rentOrSale      = false;
+	public bool $sublease        = false;
+	public bool $responseStorage = false;
+
 	/**
 	 * @return array
 	 */
@@ -148,7 +153,7 @@ class Objects extends oldDb\Objects
 		$fields['internet_type'] = function () {
 			return $this->getInternetType();
 		};
-		$fields['power'] = function () {
+		$fields['power']         = function () {
 			return $this->getPower();
 		};
 
@@ -235,5 +240,10 @@ class Objects extends oldDb\Objects
 	public function getElevatorsRecords(): ActiveQuery
 	{
 		return $this->hasMany(Elevator::class, ['object_id' => 'id']);
+	}
+
+	public static function find(): AQ
+	{
+		return new AQ(get_called_class());
 	}
 }

@@ -18,6 +18,13 @@ class Migration extends \yii\db\Migration
 		];
 	}
 
+	public function morphCol(string $defaultValue, string $name = 'morph'): array
+	{
+		return [
+			$name => $this->string()->notNull()->defaultValue($defaultValue),
+		];
+	}
+
 	public function softDelete(): array
 	{
 		return [

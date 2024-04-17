@@ -6,6 +6,7 @@ namespace app\kernel\common\models;
 
 use yii\db\ActiveQuery;
 use yii\db\Connection;
+use yii\db\Expression;
 
 class AQ extends ActiveQuery
 {
@@ -47,5 +48,13 @@ class AQ extends ActiveQuery
 	public function byId(int $id): self
 	{
 		return $this->andWhere([$this->field('id') => $id]);
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function andWhereColumn(string $first, string $second, string $operator = '='): self
+	{
+		return $this->andWhere([$operator, $first, new Expression($second)]);
 	}
 }

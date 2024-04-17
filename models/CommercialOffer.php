@@ -6,11 +6,18 @@ use app\helpers\JsonFieldNormalizer;
 use app\kernel\common\models\AQ;
 use app\kernel\common\models\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\CommercialOfferQuery;
 use app\models\oldDb\Offers;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 class CommercialOffer extends Offers
 {
+	public const DEAL_TYPE_RENT             = 1;
+	public const DEAL_TYPE_SALE             = 2;
+	public const DEAL_TYPE_RESPONSE_STORAGE = 3;
+	public const DEAL_TYPE_SUBLEASE         = 4;
+
 	public static function getMorphClass(): string
 	{
 		return 'commercial_offer';
@@ -91,14 +98,15 @@ class CommercialOffer extends Offers
 
 	/**
 	 * @return ChatMemberQuery|ActiveQuery
+	 * @throws ErrorException
 	 */
 	public function getChatMember(): ChatMemberQuery
 	{
 		return $this->morphHasOne(ChatMember::class);
 	}
 
-	public static function find(): AQ
+	public static function find(): CommercialOfferQuery
 	{
-		return new AQ(get_called_class());
+		return new CommercialOfferQuery(get_called_class());
 	}
 }
