@@ -17,16 +17,10 @@ class m240411_203246_add_morph_columns_in_tables extends Migration
 	 */
 	public function safeUp()
 	{
-		echo $this->db->dsn . PHP_EOL;
-
-//		$this->addMorphColumn('user', User::getMorphClass());
-//		$this->addMorphColumn('request', Request::getMorphClass());
+		$this->addMorphColumn('user', User::getMorphClass());
+		$this->addMorphColumn('request', Request::getMorphClass());
 
 		$this->db = Yii::$app->db_old;
-
-		echo $this->db->dsn . PHP_EOL;
-
-		echo "SUCK" . Yii::$app->db_old->dsn . PHP_EOL;
 
 		$this->addMorphColumn('c_industry_offers_mix', OfferMix::getMorphClass());
 		$this->addMorphColumn('c_industry_offers', CommercialOffer::getMorphClass());
