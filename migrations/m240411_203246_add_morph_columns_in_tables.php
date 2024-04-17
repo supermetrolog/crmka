@@ -13,15 +13,20 @@ class m240411_203246_add_morph_columns_in_tables extends Migration
 {
 	/**
 	 * {@inheritdoc}
+	 * @throws \yii\base\ErrorException
 	 */
 	public function safeUp()
 	{
-		$this->addMorphColumn('user', User::getMorphClass());
-		$this->addMorphColumn('request', Request::getMorphClass());
+		echo $this->db->dsn . PHP_EOL;
+
+//		$this->addMorphColumn('user', User::getMorphClass());
+//		$this->addMorphColumn('request', Request::getMorphClass());
 
 		$this->db = Yii::$app->db_old;
 
-		$this->addMorphColumn('c_industry_offers_mix', OfferMix::getMorphName());
+		echo $this->db->dsn . PHP_EOL;
+
+		$this->addMorphColumn('c_industry_offers_mix', OfferMix::getMorphClass());
 		$this->addMorphColumn('c_industry_offers', CommercialOffer::getMorphClass());
 	}
 

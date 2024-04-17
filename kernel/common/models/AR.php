@@ -242,4 +242,12 @@ class AR extends ActiveRecord
 	{
 		return static::getColumn($name);
 	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public static function getMorphClass(): string
+	{
+		throw new ErrorException(__FUNCTION__ . ' must be implements');
+	}
 }
