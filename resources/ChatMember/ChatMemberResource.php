@@ -7,10 +7,12 @@ namespace app\resources\ChatMember;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
 use app\models\CommercialOffer;
+use app\models\Objects;
 use app\models\OfferMix;
 use app\models\Request;
 use app\models\User;
 use app\resources\ActiveRecordResource;
+use app\resources\Object\ObjectResource;
 use app\resources\OfferMixResource;
 use app\resources\Request\RequestResource;
 use app\resources\UserResource;
@@ -47,19 +49,23 @@ class ChatMemberResource extends JsonResource
 			return new RequestResource($model);
 		}
 
-		if ($model instanceof CommercialOffer) {
-			return new ActiveRecordResource($model);
+		if ($model instanceof Objects) {
+			return new ObjectResource($model);
 		}
+
+//		if ($model instanceof CommercialOffer) {
+//			return new ActiveRecordResource($model);
+//		}
 
 		if ($model instanceof User) {
 			return new UserResource($model);
 		}
+//
+//		if ($model instanceof OfferMix) {
+//			return new OfferMixResource($model);
+//		}
 
-		if ($model instanceof OfferMix) {
-			return new OfferMixResource($model);
-		}
-
-		throw new UnexpectedValueException('Unknown created by type');
+		throw new UnexpectedValueException('Unknown model type');
 	}
 
 	public static function fromDataProvider(ActiveDataProvider $dataProvider): ActiveDataProvider

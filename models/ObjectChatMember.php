@@ -7,7 +7,6 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ObjectChatMemberQuery;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 
 /**
  * @property int    $id

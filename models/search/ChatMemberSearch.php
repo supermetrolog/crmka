@@ -43,7 +43,7 @@ class ChatMemberSearch extends Form
 		                   ->with(['messages' => function (ChatMemberMessageQuery $query) {
 			                   $query->notDeleted();
 		                   }])
-		                   ->with(['toChatMemberMessages', 'commercialOffer', 'request']);
+		                   ->with(['toChatMemberMessages', 'object', 'request']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,

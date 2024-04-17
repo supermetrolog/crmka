@@ -30,6 +30,8 @@ use yii\db\Expression;
  * @property User                  $user
  * @property Request               $request
  * @property CommercialOffer       $commercialOffer
+ * @property ObjectChatMember      $objectChatMember
+ * @property Objects               $object
  */
 class ChatMember extends AR
 {
@@ -106,6 +108,23 @@ class ChatMember extends AR
 	/**
 	 * @return ActiveQuery
 	 */
+	public function getObjectChatMember(): ActiveQuery
+	{
+		return $this->morphBelongTo(ObjectChatMember::class);
+	}
+
+	/**
+	 * @return ActiveQuery
+	 */
+	public function getObject(): ActiveQuery
+	{
+		return $this->hasOne(Objects::class, ['id' => 'object_id'])
+		            ->via('objectChatMember');
+	}
+
+	/**
+	 * @return ActiveQuery
+	 */
 	public function getCommercialOffer(): ActiveQuery
 	{
 		return $this->morphBelongTo(CommercialOffer::class);
@@ -121,7 +140,8 @@ class ChatMember extends AR
 
 	public function getModel(): ActiveRecord
 	{
-		return $this->request ?? $this->commercialOffer ?? $this->user ?? $this->offerMix;
+//		return $this->request ?? $this->commercialOffer ?? $this->user ?? $this->offerMix;
+		return $this->request ?? $this->object ?? $this->user;
 	}
 
 	public static function find(): ChatMemberQuery
