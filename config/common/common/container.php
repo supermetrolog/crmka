@@ -1,11 +1,15 @@
 <?php
 
-use yii\db\Connection;
 
-$common_db = require __DIR__ . "/db.php";
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+
+$db     = require __DIR__ . "/db.php";
+$old_db = require __DIR__ . "/db_old.php";
 
 return [
 	'singletons' => [
-		Connection::class => $common_db
+		'db'                                => $db,
+		'old_db'                            => $old_db,
+		TransactionBeginnerInterface::class => 'db',
 	]
 ];

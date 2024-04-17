@@ -8,25 +8,25 @@ use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
 use app\dto\task\CreateTaskDto;
 use app\exceptions\domain\model\SaveModelException;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTask;
 use app\usecases\TaskService;
 use Throwable;
-use yii\db\Connection;
 use yii\db\Exception;
 
 class ChatMemberMessageService
 {
-	private Connection    $db;
-	protected TaskService $taskService;
+	private TransactionBeginnerInterface $transactionBeginner;
+	protected TaskService                $taskService;
 
 	public function __construct(
-		Connection $db,
+		TransactionBeginnerInterface $transactionBeginner,
 		TaskService $taskService
 	)
 	{
-		$this->db          = $db;
-		$this->taskService = $taskService;
+		$this->transactionBeginner = $transactionBeginner;
+		$this->taskService         = $taskService;
 	}
 
 	/**
@@ -66,7 +66,7 @@ class ChatMemberMessageService
 	 */
 	public function createWithTask(CreateChatMemberMessageDto $createChatMemberMessageDto, CreateTaskDto $createTaskDto): ChatMemberMessage
 	{
-		$tx = $this->db->beginTransaction();
+		$tx = $this->transactionBeginner->begin();
 
 		try {
 			$message = $this->create($createChatMemberMessageDto);
@@ -88,7 +88,7 @@ class ChatMemberMessageService
 	 */
 	public function createTask(ChatMemberMessage $message, CreateTaskDto $createTaskDto): ChatMemberMessageTask
 	{
-		$tx = $this->db->beginTransaction();
+		$tx = $this->transactionBeginner->begin();
 
 		try {
 			$task = $this->taskService->create($createTaskDto);
