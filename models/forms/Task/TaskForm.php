@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace app\models\forms\Task;
 
-use app\dto\task\CreateTaskDto;
-use app\dto\task\UpdateTaskDto;
+use app\dto\Task\CreateTaskDto;
+use app\dto\Task\UpdateTaskDto;
 use app\kernel\common\models\Form;
 use app\models\Task;
 use app\models\User;

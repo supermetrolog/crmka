@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace app\usecases;
 
-use app\dto\task\CreateTaskDto;
-use app\dto\task\UpdateTaskDto;
+use app\dto\Task\CreateTaskDto;
+use app\dto\Task\UpdateTaskDto;
 use app\exceptions\domain\model\SaveModelException;
-use app\helpers\DateTimeHelper;
 use app\models\Task;
 use Throwable;
 use yii\db\StaleObjectException;
@@ -41,11 +40,11 @@ class TaskService
 	public function update(Task $task, UpdateTaskDto $dto): Task
 	{
 		$task->load([
-			'user_id'    => $dto->user->id,
-			'message'    => $dto->message,
-			'status'     => $dto->status,
-			'start'      => $dto->start,
-			'end'        => $dto->end
+			'user_id' => $dto->user->id,
+			'message' => $dto->message,
+			'status'  => $dto->status,
+			'start'   => $dto->start,
+			'end'     => $dto->end
 		]);
 
 		$task->saveOrThrow();

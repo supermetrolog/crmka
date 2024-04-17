@@ -6,7 +6,7 @@ namespace app\usecases\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
-use app\dto\task\CreateTaskDto;
+use app\dto\Task\CreateTaskDto;
 use app\exceptions\domain\model\SaveModelException;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ChatMemberMessage;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\dto\task;
+namespace app\dto\Task;
 
 use app\models\User;
 use DateTimeInterface;
