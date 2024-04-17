@@ -6,6 +6,7 @@ use app\kernel\common\models\AR;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTaskQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\TaskQuery;
 use yii\db\ActiveQuery;
 
 /**
@@ -20,7 +21,8 @@ use yii\db\ActiveQuery;
  *
  * @property ChatMember              $fromChatMember
  * @property ChatMember              $toChatMember
- * @property ChatMemberMessageTask[] $tasks
+ * @property ChatMemberMessageTask[] $chatMemberMessageTasks
+ * @property Task[]                  $tasks
  */
 class ChatMemberMessage extends AR
 {
@@ -77,9 +79,18 @@ class ChatMemberMessage extends AR
 	/**
 	 * @return ActiveQuery|ChatMemberMessageTaskQuery
 	 */
-	public function getTasks(): ChatMemberMessageTaskQuery
+	public function getChatMemberMessageTasks(): ChatMemberMessageTaskQuery
 	{
 		return $this->hasMany(ChatMemberMessageTask::className(), ['chat_member_message_id' => 'id']);
+	}
+
+	/**
+	 * @return ActiveQuery|ChatMemberMessageTaskQuery
+	 */
+	public function getTasks(): TaskQuery
+	{
+		return $this->hasMany(Task::class, ['id' => 'task_id'])
+		            ->via('chatMemberMessageTasks');
 	}
 
 

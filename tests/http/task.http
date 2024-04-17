@@ -12,10 +12,8 @@ Authorization: Bearer {{token}}
 
 {
   "user_id": 3,
-  "message": "ANAL",
-  "status": 1,
-  "created_by_type": "user",
-  "created_by_id": 3
+  "message": "SUKA",
+  "status": 1
 }
 ###
 

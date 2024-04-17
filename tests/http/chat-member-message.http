@@ -12,7 +12,31 @@ Authorization: Bearer {{token}}
 
 {
   "message": "IDI NA HUI",
-  "to_chat_member_id": 1
+  "to_chat_member_id": 54158
 }
 
 ###
+
+POST {{url}}/chat-member-messages/create-task/5
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "message": "SUKA",
+  "status": 1
+}
+
+###
+
+POST {{url}}/tasks
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "message": "SUKA",
+  "status": 1
+}

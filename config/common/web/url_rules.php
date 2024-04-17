@@ -196,9 +196,10 @@ return
 			'class'         => 'yii\rest\UrlRule',
 			'controller'    => ['chat-member-messages' => 'ChatMember/chat-member-message'],
 			'extraPatterns' => [
-				'POST,OPTIONS'   => 'create',
-				'PUT,OPTIONS'    => 'update',
-				'DELETE,OPTIONS' => 'delete',
+				'POST,OPTIONS'                  => 'create',
+				'PUT,OPTIONS'                   => 'update',
+				'DELETE,OPTIONS'                => 'delete',
+				'POST,OPTIONS create-task/<id>' => 'create-task',
 			],
 		],
 	];

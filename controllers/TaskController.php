@@ -80,7 +80,7 @@ class TaskController extends AppController
 
 		$form->setScenario(TaskForm::SCENARIO_UPDATE);
 
-		$form->load($this->request->get());
+		$form->load($this->request->post());
 		$form->validateOrThrow();
 
 		$model = $this->service->update($model, $form->getDto());
