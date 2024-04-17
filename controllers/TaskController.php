@@ -2,11 +2,10 @@
 
 namespace app\controllers;
 
-use app\dto\task\CreateTaskDto;
-use app\dto\task\UpdateTaskDto;
 use app\exceptions\domain\model\SaveModelException;
 use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\models\forms\Task\TaskForm;
 use app\models\search\TaskSearch;
 use app\models\Task;
 use app\resources\TaskResource;
@@ -16,7 +15,6 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
-use yii\web\User;
 
 class TaskController extends AppController
 {
@@ -53,20 +51,18 @@ class TaskController extends AppController
 	 */
 	public function actionCreate(): TaskResource
 	{
-		$model = new Task();
+		$form = new TaskForm();
 
-		$model->load($this->request->post());
-		$model->validateOrThrow();
+		$form->setScenario(TaskForm::SCENARIO_CREATE);
 
-		$model = $this->service->create(new CreateTaskDto([
-			'user'            => $model->user,
-			'message'         => $model->message,
-			'status'          => Task::STATUS_CREATED,
-			'start'           => $model->start,
-			'end'             => $model->end,
-			'created_by_type' => \app\models\User::tableName(),
-			'created_by_id'   => $this->user->id,
-		]));
+		$form->load($this->request->post());
+
+		$form->created_by_id   = $this->user->id;
+		$form->created_by_type = $this->user->identity::getMorphClass();
+
+		$form->validateOrThrow();
+
+		$model = $this->service->create($form->getDto());
 
 		return new TaskResource($model);
 	}
@@ -74,22 +70,20 @@ class TaskController extends AppController
 	/**
 	 * @throws SaveModelException
 	 * @throws NotFoundHttpException
+	 * @throws ValidateException
 	 */
 	public function actionUpdate(int $id): TaskResource
 	{
 		$model = $this->findModel($id);
 
-		$model->load(Yii::$app->request->post());
-		$model->saveOrThrow();
+		$form = new TaskForm();
 
-		$model = $this->service->update($model, new UpdateTaskDto([
-			'user'    => $model->user,
-			'message' => $model->message,
-			'status'  => $model->status,
-			'start'   => $model->start,
-			'end'     => $model->end
-		]));
+		$form->setScenario(TaskForm::SCENARIO_UPDATE);
 
+		$form->load($this->request->get());
+		$form->validateOrThrow();
+
+		$model = $this->service->update($model, $form->getDto());
 
 		return new TaskResource($model);
 	}
@@ -110,10 +104,15 @@ class TaskController extends AppController
 	 */
 	protected function findModel(int $id): ?Task
 	{
-		if (($model = Task::find()->byId($id)->byMorph($this->user->id, \app\models\User::tableName())->one()) !== null) {
+		$model = Task::find()
+		             ->byId($id)
+		             ->byMorph($this->user->id, $this->user->identity::getMorphClass())
+		             ->one();
+
+		if ($model) {
 			return $model;
 		}
 
-		throw new NotFoundHttpException('The requested page does not exist.');
+		throw new NotFoundHttpException('The requested model does not exist.');
 	}
 }
