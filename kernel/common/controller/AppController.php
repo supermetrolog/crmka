@@ -55,6 +55,7 @@ class AppController extends Controller
 					'Origin'                         => ['*'],
 					'Access-Control-Request-Method'  => ['*'],
 					'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
+					'Access-Control-Expose-Headers'  => ['*']
 				]
 			],
 			'authenticator'     => [
