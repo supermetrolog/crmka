@@ -6,6 +6,7 @@ namespace app\models\forms\Task;
 
 use app\dto\Task\CreateTaskDto;
 use app\dto\Task\UpdateTaskDto;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\models\Form;
 use app\models\Task;
 use app\models\User;
@@ -55,6 +56,7 @@ class TaskForm extends Form
 
 	/**
 	 * @return CreateTaskDto|UpdateTaskDto
+	 * @throws \Exception
 	 */
 	public function getDto()
 	{
@@ -63,8 +65,8 @@ class TaskForm extends Form
 				'user'            => User::find()->byId($this->user_id)->one(),
 				'message'         => $this->message,
 				'status'          => Task::STATUS_CREATED,
-				'start'           => $this->start,
-				'end'             => $this->end,
+				'start'           => DateTimeHelper::tryMake($this->start),
+				'end'             => DateTimeHelper::tryMake($this->end),
 				'created_by_type' => $this->created_by_type,
 				'created_by_id'   => $this->created_by_id,
 			]);
@@ -74,8 +76,8 @@ class TaskForm extends Form
 			'user'    => User::find()->byId($this->user_id)->one(),
 			'message' => $this->message,
 			'status'  => $this->status,
-			'start'   => $this->start,
-			'end'     => $this->end
+			'start'   => DateTimeHelper::tryMake($this->start),
+			'end'     => DateTimeHelper::tryMake($this->end),
 		]);
 	}
 }

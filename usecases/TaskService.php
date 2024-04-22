@@ -23,8 +23,8 @@ class TaskService
 			'user_id'         => $dto->user->id,
 			'message'         => $dto->message,
 			'status'          => $dto->status,
-			'start'           => $dto->start,
-			'end'             => $dto->end,
+			'start'           => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
+			'end'             => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
 			'created_by_type' => $dto->created_by_type,
 			'created_by_id'   => $dto->created_by_id,
 		]);
@@ -43,8 +43,8 @@ class TaskService
 			'user_id' => $dto->user->id,
 			'message' => $dto->message,
 			'status'  => $dto->status,
-			'start'   => $dto->start,
-			'end'     => $dto->end
+			'start'   => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
+			'end'     => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
 		]);
 
 		$task->saveOrThrow();

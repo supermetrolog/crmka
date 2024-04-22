@@ -25,6 +25,7 @@ class UserProfileResource extends JsonResource
 			'first_name'  => $this->resource->first_name,
 			'middle_name' => $this->resource->middle_name,
 			'last_name'   => $this->resource->last_name,
+			'medium_name' => $this->resource->getMediumName(),
 			'caller_id'   => $this->resource->caller_id,
 			'avatar'      => $this->resource->avatar,
 		];

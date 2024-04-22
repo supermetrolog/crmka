@@ -10,8 +10,10 @@ use app\models\search\TaskSearch;
 use app\models\Task;
 use app\resources\TaskResource;
 use app\usecases\TaskService;
+use Exception;
 use Throwable;
 use Yii;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
@@ -46,8 +48,11 @@ class TaskController extends AppController
 	}
 
 	/**
+	 * @return TaskResource
 	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws ErrorException
+	 * @throws Exception
 	 */
 	public function actionCreate(): TaskResource
 	{
