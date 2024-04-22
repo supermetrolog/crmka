@@ -11,6 +11,7 @@ use yii\helpers\Json;
 
 /**
  * @property ObjectClass $objectClassRecord
+ * @property Company     $company
  */
 class Objects extends oldDb\Objects
 {

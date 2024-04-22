@@ -7,6 +7,7 @@ namespace app\resources;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Task;
 use app\models\User;
+use app\resources\User\UserResource;
 use UnexpectedValueException;
 
 class TaskResource extends JsonResource

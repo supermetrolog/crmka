@@ -6,16 +6,13 @@ namespace app\resources\ChatMember;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
-use app\models\CommercialOffer;
-use app\models\OfferMix;
+use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
-use app\resources\ActiveRecordResource;
-use app\resources\OfferMixResource;
-use app\resources\Request\RequestResource;
-use app\resources\UserResource;
+use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
+use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
+use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use UnexpectedValueException;
-use yii\data\ActiveDataProvider;
 
 class ChatMemberShortResource extends JsonResource
 {
@@ -43,33 +40,17 @@ class ChatMemberShortResource extends JsonResource
 		$model = $this->resource->model;
 
 		if ($model instanceof Request) {
-			return new RequestResource($model);
+			return new RequestShortResource($model);
 		}
 
-		if ($model instanceof CommercialOffer) {
-			return new ActiveRecordResource($model);
+		if ($model instanceof ObjectChatMember) {
+			return new ObjectChatMemberShortResource($model);
 		}
 
 		if ($model instanceof User) {
-			return new UserResource($model);
+			return new UserShortResource($model);
 		}
 
-		if ($model instanceof OfferMix) {
-			return new OfferMixResource($model);
-		}
-
-		throw new UnexpectedValueException('Unknown created by type');
-	}
-
-	public static function fromDataProvider(ActiveDataProvider $dataProvider): ActiveDataProvider
-	{
-		$dataProvider->setModels(array_map(
-			function (ChatMember $request) {
-				return (new self($request))->toArray();
-			},
-			$dataProvider->getModels()
-		));
-
-		return $dataProvider;
+		throw new UnexpectedValueException('Unknown model type');
 	}
 }

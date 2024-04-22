@@ -4,3 +4,10 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ###
+
+GET {{url}}/chat-members/43612
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###

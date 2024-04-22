@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\resources;
+namespace app\resources\User;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Task;
 use app\models\User;
 
 class UserResource extends JsonResource
@@ -29,6 +28,7 @@ class UserResource extends JsonResource
 			'email_username' => $this->user->email_username,
 			'role'           => $this->user->role,
 			'user_id_old'    => $this->user->user_id_old,
+			'userProfile'    => UserProfileResource::make($this->user->userProfile)->toArray()
 		];
 	}
 }

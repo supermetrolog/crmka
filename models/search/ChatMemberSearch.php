@@ -40,10 +40,16 @@ class ChatMemberSearch extends Form
 	public function search(array $params): ActiveDataProvider
 	{
 		$query = ChatMember::find()
-		                   ->with(['messages' => function (ChatMemberMessageQuery $query) {
-			                   $query->notDeleted();
-		                   }])
-		                   ->with(['toChatMemberMessages', 'objectChatMember.object', 'request']);
+		                   ->with(['objectChatMember.object.company'])
+		                   ->with([
+			                   'request.company',
+			                   'request.regions',
+			                   'request.directions',
+			                   'request.districts',
+			                   'request.objectTypes',
+			                   'request.objectClasses',
+		                   ])
+		                   ->with(['user.userProfile']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,

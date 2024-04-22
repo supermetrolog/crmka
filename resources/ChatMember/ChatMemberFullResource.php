@@ -9,13 +9,12 @@ use app\models\ChatMember;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
-use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
-use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
-use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\Object\ObjectChatMemberResource;
+use app\resources\Request\RequestResource;
+use app\resources\User\UserResource;
 use UnexpectedValueException;
-use yii\data\ActiveDataProvider;
 
-class ChatMemberResource extends JsonResource
+class ChatMemberFullResource extends JsonResource
 {
 	private ChatMember $resource;
 
@@ -33,6 +32,7 @@ class ChatMemberResource extends JsonResource
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'model'      => $this->getModel()->toArray(),
+			'messages'   => ChatMemberMessageResource::collection($this->resource->messages)
 		];
 	}
 
@@ -41,29 +41,17 @@ class ChatMemberResource extends JsonResource
 		$model = $this->resource->model;
 
 		if ($model instanceof Request) {
-			return new RequestShortResource($model);
+			return new RequestResource($model);
 		}
 
 		if ($model instanceof ObjectChatMember) {
-			return new ObjectChatMemberShortResource($model);
+			return new ObjectChatMemberResource($model);
 		}
 
 		if ($model instanceof User) {
-			return new UserShortResource($model);
+			return new UserResource($model);
 		}
 
 		throw new UnexpectedValueException('Unknown model type');
-	}
-
-	public static function fromDataProvider(ActiveDataProvider $dataProvider): ActiveDataProvider
-	{
-		$dataProvider->setModels(array_map(
-			function (ChatMember $request) {
-				return (new self($request))->toArray();
-			},
-			$dataProvider->getModels()
-		));
-
-		return $dataProvider;
 	}
 }

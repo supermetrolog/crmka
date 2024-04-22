@@ -9,7 +9,6 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 use yii\web\NotFoundHttpException;
-use app\models\miniModels\RequestDeal;
 use Yii;
 use yii\data\ActiveDataProvider;
 use app\models\miniModels\RequestDirection;
@@ -66,12 +65,12 @@ use app\models\miniModels\TimelineStep;
  *
  * @property Company              $company
  * @property User                 $consultant
- * @property RequestDirection[]   $requestDirections
- * @property RequestDistrict[]    $requestDistricts
- * @property RequestGateType[]    $requestGateTypes
- * @property RequestObjectClass[] $requestObjectClasses
- * @property RequestObjectType[]  $requestObjectTypes
- * @property RequestRegion[]      $requestRegions
+ * @property RequestDirection[]   $directions
+ * @property RequestDistrict[]    $districts
+ * @property RequestGateType[]    $gateTypes
+ * @property RequestObjectClass[] $objectClasses
+ * @property RequestObjectType[]  $objectTypes
+ * @property RequestRegion[]      $regions
  * @property Timeline[]           $timelines
  */
 class Request extends AR
@@ -368,7 +367,7 @@ class Request extends AR
 	 */
 	public function getCompany(): ActiveQuery
 	{
-		return $this->hasOne(Company::className(), ['id' => 'company_id']);
+		return $this->hasOne(Company::class, ['id' => 'company_id']);
 	}
 
 	/**

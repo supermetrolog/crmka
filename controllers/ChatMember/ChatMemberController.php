@@ -4,9 +4,11 @@ namespace app\controllers\ChatMember;
 
 use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\kernel\web\http\resources\JsonResource;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ChatMember;
 use app\models\search\ChatMemberSearch;
+use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberResource;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -31,9 +33,9 @@ class ChatMemberController extends AppController
 	/**
 	 * @throws NotFoundHttpException
 	 */
-	public function actionView(int $id): ChatMemberResource
+	public function actionView(int $id): JsonResource
 	{
-		return ChatMemberResource::make($this->findModel($id));
+		return ChatMemberFullResource::make($this->findModel($id));
 	}
 
 	/**
@@ -48,6 +50,16 @@ class ChatMemberController extends AppController
 		                   ->with(['messages' => function (ChatMemberMessageQuery $query) {
 			                   $query->notDeleted();
 		                   }])
+		                   ->with(['objectChatMember.object.company'])
+		                   ->with([
+			                   'request.company',
+			                   'request.regions',
+			                   'request.directions',
+			                   'request.districts',
+			                   'request.objectTypes',
+			                   'request.objectClasses',
+		                   ])
+		                   ->with(['user.userProfile'])
 		                   ->one();
 
 		if ($model) {
