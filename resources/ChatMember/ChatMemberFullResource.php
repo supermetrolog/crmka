@@ -32,7 +32,7 @@ class ChatMemberFullResource extends JsonResource
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'model'      => $this->getModel()->toArray(),
-			'messages'   => ChatMemberMessageResource::collection($this->resource->messages)
+//			'messages'   => ChatMemberMessageResource::collection($this->resource->messages)
 		];
 	}
 

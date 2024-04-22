@@ -47,10 +47,10 @@ class ChatMemberController extends AppController
 
 		$model = ChatMember::find()
 		                   ->byId($id)
-		                   ->with(['messages' => function (ChatMemberMessageQuery $query) {
-			                   $query->notDeleted();
-		                   }])
-		                   ->with(['objectChatMember.object.company'])
+//		                   ->with(['messages' => function (ChatMemberMessageQuery $query) {
+//			                   $query->notDeleted();
+//		                   }])
+                           ->with(['objectChatMember.object.company'])
 		                   ->with([
 			                   'request.company',
 			                   'request.regions',

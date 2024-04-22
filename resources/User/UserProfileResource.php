@@ -21,12 +21,12 @@ class UserProfileResource extends JsonResource
 	{
 		return [
 			'id'          => $this->resource->id,
-			'user_id'     => $this->resource->id,
-			'first_name'  => $this->resource->id,
-			'middle_name' => $this->resource->id,
-			'last_name'   => $this->resource->id,
-			'caller_id'   => $this->resource->id,
-			'avatar'      => $this->resource->id,
+			'user_id'     => $this->resource->user_id,
+			'first_name'  => $this->resource->first_name,
+			'middle_name' => $this->resource->middle_name,
+			'last_name'   => $this->resource->last_name,
+			'caller_id'   => $this->resource->caller_id,
+			'avatar'      => $this->resource->avatar,
 		];
 	}
 }
