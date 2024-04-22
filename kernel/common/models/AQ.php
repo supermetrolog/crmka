@@ -50,6 +50,17 @@ class AQ extends ActiveQuery
 		return $this->andWhere([$this->field('id') => $id]);
 	}
 
+
+	/**
+	 * @param array $id
+	 *
+	 * @return $this
+	 */
+	public function byIds(array $id): self
+	{
+		return $this->andWhere([$this->field('id') => $id]);
+	}
+
 	/**
 	 * @return $this
 	 */

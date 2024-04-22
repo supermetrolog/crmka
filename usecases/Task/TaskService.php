@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\usecases;
+namespace app\usecases\Task;
 
 use app\dto\Task\CreateTaskDto;
 use app\dto\Task\UpdateTaskDto;
@@ -13,26 +13,6 @@ use yii\db\StaleObjectException;
 
 class TaskService
 {
-
-	/**
-	 * @throws SaveModelException
-	 */
-	public function create(CreateTaskDto $dto): Task
-	{
-		$task = new Task([
-			'user_id'         => $dto->user->id,
-			'message'         => $dto->message,
-			'status'          => $dto->status,
-			'start'           => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
-			'end'             => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
-			'created_by_type' => $dto->created_by_type,
-			'created_by_id'   => $dto->created_by_id,
-		]);
-
-		$task->saveOrThrow();
-
-		return $task;
-	}
 
 	/**
 	 * @throws SaveModelException

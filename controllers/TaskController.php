@@ -9,7 +9,8 @@ use app\models\forms\Task\TaskForm;
 use app\models\search\TaskSearch;
 use app\models\Task;
 use app\resources\TaskResource;
-use app\usecases\TaskService;
+use app\usecases\Task\CreateTaskService;
+use app\usecases\Task\TaskService;
 use Exception;
 use Throwable;
 use Yii;
@@ -20,11 +21,19 @@ use yii\web\NotFoundHttpException;
 
 class TaskController extends AppController
 {
-	private TaskService $service;
+	private TaskService       $service;
+	private CreateTaskService $createTaskService;
 
-	public function __construct($id, $module, TaskService $service, array $config = [])
+	public function __construct(
+		$id,
+		$module,
+		TaskService $service,
+		CreateTaskService $createTaskService,
+		array $config = []
+	)
 	{
-		$this->service = $service;
+		$this->service           = $service;
+		$this->createTaskService = $createTaskService;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -67,15 +76,41 @@ class TaskController extends AppController
 
 		$form->validateOrThrow();
 
-		$model = $this->service->create($form->getDto());
+		$model = $this->createTaskService->create($form->getDto());
 
 		return new TaskResource($model);
+	}
+
+	/**
+	 * @return array
+	 * @throws ErrorException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionCreateForUsers(): array
+	{
+		$form = new TaskForm();
+
+		$form->setScenario(TaskForm::SCENARIO_CREATE_FOR_USERS);
+
+		$form->load($this->request->post());
+
+		$form->created_by_id   = $this->user->id;
+		$form->created_by_type = $this->user->identity::getMorphClass();
+
+		$form->validateOrThrow();
+
+		$models = $this->createTaskService->createForUsers($form->getDto());
+
+		return TaskResource::collection($models);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws NotFoundHttpException
 	 * @throws ValidateException
+	 * @throws Exception
 	 */
 	public function actionUpdate(int $id): TaskResource
 	{

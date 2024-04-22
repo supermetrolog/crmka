@@ -12,11 +12,9 @@ use app\models\search\ChatMemberMessageSearch;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\TaskResource;
 use app\usecases\ChatMember\ChatMemberMessageService;
-use app\usecases\TaskService;
 use Throwable;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\db\Connection;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 

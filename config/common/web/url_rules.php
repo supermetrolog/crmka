@@ -178,11 +178,12 @@ return
 			'controller'    => 'task',
 			'except'        => [],
 			'extraPatterns' => [
-				'GET,OPTIONS'         => 'index',
-				'GET,OPTIONS <id>'    => 'index',
-				'POST,OPTIONS'        => 'create',
-				'PUT,OPTIONS <id>'    => 'update',
-				'DELETE,OPTIONS <id>' => 'delete',
+				'GET,OPTIONS'            => 'index',
+				'GET,OPTIONS <id>'       => 'index',
+				'POST,OPTIONS'           => 'create',
+				'POST,OPTIONS for-users' => 'create-for-users',
+				'PUT,OPTIONS <id>'       => 'update',
+				'DELETE,OPTIONS <id>'    => 'delete',
 			],
 		],
 		[

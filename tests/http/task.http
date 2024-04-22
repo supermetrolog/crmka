@@ -32,3 +32,17 @@ Authorization: Bearer {{token}}
   "end": "2024-04-26 12:00"
 }
 ###
+
+POST {{url}}/tasks/for-users
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_ids": [3, 10, 32],
+  "message": "SUKA",
+  "start": "2024-04-25 16:00:12",
+  "end": "2024-04-26",
+  "status": 1
+}
+###

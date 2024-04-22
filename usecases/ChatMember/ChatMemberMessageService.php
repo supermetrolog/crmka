@@ -11,7 +11,7 @@ use app\exceptions\domain\model\SaveModelException;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTask;
-use app\usecases\TaskService;
+use app\usecases\Task\TaskService;
 use Throwable;
 use yii\db\Exception;
 
