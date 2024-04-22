@@ -33,7 +33,7 @@ class ChatMemberMessageSearch extends Form
 		                          ->notDeleted()
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
-		                          ->with(['tasks']);
+		                          ->with(['tasks.createdByUser.userProfile']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,

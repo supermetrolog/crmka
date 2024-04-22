@@ -102,7 +102,7 @@ class Task extends AR
 	}
 
 	/**
-	 * @throws ErrorException
+	 * @return ActiveQuery
 	 */
 	public function getCreatedByUser(): ActiveQuery
 	{
