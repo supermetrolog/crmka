@@ -47,7 +47,7 @@ class TaskController extends AppController
 	{
 		$searchModel = new TaskSearch();
 
-		return $searchModel->search(Yii::$app->request->queryParams);
+		return TaskResource::fromDataProvider($searchModel->search(Yii::$app->request->get()));
 	}
 
 	/**
