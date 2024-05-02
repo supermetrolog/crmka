@@ -19,10 +19,12 @@ class CompanyShortResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'id'      => $this->resource->id,
-			'nameEng' => $this->resource->nameEng,
-			'nameRu'  => $this->resource->nameRu,
-			'noName'  => $this->resource->noName,
+			'id'              => $this->resource->id,
+			'nameEng'         => $this->resource->nameEng,
+			'nameRu'          => $this->resource->nameRu,
+			'noName'          => $this->resource->noName,
+			'activityGroup'   => $this->resource->activityGroup,
+			'activityProfile' => $this->resource->activityProfile,
 		];
 	}
 }
