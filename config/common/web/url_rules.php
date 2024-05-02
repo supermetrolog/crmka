@@ -184,6 +184,7 @@ return
 				'POST,OPTIONS for-users' => 'create-for-users',
 				'PUT,OPTIONS <id>'       => 'update',
 				'DELETE,OPTIONS <id>'    => 'delete',
+				'POST,OPTIONS change-status/<id>'    => 'change-status',
 			],
 		],
 		[

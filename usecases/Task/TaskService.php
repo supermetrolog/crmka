@@ -9,6 +9,7 @@ use app\dto\Task\UpdateTaskDto;
 use app\exceptions\domain\model\SaveModelException;
 use app\models\Task;
 use Throwable;
+use UnexpectedValueException;
 use yii\db\StaleObjectException;
 
 class TaskService
@@ -37,7 +38,7 @@ class TaskService
 	 */
 	public function accept(Task $task): void
 	{
-		$this->changeStatus($task, Task::STATUS_ACCEPTED);
+		$this->setStatus($task, Task::STATUS_ACCEPTED);
 	}
 
 	/**
@@ -45,7 +46,7 @@ class TaskService
 	 */
 	public function done(Task $task): void
 	{
-		$this->changeStatus($task, Task::STATUS_DONE);
+		$this->setStatus($task, Task::STATUS_DONE);
 	}
 
 	/**
@@ -53,13 +54,33 @@ class TaskService
 	 */
 	public function impossible(Task $task): void
 	{
-		$this->changeStatus($task, Task::STATUS_IMPOSSIBLE);
+		$this->setStatus($task, Task::STATUS_IMPOSSIBLE);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 */
 	public function changeStatus(Task $task, int $status): void
+	{
+		switch ($status) {
+			case Task::STATUS_DONE:
+				$this->done($task);
+				break;
+			case Task::STATUS_ACCEPTED:
+				$this->accept($task);
+				break;
+			case Task::STATUS_IMPOSSIBLE:
+				$this->impossible($task);
+				break;
+			default:
+				throw new UnexpectedValueException('Unexpected status');
+		};
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	private function setStatus(Task $task, int $status): void
 	{
 		$task->status = $status;
 		$task->saveOrThrow();

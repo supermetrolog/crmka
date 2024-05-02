@@ -46,3 +46,14 @@ Authorization: Bearer {{token}}
   "status": 1
 }
 ###
+
+
+POST {{url}}/tasks/change-status/3
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "status": 2
+}
+###

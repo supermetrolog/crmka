@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\exceptions\domain\model\SaveModelException;
 use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\models\forms\Task\TaskChangeStatusForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\TaskSearch;
 use app\models\Task;
@@ -50,6 +51,7 @@ class TaskController extends AppController
 
 	/**
 	 * @throws NotFoundHttpException
+	 * @throws ErrorException
 	 */
 	public function actionView(int $id): TaskResource
 	{
@@ -129,6 +131,24 @@ class TaskController extends AppController
 	}
 
 	/**
+	 * @throws ErrorException
+	 * @throws NotFoundHttpException
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 */
+	public function actionChangeStatus(int $id): void
+	{
+		$task = $this->findModel($id);
+
+		$form = new TaskChangeStatusForm();
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->service->changeStatus($task, $form->status);
+	}
+
+	/**
 	 * @throws Throwable
 	 * @throws StaleObjectException
 	 * @throws NotFoundHttpException
@@ -140,6 +160,10 @@ class TaskController extends AppController
 
 
 	/**
+	 * @param int $id
+	 *
+	 * @return Task|null
+	 * @throws ErrorException
 	 * @throws NotFoundHttpException
 	 */
 	protected function findModel(int $id): ?Task
