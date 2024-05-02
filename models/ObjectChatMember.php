@@ -2,8 +2,8 @@
 
 namespace app\models;
 
-use app\kernel\common\models\AQ;
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ObjectChatMemberQuery;
 use yii\base\ErrorException;

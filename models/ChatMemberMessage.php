@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTaskQuery;
 use app\models\ActiveQuery\ChatMemberQuery;

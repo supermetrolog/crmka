@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\exceptions\domain\model;
 
 
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AR\AR;
 use Exception;
 use Throwable;
 

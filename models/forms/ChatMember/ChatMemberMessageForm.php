@@ -6,7 +6,7 @@ namespace app\models\forms\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
-use app\kernel\common\models\Form;
+use app\kernel\common\models\Form\Form;
 use app\models\ChatMember;
 
 class ChatMemberMessageForm extends Form

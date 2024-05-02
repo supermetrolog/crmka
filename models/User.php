@@ -2,20 +2,19 @@
 
 namespace app\models;
 
-use app\kernel\common\models\AQ;
-use app\kernel\common\models\AR;
+use app\exceptions\ValidationErrorHttpException;
+use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
-use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
-use yii\db\Exception;
-use yii\web\IdentityInterface;
-use yii\filters\auth\HttpBearerAuth;
 use yii\data\ActiveDataProvider;
-use app\exceptions\ValidationErrorHttpException;
+use yii\db\ActiveQuery;
+use yii\db\Exception;
+use yii\filters\auth\HttpBearerAuth;
 use yii\helpers\ArrayHelper;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "user".

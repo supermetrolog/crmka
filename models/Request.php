@@ -2,25 +2,25 @@
 
 namespace app\models;
 
+use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\events\NotificationEvent;
 use app\exceptions\ValidationErrorHttpException;
-use app\kernel\common\models\AQ;
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
-use yii\base\ErrorException;
-use yii\db\ActiveQuery;
-use yii\web\NotFoundHttpException;
-use Yii;
-use yii\data\ActiveDataProvider;
 use app\models\miniModels\RequestDirection;
 use app\models\miniModels\RequestDistrict;
 use app\models\miniModels\RequestGateType;
 use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
-use app\models\miniModels\RequestRegion;
-use app\behaviors\CreateManyMiniModelsBehaviors;
-use app\events\NotificationEvent;
 use app\models\miniModels\RequestObjectTypeGeneral;
+use app\models\miniModels\RequestRegion;
 use app\models\miniModels\TimelineStep;
+use Yii;
+use yii\base\ErrorException;
+use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "request".

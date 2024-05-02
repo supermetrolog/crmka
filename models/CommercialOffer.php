@@ -3,8 +3,6 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
-use app\kernel\common\models\AQ;
-use app\kernel\common\models\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\CommercialOfferQuery;
 use app\models\oldDb\Offers;

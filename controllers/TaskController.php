@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\exceptions\domain\model\SaveModelException;
 use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Task\TaskChangeStatusForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\TaskSearch;
@@ -136,7 +137,7 @@ class TaskController extends AppController
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 */
-	public function actionChangeStatus(int $id): void
+	public function actionChangeStatus(int $id): SuccessResponse
 	{
 		$task = $this->findModel($id);
 
@@ -146,6 +147,8 @@ class TaskController extends AppController
 		$form->validateOrThrow();
 
 		$this->service->changeStatus($task, $form->status);
+
+		return new SuccessResponse();
 	}
 
 	/**
@@ -153,9 +156,11 @@ class TaskController extends AppController
 	 * @throws StaleObjectException
 	 * @throws NotFoundHttpException
 	 */
-	public function actionDelete(int $id): void
+	public function actionDelete(int $id): SuccessResponse
 	{
 		$this->service->delete($this->findModel($id));
+
+		return new SuccessResponse();
 	}
 
 
@@ -170,6 +175,7 @@ class TaskController extends AppController
 	{
 		$model = Task::find()
 		             ->byId($id)
+		             ->notDeleted()
 		             ->byMorph($this->user->id, $this->user->identity::getMorphClass())
 		             ->one();
 

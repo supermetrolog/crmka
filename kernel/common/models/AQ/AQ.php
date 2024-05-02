@@ -2,14 +2,21 @@
 
 declare(strict_types=1);
 
-namespace app\kernel\common\models;
+namespace app\kernel\common\models\AQ;
 
+use app\kernel\common\models\AR\AR;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\db\Connection;
 use yii\db\Expression;
 
 class AQ extends ActiveQuery
 {
+	/**
+	 * @var ActiveRecord|AR
+	 */
+	public $modelClass;
+
 	protected function field(string $column): string
 	{
 		return $this->getPrimaryTableName() . '.' . $column;
@@ -25,6 +32,11 @@ class AQ extends ActiveQuery
 		return $this->andWhere([$column => null]);
 	}
 
+	/**
+	 * @param string $column
+	 *
+	 * @return $this
+	 */
 	public function andWhereNotNull(string $column): self
 	{
 		return $this->andWhere(['IS NOT', $column, null]);

@@ -3,11 +3,10 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
-use app\kernel\common\models\AQ;
+use app\kernel\common\models\AQ\AQ;
 use app\models\crane\Crane;
 use app\models\location\Location;
 use yii\db\ActiveQuery;
-use yii\helpers\Json;
 
 /**
  * @property ObjectClass $objectClassRecord

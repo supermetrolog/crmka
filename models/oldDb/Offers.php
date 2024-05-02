@@ -2,11 +2,9 @@
 
 namespace app\models\oldDb;
 
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AR\AR;
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Connection;
 
 /**

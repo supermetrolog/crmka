@@ -2,10 +2,9 @@
 
 namespace app\models\oldDb;
 
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AR\AR;
 use app\models\Company;
 use app\models\Deal;
-use app\models\oldDb\location\Location;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\HtmlPurifier;

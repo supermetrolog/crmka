@@ -48,7 +48,7 @@ Authorization: Bearer {{token}}
 ###
 
 
-POST {{url}}/tasks/change-status/3
+POST {{url}}/tasks/change-status/4
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -56,4 +56,11 @@ Authorization: Bearer {{token}}
 {
   "status": 2
 }
+###
+
+DELETE {{url}}/tasks/4
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
 ###

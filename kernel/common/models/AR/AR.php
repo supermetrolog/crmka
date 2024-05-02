@@ -2,21 +2,18 @@
 
 declare(strict_types=1);
 
-namespace app\kernel\common\models;
+namespace app\kernel\common\models\AR;
 
 use app\exceptions\domain\model\SaveModelException;
 use app\exceptions\domain\model\ValidateException;
 use app\helpers\DateTimeHelper;
 use app\helpers\DbHelper;
-use DateTime;
 use Exception;
 use Throwable;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\Expression;
 use yii\db\StaleObjectException;
-use yii\helpers\ArrayHelper;
 
 class AR extends ActiveRecord
 {

@@ -2,13 +2,11 @@
 
 namespace app\models;
 
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTaskQuery;
 use app\models\ActiveQuery\TaskQuery;
 use yii\db\ActiveQuery;
-use yii\db\Connection;
-use Yii;
 
 /**
  * This is the model class for table "chat_member_message_task".

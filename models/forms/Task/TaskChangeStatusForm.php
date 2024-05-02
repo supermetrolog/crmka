@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\models\forms\Task;
 
-use app\kernel\common\models\Form;
+use app\kernel\common\models\Form\Form;
 use app\models\Task;
 
 class TaskChangeStatusForm extends Form

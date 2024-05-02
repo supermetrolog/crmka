@@ -2,7 +2,7 @@
 
 namespace app\models\oldDb;
 
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\oldDb\OfferMixQuery;
 use app\models\Company;
 use app\models\Contact;
@@ -12,8 +12,6 @@ use app\models\Request;
 use app\models\User;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "c_industry_offers_mix".

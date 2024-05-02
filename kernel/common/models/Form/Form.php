@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\kernel\common\models;
+namespace app\kernel\common\models\Form;
 
 use app\exceptions\domain\model\ValidateException;
 use Exception;

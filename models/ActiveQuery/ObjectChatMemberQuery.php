@@ -2,7 +2,7 @@
 
 namespace app\models\ActiveQuery;
 
-use app\kernel\common\models\AQ;
+use app\kernel\common\models\AQ\AQ;
 use app\models\ObjectChatMember;
 use yii\db\ActiveRecord;
 

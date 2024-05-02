@@ -2,12 +2,14 @@
 
 namespace app\models\ActiveQuery;
 
-use app\kernel\common\models\AQ;
+use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\models\Task;
 use yii\db\ActiveRecord;
 
 class TaskQuery extends AQ
 {
+	use SoftDeleteTrait;
 
 	/**
 	 * @return Task[]|ActiveRecord[]
@@ -38,10 +40,5 @@ class TaskQuery extends AQ
 	public function byMorph(int $id, string $type): self
 	{
 		return $this->byCreatedByType($type)->byCreatedById($id);
-	}
-
-	public function byId(int $id): self
-	{
-		return $this->andWhere([$this->field('id') => $id]);
 	}
 }

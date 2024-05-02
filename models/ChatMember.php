@@ -2,16 +2,11 @@
 
 namespace app\models;
 
-use app\helpers\MatchHelper;
-use app\kernel\common\models\AR;
+use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
-use Exception;
-use yii\base\ErrorException;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
-use yii\db\Expression;
 
 /**
  * This is the model class for table "chat_member".

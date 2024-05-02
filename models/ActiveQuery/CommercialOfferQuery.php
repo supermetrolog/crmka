@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\models\ActiveQuery;
 
-use app\kernel\common\models\AQ;
+use app\kernel\common\models\AQ\AQ;
 use app\models\CommercialOffer;
 use yii\db\ActiveRecord;
 

@@ -3,10 +3,9 @@
 namespace app\models\search;
 
 use app\exceptions\domain\model\ValidateException;
-use app\kernel\common\models\Form;
-use app\models\ActiveQuery\ChatMemberMessageQuery;
-use yii\data\ActiveDataProvider;
+use app\kernel\common\models\Form\Form;
 use app\models\ChatMember;
+use yii\data\ActiveDataProvider;
 
 class ChatMemberSearch extends Form
 {
