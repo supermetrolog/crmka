@@ -7,6 +7,7 @@ namespace app\resources;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Task;
 use app\models\User;
+use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\User\UserResource;
 use UnexpectedValueException;
 
@@ -33,7 +34,8 @@ class TaskResource extends JsonResource
 			'created_at'      => $this->task->created_at,
 			'updated_at'      => $this->task->updated_at,
 			'deleted_at'      => $this->task->deleted_at,
-			'created_by'      => $this->getCreatedBy()->toArray()
+			'user'            => UserShortResource::make($this->task->user)->toArray(),
+			'created_by'      => $this->getCreatedBy()->toArray(),
 		];
 	}
 

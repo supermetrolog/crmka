@@ -6,6 +6,7 @@ use app\helpers\JsonFieldNormalizer;
 use app\kernel\common\models\AQ\AQ;
 use app\models\crane\Crane;
 use app\models\location\Location;
+use Yii;
 use yii\db\ActiveQuery;
 
 /**
@@ -107,6 +108,17 @@ class Objects extends oldDb\Objects
 	public function getPower(): ?int
 	{
 		return $this->power !== null ? (int)$this->power : null;
+	}
+
+	public function getThumb(): ?string
+	{
+		$photos = $this->getPhotos();
+
+		if ($photos) {
+			return Yii::$app->params['url']['objects'] . $photos[0];
+		}
+
+		return Yii::$app->params['url']['image_not_found'];
 	}
 
 	/**

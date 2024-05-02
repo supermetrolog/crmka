@@ -32,7 +32,7 @@ class TaskSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = Task::find();
+		$query = Task::find()->with(['user', 'createdByUser']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
