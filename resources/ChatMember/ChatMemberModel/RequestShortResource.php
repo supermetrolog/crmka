@@ -32,7 +32,7 @@ class RequestShortResource extends JsonResource
 			'objectClasses'    => $this->resource->objectClasses,
 			'created_at'       => $this->resource->created_at,
 			'updated_at'       => $this->resource->updated_at,
-			'company'          => CompanyShortResource::make($this->resource->company)->toArray(),
+			'company'          => CompanyShortResource::tryMakeArray($this->resource->company),
 		];
 	}
 }

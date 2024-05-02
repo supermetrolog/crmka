@@ -62,7 +62,7 @@ class RequestResource extends JsonResource
 			'districts'                     => $this->resource->districts,
 			'objectTypes'                   => $this->resource->objectTypes,
 			'objectClasses'                 => $this->resource->objectClasses,
-			'company'                       => CompanyShortResource::make($this->resource->company)->toArray(),
+			'company'                       => CompanyShortResource::tryMakeArray($this->resource->company),
 		];
 	}
 }

@@ -59,7 +59,7 @@ class ObjectShortResource extends JsonResource
 			'photos'              => $this->resource->getPhotos(),
 			'publ_time'           => $this->resource->publ_time,
 			'test_only'           => $this->resource->test_only,
-			'company'             => CompanyShortResource::make($this->resource->company)->toArray()
+			'company'             => CompanyShortResource::tryMakeArray($this->resource->company)
 		];
 	}
 }

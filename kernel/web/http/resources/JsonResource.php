@@ -21,6 +21,36 @@ abstract class JsonResource
 	}
 
 	/**
+	 * @return static
+	 */
+	public static function tryMake(...$argv): ?self
+	{
+		$resource = $argv[0];
+
+		if ($resource === null) {
+			return null;
+		}
+
+		return new static(...$argv);
+	}
+
+	/**
+	 * @param mixed ...$argv
+	 *
+	 * @return array|null
+	 */
+	public static function tryMakeArray(...$argv): ?array
+	{
+		$resource = $argv[0];
+
+		if ($resource === null) {
+			return null;
+		}
+
+		return (new static(...$argv))->toArray();
+	}
+
+	/**
 	 * @param array $resources
 	 *
 	 * @return static[]
