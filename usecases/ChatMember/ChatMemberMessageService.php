@@ -11,22 +11,22 @@ use app\exceptions\domain\model\SaveModelException;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTask;
-use app\usecases\Task\TaskService;
+use app\usecases\Task\CreateTaskService;
 use Throwable;
 use yii\db\Exception;
 
 class ChatMemberMessageService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
-	protected TaskService                $taskService;
+	protected CreateTaskService          $createTaskService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
-		TaskService $taskService
+		CreateTaskService $createTaskService
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
-		$this->taskService         = $taskService;
+		$this->createTaskService   = $createTaskService;
 	}
 
 	/**
@@ -70,7 +70,7 @@ class ChatMemberMessageService
 
 		try {
 			$message = $this->create($createChatMemberMessageDto);
-			$this->taskService->create($createTaskDto);
+			$this->createTaskService->create($createTaskDto);
 
 			$tx->commit();
 
@@ -91,7 +91,7 @@ class ChatMemberMessageService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$task = $this->taskService->create($createTaskDto);
+			$task = $this->createTaskService->create($createTaskDto);
 
 			$messageTask                         = new ChatMemberMessageTask();
 			$messageTask->task_id                = $task->id;
