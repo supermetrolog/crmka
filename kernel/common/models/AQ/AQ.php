@@ -80,4 +80,12 @@ class AQ extends ActiveQuery
 	{
 		return $this->andWhere([$operator, $first, new Expression($second)]);
 	}
+
+	/**
+	 * @return $this
+	 */
+	public function andWhereExpr(string $first, string $second, string $operator = '=', array $params = []): self
+	{
+		return $this->andWhere([$operator, $first, new Expression($second, $params)]);
+	}
 }

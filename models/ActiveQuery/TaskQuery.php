@@ -41,4 +41,9 @@ class TaskQuery extends AQ
 	{
 		return $this->byCreatedByType($type)->byCreatedById($id);
 	}
+
+	public function expired(): self
+	{
+		return $this->andWhereExpr($this->field('end'), 'NOW()', '<');
+	}
 }

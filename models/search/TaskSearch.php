@@ -13,52 +13,52 @@ class TaskSearch extends Form
 	public $user_id;
 	public $message;
 	public $status;
-	public $start;
-	public $end;
-	public $created_by_type;
 	public $created_by_id;
-	public $created_at;
-	public $updated_at;
-	public $deleted_at;
-	
-    public function rules(): array
-    {
-        return [
-            [['id', 'user_id', 'status', 'created_by_id'], 'integer'],
-            [['message', 'start', 'end', 'created_by_type', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
-        ];
-    }
+	public $deleted;
+	public $expired;
+
+
+	public function rules(): array
+	{
+		return [
+			[['id', 'user_id', 'status', 'created_by_id'], 'integer'],
+			[['deleted', 'expired'], 'boolean'],
+			[['message', 'start', 'end', 'created_by_type'], 'safe'],
+		];
+	}
 
 	/**
 	 * @throws ValidateException
 	 */
-    public function search(array $params): ActiveDataProvider
-    {
-        $query = Task::find();
+	public function search(array $params): ActiveDataProvider
+	{
+		$query = Task::find();
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
+		$dataProvider = new ActiveDataProvider([
+			'query' => $query,
+		]);
 
-        $this->load($params);
+		$this->load($params);
 
 		$this->validateOrThrow();
 
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'user_id' => $this->user_id,
-            'status' => $this->status,
-            'start' => $this->start,
-            'end' => $this->end,
-            'created_by_id' => $this->created_by_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
-        ]);
+		if ($this->deleted) {
+			$query->deleted();
+		}
 
-        $query->andFilterWhere(['like', 'message', $this->message])
-            ->andFilterWhere(['like', 'created_by_type', $this->created_by_type]);
+		if ($this->expired) {
+			$query->expired();
+		}
 
-        return $dataProvider;
-    }
+		$query->andFilterWhere([
+			'id'            => $this->id,
+			'user_id'       => $this->user_id,
+			'status'        => $this->status,
+			'created_by_id' => $this->created_by_id,
+		]);
+
+		$query->andFilterWhere(['like', 'message', $this->message]);
+
+		return $dataProvider;
+	}
 }
