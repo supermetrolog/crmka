@@ -6,6 +6,7 @@ namespace app\resources\ChatMember;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMemberMessage;
+use app\resources\Contact\ContactShortResource;
 use app\resources\TaskResource;
 
 class ChatMemberMessageResource extends JsonResource
@@ -27,7 +28,8 @@ class ChatMemberMessageResource extends JsonResource
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
 			'from'                => ChatMemberShortResource::make($this->resource->fromChatMember)->toArray(),
-			'tasks'               => TaskResource::collection($this->resource->tasks)
+			'tasks'               => TaskResource::collection($this->resource->tasks),
+			'contacts'            => ContactShortResource::collection($this->resource->contacts),
 		];
 	}
 }

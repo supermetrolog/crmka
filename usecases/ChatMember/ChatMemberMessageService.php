@@ -11,6 +11,7 @@ use app\dto\Task\CreateTaskDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
+use app\models\Contact;
 use app\models\Task;
 use app\usecases\Relation\RelationService;
 use app\usecases\Task\CreateTaskService;
@@ -36,19 +37,38 @@ class ChatMemberMessageService
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function create(CreateChatMemberMessageDto $dto): ChatMemberMessage
 	{
-		$message = new ChatMemberMessage();
+		$tx = $this->transactionBeginner->begin();
 
-		$message->from_chat_member_id = $dto->from->id;
-		$message->to_chat_member_id   = $dto->to->id;
+		try {
+			$message = new ChatMemberMessage();
 
-		$message->message = $dto->message;
+			$message->from_chat_member_id = $dto->from->id;
+			$message->to_chat_member_id   = $dto->to->id;
 
-		$message->saveOrThrow();
+			$message->message = $dto->message;
 
-		return $message;
+			$message->saveOrThrow();
+
+			foreach ($dto->contactIds as $contactId) {
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $message::getMorphClass(),
+					'first_id'    => $message->id,
+					'second_type' => Contact::getMorphClass(),
+					'second_id'   => $contactId,
+				]));
+			}
+
+			$tx->commit();
+
+			return $message;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 

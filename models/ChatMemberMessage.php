@@ -23,6 +23,7 @@ use yii\db\ActiveQuery;
  * @property ChatMember  $fromChatMember
  * @property ChatMember  $toChatMember
  * @property Task[]      $tasks
+ * @property Contact[]   $contacts
  */
 class ChatMemberMessage extends AR
 {
@@ -95,6 +96,16 @@ class ChatMemberMessage extends AR
 		            ->via('relationFirst');
 	}
 
+
+	/**
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getContacts(): ActiveQuery
+	{
+		return $this->morphHasManyVia(Contact::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
 
 	public static function find(): ChatMemberMessageQuery
 	{

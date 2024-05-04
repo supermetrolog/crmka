@@ -1,4 +1,4 @@
-GET {{url}}/chat-member-messages?id=5
+GET {{url}}/chat-member-messages?id=8
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -18,8 +18,11 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "message": "ANAL JOSKI",
-  "to_chat_member_id": 43593
+  "message": "PIZDEC NAHUI BLYAT",
+  "to_chat_member_id": 43593,
+  "contact_ids": [
+    43989
+  ]
 }
 
 ###

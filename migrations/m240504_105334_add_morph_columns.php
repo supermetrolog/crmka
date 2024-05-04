@@ -14,6 +14,7 @@ class m240504_105334_add_morph_columns extends Migration
 	{
 		$this->addMorphColumn('chat_member_message');
 		$this->addMorphColumn('task');
+		$this->addMorphColumn('contact');
 	}
 
 	/**
@@ -21,6 +22,7 @@ class m240504_105334_add_morph_columns extends Migration
 	 */
 	public function safeDown()
 	{
+		$this->dropMorphColumn('contact');
 		$this->dropMorphColumn('task');
 		$this->dropMorphColumn('chat_member_message');
 	}
