@@ -42,12 +42,20 @@ class TaskSearch extends Form
 
 		$this->validateOrThrow();
 
-		if ($this->deleted) {
+		if ($this->isFilterTrue($this->deleted)) {
 			$query->deleted();
 		}
 
-		if ($this->expired) {
+		if ($this->isFilterFalse($this->deleted)) {
+			$query->notDeleted();
+		}
+
+		if ($this->isFilterTrue($this->expired)) {
 			$query->expired();
+		}
+
+		if ($this->isFilterFalse($this->expired)) {
+			$query->notExpired();
 		}
 
 		$query->andFilterWhere([

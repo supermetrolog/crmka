@@ -50,4 +50,30 @@ class Form extends Model
 			throw new ValidateException($this);
 		}
 	}
+
+	protected function isFilterTrue($value): bool
+	{
+		if ($value === null) {
+			return false;
+		}
+
+		if ((int)$value === 1) {
+			return true;
+		}
+
+		return false;
+	}
+
+	protected function isFilterFalse($value): bool
+	{
+		if ($value === null) {
+			return false;
+		}
+
+		if ((int)$value === 0) {
+			return true;
+		}
+
+		return false;
+	}
 }

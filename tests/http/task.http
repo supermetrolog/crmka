@@ -1,4 +1,4 @@
-GET {{url}}/tasks
+GET {{url}}/tasks?expired=1
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}

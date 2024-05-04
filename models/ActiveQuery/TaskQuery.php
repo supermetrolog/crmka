@@ -7,6 +7,7 @@ use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Task;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 class TaskQuery extends AQ
 {
@@ -55,5 +56,14 @@ class TaskQuery extends AQ
 	public function expired(): self
 	{
 		return $this->andWhereExpr($this->field('end'), 'NOW()', '<');
+	}
+
+	public function notExpired(): self
+	{
+		return $this->andWhere([
+			'OR',
+			['>', $this->field('end'), new Expression('NOW()')],
+			['IS', $this->field('end'), null],
+		]);
 	}
 }

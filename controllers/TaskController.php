@@ -15,7 +15,6 @@ use app\repositories\TaskRepository;
 use app\resources\TaskResource;
 use app\usecases\Task\CreateTaskService;
 use app\usecases\Task\TaskService;
-use Exception;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -51,13 +50,16 @@ class TaskController extends AppController
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
-		$searchModel = new TaskSearch();
+		$searchModel  = new TaskSearch();
+		$dataProvider = $searchModel->search($this->request->get());
 
-		return TaskResource::fromDataProvider($searchModel->search(Yii::$app->request->get()));
+		return TaskResource::fromDataProvider($dataProvider);
 	}
 
 	/**
-	 * @throws ErrorException
+	 * @param int $id
+	 *
+	 * @return TaskResource
 	 * @throws ModelNotFoundException
 	 */
 	public function actionView(int $id): TaskResource
@@ -69,8 +71,6 @@ class TaskController extends AppController
 	 * @return TaskResource
 	 * @throws SaveModelException
 	 * @throws ValidateException
-	 * @throws ErrorException
-	 * @throws Exception
 	 */
 	public function actionCreate(): TaskResource
 	{
@@ -119,11 +119,9 @@ class TaskController extends AppController
 	 * @param int $id
 	 *
 	 * @return TaskResource
-	 * @throws ErrorException
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws ValidateException
-	 * @throws Exception
 	 */
 	public function actionUpdate(int $id): TaskResource
 	{
@@ -145,7 +143,6 @@ class TaskController extends AppController
 	 * @param int $id
 	 *
 	 * @return SuccessResponse
-	 * @throws ErrorException
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws ValidateException
@@ -180,7 +177,6 @@ class TaskController extends AppController
 	 * @param int $id
 	 *
 	 * @return Task
-	 * @throws ErrorException
 	 * @throws ModelNotFoundException
 	 */
 	protected function findModelByIdAndCreatedBy(int $id): Task
@@ -192,7 +188,6 @@ class TaskController extends AppController
 	 * @param int $id
 	 *
 	 * @return Task
-	 * @throws ErrorException
 	 * @throws ModelNotFoundException
 	 */
 	protected function findModelByIdAndCreatedByOrUserId(int $id): Task
