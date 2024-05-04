@@ -20,6 +20,8 @@ class RequestShortResource extends JsonResource
 	{
 		return [
 			'id'               => $this->resource->id,
+			'status'           => $this->resource->status,
+			'expressRequest'   => $this->resource->expressRequest,
 			'company_id'       => $this->resource->company_id,
 			'dealType'         => $this->resource->dealType,
 			'minArea'          => $this->resource->minArea,
