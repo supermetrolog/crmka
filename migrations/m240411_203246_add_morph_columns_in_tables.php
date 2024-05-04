@@ -31,12 +31,12 @@ class m240411_203246_add_morph_columns_in_tables extends Migration
 	 */
 	public function safeDown()
 	{
-		$this->dropMorphColumns('request');
-		$this->dropMorphColumns('user');
+		$this->dropMorphColumn('request');
+		$this->dropMorphColumn('user');
 
 		$this->db = Yii::$app->db_old;
-		$this->dropMorphColumns('c_industry_offers_mix');
-		$this->dropMorphColumns('c_industry_offers');
+		$this->dropMorphColumn('c_industry_offers_mix');
+		$this->dropMorphColumn('c_industry_offers');
 	}
 
 	/*

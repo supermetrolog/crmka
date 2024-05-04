@@ -3,7 +3,6 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
-use app\models\ActiveQuery\ChatMemberMessageTaskQuery;
 use app\models\ActiveQuery\TaskQuery;
 use yii\db\ActiveQuery;
 
@@ -22,7 +21,6 @@ use yii\db\ActiveQuery;
  * @property string                  $updated_at
  * @property string                  $deleted_at
  *
- * @property ChatMemberMessageTask[] $chatMemberMessageTasks
  * @property User                    $user
  * @property User                    $createdByUser
  * @property User                    $createdBy
@@ -85,14 +83,6 @@ class Task extends AR
 			self::STATUS_DONE,
 			self::STATUS_IMPOSSIBLE,
 		];
-	}
-
-	/**
-	 * @return ActiveQuery|ChatMemberMessageTaskQuery
-	 */
-	public function getChatMemberMessageTasks(): ChatMemberMessageTaskQuery
-	{
-		return $this->hasMany(ChatMemberMessageTask::className(), ['task_id' => 'id']);
 	}
 
 	public function getUser(): ActiveQuery

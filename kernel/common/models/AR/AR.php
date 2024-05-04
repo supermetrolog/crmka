@@ -220,6 +220,46 @@ class AR extends ActiveRecord
 	}
 
 	/**
+	 * @param string|AR $class
+	 * @param string    $column
+	 * @param string    $name
+	 * @param string    $localColumn
+	 *
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function morphHasMany(string $class, string $column = 'id', string $name = 'model', string $localColumn = 'morph'): ActiveQuery
+	{
+		$type = $name . '_type';
+		$id   = $name . '_id';
+
+		return $this->hasMany($class, [
+			$id   => $column,
+			$type => $localColumn
+		])->from([$class::tableName() => $class::getTable()]);
+	}
+
+	/**
+	 * @param string|AR $class
+	 * @param string    $column
+	 * @param string    $name
+	 * @param string    $localColumn
+	 *
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function morphHasManyVia(string $class, string $column = 'id', string $name = 'model', string $localColumn = 'morph'): ActiveQuery
+	{
+		$type = $name . '_type';
+		$id   = $name . '_id';
+
+		return $this->hasMany($class, [
+			$column      => $id,
+			$localColumn => $type
+		])->from([$class::tableName() => $class::getTable()]);
+	}
+
+	/**
 	 * @param string     $tableName
 	 * @param array      $insertColumns
 	 * @param array|bool $updateColumns
@@ -240,11 +280,8 @@ class AR extends ActiveRecord
 		return static::getColumn($name);
 	}
 
-	/**
-	 * @throws ErrorException
-	 */
 	public static function getMorphClass(): string
 	{
-		throw new ErrorException(__FUNCTION__ . ' must be implements');
+		return static::tableName();
 	}
 }

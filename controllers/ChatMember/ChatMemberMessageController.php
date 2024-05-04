@@ -151,9 +151,9 @@ class ChatMemberMessageController extends AppController
 
 		$taskForm->validateOrThrow();
 
-		$messageTask = $this->service->createTask($message, $taskForm->getDto());
+		$task = $this->service->createTask($message, $taskForm->getDto());
 
-		return TaskResource::make($messageTask->task);
+		return TaskResource::make($task);
 	}
 
 	/**

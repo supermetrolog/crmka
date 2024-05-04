@@ -6,11 +6,13 @@ namespace app\usecases\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
+use app\dto\Relation\CreateRelationDto;
 use app\dto\Task\CreateTaskDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
-use app\models\ChatMemberMessageTask;
+use app\models\Task;
+use app\usecases\Relation\RelationService;
 use app\usecases\Task\CreateTaskService;
 use Throwable;
 use yii\db\Exception;
@@ -19,14 +21,17 @@ class ChatMemberMessageService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
 	protected CreateTaskService          $createTaskService;
+	protected RelationService            $relationService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
-		CreateTaskService $createTaskService
+		CreateTaskService $createTaskService,
+		RelationService $relationService
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
 		$this->createTaskService   = $createTaskService;
+		$this->relationService     = $relationService;
 	}
 
 	/**
@@ -70,7 +75,7 @@ class ChatMemberMessageService
 
 		try {
 			$message = $this->create($createChatMemberMessageDto);
-			$this->createTaskService->create($createTaskDto);
+			$this->createTask($message, $createTaskDto);
 
 			$tx->commit();
 
@@ -86,22 +91,23 @@ class ChatMemberMessageService
 	 * @throws Exception
 	 * @throws Throwable
 	 */
-	public function createTask(ChatMemberMessage $message, CreateTaskDto $createTaskDto): ChatMemberMessageTask
+	public function createTask(ChatMemberMessage $message, CreateTaskDto $createTaskDto): Task
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
 			$task = $this->createTaskService->create($createTaskDto);
 
-			$messageTask                         = new ChatMemberMessageTask();
-			$messageTask->task_id                = $task->id;
-			$messageTask->chat_member_message_id = $message->id;
-
-			$messageTask->saveOrThrow();
+			$this->relationService->create(new CreateRelationDto([
+				'first_type'  => $message::getMorphClass(),
+				'first_id'    => $message->id,
+				'second_type' => $task::getMorphClass(),
+				'second_id'   => $task->id,
+			]));
 
 			$tx->commit();
 
-			return $messageTask;
+			return $task;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;

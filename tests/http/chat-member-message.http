@@ -1,4 +1,4 @@
-GET {{url}}/chat-member-messages
+GET {{url}}/chat-member-messages?id=5
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -31,7 +31,7 @@ Authorization: Bearer {{token}}
 
 {
   "user_id": 3,
-  "message": "SUKA2",
+  "message": "ANAL",
   "status": 1
 }
 

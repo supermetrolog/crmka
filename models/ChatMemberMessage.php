@@ -4,25 +4,25 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
-use app\models\ActiveQuery\ChatMemberMessageTaskQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskQuery;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "chat_member_message".
  *
- * @property int                     $id
- * @property int                     $to_chat_member_id
- * @property int|null                $from_chat_member_id
- * @property string|null             $message
- * @property string                  $created_at
- * @property string                  $updated_at
+ * @property int         $id
+ * @property int         $to_chat_member_id
+ * @property int|null    $from_chat_member_id
+ * @property string|null $message
+ * @property string      $created_at
+ * @property string      $updated_at
  *
- * @property ChatMember              $fromChatMember
- * @property ChatMember              $toChatMember
- * @property ChatMemberMessageTask[] $chatMemberMessageTasks
- * @property Task[]                  $tasks
+ * @property ChatMember  $fromChatMember
+ * @property ChatMember  $toChatMember
+ * @property Task[]      $tasks
  */
 class ChatMemberMessage extends AR
 {
@@ -77,25 +77,32 @@ class ChatMemberMessage extends AR
 	}
 
 	/**
-	 * @return ActiveQuery|ChatMemberMessageTaskQuery
+	 * @return RelationQuery|ActiveQuery
+	 * @throws ErrorException
 	 */
-	public function getChatMemberMessageTasks(): ChatMemberMessageTaskQuery
+	public function getRelationFirst(): RelationQuery
 	{
-		return $this->hasMany(ChatMemberMessageTask::className(), ['chat_member_message_id' => 'id']);
+		return $this->morphHasOne(Relation::class, 'id', 'first');
 	}
 
 	/**
-	 * @return ActiveQuery|ChatMemberMessageTaskQuery
+	 * @return ActiveQuery|TaskQuery
+	 * @throws ErrorException
 	 */
 	public function getTasks(): TaskQuery
 	{
-		return $this->hasMany(Task::class, ['id' => 'task_id'])
-		            ->via('chatMemberMessageTasks');
+		return $this->morphHasManyVia(Task::class, 'id', 'second')
+		            ->via('relationFirst');
 	}
 
 
 	public static function find(): ChatMemberMessageQuery
 	{
 		return new ChatMemberMessageQuery(get_called_class());
+	}
+
+	public static function getMorphClass(): string
+	{
+		return self::tableName();
 	}
 }
