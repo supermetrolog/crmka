@@ -2,9 +2,9 @@
 
 namespace app\kernel\common\controller;
 
-use app\exceptions\domain\model\SaveModelException;
-use app\exceptions\domain\model\ValidateException;
-use app\exceptions\http\ValidateHttpException;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\resources\JsonResource;
 use Yii;
 use yii\base\InvalidRouteException;
@@ -14,6 +14,7 @@ use yii\filters\Cors;
 use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
 use yii\rest\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\User;
 
@@ -71,6 +72,7 @@ class AppController extends Controller
 	 *
 	 * @return array|mixed|null
 	 * @throws InvalidRouteException
+	 * @throws NotFoundHttpException
 	 */
 	public function runAction($id, $params = [])
 	{
@@ -89,6 +91,8 @@ class AppController extends Controller
 				'success' => false,
 				'errors'  => $e->getModel()->getErrors()
 			];
+		} catch (ModelNotFoundException $e) {
+			throw new NotFoundHttpException($e->getMessage(), $e->getCode(), $e);
 		}
 	}
 }

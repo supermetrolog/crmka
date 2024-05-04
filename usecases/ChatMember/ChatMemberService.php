@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace app\usecases\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberDto;
-use app\exceptions\domain\model\SaveModelException;
 use app\helpers\DateTimeHelper;
+use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use yii\db\Exception;
 

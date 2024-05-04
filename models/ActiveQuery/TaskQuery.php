@@ -4,6 +4,7 @@ namespace app\models\ActiveQuery;
 
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AQ\SoftDeleteTrait;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Task;
 use yii\db\ActiveRecord;
 
@@ -25,6 +26,15 @@ class TaskQuery extends AQ
 	public function one($db = null): ?Task
 	{
 		return parent::one($db);
+	}
+
+	/**
+	 * @return Task|ActiveRecord|null
+	 * @throws ModelNotFoundException
+	 */
+	public function oneOrThrow($db = null): Task
+	{
+		return parent::oneOrThrow($db);
 	}
 
 	public function byCreatedById(int $id): self

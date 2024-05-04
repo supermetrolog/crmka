@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\kernel\common\models\AQ;
 
 use app\kernel\common\models\AR\AR;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Connection;
@@ -87,5 +88,21 @@ class AQ extends ActiveQuery
 	public function andWhereExpr(string $first, string $second, string $operator = '=', array $params = []): self
 	{
 		return $this->andWhere([$operator, $first, new Expression($second, $params)]);
+	}
+
+
+	/**
+	 * @return ActiveRecord|array
+	 * @throws ModelNotFoundException
+	 */
+	public function oneOrThrow($db = null): ActiveRecord
+	{
+		$model = $this->one($db);
+
+		if ($model) {
+			return $model;
+		}
+
+		throw new ModelNotFoundException();
 	}
 }

@@ -2,14 +2,16 @@
 
 namespace app\controllers;
 
-use app\exceptions\domain\model\SaveModelException;
-use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Task\TaskChangeStatusForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\TaskSearch;
 use app\models\Task;
+use app\repositories\TaskRepository;
 use app\resources\TaskResource;
 use app\usecases\Task\CreateTaskService;
 use app\usecases\Task\TaskService;
@@ -25,17 +27,21 @@ class TaskController extends AppController
 {
 	private TaskService       $service;
 	private CreateTaskService $createTaskService;
+	private TaskRepository    $repository;
+
 
 	public function __construct(
 		$id,
 		$module,
 		TaskService $service,
 		CreateTaskService $createTaskService,
+		TaskRepository $repository,
 		array $config = []
 	)
 	{
 		$this->service           = $service;
 		$this->createTaskService = $createTaskService;
+		$this->repository        = $repository;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -51,12 +57,12 @@ class TaskController extends AppController
 	}
 
 	/**
-	 * @throws NotFoundHttpException
 	 * @throws ErrorException
+	 * @throws ModelNotFoundException
 	 */
 	public function actionView(int $id): TaskResource
 	{
-		return new TaskResource($this->findModel($id));
+		return new TaskResource($this->findModelByIdAndCreatedBy($id));
 	}
 
 	/**
@@ -110,14 +116,18 @@ class TaskController extends AppController
 	}
 
 	/**
+	 * @param int $id
+	 *
+	 * @return TaskResource
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
-	 * @throws NotFoundHttpException
 	 * @throws ValidateException
 	 * @throws Exception
 	 */
 	public function actionUpdate(int $id): TaskResource
 	{
-		$model = $this->findModel($id);
+		$model = $this->findModelByIdAndCreatedByOrUserId($id);
 
 		$form = new TaskForm();
 
@@ -132,14 +142,17 @@ class TaskController extends AppController
 	}
 
 	/**
+	 * @param int $id
+	 *
+	 * @return SuccessResponse
 	 * @throws ErrorException
-	 * @throws NotFoundHttpException
+	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 */
 	public function actionChangeStatus(int $id): SuccessResponse
 	{
-		$task = $this->findModel($id);
+		$task = $this->findModelByIdAndCreatedByOrUserId($id);
 
 		$form = new TaskChangeStatusForm();
 		$form->load($this->request->post());
@@ -158,31 +171,32 @@ class TaskController extends AppController
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$this->service->delete($this->findModel($id));
+		$this->service->delete($this->findModelByIdAndCreatedBy($id));
 
 		return new SuccessResponse();
 	}
 
+	/**
+	 * @param int $id
+	 *
+	 * @return Task
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
+	 */
+	protected function findModelByIdAndCreatedBy(int $id): Task
+	{
+		return $this->repository->findModelByIdAndCreatedBy($id, $this->user->id, $this->user->identity::getMorphClass());
+	}
 
 	/**
 	 * @param int $id
 	 *
-	 * @return Task|null
+	 * @return Task
 	 * @throws ErrorException
-	 * @throws NotFoundHttpException
+	 * @throws ModelNotFoundException
 	 */
-	protected function findModel(int $id): ?Task
+	protected function findModelByIdAndCreatedByOrUserId(int $id): Task
 	{
-		$model = Task::find()
-		             ->byId($id)
-		             ->notDeleted()
-		             ->byMorph($this->user->id, $this->user->identity::getMorphClass())
-		             ->one();
-
-		if ($model) {
-			return $model;
-		}
-
-		throw new NotFoundHttpException('The requested model does not exist.');
+		return $this->repository->findModelByIdAndCreatedByOrUserId($id, $this->user->id, $this->user->identity::getMorphClass());
 	}
 }

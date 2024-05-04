@@ -2,8 +2,8 @@
 
 namespace app\exceptions\http;
 
-use app\exceptions\domain\model\ModelException;
-use app\exceptions\domain\model\ValidateException;
+use app\kernel\common\models\exceptions\ModelException;
+use app\kernel\common\models\exceptions\ValidateException;
 use yii\web\HttpException;
 
 class ValidateHttpException extends HttpException

@@ -2,7 +2,7 @@
 
 namespace app\models\search;
 
-use app\exceptions\domain\model\ValidateException;
+use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMember;
 use yii\data\ActiveDataProvider;

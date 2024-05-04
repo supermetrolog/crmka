@@ -2,15 +2,13 @@
 
 namespace app\controllers\ChatMember;
 
-use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\resources\JsonResource;
-use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ChatMember;
 use app\models\search\ChatMemberSearch;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberResource;
-use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 

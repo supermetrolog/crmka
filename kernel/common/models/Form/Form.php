@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\kernel\common\models\Form;
 
-use app\exceptions\domain\model\ValidateException;
+use app\kernel\common\models\exceptions\ValidateException;
 use Exception;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;

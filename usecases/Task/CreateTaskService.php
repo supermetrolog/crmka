@@ -6,8 +6,8 @@ namespace app\usecases\Task;
 
 use app\dto\Task\CreateTaskDto;
 use app\dto\Task\CreateTaskForUsersDto;
-use app\exceptions\domain\model\SaveModelException;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
 use Throwable;
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace app\kernel\common\models\AR;
 
-use app\exceptions\domain\model\SaveModelException;
-use app\exceptions\domain\model\ValidateException;
 use app\helpers\DateTimeHelper;
 use app\helpers\DbHelper;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\kernel\common\models\exceptions\ValidateException;
 use Exception;
 use Throwable;
 use yii\base\ErrorException;
