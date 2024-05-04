@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
+use app\models\ActiveQuery\ChatMemberMessageTagQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskQuery;
@@ -13,17 +14,18 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "chat_member_message".
  *
- * @property int         $id
- * @property int         $to_chat_member_id
- * @property int|null    $from_chat_member_id
- * @property string|null $message
- * @property string      $created_at
- * @property string      $updated_at
+ * @property int                    $id
+ * @property int                    $to_chat_member_id
+ * @property int|null               $from_chat_member_id
+ * @property string|null            $message
+ * @property string                 $created_at
+ * @property string                 $updated_at
  *
- * @property ChatMember  $fromChatMember
- * @property ChatMember  $toChatMember
- * @property Task[]      $tasks
- * @property Contact[]   $contacts
+ * @property ChatMember             $fromChatMember
+ * @property ChatMember             $toChatMember
+ * @property Task[]                 $tasks
+ * @property Contact[]              $contacts
+ * @property ChatMemberMessageTag[] $tags
  */
 class ChatMemberMessage extends AR
 {
@@ -83,7 +85,7 @@ class ChatMemberMessage extends AR
 	 */
 	public function getRelationFirst(): RelationQuery
 	{
-		return $this->morphHasOne(Relation::class, 'id', 'first');
+		return $this->morphHasMany(Relation::class, 'id', 'first');
 	}
 
 	/**
@@ -106,6 +108,17 @@ class ChatMemberMessage extends AR
 		return $this->morphHasManyVia(Contact::class, 'id', 'second')
 		            ->via('relationFirst');
 	}
+
+	/**
+	 * @return ActiveQuery|ChatMemberMessageTagQuery
+	 * @throws ErrorException
+	 */
+	public function getTags(): ChatMemberMessageTagQuery
+	{
+		return $this->morphHasManyVia(ChatMemberMessageTag::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
 
 	public static function find(): ChatMemberMessageQuery
 	{

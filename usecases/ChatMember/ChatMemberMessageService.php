@@ -11,6 +11,7 @@ use app\dto\Task\CreateTaskDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
+use app\models\ChatMemberMessageTag;
 use app\models\Contact;
 use app\models\Task;
 use app\usecases\Relation\RelationService;
@@ -59,6 +60,15 @@ class ChatMemberMessageService
 					'first_id'    => $message->id,
 					'second_type' => Contact::getMorphClass(),
 					'second_id'   => $contactId,
+				]));
+			}
+
+			foreach ($dto->tagIds as $tagId) {
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $message::getMorphClass(),
+					'first_id'    => $message->id,
+					'second_type' => ChatMemberMessageTag::getMorphClass(),
+					'second_id'   => $tagId,
 				]));
 			}
 

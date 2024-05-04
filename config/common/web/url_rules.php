@@ -178,13 +178,13 @@ return
 			'controller'    => 'task',
 			'except'        => [],
 			'extraPatterns' => [
-				'GET,OPTIONS'            => 'index',
-				'GET,OPTIONS <id>'       => 'index',
-				'POST,OPTIONS'           => 'create',
-				'POST,OPTIONS for-users' => 'create-for-users',
-				'PUT,OPTIONS <id>'       => 'update',
-				'DELETE,OPTIONS <id>'    => 'delete',
-				'POST,OPTIONS change-status/<id>'    => 'change-status',
+				'GET,OPTIONS'                     => 'index',
+				'GET,OPTIONS <id>'                => 'index',
+				'POST,OPTIONS'                    => 'create',
+				'POST,OPTIONS for-users'          => 'create-for-users',
+				'PUT,OPTIONS <id>'                => 'update',
+				'DELETE,OPTIONS <id>'             => 'delete',
+				'POST,OPTIONS change-status/<id>' => 'change-status',
 			],
 		],
 		[
@@ -203,5 +203,9 @@ return
 				'DELETE,OPTIONS'                => 'delete',
 				'POST,OPTIONS create-task/<id>' => 'create-task',
 			],
+		],
+		[
+			'class'      => 'yii\rest\UrlRule',
+			'controller' => ['chat-member-message-tags' => 'ChatMember/chat-member-message-tag'],
 		],
 	];

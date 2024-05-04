@@ -8,6 +8,7 @@ use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMember;
+use app\models\ChatMemberMessageTag;
 use app\models\Contact;
 
 class ChatMemberMessageForm extends Form
@@ -19,6 +20,7 @@ class ChatMemberMessageForm extends Form
 	public $to_chat_member_id;
 	public $message;
 	public $contact_ids = [];
+	public $tag_ids     = [];
 
 	public function rules(): array
 	{
@@ -31,7 +33,12 @@ class ChatMemberMessageForm extends Form
 				'exist',
 				'targetClass'     => Contact::class,
 				'targetAttribute' => ['contact_ids' => 'id'],
-			],]
+			]],
+			['tag_ids', 'each', 'rule' => [
+				'exist',
+				'targetClass'     => ChatMemberMessageTag::class,
+				'targetAttribute' => ['tag_ids' => 'id'],
+			]]
 		];
 	}
 
@@ -42,7 +49,7 @@ class ChatMemberMessageForm extends Form
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common, 'from_chat_member_id', 'to_chat_member_id', 'contact_ids'],
+			self::SCENARIO_CREATE => [...$common, 'from_chat_member_id', 'to_chat_member_id', 'contact_ids', 'tag_ids'],
 			self::SCENARIO_UPDATE => [...$common],
 		];
 	}
@@ -57,7 +64,8 @@ class ChatMemberMessageForm extends Form
 				'from'       => ChatMember::find()->byId($this->from_chat_member_id)->one(),
 				'to'         => ChatMember::find()->byId($this->to_chat_member_id)->one(),
 				'message'    => $this->message,
-				'contactIds' => $this->contact_ids
+				'contactIds' => $this->contact_ids,
+				'tagIds'     => $this->tag_ids,
 			]);
 		}
 

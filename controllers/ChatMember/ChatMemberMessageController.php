@@ -47,7 +47,9 @@ class ChatMemberMessageController extends AppController
 	}
 
 	/**
+	 * @return ChatMemberMessageResource
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 * @throws ValidateException
 	 */
 	public function actionCreate(): ChatMemberMessageResource

@@ -1,4 +1,4 @@
-GET {{url}}/chat-member-messages?id=8
+GET {{url}}/chat-member-messages?id=9
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -22,6 +22,9 @@ Authorization: Bearer {{token}}
   "to_chat_member_id": 43593,
   "contact_ids": [
     43989
+  ],
+  "tag_ids": [
+    1, 3
   ]
 }
 

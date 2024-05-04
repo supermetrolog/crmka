@@ -53,7 +53,7 @@ abstract class JsonResource
 	/**
 	 * @param array $resources
 	 *
-	 * @return static[]
+	 * @return array
 	 */
 	public static function collection(array $resources): array
 	{

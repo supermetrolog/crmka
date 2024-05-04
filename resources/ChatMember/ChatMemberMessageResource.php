@@ -30,6 +30,7 @@ class ChatMemberMessageResource extends JsonResource
 			'from'                => ChatMemberShortResource::make($this->resource->fromChatMember)->toArray(),
 			'tasks'               => TaskResource::collection($this->resource->tasks),
 			'contacts'            => ContactShortResource::collection($this->resource->contacts),
+			'tags'                => ChatMemberMessageTagResource::collection($this->resource->tags),
 		];
 	}
 }
