@@ -8,6 +8,7 @@ use app\dto\ChatMember\CreateChatMemberDto;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
+use app\models\ChatMemberMessage;
 use yii\db\Exception;
 
 class ChatMemberService
@@ -52,5 +53,14 @@ class ChatMemberService
 				'updated_at' => $now,
 			]
 		);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function pinMessage(ChatMember $member, ChatMemberMessage $message)
+	{
+		$member->pinned_chat_member_message_id = $message->id;
+		$member->saveOrThrow();
 	}
 }

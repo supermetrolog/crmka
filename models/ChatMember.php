@@ -16,6 +16,7 @@ use yii\db\ActiveQuery;
  * @property int                   $model_id
  * @property string                $created_at
  * @property string                $updated_at
+ * @property int|null              $pinned_chat_member_message_id
  *
  * @property ChatMemberMessage[]   $fromChatMemberMessages
  * @property ChatMemberMessage[]   $toChatMemberMessages
@@ -27,6 +28,7 @@ use yii\db\ActiveQuery;
  * @property CommercialOffer       $commercialOffer
  * @property ObjectChatMember      $objectChatMember
  * @property Objects               $object
+ * @property ChatMemberMessage     $pinnedChatMemberMessage
  */
 class ChatMember extends AR
 {
@@ -136,6 +138,14 @@ class ChatMember extends AR
 	public function getModel(): AR
 	{
 		return $this->request ?? $this->objectChatMember ?? $this->user;
+	}
+
+	/**
+	 * @return ChatMemberMessageQuery|ActiveQuery
+	 */
+	public function getPinnedChatMemberMessage(): ChatMemberMessageQuery
+	{
+		return $this->hasOne(ChatMemberMessage::class, ['id' => 'pinned_chat_member_message_id']);
 	}
 
 	public static function find(): ChatMemberQuery

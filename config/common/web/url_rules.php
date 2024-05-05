@@ -191,7 +191,9 @@ return
 			'class'         => 'yii\rest\UrlRule',
 			'controller'    => ['chat-members' => 'ChatMember/chat-member'],
 			'extraPatterns' => [
-				'GET,OPTIONS' => 'index'
+				'GET,OPTIONS'                     => 'index',
+				'GET,OPTIONS <id>/pinned-message' => 'pinned-message',
+				'POST,OPTIONS pin-message'   => 'pin-message',
 			],
 		],
 		[

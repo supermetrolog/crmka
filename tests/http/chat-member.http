@@ -11,3 +11,21 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ###
+
+GET {{url}}/chat-members/54158/pinned-message
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/chat-members/pin-message
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "chat_member_id": 54158,
+  "chat_member_message_id": 5
+}
+###

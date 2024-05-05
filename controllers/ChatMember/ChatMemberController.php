@@ -3,17 +3,32 @@
 namespace app\controllers\ChatMember;
 
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\resources\JsonResource;
+use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMember;
+use app\models\forms\ChatMember\PinChatMemberMessageForm;
 use app\models\search\ChatMemberSearch;
 use app\resources\ChatMember\ChatMemberFullResource;
+use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
+use app\usecases\ChatMember\ChatMemberMessageService;
+use app\usecases\ChatMember\ChatMemberService;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 
 class ChatMemberController extends AppController
 {
+	private ChatMemberService $service;
+
+	public function __construct($id, $module, ChatMemberService $service, array $config = [])
+	{
+		$this->service = $service;
+		parent::__construct($id, $module, $config);
+	}
+
 	/**
 	 * @throws ValidateException
 	 */
@@ -34,6 +49,37 @@ class ChatMemberController extends AppController
 	public function actionView(int $id): JsonResource
 	{
 		return ChatMemberFullResource::make($this->findModel($id));
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionPinnedMessage(int $id): ?JsonResource
+	{
+		$model = ChatMember::find()
+		                   ->byId($id)
+		                   ->oneOrThrow();
+
+		return ChatMemberMessageResource::tryMake($model->pinnedChatMemberMessage);
+	}
+
+
+	/**
+	 * @return SuccessResponse
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 */
+	public function actionPinMessage(): SuccessResponse
+	{
+		$form = new PinChatMemberMessageForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->service->pinMessage($form->getChatMember(), $form->getChatMemberMessage());
+
+		return new SuccessResponse();
 	}
 
 	/**
