@@ -208,7 +208,14 @@ return
 			],
 		],
 		[
-			'class'      => 'yii\rest\UrlRule',
-			'controller' => ['chat-member-message-tags' => 'ChatMember/chat-member-message-tag'],
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => ['chat-member-message-tags' => 'ChatMember/chat-member-message-tag'],
+			'extraPatterns' => [
+				'ПУЕ,OPTIONS'      => 'index',
+				'ПУЕ,OPTIONS <id>' => 'view',
+				'POST,OPTIONS'     => 'create',
+				'PUT,OPTIONS'      => 'update',
+				'DELETE,OPTIONS'   => 'delete',
+			],
 		],
 	];
