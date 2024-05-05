@@ -55,7 +55,7 @@ class AppController extends Controller
 				'cors'  => [
 					'Origin'                         => ['*'],
 					'Access-Control-Request-Method'  => ['*'],
-					'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
+					'Access-Control-Request-Headers' => ['*'],
 					'Access-Control-Expose-Headers'  => ['*']
 				]
 			],

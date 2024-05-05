@@ -5,17 +5,19 @@ Authorization: Bearer {{token}}
 
 ###
 
-GET {{url}}/chat-members/43612
+GET {{url}}/chat-members/54158
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
+Origin: https://clients.pennylane.pro
 
 ###
 
-GET {{url}}/chat-members/54158/pinned-message
+GET {{url}}/chat-members/47/pinned-message
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
+Origin: https://clients.supermetrolog.ru
 
 ###
 
