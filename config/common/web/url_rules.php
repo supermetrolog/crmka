@@ -193,7 +193,8 @@ return
 			'extraPatterns' => [
 				'GET,OPTIONS'                     => 'index',
 				'GET,OPTIONS <id>/pinned-message' => 'pinned-message',
-				'POST,OPTIONS pin-message'   => 'pin-message',
+				'POST,OPTIONS pin-message'        => 'pin-message',
+				'GET,OPTIONS <id>'                => 'view',
 			],
 		],
 		[
