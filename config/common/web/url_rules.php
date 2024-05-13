@@ -179,7 +179,7 @@ return
 			'except'        => [],
 			'extraPatterns' => [
 				'GET,OPTIONS'                     => 'index',
-				'GET,OPTIONS <id>'                => 'index',
+				'GET,OPTIONS <id>'                => 'view',
 				'POST,OPTIONS'                    => 'create',
 				'POST,OPTIONS for-users'          => 'create-for-users',
 				'PUT,OPTIONS <id>'                => 'update',
@@ -217,6 +217,19 @@ return
 				'POST,OPTIONS'        => 'create',
 				'PUT,OPTIONS <id>'    => 'update',
 				'DELETE,OPTIONS <id>' => 'delete',
+			],
+		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'alert',
+			'except'        => [],
+			'extraPatterns' => [
+				'GET,OPTIONS'            => 'index',
+				'GET,OPTIONS <id>'       => 'view',
+				'POST,OPTIONS'           => 'create',
+				'POST,OPTIONS for-users' => 'create-for-users',
+				'PUT,OPTIONS <id>'       => 'update',
+				'DELETE,OPTIONS <id>'    => 'delete',
 			],
 		],
 	];

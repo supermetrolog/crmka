@@ -1,0 +1,52 @@
+GET {{url}}/alerts
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/alerts
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "message": "GOVNO"
+}
+###
+
+PUT {{url}}/alerts/9
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "message": "GOVNO"
+}
+###
+
+POST {{url}}/alerts/for-users
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_ids": [
+    3,
+    10,
+    32
+  ],
+  "message": "DERbMO"
+}
+###
+
+
+
+DELETE {{url}}/alerts/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###

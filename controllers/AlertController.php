@@ -24,7 +24,6 @@ use yii\web\NotFoundHttpException;
 
 class AlertController extends AppController
 {
-
 	private AlertService       $service;
 	private CreateAlertService $createAlertService;
 	private AlertRepository    $repository;
@@ -48,6 +47,7 @@ class AlertController extends AppController
 
 	/**
 	 * @return ActiveDataProvider
+	 * @throws ValidateException
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
