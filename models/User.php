@@ -6,6 +6,7 @@ use app\exceptions\ValidationErrorHttpException;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\UserQuery;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -462,8 +463,8 @@ class User extends AR implements IdentityInterface
 		return $this->morphHasOne(ChatMember::class);
 	}
 
-	public static function find(): AQ
+	public static function find(): UserQuery
 	{
-		return new AQ(get_called_class());
+		return new UserQuery(get_called_class());
 	}
 }

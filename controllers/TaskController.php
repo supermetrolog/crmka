@@ -15,6 +15,7 @@ use app\repositories\TaskRepository;
 use app\resources\TaskResource;
 use app\usecases\Task\CreateTaskService;
 use app\usecases\Task\TaskService;
+use Exception;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
@@ -71,6 +72,7 @@ class TaskController extends AppController
 	 * @return TaskResource
 	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws Exception
 	 */
 	public function actionCreate(): TaskResource
 	{
