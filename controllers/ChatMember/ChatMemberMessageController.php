@@ -6,9 +6,11 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\models\ChatMemberMessage;
+use app\models\forms\Alert\AlertForm;
 use app\models\forms\ChatMember\ChatMemberMessageForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\ChatMemberMessageSearch;
+use app\resources\AlertResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\TaskResource;
 use app\usecases\ChatMember\ChatMemberMessageService;
@@ -157,6 +159,32 @@ class ChatMemberMessageController extends AppController
 
 		return TaskResource::make($task);
 	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 * @throws Throwable
+	 */
+	public function actionCreateAlert(int $id): AlertResource
+	{
+		$message = $this->findModel($id, false);
+
+		$alertForm = new AlertForm();
+
+		$alertForm->setScenario(TaskForm::SCENARIO_CREATE);
+
+		$alertForm->load($this->request->post());
+
+		$alertForm->created_by_id   = $this->user->id;
+		$alertForm->created_by_type = $this->user->identity::getMorphClass();
+
+		$alertForm->validateOrThrow();
+
+		$alert = $this->service->createAlert($message, $alertForm->getDto());
+
+		return AlertResource::make($alert);
+	}
+
 
 	/**
 	 * @throws NotFoundHttpException

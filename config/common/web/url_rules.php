@@ -202,10 +202,11 @@ return
 			'class'         => 'yii\rest\UrlRule',
 			'controller'    => ['chat-member-messages' => 'ChatMember/chat-member-message'],
 			'extraPatterns' => [
-				'POST,OPTIONS'                  => 'create',
-				'PUT,OPTIONS <id>'              => 'update',
-				'DELETE,OPTIONS <id>'           => 'delete',
-				'POST,OPTIONS create-task/<id>' => 'create-task',
+				'POST,OPTIONS'                   => 'create',
+				'PUT,OPTIONS <id>'               => 'update',
+				'DELETE,OPTIONS <id>'            => 'delete',
+				'POST,OPTIONS create-task/<id>'  => 'create-task',
+				'POST,OPTIONS create-alert/<id>' => 'create-alert',
 			],
 		],
 		[

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\AlertQuery;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTagQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
@@ -24,6 +25,7 @@ use yii\db\ActiveQuery;
  * @property ChatMember             $fromChatMember
  * @property ChatMember             $toChatMember
  * @property Task[]                 $tasks
+ * @property Alert[]                $alerts
  * @property Contact[]              $contacts
  * @property ChatMemberMessageTag[] $tags
  */
@@ -95,6 +97,16 @@ class ChatMemberMessage extends AR
 	public function getTasks(): TaskQuery
 	{
 		return $this->morphHasManyVia(Task::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
+	/**
+	 * @return ActiveQuery|AlertQuery
+	 * @throws ErrorException
+	 */
+	public function getAlerts(): AlertQuery
+	{
+		return $this->morphHasManyVia(Alert::class, 'id', 'second')
 		            ->via('relationFirst');
 	}
 

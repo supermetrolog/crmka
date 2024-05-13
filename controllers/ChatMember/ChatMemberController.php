@@ -15,8 +15,8 @@ use app\models\search\ChatMemberSearch;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
-use app\usecases\ChatMember\ChatMemberMessageService;
 use app\usecases\ChatMember\ChatMemberService;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 
@@ -32,6 +32,7 @@ class ChatMemberController extends AppController
 
 	/**
 	 * @throws ValidateException
+	 * @throws ErrorException
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{

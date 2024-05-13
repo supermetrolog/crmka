@@ -34,6 +34,7 @@ class ChatMemberMessageSearch extends Form
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
 		                          ->with(['tasks.createdByUser.userProfile'])
+		                          ->with(['alerts.createdByUser.userProfile'])
 		                          ->with(['contacts', 'tags']);
 
 		$dataProvider = new ActiveDataProvider([
