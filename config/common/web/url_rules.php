@@ -203,8 +203,8 @@ return
 			'controller'    => ['chat-member-messages' => 'ChatMember/chat-member-message'],
 			'extraPatterns' => [
 				'POST,OPTIONS'                  => 'create',
-				'PUT,OPTIONS'                   => 'update',
-				'DELETE,OPTIONS'                => 'delete',
+				'PUT,OPTIONS <id>'              => 'update',
+				'DELETE,OPTIONS <id>'           => 'delete',
 				'POST,OPTIONS create-task/<id>' => 'create-task',
 			],
 		],
@@ -212,11 +212,11 @@ return
 			'class'         => 'yii\rest\UrlRule',
 			'controller'    => ['chat-member-message-tags' => 'ChatMember/chat-member-message-tag'],
 			'extraPatterns' => [
-				'GET,OPTIONS'      => 'index',
-				'GET,OPTIONS <id>' => 'view',
-				'POST,OPTIONS'     => 'create',
-				'PUT,OPTIONS'      => 'update',
-				'DELETE,OPTIONS'   => 'delete',
+				'GET,OPTIONS'         => 'index',
+				'GET,OPTIONS <id>'    => 'view',
+				'POST,OPTIONS'        => 'create',
+				'PUT,OPTIONS <id>'    => 'update',
+				'DELETE,OPTIONS <id>' => 'delete',
 			],
 		],
 	];

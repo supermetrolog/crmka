@@ -71,9 +71,10 @@ class ObjectChatMember extends AR
 
 	/**
 	 * @return AQ|ActiveQuery
+	 * @throws ErrorException
 	 */
 	public function getObject(): AQ
 	{
-		return $this->hasOne(Objects::class, ['id' => 'object_id']);
+		return $this->hasOne(Objects::class, ['id' => 'object_id'])->from([Objects::tableName() => Objects::getTable()]);
 	}
 }
