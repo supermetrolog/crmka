@@ -11,7 +11,6 @@ use app\models\ChatMemberMessage;
 
 class PinChatMemberMessageForm extends Form
 {
-
 	public $chat_member_id;
 	public $chat_member_message_id;
 

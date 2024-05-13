@@ -63,4 +63,13 @@ class ChatMemberService
 		$member->pinned_chat_member_message_id = $message->id;
 		$member->saveOrThrow();
 	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function unpinMessage(ChatMember $member)
+	{
+		$member->pinned_chat_member_message_id = null;
+		$member->saveOrThrow();
+	}
 }

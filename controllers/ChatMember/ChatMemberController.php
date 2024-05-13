@@ -10,6 +10,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMember;
 use app\models\forms\ChatMember\PinChatMemberMessageForm;
+use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
 use app\models\search\ChatMemberSearch;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
@@ -78,6 +79,25 @@ class ChatMemberController extends AppController
 		$form->validateOrThrow();
 
 		$this->service->pinMessage($form->getChatMember(), $form->getChatMemberMessage());
+
+		return new SuccessResponse();
+	}
+
+
+	/**
+	 * @return SuccessResponse
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 */
+	public function actionUnpinMessage(): SuccessResponse
+	{
+		$form = new UnpinChatMemberMessageForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->service->unpinMessage($form->getChatMember());
 
 		return new SuccessResponse();
 	}

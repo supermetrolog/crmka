@@ -31,3 +31,13 @@ Authorization: Bearer {{token}}
   "chat_member_message_id": 5
 }
 ###
+
+POST {{url}}/chat-members/unpin-message
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "chat_member_id": 54158
+}
+###
