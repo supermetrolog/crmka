@@ -1,4 +1,4 @@
-GET {{url}}/chat-member-messages?id=9
+GET {{url}}/chat-member-messages?id=10
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}

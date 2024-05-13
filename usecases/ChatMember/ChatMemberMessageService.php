@@ -72,6 +72,8 @@ class ChatMemberMessageService
 				]));
 			}
 
+			$message->refresh();
+
 			$tx->commit();
 
 			return $message;
