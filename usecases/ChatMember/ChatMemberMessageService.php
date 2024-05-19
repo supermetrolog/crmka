@@ -15,6 +15,7 @@ use app\models\Alert;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
 use app\models\Contact;
+use app\models\Relation;
 use app\models\Task;
 use app\usecases\Alert\CreateAlertService;
 use app\usecases\Relation\RelationService;
@@ -92,14 +93,56 @@ class ChatMemberMessageService
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function update(ChatMemberMessage $message, UpdateChatMemberMessageDto $dto): ChatMemberMessage
 	{
-		$message->message = $dto->message;
+		$tx = $this->transactionBeginner->begin();
 
-		$message->saveOrThrow();
+		try {
+			$message->message = $dto->message;
 
-		return $message;
+			$message->saveOrThrow();
+
+			$query = Relation::find()
+			                 ->byFirst($message->id, $message::getMorphClass())
+			                 ->bySecondType(Contact::getMorphClass())
+			                 ->notSecondIds($dto->contactIds);
+
+			$this->relationService->deleteByQuery($query);
+
+			$query = Relation::find()
+			                 ->byFirst($message->id, $message::getMorphClass())
+			                 ->bySecondType(ChatMemberMessageTag::getMorphClass())
+			                 ->notSecondIds($dto->tagIds);
+
+			$this->relationService->deleteByQuery($query);
+
+			foreach ($dto->contactIds as $contactId) {
+				$this->relationService->createIfNotExists(new CreateRelationDto([
+					'first_type'  => $message::getMorphClass(),
+					'first_id'    => $message->id,
+					'second_type' => Contact::getMorphClass(),
+					'second_id'   => $contactId,
+				]));
+			}
+
+			foreach ($dto->tagIds as $tagId) {
+				$this->relationService->createIfNotExists(new CreateRelationDto([
+					'first_type'  => $message::getMorphClass(),
+					'first_id'    => $message->id,
+					'second_type' => ChatMemberMessageTag::getMorphClass(),
+					'second_id'   => $tagId,
+				]));
+			}
+
+			$tx->commit();
+
+			return $message;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 	/**

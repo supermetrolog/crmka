@@ -29,4 +29,33 @@ class RelationQuery extends AQ
 	{
 		return parent::one($db);
 	}
+
+	public function byFirst(int $id, string $type): self
+	{
+		return $this->andWhere([
+			$this->field('first_id')   => $id,
+			$this->field('first_type') => $type
+		]);
+	}
+
+	public function bySecond(int $id, string $type): self
+	{
+		return $this->andWhere([
+			$this->field('second_id')   => $id,
+			$this->field('second_type') => $type
+		]);
+	}
+
+
+	public function bySecondType(string $type): self
+	{
+		return $this->andWhere([
+			$this->field('second_type') => $type
+		]);
+	}
+
+	public function notSecondIds(array $ids): self
+	{
+		return $this->andWhereNotIn($this->field('second_id'), $ids);
+	}
 }

@@ -9,5 +9,7 @@ use yii\base\BaseObject;
 
 class UpdateChatMemberMessageDto extends BaseObject
 {
-	public string     $message;
+	public string $message;
+	public array  $contactIds;
+	public array  $tagIds;
 }

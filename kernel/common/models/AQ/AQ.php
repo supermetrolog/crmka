@@ -105,4 +105,12 @@ class AQ extends ActiveQuery
 
 		throw new ModelNotFoundException();
 	}
+
+	/**
+	 * @return $this
+	 */
+	public function andWhereNotIn(string $column, array $value): self
+	{
+		return $this->andWhere(['NOT IN', $column, $value]);
+	}
 }

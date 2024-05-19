@@ -9,7 +9,7 @@ use yii\base\BaseObject;
 class CreateRelationDto extends BaseObject
 {
 	public string $first_type;
-	public string $first_id;
+	public int    $first_id;
 	public string $second_type;
-	public string $second_id;
+	public int    $second_id;
 }

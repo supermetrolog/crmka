@@ -45,11 +45,13 @@ class ChatMemberMessageForm extends Form
 	public function scenarios(): array
 	{
 		$common = [
-			'message'
+			'message',
+			'contact_ids',
+			'tag_ids'
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common, 'from_chat_member_id', 'to_chat_member_id', 'contact_ids', 'tag_ids'],
+			self::SCENARIO_CREATE => [...$common, 'from_chat_member_id', 'to_chat_member_id'],
 			self::SCENARIO_UPDATE => [...$common],
 		];
 	}
@@ -70,7 +72,9 @@ class ChatMemberMessageForm extends Form
 		}
 
 		return new UpdateChatMemberMessageDto([
-			'message' => $this->message
+			'message'    => $this->message,
+			'contactIds' => $this->contact_ids,
+			'tagIds'     => $this->tag_ids,
 		]);
 	}
 }
