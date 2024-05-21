@@ -70,7 +70,7 @@ class TaskController extends AppController
 
 	public function actionStatistic(): array
 	{
-		return [];
+		return $this->repository->getStatusStatisticByUserId($this->user->id);
 	}
 
 	/**
