@@ -68,6 +68,11 @@ class TaskController extends AppController
 		return new TaskResource($this->findModelByIdAndCreatedBy($id));
 	}
 
+	public function actionStatusesByUser(int $user_id)
+	{
+		return Task::getStatusesByUser($user_id);
+	}
+
 	/**
 	 * @return TaskResource
 	 * @throws SaveModelException
