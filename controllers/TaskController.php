@@ -70,7 +70,7 @@ class TaskController extends AppController
 
 	public function actionStatistic(): array
 	{
-		return Task::getStatusesByUser($user_id);
+		return [];
 	}
 
 	/**

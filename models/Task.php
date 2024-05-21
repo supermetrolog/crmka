@@ -85,16 +85,6 @@ class Task extends AR
 		];
 	}
 
-	public static function getStatusesByUser(int $user_id)
-	{
-		return [
-			'created' => (int)Task::find()->where(['user_id' => $user_id, 'status' => Task::STATUS_CREATED])->andWhereNull('deleted_at')->count(),
-			'accepted' => (int)Task::find()->where(['user_id' => $user_id, 'status' => Task::STATUS_ACCEPTED])->andWhereNull('deleted_at')->count(),
-			'done' => (int)Task::find()->where(['user_id' => $user_id, 'status' => Task::STATUS_DONE])->andWhereNull('deleted_at')->count(),
-			'impossible' => (int)Task::find()->where(['user_id' => $user_id, 'status' => Task::STATUS_IMPOSSIBLE])->andWhereNull('deleted_at')->count(),
-		];
-	}
-
 	public function getUser(): ActiveQuery
 	{
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
