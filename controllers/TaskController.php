@@ -68,7 +68,7 @@ class TaskController extends AppController
 		return new TaskResource($this->findModelByIdAndCreatedBy($id));
 	}
 
-	public function actionStatusesByUser(int $user_id)
+	public function actionStatistic(): array
 	{
 		return Task::getStatusesByUser($user_id);
 	}
