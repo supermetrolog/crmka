@@ -25,6 +25,11 @@ class AR extends ActiveRecord
 	protected bool $useSoftUpdate = false;
 	protected bool $useSoftCreate = false;
 
+	
+	public function formName(): string
+	{
+		return '';
+	}
 
 	/**
 	 * @throws ErrorException
