@@ -43,20 +43,11 @@ class TaskRepository
 
 	public function getStatusStatisticByUserId(int $user_id): array
 	{
-		$result = Task::find()->select('COUNT(*)')->where(['user_id' => $user_id])->byStatus(Task::STATUS_CREATED)->notDeleted()
-				->union(
-					Task::find()->select('COUNT(*)')->where(['user_id' => $user_id])->byStatus(Task::STATUS_ACCEPTED)->notDeleted(), true
-				)->union(
-					Task::find()->select('COUNT(*)')->where(['user_id' => $user_id])->byStatus(Task::STATUS_DONE)->notDeleted(), true
-				)->union(
-					Task::find()->select('COUNT(*)')->where(['user_id' => $user_id])->byStatus(Task::STATUS_IMPOSSIBLE)->notDeleted(), true
-				)->column();
-
-		return [
-			'created' => $result[0],
-			'accepted' => $result[1],
-			'done' => $result[2],
-			'impossible' => $result[3],
-		];
+		return Task::find()->select([
+			'SUM(IF(status='.Task::STATUS_CREATED.', 1, 0)) AS created',
+			'SUM(IF(status='.Task::STATUS_ACCEPTED.', 1, 0)) AS accepted',
+			'SUM(IF(status='.Task::STATUS_DONE.', 1, 0)) AS done',
+			'SUM(IF(status='.Task::STATUS_IMPOSSIBLE.', 1, 0)) AS impossible',
+		])->where(['user_id' => $user_id])->notDeleted()->asArray()->all();
 	}
 }
