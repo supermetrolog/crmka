@@ -31,11 +31,6 @@ class Alert extends AR
 		return 'alert';
 	}
 
-	public function formName(): string
-	{
-		return '';
-	}
-
 	public function rules(): array
 	{
 		return [
