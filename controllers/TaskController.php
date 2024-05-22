@@ -68,6 +68,11 @@ class TaskController extends AppController
 		return new TaskResource($this->findModelByIdAndCreatedBy($id));
 	}
 
+	public function actionStatistic(): array
+	{
+		return $this->repository->getStatusStatisticByUserId($this->request->get('user_id'));
+	}
+
 	/**
 	 * @return TaskResource
 	 * @throws SaveModelException

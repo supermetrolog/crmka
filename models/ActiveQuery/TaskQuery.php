@@ -38,6 +38,11 @@ class TaskQuery extends AQ
 		return parent::oneOrThrow($db);
 	}
 
+	public function byStatus(int $status): self
+	{
+		return $this->andWhere([$this->field('status') => $status]);
+	}
+
 	public function byCreatedById(int $id): self
 	{
 		return $this->andWhere([$this->field('created_by_id') => $id]);
