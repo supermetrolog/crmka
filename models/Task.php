@@ -41,11 +41,6 @@ class Task extends AR
 		return 'task';
 	}
 
-	public function formName(): string
-	{
-		return '';
-	}
-
 	public function rules(): array
 	{
 		return [
