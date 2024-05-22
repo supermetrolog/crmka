@@ -41,13 +41,13 @@ class TaskRepository
 		           ->oneOrThrow();
 	}
 
-	public function getStatusStatisticByUserId(int $user_id): array
+	public function getStatusStatisticByUserId(?int $user_id = null): array
 	{
 		return Task::find()->select([
 			'SUM(IF(status='.Task::STATUS_CREATED.', 1, 0)) AS created',
 			'SUM(IF(status='.Task::STATUS_ACCEPTED.', 1, 0)) AS accepted',
 			'SUM(IF(status='.Task::STATUS_DONE.', 1, 0)) AS done',
 			'SUM(IF(status='.Task::STATUS_IMPOSSIBLE.', 1, 0)) AS impossible',
-		])->where(['user_id' => $user_id])->notDeleted()->asArray()->all();
+		])->filterWhere(['user_id' => $user_id])->notDeleted()->asArray()->all();
 	}
 }
