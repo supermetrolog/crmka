@@ -41,8 +41,12 @@ class TaskRepository
 		           ->oneOrThrow();
 	}
 
-	public function getStatusStatisticByUserId(?int $user_id = null): array
+	public function getStatusStatisticByUserId(array $data = []): array
 	{
+		$user_id = $data['user_id'] ?? null;
+		$start_date = $data['start_date'] ?? null;
+		$end_date = $data['end_date'] ?? null;
+
 		/** @var array */
 		$statuses = Task::find()->select([
 			'SUM(IF(status='.Task::STATUS_CREATED.', 1, 0)) AS created',
@@ -51,7 +55,11 @@ class TaskRepository
 			'SUM(IF(status='.Task::STATUS_IMPOSSIBLE.', 1, 0)) AS impossible',
 			'SUM(IF(end<=CURRENT_TIMESTAMP, 1, 0)) AS expired',
 			'SUM(1) AS all',
-		])->filterWhere(['user_id' => $user_id])->notDeleted()->asArray()->all()[0];
+		])
+		->filterWhere(['user_id' => $user_id])
+		->andFilterCompare('UNIX_TIMESTAMP(created_at)', $start_date, '>=')
+		->andFilterCompare('UNIX_TIMESTAMP(created_at)', $end_date, '<=')
+		->notDeleted()->asArray()->all()[0];
 
 		$statuses = array_map(fn($value) => (int)$value, $statuses);
 		
