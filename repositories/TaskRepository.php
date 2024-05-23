@@ -50,6 +50,7 @@ class TaskRepository
 			'SUM(IF(status='.Task::STATUS_DONE.', 1, 0)) AS done',
 			'SUM(IF(status='.Task::STATUS_IMPOSSIBLE.', 1, 0)) AS impossible',
 			'SUM(IF(end<=CURRENT_TIMESTAMP, 1, 0)) AS expired',
+			'SUM(1) AS all',
 		])->filterWhere(['user_id' => $user_id])->notDeleted()->asArray()->all()[0];
 
 		$statuses = array_map(fn($value) => (int)$value, $statuses);
