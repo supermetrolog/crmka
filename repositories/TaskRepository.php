@@ -51,6 +51,8 @@ class TaskRepository
 			'SUM(IF(status='.Task::STATUS_IMPOSSIBLE.', 1, 0)) AS impossible',
 		])->filterWhere(['user_id' => $user_id])->notDeleted()->asArray()->all()[0];
 
+		$statuses = array_map(fn($value) => (int)$value, $statuses);
+		
 		return $statuses;
 	}
 }
