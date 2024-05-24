@@ -28,8 +28,8 @@ use yii\db\ActiveQuery;
  */
 class Reminder extends AR
 {
-	public const STATUS_ACCEPTED   = 1;
-	public const STATUS_SEND_LATER = 2;
+	public const STATUS_CREATED    = 1;
+	public const STATUS_ACCEPTED   = 2;
 	public const STATUS_DONE       = 3;
 	public const STATUS_IMPOSSIBLE = 4;
 
@@ -72,8 +72,8 @@ class Reminder extends AR
 	public static function getStatuses(): array
 	{
 		return [
+			self::STATUS_CREATED,
 			self::STATUS_ACCEPTED,
-			self::STATUS_SEND_LATER,
 			self::STATUS_DONE,
 			self::STATUS_IMPOSSIBLE,
 		];
