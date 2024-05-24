@@ -18,13 +18,14 @@ class ReminderSearch extends Form
 	public $notify_at;
 	public $created_at;
 	public $updated_at;
-	public $deleted_at;
+	public $deleted;
 	
     public function rules(): array
     {
         return [
             [['id', 'user_id', 'status', 'created_by_id'], 'integer'],
-            [['message', 'created_by_type', 'notify_at', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
+            [['deleted'], 'boolean'],
+            [['message', 'created_by_type', 'notify_at', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -43,6 +44,14 @@ class ReminderSearch extends Form
 
 		$this->validateOrThrow();
 
+		if ($this->isFilterTrue($this->deleted)) {
+			$query->deleted();
+		}
+
+		if ($this->isFilterFalse($this->deleted)) {
+			$query->notDeleted();
+		}
+
         $query->andFilterWhere([
             'id' => $this->id,
             'user_id' => $this->user_id,
@@ -51,7 +60,6 @@ class ReminderSearch extends Form
             'notify_at' => $this->notify_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
         ]);
 
         $query->andFilterWhere(['like', 'message', $this->message])
