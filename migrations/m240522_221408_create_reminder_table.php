@@ -20,7 +20,7 @@ class m240522_221408_create_reminder_table extends Migration
 			'status'    => $this->tinyInteger()->notNull(),
 		], $this->morph('created_by'), ['notify_at' => $this->timestamp()->notNull()], $this->timestamps(), $this->softDelete());
 
-        $this->addMorphColumn($tableName);
+        $this->addMorphColumn('reminder');
         
 
 		$this->index(
