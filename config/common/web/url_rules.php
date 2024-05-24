@@ -241,6 +241,7 @@ return
 			'except'        => [],
 			'extraPatterns' => [
 				'GET,OPTIONS'                        => 'index',
+				'GET,OPTIONS statistic'              => 'statistic',
 				'GET,OPTIONS <id>'                   => 'view',
 				'POST,OPTIONS'                       => 'create',
 				'POST,OPTIONS for-users'             => 'create-for-users',

@@ -61,6 +61,11 @@ class ReminderController extends AppController
 		return new ReminderResource($this->findModelByIdAndCreatedBy($id));
     }
 
+	public function actionStatistic(): array
+	{
+		return $this->repository->getStatusStatisticByUserId($this->request->get('user_id'));
+	}
+
 	/**
 	 * @throws SaveModelException
 	 */
