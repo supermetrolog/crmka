@@ -7,6 +7,9 @@ use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
 use app\models\search\ReminderSearch;
 use app\models\Reminder;
+use app\repositories\ReminderRepository;
+use app\usecases\Reminder\CreateReminderService;
+use app\usecases\Reminder\ReminderService;
 use Throwable;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -15,6 +18,27 @@ use yii\web\NotFoundHttpException;
 
 class ReminderController extends AppController
 {
+	private ReminderService       $service;
+	private CreateReminderService $createAlertService;
+	private ReminderRepository    $repository;
+
+
+	public function __construct(
+		$id,
+		$module,
+		ReminderService $service,
+		CreateReminderService $createAlertService,
+		ReminderRepository $repository,
+		array $config = []
+	)
+	{
+		$this->service            = $service;
+		$this->createAlertService = $createAlertService;
+		$this->repository         = $repository;
+
+		parent::__construct($id, $module, $config);
+	}
+
 	/**
 	 * @throws ValidateException
 	 */
