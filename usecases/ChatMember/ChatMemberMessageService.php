@@ -8,6 +8,7 @@ use app\dto\Alert\CreateAlertDto;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
 use app\dto\Relation\CreateRelationDto;
+use app\dto\Reminder\CreateReminderDto;
 use app\dto\Task\CreateTaskDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -16,9 +17,11 @@ use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
 use app\models\Contact;
 use app\models\Relation;
+use app\models\Reminder;
 use app\models\Task;
 use app\usecases\Alert\CreateAlertService;
 use app\usecases\Relation\RelationService;
+use app\usecases\Reminder\CreateReminderService;
 use app\usecases\Task\CreateTaskService;
 use Throwable;
 use yii\db\Exception;
@@ -28,19 +31,22 @@ class ChatMemberMessageService
 	private TransactionBeginnerInterface $transactionBeginner;
 	protected CreateTaskService          $createTaskService;
 	protected CreateAlertService         $createAlertService;
+	protected CreateReminderService      $createReminderService;
 	protected RelationService            $relationService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		CreateTaskService $createTaskService,
 		RelationService $relationService,
-		CreateAlertService $createAlertService
+		CreateAlertService $createAlertService,
+		CreateReminderService $createReminderService
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
 		$this->createTaskService   = $createTaskService;
 		$this->relationService     = $relationService;
 		$this->createAlertService  = $createAlertService;
+		$this->createReminderService  = $createReminderService;
 	}
 
 	/**
@@ -217,6 +223,34 @@ class ChatMemberMessageService
 			$tx->commit();
 
 			return $alert;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Exception
+	 * @throws Throwable
+	 */
+	public function createReminder(ChatMemberMessage $message, CreateReminderDto $createReminderDto): Reminder
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$reminder = $this->createReminderService->create($createReminderDto);
+
+			$this->relationService->create(new CreateRelationDto([
+				'first_type'  => $message::getMorphClass(),
+				'first_id'    => $message->id,
+				'second_type' => $reminder::getMorphClass(),
+				'second_id'   => $reminder->id,
+			]));
+
+			$tx->commit();
+
+			return $reminder;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;

@@ -8,10 +8,12 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\models\ChatMemberMessage;
 use app\models\forms\Alert\AlertForm;
 use app\models\forms\ChatMember\ChatMemberMessageForm;
+use app\models\forms\Reminder\ReminderForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\ChatMemberMessageSearch;
 use app\resources\AlertResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
+use app\resources\ReminderResource;
 use app\resources\TaskResource;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
@@ -183,6 +185,31 @@ class ChatMemberMessageController extends AppController
 		$alert = $this->service->createAlert($message, $alertForm->getDto());
 
 		return AlertResource::make($alert);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 * @throws Throwable
+	 */
+	public function actionCreateReminder(int $id): ReminderResource
+	{
+		$message = $this->findModel($id, false);
+
+		$reminderForm = new ReminderForm();
+
+		$reminderForm->setScenario(TaskForm::SCENARIO_CREATE);
+
+		$reminderForm->load($this->request->post());
+
+		$reminderForm->created_by_id   = $this->user->id;
+		$reminderForm->created_by_type = $this->user->identity::getMorphClass();
+
+		$reminderForm->validateOrThrow();
+
+		$reminder = $this->service->createReminder($message, $reminderForm->getDto());
+
+		return ReminderResource::make($reminder);
 	}
 
 
