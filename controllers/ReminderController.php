@@ -5,13 +5,16 @@ namespace app\controllers;
 use app\exceptions\domain\model\SaveModelException;
 use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Reminder\ReminderChangeStatusForm;
+use app\models\forms\Reminder\ReminderForm;
 use app\models\search\ReminderSearch;
 use app\models\Reminder;
 use app\repositories\ReminderRepository;
+use app\resources\ReminderResource;
 use app\usecases\Reminder\CreateReminderService;
 use app\usecases\Reminder\ReminderService;
 use Throwable;
-use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
@@ -19,7 +22,7 @@ use yii\web\NotFoundHttpException;
 class ReminderController extends AppController
 {
 	private ReminderService       $service;
-	private CreateReminderService $createAlertService;
+	private CreateReminderService $createReminderService;
 	private ReminderRepository    $repository;
 
 
@@ -27,13 +30,13 @@ class ReminderController extends AppController
 		$id,
 		$module,
 		ReminderService $service,
-		CreateReminderService $createAlertService,
+		CreateReminderService $createReminderService,
 		ReminderRepository $repository,
 		array $config = []
 	)
 	{
 		$this->service            = $service;
-		$this->createAlertService = $createAlertService;
+		$this->createReminderService = $createReminderService;
 		$this->repository         = $repository;
 
 		parent::__construct($id, $module, $config);
@@ -44,63 +47,143 @@ class ReminderController extends AppController
 	 */
     public function actionIndex(): ActiveDataProvider
     {
-        $searchModel = new ReminderSearch();
-        return $searchModel->search(Yii::$app->request->queryParams);
+		$searchModel  = new ReminderSearch();
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return ReminderResource::fromDataProvider($dataProvider);
     }
 
 	/**
 	 * @throws NotFoundHttpException
 	 */
-    public function actionView(int $id): Reminder
+    public function actionView(int $id): ReminderResource
     {
-		return $this->findModel($id);
+		return new ReminderResource($this->findModelByIdAndCreatedBy($id));
     }
 
 	/**
 	 * @throws SaveModelException
 	 */
-    public function actionCreate(): Reminder    {
-        $model = new Reminder();
+    public function actionCreate(): ReminderResource
+	{
+		$form = new ReminderForm();
 
-		$model->load(Yii::$app->request->post());
-		$model->saveOrThrow();
+		$form->setScenario(ReminderForm::SCENARIO_CREATE);
 
-		return $model;
+		$form->load($this->request->post());
+
+		$form->created_by_id   = $this->user->id;
+		$form->created_by_type = $this->user->identity::getMorphClass();
+
+		$form->validateOrThrow();
+
+		$model = $this->createReminderService->create($form->getDto());
+
+		return new ReminderResource($model);
     }
 
 	/**
+	 * @return array
+	 * @throws ErrorException
 	 * @throws SaveModelException
-	 * @throws NotFoundHttpException
+	 * @throws Throwable
+	 * @throws ValidateException
 	 */
-    public function actionUpdate(int $id): Reminder    {
-		$model = $this->findModel($id);
+	public function actionCreateForUsers(): array
+	{
+		$form = new ReminderForm();
 
-		$model->load(Yii::$app->request->post());
-		$model->saveOrThrow();
+		$form->setScenario(ReminderForm::SCENARIO_CREATE_FOR_USERS);
 
-		return $model;
-    }
+		$form->load($this->request->post());
+
+		$form->created_by_id   = $this->user->id;
+		$form->created_by_type = $this->user->identity::getMorphClass();
+
+		$form->validateOrThrow();
+
+		$models = $this->createReminderService->createForUsers($form->getDto());
+
+		return ReminderResource::collection($models);
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return ReminderResource
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 */
+	public function actionUpdate(int $id): ReminderResource
+	{
+		$model = $this->findModelByIdAndCreatedByOrUserId($id);
+
+		$form = new ReminderForm();
+
+		$form->setScenario(ReminderForm::SCENARIO_UPDATE);
+
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$model = $this->service->update($model, $form->getDto());
+
+		return new ReminderResource($model);
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return SuccessResponse
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 */
+	public function actionChangeStatus(int $id): SuccessResponse
+	{
+		$Reminder = $this->findModelByIdAndCreatedByOrUserId($id);
+
+		$form = new ReminderChangeStatusForm();
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->service->changeStatus($Reminder, $form->status);
+
+		return new SuccessResponse();
+	}
 
 	/**
 	 * @throws Throwable
 	 * @throws StaleObjectException
 	 * @throws NotFoundHttpException
 	 */
-    public function actionDelete(int $id): void
-    {
-		$this->findModel($id)->delete();
-    }
+	public function actionDelete(int $id): SuccessResponse
+	{
+		$this->service->delete($this->findModelByIdAndCreatedBy($id));
+
+		return new SuccessResponse();
+	}
+
 
 
 	/**
-	 * @throws NotFoundHttpException
+	 * @param int $id
+	 *
+	 * @throws ModelNotFoundException
 	 */
-    protected function findModel(int $id): ?Reminder
-    {
-		if (($model = Reminder::findOne($id)) !== null) {
-			return $model;
-		}
+	protected function findModelByIdAndCreatedBy(int $id): Reminder
+	{
+		return $this->repository->findModelByIdAndCreatedBy($id, $this->user->id, $this->user->identity::getMorphClass());
+	}
 
-		throw new NotFoundHttpException('The requested page does not exist.');
-    }
+	/**
+	 * @param int $id
+	 *
+	 * @throws ModelNotFoundException
+	 */
+	protected function findModelByIdAndCreatedByOrUserId(int $id): Reminder
+	{
+		return $this->repository->findModelByIdAndCreatedByOrUserId($id, $this->user->id, $this->user->identity::getMorphClass());
+	}
 }

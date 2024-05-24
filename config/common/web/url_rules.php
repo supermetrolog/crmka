@@ -239,11 +239,13 @@ return
 			'controller'    => 'reminder',
 			'except'        => [],
 			'extraPatterns' => [
-				'GET,OPTIONS'            => 'index',
-				'GET,OPTIONS <id>'       => 'view',
-				'POST,OPTIONS'           => 'create',
-				'PUT,OPTIONS <id>'       => 'update',
-				'DELETE,OPTIONS <id>'    => 'delete',
+				'GET,OPTIONS'                        => 'index',
+				'GET,OPTIONS <id>'                   => 'view',
+				'POST,OPTIONS'                       => 'create',
+				'POST,OPTIONS for-users'             => 'create-for-users',
+				'PUT,OPTIONS <id>'                   => 'update',
+				'DELETE,OPTIONS <id>'                => 'delete',
+				'POST,OPTIONS change-status/<id>'    => 'change-status',
 			],
 		],
 	];
