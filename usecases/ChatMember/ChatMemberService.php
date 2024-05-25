@@ -42,7 +42,6 @@ class ChatMemberService
 		$now = DateTimeHelper::nowf();
 
 		ChatMember::upsert(
-			ChatMember::tableName(),
 			[
 				'model_id'   => $dto->model_id,
 				'model_type' => $dto->model_type,

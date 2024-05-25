@@ -110,7 +110,6 @@ class  SyncObjectChatMemberAction extends Action
 	private function storeObjectChatMember(Objects $object, string $type): void
 	{
 		ObjectChatMember::upsert(
-			ObjectChatMember::tableName(),
 			[
 				'object_id'  => $object->id,
 				'type'       => $type,

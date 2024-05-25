@@ -24,6 +24,8 @@ echo "<?php\n";
 
 namespace <?= $generator->queryNs ?>;
 
+use app\kernel\common\models\exceptions\ModelNotFoundException;
+
 /**
  * This is the ActiveQuery class for [[<?= $modelFullClassName ?>]].
  *
@@ -47,4 +49,13 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->queryBaseClass, '\\
     {
         return parent::one($db);
     }
+
+	/**
+	 * @return <?= $modelFullClassName ?>|\yii\db\ActiveRecord
+	 * @throws ModelNotFoundException
+	 */
+	public function oneOrThrow($db = null): <?= $modelFullClassName . "\n" ?>
+	{
+		return parent::oneOrThrow($db);
+	}
 }

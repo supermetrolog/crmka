@@ -4,18 +4,32 @@ declare(strict_types=1);
 
 namespace app\commands;
 
-use app\models\ChatMember;
+use app\components\Notification\Factories\NotificationBuilderFactory;
+use app\components\Notification\TestNotification;
+use app\models\Notification\NotificationChannel;
 use yii\console\Controller;
 
 class TestController extends Controller
 {
+	private NotificationBuilderFactory $notificationBuilderFactory;
+
+	public function __construct($id, $module, NotificationBuilderFactory $notificationBuilderFactory, array $config = [])
+	{
+		$this->notificationBuilderFactory = $notificationBuilderFactory;
+
+		parent::__construct($id, $module, $config);
+	}
 
 	public function actionIndex(): void
 	{
-		$members = ChatMember::find()->orderBy(['id' => SORT_DESC])->all();
-
-		foreach ($members as $member) {
-			dump($member->id, $member->model_type, $member->model->id, get_class($member->model));
-		}
+		$model = $this->notificationBuilderFactory
+			->create()
+			->addChannel(NotificationChannel::WEB)
+			->addChannel(NotificationChannel::EMAIL)
+			->withNotifiable(new TestNotification())
+			->withNotification(new TestNotification())
+			->sendNow()
+			->build()
+			->send();
 	}
 }

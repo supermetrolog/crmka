@@ -265,16 +265,15 @@ class AR extends ActiveRecord
 	}
 
 	/**
-	 * @param string     $tableName
 	 * @param array      $insertColumns
 	 * @param array|bool $updateColumns
 	 *
 	 * @return void
 	 * @throws \yii\db\Exception
 	 */
-	public static function upsert(string $tableName, array $insertColumns, $updateColumns = true): void
+	public static function upsert(array $insertColumns, $updateColumns = true): void
 	{
-		self::getDb()->createCommand()->upsert($tableName, $insertColumns, $updateColumns)->execute();
+		self::getDb()->createCommand()->upsert(static::tableName(), $insertColumns, $updateColumns)->execute();
 	}
 
 	/**
