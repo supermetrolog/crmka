@@ -208,6 +208,7 @@ return
 				'DELETE,OPTIONS <id>'            => 'delete',
 				'POST,OPTIONS create-task/<id>'  => 'create-task',
 				'POST,OPTIONS create-alert/<id>' => 'create-alert',
+				'POST,OPTIONS create-reminder/<id>' => 'create-reminder',
 			],
 		],
 		[
@@ -232,6 +233,21 @@ return
 				'POST,OPTIONS for-users' => 'create-for-users',
 				'PUT,OPTIONS <id>'       => 'update',
 				'DELETE,OPTIONS <id>'    => 'delete',
+			],
+		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'reminder',
+			'except'        => [],
+			'extraPatterns' => [
+				'GET,OPTIONS'                        => 'index',
+				'GET,OPTIONS statistic'              => 'statistic',
+				'GET,OPTIONS <id>'                   => 'view',
+				'POST,OPTIONS'                       => 'create',
+				'POST,OPTIONS for-users'             => 'create-for-users',
+				'PUT,OPTIONS <id>'                   => 'update',
+				'DELETE,OPTIONS <id>'                => 'delete',
+				'POST,OPTIONS change-status/<id>'    => 'change-status',
 			],
 		],
 	];
