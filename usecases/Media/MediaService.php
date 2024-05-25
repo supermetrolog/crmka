@@ -13,23 +13,23 @@ use yii\db\StaleObjectException;
 class MediaService
 {
 
-	/**
-	 * @throws SaveModelException
-	 */
-	public function update(Media $media, UpdateMediaDto $dto): Media
-	{
-		$media->load([
-			'name'          => $dto->name,
-			'original_name' => $dto->original_name,
-			'extension'     => $dto->extension,
-			'path'          => $dto->path,
-			'category'      => $dto->category,
-		]);
-
-		$media->saveOrThrow();
-
-		return $media;
-	}
+//	/**
+//	 * @throws SaveModelException
+//	 */
+//	public function update(Media $media, UpdateMediaDto $dto): Media
+//	{
+//		$media->load([
+//			'name'          => $dto->name,
+//			'original_name' => $dto->original_name,
+//			'extension'     => $dto->extension,
+//			'path'          => $dto->path,
+//			'category'      => $dto->category,
+//		]);
+//
+//		$media->saveOrThrow();
+//
+//		return $media;
+//	}
 
 	/**
 	 * @throws StaleObjectException
@@ -37,6 +37,8 @@ class MediaService
 	 */
 	public function delete(Media $media): void
 	{
+		\Yii::$app->media->delete(basename($media->path));
+
 		$media->delete();
 	}
 }

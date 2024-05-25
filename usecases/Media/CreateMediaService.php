@@ -7,6 +7,7 @@ namespace app\usecases\Media;
 use app\dto\Media\CreateMediaDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Media;
+use yii\web\UploadedFile;
 
 class CreateMediaService
 {
@@ -15,11 +16,13 @@ class CreateMediaService
 	 */
 	public function create(CreateMediaDto $dto): Media
 	{
+		$name = md5($dto->uploadedFile->name . time()) . $dto->uploadedFile->extension;
+
 		$media = new Media([
-			'name'          => $dto->name,
-			'original_name' => $dto->original_name,
-			'extension'     => $dto->extension,
-			'path'          => $dto->path,
+			'name'          => $name,
+			'original_name' => $dto->uploadedFile->name,
+			'extension'     => $dto->uploadedFile->extension,
+			'path'          => \Yii::$app->media->put($name, $dto->uploadedFile),
 			'category'      => $dto->category,
 			'model_type'    => $dto->model_type,
 			'model_id'      => $dto->model_id,
