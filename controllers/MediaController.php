@@ -2,9 +2,9 @@
 
 namespace app\controllers;
 
-use app\exceptions\domain\model\SaveModelException;
-use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\kernel\common\models\exceptions\ValidateException;
 use app\models\search\MediaSearch;
 use app\models\Media;
 use Throwable;
