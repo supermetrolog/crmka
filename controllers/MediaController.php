@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\kernel\common\controller\AppController;
-use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\models\search\MediaSearch;
 use app\models\Media;
@@ -30,31 +29,6 @@ class MediaController extends AppController
     public function actionView(int $id): Media
     {
 		return $this->findModel($id);
-    }
-
-	/**
-	 * @throws SaveModelException
-	 */
-    public function actionCreate(): Media    {
-        $model = new Media();
-
-		$model->load(Yii::$app->request->post());
-		$model->saveOrThrow();
-
-		return $model;
-    }
-
-	/**
-	 * @throws SaveModelException
-	 * @throws NotFoundHttpException
-	 */
-    public function actionUpdate(int $id): Media    {
-		$model = $this->findModel($id);
-
-		$model->load(Yii::$app->request->post());
-		$model->saveOrThrow();
-
-		return $model;
     }
 
 	/**
