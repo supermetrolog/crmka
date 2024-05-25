@@ -58,6 +58,14 @@ class ReminderService
 	/**
 	 * @throws SaveModelException
 	 */
+	public function later(Reminder $Reminder): void
+	{
+		$this->setStatus($Reminder, Reminder::STATUS_LATER);
+	}
+	
+	/**
+	 * @throws SaveModelException
+	 */
 	public function changeStatus(Reminder $Reminder, int $status): void
 	{
 		switch ($status) {
@@ -68,6 +76,9 @@ class ReminderService
 				$this->accept($Reminder);
 				break;
 			case Reminder::STATUS_IMPOSSIBLE:
+				$this->impossible($Reminder);
+				break;
+			case Reminder::STATUS_LATER:
 				$this->impossible($Reminder);
 				break;
 			default:

@@ -32,6 +32,7 @@ class Reminder extends AR
 	public const STATUS_ACCEPTED   = 2;
 	public const STATUS_DONE       = 3;
 	public const STATUS_IMPOSSIBLE = 4;
+	public const STATUS_LATER      = 5;
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -76,6 +77,7 @@ class Reminder extends AR
 			self::STATUS_ACCEPTED,
 			self::STATUS_DONE,
 			self::STATUS_IMPOSSIBLE,
+			self::STATUS_LATER,
 		];
 	}
 
