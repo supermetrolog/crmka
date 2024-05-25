@@ -146,14 +146,14 @@ class ReminderController extends AppController
 	 */
 	public function actionChangeStatus(int $id): SuccessResponse
 	{
-		$Reminder = $this->findModelByIdAndCreatedByOrUserId($id);
+		$reminder = $this->findModelByIdAndCreatedByOrUserId($id);
 
 		$form = new ReminderChangeStatusForm();
 		$form->load($this->request->post());
 
 		$form->validateOrThrow();
 
-		$this->service->changeStatus($Reminder, $form->status);
+		$this->service->changeStatus($reminder, $form->status);
 
 		return new SuccessResponse();
 	}

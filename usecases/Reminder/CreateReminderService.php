@@ -27,7 +27,7 @@ class CreateReminderService
 	 */
 	public function create(CreateReminderDto $dto): Reminder
 	{
-		$Reminder = new Reminder([
+		$reminder = new Reminder([
 			'user_id'         => $dto->user->id,
 			'message'         => $dto->message,
 			'status'          => $dto->status,
@@ -36,9 +36,9 @@ class CreateReminderService
 			'notify_at'       => $dto->notify_at ? $dto->notify_at->format('Y-m-d H:i:s') : null,
 		]);
 
-		$Reminder->saveOrThrow();
+		$reminder->saveOrThrow();
 
-		return $Reminder;
+		return $reminder;
 	}
 
 	/**
@@ -50,10 +50,10 @@ class CreateReminderService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$Reminders = [];
+			$reminders = [];
 
 			foreach ($dto->users as $user) {
-				$Reminders[] = $this->create(new CreateReminderDto([
+				$reminders[] = $this->create(new CreateReminderDto([
 					'user'            => $user,
 					'message'         => $dto->message,
 					'status'          => $dto->status,
@@ -65,7 +65,7 @@ class CreateReminderService
 
 			$tx->commit();
 
-			return $Reminders;
+			return $reminders;
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;

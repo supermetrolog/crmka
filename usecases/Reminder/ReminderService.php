@@ -17,69 +17,69 @@ class ReminderService
 	/**
 	 * @throws SaveModelException
 	 */
-	public function update(Reminder $Reminder, UpdateReminderDto $dto): Reminder
+	public function update(Reminder $reminder, UpdateReminderDto $dto): Reminder
 	{
-		$Reminder->load([
+		$reminder->load([
 			'user_id'   => $dto->user->id,
 			'message'   => $dto->message,
 			'status'    => $dto->status,
 			'notify_at' => $dto->notify_at ? $dto->notify_at->format('Y-m-d H:i:s') : null,
 		]);
 
-		$Reminder->saveOrThrow();
+		$reminder->saveOrThrow();
 
-		return $Reminder;
+		return $reminder;
 	}
 
 	/**
 	 * @throws SaveModelException
 	 */
-	public function accept(Reminder $Reminder): void
+	public function accept(Reminder $reminder): void
 	{
-		$this->setStatus($Reminder, Reminder::STATUS_ACCEPTED);
+		$this->setStatus($reminder, Reminder::STATUS_ACCEPTED);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 */
-	public function done(Reminder $Reminder): void
+	public function done(Reminder $reminder): void
 	{
-		$this->setStatus($Reminder, Reminder::STATUS_DONE);
+		$this->setStatus($reminder, Reminder::STATUS_DONE);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 */
-	public function impossible(Reminder $Reminder): void
+	public function impossible(Reminder $reminder): void
 	{
-		$this->setStatus($Reminder, Reminder::STATUS_IMPOSSIBLE);
+		$this->setStatus($reminder, Reminder::STATUS_IMPOSSIBLE);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 */
-	public function later(Reminder $Reminder): void
+	public function later(Reminder $reminder): void
 	{
-		$this->setStatus($Reminder, Reminder::STATUS_LATER);
+		$this->setStatus($reminder, Reminder::STATUS_LATER);
 	}
 	
 	/**
 	 * @throws SaveModelException
 	 */
-	public function changeStatus(Reminder $Reminder, int $status): void
+	public function changeStatus(Reminder $reminder, int $status): void
 	{
 		switch ($status) {
 			case Reminder::STATUS_DONE:
-				$this->done($Reminder);
+				$this->done($reminder);
 				break;
 			case Reminder::STATUS_ACCEPTED:
-				$this->accept($Reminder);
+				$this->accept($reminder);
 				break;
 			case Reminder::STATUS_IMPOSSIBLE:
-				$this->impossible($Reminder);
+				$this->impossible($reminder);
 				break;
 			case Reminder::STATUS_LATER:
-				$this->impossible($Reminder);
+				$this->impossible($reminder);
 				break;
 			default:
 				throw new UnexpectedValueException('Unexpected status');
@@ -89,18 +89,18 @@ class ReminderService
 	/**
 	 * @throws SaveModelException
 	 */
-	private function setStatus(Reminder $Reminder, int $status): void
+	private function setStatus(Reminder $reminder, int $status): void
 	{
-		$Reminder->status = $status;
-		$Reminder->saveOrThrow();
+		$reminder->status = $status;
+		$reminder->saveOrThrow();
 	}
 
 	/**
 	 * @throws StaleObjectException
 	 * @throws Throwable
 	 */
-	public function delete(Reminder $Reminder): void
+	public function delete(Reminder $reminder): void
 	{
-		$Reminder->delete();
+		$reminder->delete();
 	}
 }
