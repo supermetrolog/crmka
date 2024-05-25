@@ -173,7 +173,7 @@ class ChatMemberMessageController extends AppController
 
 		$alertForm = new AlertForm();
 
-		$alertForm->setScenario(TaskForm::SCENARIO_CREATE);
+		$alertForm->setScenario(AlertForm::SCENARIO_CREATE);
 
 		$alertForm->load($this->request->post());
 
@@ -198,7 +198,7 @@ class ChatMemberMessageController extends AppController
 
 		$reminderForm = new ReminderForm();
 
-		$reminderForm->setScenario(TaskForm::SCENARIO_CREATE);
+		$reminderForm->setScenario(ReminderForm::SCENARIO_CREATE);
 
 		$reminderForm->load($this->request->post());
 
