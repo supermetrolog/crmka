@@ -15,10 +15,10 @@ class m240525_090140_create_media_table extends Migration
 		$tableName = '{{%media}}';
 		$this->table($tableName, [
 			'id'            => $this->primaryKey(),
-			'name'          => $this->string()->notNull(),
+			'name'          => $this->string()->notNull()->unique(),
 			'original_name' => $this->string()->notNull(),
 			'extension'     => $this->string()->notNull(),
-			'path'          => $this->string()->notNull(),
+			'path'          => $this->string()->notNull()->unique(),
 			'category'      => $this->string()->notNull(),
 		], $this->morph('model'), ['created_at' => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP)], $this->softDelete());
 
