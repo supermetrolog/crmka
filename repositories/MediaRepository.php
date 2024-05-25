@@ -20,24 +20,4 @@ class MediaRepository
 		               ->byMorph($createdById, $createdByType)
 		               ->oneOrThrow();
 	}
-
-	/**
-	 * @throws ModelNotFoundException
-	 */
-	public function findModelByIdAndCreatedByOrUserId(int $id, int $userId, string $createdByType): Media
-	{
-		return Media::find()
-		               ->byId($id)
-		               ->notDeleted()
-		               ->andWhere([
-			               'OR',
-			               ['user_id' => $userId],
-			               [
-				               'AND',
-				               ['=', 'created_by_id', $userId],
-				               ['=', 'created_by_type', $createdByType],
-			               ]
-		               ])
-		               ->oneOrThrow();
-	}
 }

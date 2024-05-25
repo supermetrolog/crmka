@@ -3,54 +3,86 @@
 namespace app\controllers;
 
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\SuccessResponse;
 use app\models\search\MediaSearch;
 use app\models\Media;
+use app\repositories\MediaRepository;
+use app\resources\MediaResource;
+use app\usecases\Media\CreateMediaService;
+use app\usecases\Media\MediaService;
 use Throwable;
-use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
 class MediaController extends AppController
 {
+	private MediaService       $service;
+	private CreateMediaService $createMediaService;
+	private MediaRepository    $repository;
+
+
+	public function __construct(
+		$id,
+		$module,
+		MediaService $service,
+		CreateMediaService $createMediaService,
+		MediaRepository $repository,
+		array $config = []
+	)
+	{
+		$this->service            = $service;
+		$this->createMediaService = $createMediaService;
+		$this->repository         = $repository;
+
+		parent::__construct($id, $module, $config);
+	}
+
 	/**
 	 * @throws ValidateException
 	 */
-    public function actionIndex(): ActiveDataProvider
-    {
-        $searchModel = new MediaSearch();
-        return $searchModel->search(Yii::$app->request->queryParams);
-    }
+	public function actionIndex(): ActiveDataProvider
+	{
+		$searchModel  = new MediaSearch();
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return MediaResource::fromDataProvider($dataProvider);
+	}
 
 	/**
-	 * @throws NotFoundHttpException
+	 * @param int $id
+	 *
+	 * @return MediaResource
+	 * @throws ModelNotFoundException
 	 */
-    public function actionView(int $id): Media
-    {
-		return $this->findModel($id);
-    }
+	public function actionView(int $id): MediaResource
+	{
+		return new MediaResource($this->findModelByIdAndCreatedBy($id));
+	}
 
 	/**
 	 * @throws Throwable
 	 * @throws StaleObjectException
 	 * @throws NotFoundHttpException
 	 */
-    public function actionDelete(int $id): void
-    {
-		$this->findModel($id)->delete();
-    }
+	public function actionDelete(int $id): SuccessResponse
+	{
+		$this->service->delete($this->findModelByIdAndCreatedBy($id));
+
+		return new SuccessResponse();
+	}
 
 
 	/**
-	 * @throws NotFoundHttpException
+	 * @param int $id
+	 *
+	 * @return Media
+	 * @throws ModelNotFoundException
 	 */
-    protected function findModel(int $id): ?Media
-    {
-		if (($model = Media::findOne($id)) !== null) {
-			return $model;
-		}
-
-		throw new NotFoundHttpException('The requested page does not exist.');
-    }
+	protected function findModelByIdAndCreatedBy(int $id): Media
+	{
+		return $this->repository->findModelByIdAndCreatedBy($id, $this->user->id, $this->user->identity::getMorphClass());
+	}
 }

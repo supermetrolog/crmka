@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\usecases\Reminder;
+namespace app\usecases\Media;
 
 use app\dto\Media\UpdateMediaDto;
 use app\kernel\common\models\exceptions\SaveModelException;
