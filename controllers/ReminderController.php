@@ -2,19 +2,21 @@
 
 namespace app\controllers;
 
-use app\exceptions\domain\model\SaveModelException;
-use app\exceptions\domain\model\ValidateException;
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Reminder\ReminderChangeStatusForm;
 use app\models\forms\Reminder\ReminderForm;
-use app\models\search\ReminderSearch;
 use app\models\Reminder;
+use app\models\search\ReminderSearch;
 use app\repositories\ReminderRepository;
 use app\resources\ReminderResource;
 use app\usecases\Reminder\CreateReminderService;
 use app\usecases\Reminder\ReminderService;
 use Throwable;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
@@ -35,31 +37,34 @@ class ReminderController extends AppController
 		array $config = []
 	)
 	{
-		$this->service            = $service;
+		$this->service               = $service;
 		$this->createReminderService = $createReminderService;
-		$this->repository         = $repository;
+		$this->repository            = $repository;
 
 		parent::__construct($id, $module, $config);
 	}
 
 	/**
-	 * @throws ValidateException
+	 * @return ActiveDataProvider
 	 */
-    public function actionIndex(): ActiveDataProvider
-    {
+	public function actionIndex(): ActiveDataProvider
+	{
 		$searchModel  = new ReminderSearch();
 		$dataProvider = $searchModel->search($this->request->get());
 
 		return ReminderResource::fromDataProvider($dataProvider);
-    }
+	}
 
 	/**
-	 * @throws NotFoundHttpException
+	 * @param int $id
+	 *
+	 * @return ReminderResource
+	 * @throws ModelNotFoundException
 	 */
-    public function actionView(int $id): ReminderResource
-    {
+	public function actionView(int $id): ReminderResource
+	{
 		return new ReminderResource($this->findModelByIdAndCreatedBy($id));
-    }
+	}
 
 	public function actionStatistic(): array
 	{
@@ -67,9 +72,11 @@ class ReminderController extends AppController
 	}
 
 	/**
+	 * @return ReminderResource
+	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
-    public function actionCreate(): ReminderResource
+	public function actionCreate(): ReminderResource
 	{
 		$form = new ReminderForm();
 
@@ -85,7 +92,7 @@ class ReminderController extends AppController
 		$model = $this->createReminderService->create($form->getDto());
 
 		return new ReminderResource($model);
-    }
+	}
 
 	/**
 	 * @return array
@@ -171,10 +178,10 @@ class ReminderController extends AppController
 	}
 
 
-
 	/**
 	 * @param int $id
 	 *
+	 * @return Reminder
 	 * @throws ModelNotFoundException
 	 */
 	protected function findModelByIdAndCreatedBy(int $id): Reminder
@@ -185,6 +192,7 @@ class ReminderController extends AppController
 	/**
 	 * @param int $id
 	 *
+	 * @return Reminder
 	 * @throws ModelNotFoundException
 	 */
 	protected function findModelByIdAndCreatedByOrUserId(int $id): Reminder

@@ -79,7 +79,7 @@ class ReminderService
 				$this->impossible($reminder);
 				break;
 			case Reminder::STATUS_LATER:
-				$this->impossible($reminder);
+				$this->later($reminder);
 				break;
 			default:
 				throw new UnexpectedValueException('Unexpected status');
