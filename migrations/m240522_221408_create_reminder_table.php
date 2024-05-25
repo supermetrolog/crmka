@@ -18,10 +18,8 @@ class m240522_221408_create_reminder_table extends Migration
 			'user_id'   => $this->integer()->notNull(),
 			'message'   => $this->text()->notNull(),
 			'status'    => $this->tinyInteger()->notNull(),
-		], $this->morph('created_by'), ['notify_at' => $this->timestamp()->notNull()], $this->timestamps(), $this->softDelete());
+		], $this->morph('created_by'), ['notify_at' => $this->timestamp()->notNull()], $this->timestamps(), $this->softDelete(), $this->morphCol('reminder'));
 
-        $this->addMorphColumn('reminder');
-        
 
 		$this->index(
 			$tableName,
@@ -31,6 +29,11 @@ class m240522_221408_create_reminder_table extends Migration
 		$this->index(
 			$tableName,
 			['created_by_type', 'created_by_id']
+		);
+
+		$this->index(
+			$tableName,
+			['morph']
 		);
 
 		$this->foreignKey(
