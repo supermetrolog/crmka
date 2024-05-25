@@ -58,6 +58,7 @@ return [
 	'db_old'      => fn() => Yii::$container->get('old_db'),
 	'media' => [
 		'class'  => \app\components\MediaService::class,
-		'path' => dirname(__DIR__, 3) . '/public_html/storage',
+		'diskPath' => dirname(__DIR__, 3) . '/public_html/storage',
+		'webPath' => '/storage',
 	]
 ];

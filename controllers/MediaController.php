@@ -33,7 +33,6 @@ class MediaController extends AppController
 		array $config = []
 	)
 	{
-		//dd(\Yii::$app->media->path('cc03e747a6afbbcbf8be7668acfebee5.png'));
 		$this->service            = $service;
 		$this->createMediaService = $createMediaService;
 		$this->repository         = $repository;

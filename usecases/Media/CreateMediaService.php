@@ -24,7 +24,7 @@ class CreateMediaService
 			'name'          => $name,
 			'original_name' => $dto->uploadedFile->name,
 			'extension'     => $dto->uploadedFile->extension,
-			'path'          => \Yii::$app->media->path($name),
+			'path'          => \Yii::$app->media->webPath($name),
 			'category'      => $dto->category,
 			'model_type'    => $dto->model_type,
 			'model_id'      => $dto->model_id,
