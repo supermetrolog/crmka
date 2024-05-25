@@ -33,6 +33,7 @@ class MediaController extends AppController
 		array $config = []
 	)
 	{
+		//dd(\Yii::$app->media->path('cc03e747a6afbbcbf8be7668acfebee5.png'));
 		$this->service            = $service;
 		$this->createMediaService = $createMediaService;
 		$this->repository         = $repository;
@@ -59,7 +60,7 @@ class MediaController extends AppController
 	 */
 	public function actionView(int $id): MediaResource
 	{
-		return new MediaResource($this->findModelByIdAndCreatedBy($id));
+		return new MediaResource($this->findModelByIdAndModel($id));
 	}
 
 	/**
@@ -69,7 +70,7 @@ class MediaController extends AppController
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$this->service->delete($this->findModelByIdAndCreatedBy($id));
+		$this->service->delete($this->findModelByIdAndModel($id));
 
 		return new SuccessResponse();
 	}
@@ -81,8 +82,8 @@ class MediaController extends AppController
 	 * @return Media
 	 * @throws ModelNotFoundException
 	 */
-	protected function findModelByIdAndCreatedBy(int $id): Media
+	protected function findModelByIdAndModel(int $id): Media
 	{
-		return $this->repository->findModelByIdAndCreatedBy($id, $this->user->id, $this->user->identity::getMorphClass());
+		return $this->repository->findModelByIdAndModel($id, $this->user->id, $this->user->identity::getMorphClass());
 	}
 }

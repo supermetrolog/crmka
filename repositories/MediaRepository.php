@@ -12,12 +12,12 @@ class MediaRepository
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	public function findModelByIdAndCreatedBy(int $id, int $createdById, string $createdByType): Media
+	public function findModelByIdAndModel(int $id, int $modelId, string $modelType): Media
 	{
 		return Media::find()
 		               ->byId($id)
 		               ->notDeleted()
-		               ->byMorph($createdById, $createdByType)
+		               ->byMorph($modelId, $modelType)
 		               ->oneOrThrow();
 	}
 }

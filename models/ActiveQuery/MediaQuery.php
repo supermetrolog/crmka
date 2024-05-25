@@ -2,6 +2,7 @@
 
 namespace app\models\ActiveQuery;
 
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Media;
@@ -12,7 +13,7 @@ use yii\db\ActiveRecord;
  *
  * @see Media
  */
-class MediaQuery extends ActiveQuery
+class MediaQuery extends AQ
 {
 	use SoftDeleteTrait;
 
@@ -41,18 +42,18 @@ class MediaQuery extends ActiveQuery
 		return parent::oneOrThrow($db);
 	}
 
-	public function byCreatedById(int $id): self
+	public function byModelId(int $id): self
 	{
-		return $this->andWhere([$this->field('created_by_id') => $id]);
+		return $this->andWhere([$this->field('model_id') => $id]);
 	}
 
-	public function byCreatedByType(string $type): self
+	public function byModelType(string $type): self
 	{
-		return $this->andWhere([$this->field('created_by_type') => $type]);
+		return $this->andWhere([$this->field('model_type') => $type]);
 	}
 
 	public function byMorph(int $id, string $type): self
 	{
-		return $this->byCreatedByType($type)->byCreatedById($id);
+		return $this->byModelId($id)->byModelType($type);
 	}
 }
