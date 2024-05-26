@@ -9,6 +9,7 @@ use yii\web\UploadedFile;
 
 class CreateMediaDto extends BaseObject
 {
+	public string       $path;
 	public string       $category;
 	public string       $model_type;
 	public int          $model_id;
