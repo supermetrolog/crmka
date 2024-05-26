@@ -24,6 +24,11 @@ class MediaResource extends JsonResource
 			'original_name' => $this->resource->original_name,
 			'extension'     => $this->resource->extension,
 			'path'          => $this->resource->path,
+			'web_path'      => \Yii::$app->mediaPath->web(
+				$this->resource->path,
+				$this->resource->name,
+				$this->resource->extension
+			),
 			'category'      => $this->resource->category,
 			'created_at'    => $this->resource->created_at,
 			'deleted_at'    => $this->resource->deleted_at,
