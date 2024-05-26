@@ -37,14 +37,4 @@ class Media extends Component
 
 		unlink($path);
 	}
-
-	public function webPath(string $path): string
-	{
-		return $this->pathBuilder->join($this->webPath, $path);
-	}
-
-	public function pathBuilder(): PathBuilder
-	{
-		return $this->pathBuilder;
-	}
 }

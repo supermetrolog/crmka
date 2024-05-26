@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\usecases\Media;
 
+use app\components\PathBuilder;
 use app\dto\Media\CreateMediaDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -15,14 +16,17 @@ class CreateMediaService
 {
 	private MediaComponent $media;
 	private TransactionBeginnerInterface $transactionBeginner;
+	private PathBuilder $pathBuilder;
 
 	public function __construct(
 		MediaComponent $media,
-		TransactionBeginnerInterface $transactionBeginner
+		TransactionBeginnerInterface $transactionBeginner,
+		PathBuilder $pathBuilder
 	)
 	{
 		$this->media = $media;
 		$this->transactionBeginner = $transactionBeginner;
+		$this->pathBuilder = $pathBuilder;
 	}
 
 	/**
@@ -34,7 +38,7 @@ class CreateMediaService
 
 		try {
 			$name = md5($dto->uploadedFile->name . time());
-			$path = $this->media->pathBuilder()->join($dto->path, "{$name}.{$dto->uploadedFile->extension}");
+			$path = $this->pathBuilder->join($dto->path, "{$name}.{$dto->uploadedFile->extension}");
 
 			$media = new Media([
 				'name'          => $name,
