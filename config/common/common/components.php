@@ -56,9 +56,5 @@ return [
 	],
 	'db'          => fn() => Yii::$container->get('db'),
 	'db_old'      => fn() => Yii::$container->get('old_db'),
-	'media' => [
-		'class'  => \app\components\MediaService::class,
-		'diskPath' => dirname(__DIR__, 3) . '/public_html/storage',
-		'webPath' => '/storage',
-	]
+	'media'       => fn() => Yii::$container->get('media'),
 ];

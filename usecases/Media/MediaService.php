@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\usecases\Media;
 
+use app\components\Media as MediaComponent;
 use app\dto\Media\UpdateMediaDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Media;
@@ -12,6 +13,12 @@ use yii\db\StaleObjectException;
 
 class MediaService
 {
+	private MediaComponent $media;
+
+	public function __construct(MediaComponent $media)
+	{
+		$this->media = $media;
+	}
 
 //	/**
 //	 * @throws SaveModelException
@@ -37,7 +44,7 @@ class MediaService
 	 */
 	public function delete(Media $media): void
 	{
-		\Yii::$app->media->delete(basename($media->path));
+		$this->media->delete(basename($media->path));
 
 		$media->delete();
 	}

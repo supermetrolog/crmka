@@ -5,17 +5,17 @@ namespace app\components;
 use yii\base\Component;
 use yii\web\UploadedFile;
 
-class MediaService extends Component
+class Media extends Component
 {
 	public string $diskPath = '';
 	public string $webPath = '';
 
 	public function __construct($config = [])
 	{
-		$config['diskPath'] = rtrim($config['diskPath'], '\\/');
-		$config['webPath'] = rtrim($config['webPath'], '\\/');
-
 		parent::__construct($config);
+
+		$this->diskPath = rtrim($this->diskPath, '\\/');
+		$this->webPath = rtrim($this->webPath, '\\/');
 	}
 
 	public function put(string $filename, UploadedFile $uploadedFile): void
