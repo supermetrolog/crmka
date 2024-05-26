@@ -13,9 +13,8 @@ return [
 		'db'                                => $db,
 		'old_db'                            => $old_db,
 		TransactionBeginnerInterface::class => 'db',
-		'media'                             => \app\components\Media::class,
-		'mediaPath'                         => [
-			'class'    => \app\components\MediaPathBuilder::class,
+		'media'                             => [
+			'class'    => \app\components\Media::class,
 			'diskPath' => dirname(__DIR__, 3) . '/public_html/storage',
 			'webPath'  => '/storage',
 		],

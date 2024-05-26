@@ -44,7 +44,7 @@ class MediaService
 	 */
 	public function delete(Media $media): void
 	{
-		$this->media->delete($media->path, $media->name, $media->extension);
+		$this->media->delete($media->path);
 
 		$media->delete();
 	}

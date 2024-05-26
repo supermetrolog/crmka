@@ -34,20 +34,21 @@ class CreateMediaService
 
 		try {
 			$name = md5($dto->uploadedFile->name . time());
-
-			$this->media->put($dto->path, $name, $dto->uploadedFile->extension, $dto->uploadedFile);
+			$path = $this->media->pathBuilder()->join($dto->path, "{$name}.{$dto->uploadedFile->extension}");
 
 			$media = new Media([
 				'name'          => $name,
 				'original_name' => $dto->uploadedFile->name,
 				'extension'     => $dto->uploadedFile->extension,
-				'path'          => $dto->path,
+				'path'          => $path,
 				'category'      => $dto->category,
 				'model_type'    => $dto->model_type,
 				'model_id'      => $dto->model_id,
 			]);
 
 			$media->saveOrThrow();
+
+			$this->media->put($path, $dto->uploadedFile);
 
 			$tx->commit();
 

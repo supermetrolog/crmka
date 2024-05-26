@@ -56,6 +56,4 @@ return [
 	],
 	'db'          => fn() => Yii::$container->get('db'),
 	'db_old'      => fn() => Yii::$container->get('old_db'),
-	'media'       => fn() => Yii::$container->get('media'),
-	'mediaPath'   => fn() => Yii::$container->get('mediaPath'),
 ];
