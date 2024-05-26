@@ -2,8 +2,9 @@
 
 namespace app\models;
 
+use app\components\Notification\Drivers\Web\WebNotifiableInterface;
+use app\components\Notification\Interfaces\NotifiableInterface;
 use app\exceptions\ValidationErrorHttpException;
-use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\UserQuery;
@@ -38,7 +39,7 @@ use yii\web\IdentityInterface;
  * @property UserProfile $userProfile
  * @property ChatMember  $chatMember
  */
-class User extends AR implements IdentityInterface
+class User extends AR implements IdentityInterface, NotifiableInterface, WebNotifiableInterface
 {
 	const STATUS_DELETED  = 0;
 	const STATUS_INACTIVE = 9;
@@ -372,7 +373,7 @@ class User extends AR implements IdentityInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getId()
+	public function getId(): int
 	{
 		return $this->getPrimaryKey();
 	}
@@ -380,7 +381,7 @@ class User extends AR implements IdentityInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getAuthKey()
+	public function getAuthKey(): ?string
 	{
 		return $this->auth_key;
 	}
@@ -466,5 +467,10 @@ class User extends AR implements IdentityInterface
 	public static function find(): UserQuery
 	{
 		return new UserQuery(get_called_class());
+	}
+
+	public function getUserId(): int
+	{
+		return $this->id;
 	}
 }

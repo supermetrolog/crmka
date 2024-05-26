@@ -5,30 +5,39 @@ declare(strict_types=1);
 namespace app\commands;
 
 use app\components\Notification\Factories\NotifierFactory;
-use app\components\Notification\TestNotification;
+use app\components\Notification\Notification;
+use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Notification\NotificationChannel;
+use app\models\User;
+use Throwable;
+use yii\base\ErrorException;
 use yii\console\Controller;
 
 class TestController extends Controller
 {
-	private NotifierFactory $notificationBuilderFactory;
+	private NotifierFactory $notifierFactory;
 
-	public function __construct($id, $module, NotifierFactory $notificationBuilderFactory, array $config = [])
+	public function __construct($id, $module, NotifierFactory $notifierFactory, array $config = [])
 	{
-		$this->notificationBuilderFactory = $notificationBuilderFactory;
+		$this->notifierFactory = $notifierFactory;
 
 		parent::__construct($id, $module, $config);
 	}
 
+	/**
+	 * @throws SaveModelException
+	 * @throws ErrorException
+	 * @throws Throwable
+	 */
 	public function actionIndex(): void
 	{
-		$model = $this->notificationBuilderFactory
+		$model = $this->notifierFactory
 			->create()
-			->addChannel(NotificationChannel::WEB)
-			->addChannel(NotificationChannel::EMAIL)
-			->setNotification(new TestNotification())
-			->setNotifiable(new TestNotification())
-			->setSendNow(true)
+			->setChannel(NotificationChannel::WEB)
+			->setNotification(new Notification('Subject', 'Message'))
+			->setNotifiable(User::find()->one())
+			->setCreatedByType(User::getMorphClass())
+			->setCreatedById(User::find()->one()->id)
 			->send();
 	}
 }

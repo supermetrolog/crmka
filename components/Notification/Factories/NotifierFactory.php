@@ -5,27 +5,18 @@ declare(strict_types=1);
 namespace app\components\Notification\Factories;
 
 use app\components\Notification\Notifier;
-use app\models\ActiveQuery\NotificationChannelQuery;
+use Yii;
+use yii\base\InvalidConfigException;
+use yii\di\NotInstantiableException;
 
 class NotifierFactory
 {
-	private NotificationDriverFactory $notificationDriverFactory;
-	private NotificationChannelQuery  $notificationChannelQuery;
-
-	public function __construct(
-		NotificationDriverFactory $notificationDriverFactory,
-		NotificationChannelQuery $notificationChannelQuery
-	)
-	{
-		$this->notificationDriverFactory = $notificationDriverFactory;
-		$this->notificationChannelQuery  = $notificationChannelQuery;
-	}
-
+	/**
+	 * @throws NotInstantiableException
+	 * @throws InvalidConfigException
+	 */
 	public function create(): Notifier
 	{
-		return new Notifier(
-			$this->notificationDriverFactory,
-			$this->notificationChannelQuery
-		);
+		return Yii::$container->get(Notifier::class);
 	}
 }

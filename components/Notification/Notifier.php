@@ -5,75 +5,112 @@ declare(strict_types=1);
 namespace app\components\Notification;
 
 use app\components\Notification\Factories\NotificationDriverFactory;
+use app\components\Notification\Interfaces\NotifiableInterface;
+use app\components\Notification\Interfaces\NotificationInterface;
+use app\dto\Mailing\CreateMailingDto;
+use app\dto\UserNotification\CreateUserNotificationDto;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ActiveQuery\NotificationChannelQuery;
+use app\models\Notification\UserNotification;
+use app\usecases\Mailing\MailingService;
+use app\usecases\Notification\UserNotificationService;
+use DateTime;
+use Throwable;
 use yii\base\ErrorException;
 
 class Notifier
 {
-	private array                $channels = [];
-	private bool                 $sendNow  = false;
-	private AbstractNotification $notification;
-	private AbstractNotifiable   $notifiable;
+	private string                $channel;
+	private bool                  $sendNow = true;
+	private NotificationInterface $notification;
+	private NotifiableInterface   $notifiable;
 
-	private NotificationDriverFactory $notificationDriverFactory;
-	private NotificationChannelQuery  $notificationChannelQuery;
+	private string $createdByType;
+	private int    $createdById;
+
+	private NotificationDriverFactory    $notificationDriverFactory;
+	private NotificationChannelQuery     $notificationChannelQuery;
+	private TransactionBeginnerInterface $transactionBeginner;
+	private MailingService               $mailingService;
+	private UserNotificationService      $userNotificationService;
 
 	public function __construct(
 		NotificationDriverFactory $notificationDriverFactory,
-		NotificationChannelQuery $notificationChannelQuery
+		NotificationChannelQuery $notificationChannelQuery,
+		TransactionBeginnerInterface $transactionBeginner,
+		MailingService $mailingService,
+		UserNotificationService $userNotificationService
 	)
 	{
 		$this->notificationDriverFactory = $notificationDriverFactory;
 		$this->notificationChannelQuery  = $notificationChannelQuery;
+		$this->transactionBeginner       = $transactionBeginner;
+		$this->mailingService            = $mailingService;
+		$this->userNotificationService   = $userNotificationService;
 	}
 
 	/**
-	 * @return array
+	 * @return UserNotification
 	 * @throws ErrorException
+	 * @throws Throwable
+	 * @throws SaveModelException
 	 */
-	public function send(): array
+	public function send(): UserNotification
 	{
-		$channels = $this->notificationChannelQuery->bySlugs($this->channels)->all();
+		$tx = $this->transactionBeginner->begin();
 
-		if (!$this->channels) {
-			throw new ErrorException('Channels not found');
-		}
+		try {
+			$channel = $this->notificationChannelQuery->bySlug($this->channel)->one();
 
-		foreach ($channels as $channel) {
-			// TODO: create model
+			$mailing = $this->mailingService->create(new CreateMailingDto([
+				'channel_id'      => $channel->id,
+				'subject'         => $this->notification->getSubject(),
+				'message'         => $this->notification->getMessage(),
+				'created_by_type' => $this->createdByType,
+				'created_by_id'   => $this->createdById,
+			]));
+
+			$userNotification = $this->userNotificationService->create(new CreateUserNotificationDto([
+				'mailing_id'  => $mailing->id,
+				'user_id'     => $this->notifiable->getUserId(),
+				'notified_at' => $this->sendNow ? new DateTime() : null,
+			]));
+
 
 			if ($this->sendNow) {
-				$driver = $this->notificationDriverFactory->fromChannel($channel);
-				$driver->send($this->notifiable, $this->notification);
+				$this->notificationDriverFactory
+					->fromChannel($channel)
+					->send($this->notifiable, $this->notification);
+
+				$tx->commit();
+				return $userNotification;
 			} else {
 				// TODO: push job
+				$tx->commit();
+				return $userNotification;
 			}
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
 		}
-
 	}
 
-	public function addChannel(string $channel): self
+	public function setChannel(string $channel): self
 	{
-		$this->channels[] = $channel;
+		$this->channel = $channel;
 
 		return $this;
 	}
 
-	public function setChannels(array $channels): self
-	{
-		$this->channels = $channels;
-
-		return $this;
-	}
-
-	public function setNotification(AbstractNotification $notification): self
+	public function setNotification(NotificationInterface $notification): self
 	{
 		$this->notification = $notification;
 
 		return $this;
 	}
 
-	public function setNotifiable(AbstractNotifiable $notifiable): self
+	public function setNotifiable(NotifiableInterface $notifiable): self
 	{
 		$this->notifiable = $notifiable;
 
@@ -83,6 +120,20 @@ class Notifier
 	public function setSendNow(bool $sendNow): self
 	{
 		$this->sendNow = $sendNow;
+
+		return $this;
+	}
+
+	public function setCreatedByType(string $createdByType): self
+	{
+		$this->createdByType = $createdByType;
+
+		return $this;
+	}
+
+	public function setCreatedById(int $createdById): self
+	{
+		$this->createdById = $createdById;
 
 		return $this;
 	}
