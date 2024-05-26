@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace app\commands;
 
-use app\components\Notification\Factories\NotificationBuilderFactory;
+use app\components\Notification\Factories\NotifierFactory;
 use app\components\Notification\TestNotification;
 use app\models\Notification\NotificationChannel;
 use yii\console\Controller;
 
 class TestController extends Controller
 {
-	private NotificationBuilderFactory $notificationBuilderFactory;
+	private NotifierFactory $notificationBuilderFactory;
 
-	public function __construct($id, $module, NotificationBuilderFactory $notificationBuilderFactory, array $config = [])
+	public function __construct($id, $module, NotifierFactory $notificationBuilderFactory, array $config = [])
 	{
 		$this->notificationBuilderFactory = $notificationBuilderFactory;
 
@@ -26,10 +26,9 @@ class TestController extends Controller
 			->create()
 			->addChannel(NotificationChannel::WEB)
 			->addChannel(NotificationChannel::EMAIL)
-			->withNotifiable(new TestNotification())
-			->withNotification(new TestNotification())
-			->sendNow()
-			->build()
+			->setNotification(new TestNotification())
+			->setNotifiable(new TestNotification())
+			->setSendNow(true)
 			->send();
 	}
 }
