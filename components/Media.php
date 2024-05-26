@@ -18,7 +18,6 @@ class Media extends Component
 
 	public function put(string $path, string $name, string $extension, UploadedFile $uploadedFile): void
 	{
-		dd($this->pathBuilder->disk($path, $name, $extension));
 		$uploadedFile->saveAs($this->pathBuilder->disk($path, $name, $extension));
 	}
 
