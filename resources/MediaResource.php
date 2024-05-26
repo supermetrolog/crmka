@@ -11,12 +11,10 @@ use app\components\Media as MediaComponent;
 class MediaResource extends JsonResource
 {
 	private Media          $resource;
-	private MediaComponent $media;
 
 	public function __construct(Media $resource)
 	{
 		$this->resource = $resource;
-		$this->media    = \Yii::$container->get('media');
 	}
 
 	public function toArray(): array
@@ -26,7 +24,7 @@ class MediaResource extends JsonResource
 			'name'          => $this->resource->name,
 			'original_name' => $this->resource->original_name,
 			'extension'     => $this->resource->extension,
-			'path'          => $this->media->webPath($this->resource->path),
+			'path'          => $this->resource->path,
 			'category'      => $this->resource->category,
 			'created_at'    => $this->resource->created_at,
 			'deleted_at'    => $this->resource->deleted_at,
