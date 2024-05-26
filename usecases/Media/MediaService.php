@@ -6,6 +6,7 @@ namespace app\usecases\Media;
 
 use app\components\Media as MediaComponent;
 use app\dto\Media\UpdateMediaDto;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Media;
 use Throwable;
@@ -14,10 +15,15 @@ use yii\db\StaleObjectException;
 class MediaService
 {
 	private MediaComponent $media;
+	private TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(MediaComponent $media)
+	public function __construct(
+		MediaComponent $media,
+		TransactionBeginnerInterface $transactionBeginner
+	)
 	{
 		$this->media = $media;
+		$this->transactionBeginner = $transactionBeginner;
 	}
 
 //	/**
@@ -44,8 +50,17 @@ class MediaService
 	 */
 	public function delete(Media $media): void
 	{
-		$this->media->delete($media->path);
+		$tx = $this->transactionBeginner->begin();
 
-		$media->delete();
+		try {
+			$media->delete();
+
+			$this->media->delete($media->path);
+
+			$tx->commit();
+		} catch (\Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 }
