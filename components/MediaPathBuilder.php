@@ -6,8 +6,8 @@ use yii\base\Component;
 
 class MediaPathBuilder extends Component
 {
-	private string $diskPath = '';
-	private string $webPath = '';
+	public string $diskPath = '';
+	public string $webPath = '';
 
 	public function __construct($config = [])
 	{
