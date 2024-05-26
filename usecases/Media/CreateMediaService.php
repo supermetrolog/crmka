@@ -33,9 +33,9 @@ class CreateMediaService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$name = md5($dto->uploadedFile->name . time()) . $dto->uploadedFile->extension;
+			$name = md5($dto->uploadedFile->name . time());
 
-			$this->media->put($dto->path . $name, $dto->uploadedFile);
+			$this->media->put($dto->path, $name, $dto->uploadedFile->extension, $dto->uploadedFile);
 
 			$media = new Media([
 				'name'          => $name,

@@ -7,25 +7,24 @@ use yii\web\UploadedFile;
 
 class Media extends Component
 {
-	public string $diskPath = '';
-	public string $webPath = '';
+	private MediaPathBuilder $pathBuilder;
 
-	public function __construct($config = [])
+	public function __construct(MediaPathBuilder $pathBuilder, $config = [])
 	{
+		$this->pathBuilder = $pathBuilder;
+
 		parent::__construct($config);
-
-		$this->diskPath = rtrim($this->diskPath, '\\/');
-		$this->webPath = rtrim($this->webPath, '\\/');
 	}
 
-	public function put(string $filename, UploadedFile $uploadedFile): void
+	public function put(string $path, string $name, string $extension, UploadedFile $uploadedFile): void
 	{
-		$uploadedFile->saveAs($this->diskPath($filename));
+		dd($this->pathBuilder->disk($path, $name, $extension));
+		$uploadedFile->saveAs($this->pathBuilder->disk($path, $name, $extension));
 	}
 
-	public function delete(string $filename): void
+	public function delete(string $path, string $name, string $extension): void
 	{
-		$path = $this->diskPath($filename);
+		$path = $this->pathBuilder->disk($path, $name, $extension);
 
 		if (! file_exists($path)) {
 			return;
@@ -34,13 +33,8 @@ class Media extends Component
 		unlink($path);
 	}
 
-	public function webPath(string $filename): string
+	public function pathBuilder(): MediaPathBuilder
 	{
-		return $this->webPath . '/' . trim($filename, '\\/');
-	}
-
-	protected function diskPath(string $filename): string
-	{
-		return $this->diskPath . '/' . trim($filename, '\\/');
+		return $this->pathBuilder;
 	}
 }
