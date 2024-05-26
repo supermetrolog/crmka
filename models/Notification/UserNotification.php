@@ -2,8 +2,13 @@
 
 namespace app\models\Notification;
 
+use app\components\Notification\Interfaces\StoredNotificationInterface;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\MailingQuery;
+use app\models\ActiveQuery\UserNotificationQuery;
+use app\models\ActiveQuery\UserQuery;
 use app\models\User;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "user_notification".
@@ -18,7 +23,7 @@ use app\models\User;
  * @property Mailing     $mailing
  * @property User        $user
  */
-class UserNotification extends AR
+class UserNotification extends AR implements StoredNotificationInterface
 {
 
 	public static function tableName(): string
@@ -50,24 +55,39 @@ class UserNotification extends AR
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery|\app\models\ActiveQuery\MailingQuery
+	 * @return ActiveQuery|MailingQuery
 	 */
-	public function getMailing(): \app\models\ActiveQuery\MailingQuery
+	public function getMailing(): MailingQuery
 	{
 		return $this->hasOne(Mailing::className(), ['id' => 'mailing_id']);
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery|\app\models\ActiveQuery\UserQuery
+	 * @return ActiveQuery|UserQuery
 	 */
-	public function getUser(): \app\models\ActiveQuery\UserQuery
+	public function getUser(): UserQuery
 	{
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
 	}
 
 
-	public static function find(): \app\models\ActiveQuery\UserNotificationQuery
+	public static function find(): UserNotificationQuery
 	{
-		return new \app\models\ActiveQuery\UserNotificationQuery(get_called_class());
+		return new UserNotificationQuery(get_called_class());
+	}
+
+	public function getId(): int
+	{
+		return $this->id;
+	}
+
+	public function getSubject(): string
+	{
+		return $this->mailing->subject;
+	}
+
+	public function getMessage(): string
+	{
+		return $this->mailing->message;
 	}
 }

@@ -6,5 +6,5 @@ namespace app\components\Notification\Interfaces;
 
 interface NotificationChannelDriverInterface
 {
-	public function send(NotifiableInterface $notifiable, NotificationInterface $notification): void;
+	public function send(NotifiableInterface $notifiable, StoredNotificationInterface $notification): void;
 }

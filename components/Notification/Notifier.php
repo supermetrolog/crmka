@@ -77,18 +77,19 @@ class Notifier
 				'notified_at' => $this->sendNow ? new DateTime() : null,
 			]));
 
+			$userNotification->populateRelation('mailing', $mailing); // Чтобы не грузить из базы
 
 			if ($this->sendNow) {
 				$this->notificationDriverFactory
 					->fromChannel($channel)
-					->send($this->notifiable, $this->notification);
+					->send($this->notifiable, $userNotification);
 
 				$tx->commit();
+
 				return $userNotification;
 			} else {
 				// TODO: push job
-				$tx->commit();
-				return $userNotification;
+				throw new ErrorException('Not supported delayed send');
 			}
 		} catch (Throwable $th) {
 			$tx->rollback();

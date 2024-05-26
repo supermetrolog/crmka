@@ -6,25 +6,31 @@ namespace app\components\Notification\Drivers\Web;
 
 use app\components\Notification\Interfaces\NotifiableInterface;
 use app\components\Notification\Interfaces\NotificationChannelDriverInterface;
-use app\components\Notification\Interfaces\NotificationInterface;
-use yii\base\ErrorException;
+use app\components\Notification\Interfaces\StoredNotificationInterface;
+use app\dto\WebNotification\CreateWebNotificationDto;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\usecases\WebNotification\WebNotificationService;
 
 class WebNotificationChannelDriver implements NotificationChannelDriverInterface
 {
+	private WebNotificationService $service;
+
+
+	public function __construct(WebNotificationService $service)
+	{
+		$this->service = $service;
+	}
 
 	/**
-	 * @throws ErrorException
+	 * @throws SaveModelException
 	 */
-	public function send(NotifiableInterface $notifiable, NotificationInterface $notification): void
+	public function send(NotifiableInterface $notifiable, StoredNotificationInterface $notification): void
 	{
-		if (!($notifiable instanceof WebNotifiableInterface)) {
-			throw new ErrorException('Notifiable not supported web driver');
-		}
-
-		$id = $notifiable->getId();
-
-		dump($id, $notifiable instanceof WebNotifiableInterface);
-
-		// TODO: Implement send() method.
+		$this->service->create(new CreateWebNotificationDto([
+			'user_id'              => $notifiable->getUserId(),
+			'user_notification_id' => $notification->getId(),
+			'subject'              => $notification->getSubject(),
+			'message'              => $notification->getMessage(),
+		]));
 	}
 }
