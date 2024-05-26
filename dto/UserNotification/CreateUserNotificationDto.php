@@ -12,4 +12,5 @@ class CreateUserNotificationDto extends BaseObject
 	public int                $mailing_id;
 	public int                $user_id;
 	public ?DateTimeInterface $notified_at = null;
+	public ?DateTimeInterface $viewed_at   = null;
 }

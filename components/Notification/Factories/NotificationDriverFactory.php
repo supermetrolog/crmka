@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\components\Notification\Factories;
 
+use app\components\Notification\Drivers\Telegram\TelegramNotificationChannelDriver;
 use app\components\Notification\Drivers\Web\WebNotificationChannelDriver;
 use app\components\Notification\Interfaces\NotificationChannelDriverInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
@@ -41,6 +42,8 @@ class NotificationDriverFactory
 		switch ($channel->slug) {
 			case NotificationChannel::WEB:
 				return Yii::$container->get(WebNotificationChannelDriver::class);
+			case NotificationChannel::TELEGRAM:
+				return Yii::$container->get(TelegramNotificationChannelDriver::class);
 			default:
 				throw new UnexpectedValueException(sprintf('Driver for channel [%s] not found', $channel->slug));
 		}

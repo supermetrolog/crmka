@@ -17,6 +17,7 @@ use yii\db\ActiveQuery;
  * @property int         $mailing_id
  * @property int         $user_id
  * @property string|null $notified_at
+ * @property string|null $viewed_at
  * @property string      $created_at
  * @property string      $updated_at
  *
@@ -36,7 +37,7 @@ class UserNotification extends AR implements StoredNotificationInterface
 		return [
 			[['mailing_id', 'user_id'], 'required'],
 			[['mailing_id', 'user_id'], 'integer'],
-			[['notified_at', 'created_at', 'updated_at'], 'safe'],
+			[['notified_at', 'created_at', 'updated_at', 'viewed_at'], 'safe'],
 			[['mailing_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mailing::className(), 'targetAttribute' => ['mailing_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
 		];
@@ -49,6 +50,7 @@ class UserNotification extends AR implements StoredNotificationInterface
 			'mailing_id'  => 'Mailing ID',
 			'user_id'     => 'User ID',
 			'notified_at' => 'Notified At',
+			'viewed_at'   => 'Viewed At',
 			'created_at'  => 'Created At',
 			'updated_at'  => 'Updated At',
 		];

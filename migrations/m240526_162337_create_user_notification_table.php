@@ -18,7 +18,8 @@ class m240526_162337_create_user_notification_table extends Migration
 			'id'          => $this->primaryKey(),
 			'mailing_id'  => $this->integer()->notNull(),
 			'user_id'     => $this->integer()->notNull(),
-			'notified_at' => $this->timestamp()->null()
+			'notified_at' => $this->timestamp()->null(),
+			'viewed_at'   => $this->timestamp()->null(),
 		], $this->timestamps());
 
 		$this->foreignKey($tableName, ['mailing_id'], 'mailing', ['id']);

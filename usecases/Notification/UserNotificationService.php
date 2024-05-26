@@ -21,6 +21,7 @@ class UserNotificationService
 		$model->mailing_id  = $dto->mailing_id;
 		$model->user_id     = $dto->user_id;
 		$model->notified_at = $dto->notified_at ? $dto->notified_at->format('Y-m-d H:i:s') : null;
+		$model->viewed_at   = $dto->viewed_at ? $dto->viewed_at->format('Y-m-d H:i:s') : null;
 
 		$model->saveOrThrow();
 

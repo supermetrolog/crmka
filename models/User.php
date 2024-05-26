@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use app\components\Notification\Drivers\Web\WebNotifiableInterface;
 use app\components\Notification\Interfaces\NotifiableInterface;
 use app\exceptions\ValidationErrorHttpException;
 use app\kernel\common\models\AR\AR;
@@ -39,7 +38,7 @@ use yii\web\IdentityInterface;
  * @property UserProfile $userProfile
  * @property ChatMember  $chatMember
  */
-class User extends AR implements IdentityInterface, NotifiableInterface, WebNotifiableInterface
+class User extends AR implements IdentityInterface, NotifiableInterface
 {
 	const STATUS_DELETED  = 0;
 	const STATUS_INACTIVE = 9;
