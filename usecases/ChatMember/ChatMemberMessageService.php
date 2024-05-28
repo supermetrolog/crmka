@@ -4,21 +4,29 @@ declare(strict_types=1);
 
 namespace app\usecases\ChatMember;
 
+use app\components\Notification\Factories\NotifierFactory;
+use app\components\Notification\Interfaces\NotifiableInterface;
+use app\components\Notification\Notification;
 use app\dto\Alert\CreateAlertDto;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
+use app\dto\Notification\CreateNotificationDto;
 use app\dto\Relation\CreateRelationDto;
 use app\dto\Reminder\CreateReminderDto;
 use app\dto\Task\CreateTaskDto;
+use app\dto\UserNotification\CreateUserNotificationDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Alert;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
 use app\models\Contact;
+use app\models\Notification\NotificationChannel;
+use app\models\Notification\UserNotification;
 use app\models\Relation;
 use app\models\Reminder;
 use app\models\Task;
+use app\models\User;
 use app\usecases\Alert\CreateAlertService;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Relation\RelationService;
@@ -35,6 +43,7 @@ class ChatMemberMessageService
 	protected CreateReminderService      $createReminderService;
 	protected CreateMediaService         $createMediaService;
 	protected RelationService            $relationService;
+	protected NotifierFactory $notifierFactory;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -42,7 +51,8 @@ class ChatMemberMessageService
 		RelationService $relationService,
 		CreateAlertService $createAlertService,
 		CreateReminderService $createReminderService,
-		CreateMediaService $createMediaService
+		CreateMediaService $createMediaService,
+		NotifierFactory $notifierFactory
 	)
 	{
 		$this->transactionBeginner   = $transactionBeginner;
@@ -51,6 +61,7 @@ class ChatMemberMessageService
 		$this->createAlertService    = $createAlertService;
 		$this->createReminderService = $createReminderService;
 		$this->createMediaService    = $createMediaService;
+		$this->notifierFactory       = $notifierFactory;
 	}
 
 	/**
@@ -259,6 +270,41 @@ class ChatMemberMessageService
 			$tx->commit();
 
 			return $reminder;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Exception
+	 * @throws Throwable
+	 */
+	public function createNotification(ChatMemberMessage $message, CreateNotificationDto $dto): UserNotification
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$userNotification = $this->notifierFactory
+				->create()
+				->setChannel($dto->channel)
+				->setNotification(new Notification($dto->subject, $dto->message))
+				->setNotifiable($dto->notifiable)
+				->setCreatedByType($dto->created_by_type)
+				->setCreatedById($dto->created_by_id)
+				->send();
+
+			$this->relationService->create(new CreateRelationDto([
+				'first_type'  => $message::getMorphClass(),
+				'first_id'    => $message->id,
+				'second_type' => $userNotification::getMorphClass(),
+				'second_id'   => $userNotification->id,
+			]));
+
+			$tx->commit();
+
+			return $userNotification;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
