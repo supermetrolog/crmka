@@ -209,6 +209,7 @@ return
 				'POST,OPTIONS create-task/<id>'     => 'create-task',
 				'POST,OPTIONS create-alert/<id>'    => 'create-alert',
 				'POST,OPTIONS create-reminder/<id>' => 'create-reminder',
+				'POST,OPTIONS create-notification/<id>' => 'create-notification',
 			],
 		],
 		[
