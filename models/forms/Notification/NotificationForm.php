@@ -25,7 +25,7 @@ class NotificationForm extends Form
 		return [
 			[['channel', 'subject', 'message', 'user_id'], 'required'],
 			[['channel', 'subject', 'message'], 'string'],
-			['user_id', 'compare', 'compareValue' => \Yii::$app->user->id, 'operator' => '!=', 'type' => 'integer'],
+			[['user_id'], 'integer'],
 			['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			['channel', 'in', 'range' => NotificationChannel::getChannels()],
 		];
