@@ -7,6 +7,7 @@ namespace app\models\forms\Notification;
 use app\dto\Notification\CreateNotificationDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Notification\NotificationChannel;
+use app\models\User;
 use Exception;
 
 class NotificationForm extends Form
@@ -17,15 +18,15 @@ class NotificationForm extends Form
 	public $channel;
 	public $subject;
 	public $message;
-	public $notifiable;
-	public $created_by_type;
-	public $created_by_id;
+	public $user_id;
 
 	public function rules(): array
 	{
 		return [
-			[['channel', 'subject', 'message'], 'required'],
+			[['channel', 'subject', 'message', 'user_id'], 'required'],
 			[['channel', 'subject', 'message'], 'string'],
+			['user_id', 'compare', 'compareValue' => \Yii::$app->user->id, 'operator' => '!=', 'type' => 'integer'],
+			['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			['channel', 'in', 'range' => NotificationChannel::getChannels()],
 		];
 	}
@@ -36,6 +37,7 @@ class NotificationForm extends Form
 			'channel',
 			'subject',
 			'message',
+			'user_id',
 		];
 
 		return [
@@ -49,13 +51,15 @@ class NotificationForm extends Form
 	 */
 	public function getDto()
 	{
+		$user = User::find()->byId($this->user_id)->one();
+
 		return new CreateNotificationDto([
 			'channel'         => $this->channel,
 			'subject'         => $this->subject,
 			'message'         => $this->message,
-			'notifiable'      => $this->notifiable,
-			'created_by_type' => $this->created_by_type,
-			'created_by_id'   => $this->created_by_id,
+			'notifiable'      => $user,
+			'created_by_type' => $user->getMorphClass(),
+			'created_by_id'   => $user->id,
 		]);
 	}
 }

@@ -244,10 +244,6 @@ class ChatMemberMessageController extends AppController
 
 		$notificationForm->load($this->request->post());
 
-		$notificationForm->notifiable      = $this->user;
-		$notificationForm->created_by_id   = $this->user->id;
-		$notificationForm->created_by_type = $this->user->identity::getMorphClass();
-
 		$notificationForm->validateOrThrow();
 
 		$userNotification = $this->service->createNotification($message, $notificationForm->getDto());
