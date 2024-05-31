@@ -9,6 +9,7 @@ use app\models\ChatMemberMessage;
 use app\models\forms\Alert\AlertForm;
 use app\models\forms\ChatMember\ChatMemberMessageForm;
 use app\models\forms\Media\MediaForm;
+use app\models\forms\Notification\NotificationForm;
 use app\models\forms\Reminder\ReminderForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\ChatMemberMessageSearch;
@@ -16,6 +17,7 @@ use app\resources\AlertResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ReminderResource;
 use app\resources\TaskResource;
+use app\resources\UserNotificationResource;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 use Yii;
@@ -225,6 +227,28 @@ class ChatMemberMessageController extends AppController
 		$reminder = $this->service->createReminder($message, $reminderForm->getDto());
 
 		return ReminderResource::make($reminder);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 * @throws Throwable
+	 */
+	public function actionCreateNotification(int $id): UserNotificationResource
+	{
+		$message = $this->findModel($id, false);
+
+		$notificationForm = new NotificationForm();
+
+		$notificationForm->setScenario(NotificationForm::SCENARIO_CREATE);
+
+		$notificationForm->load($this->request->post());
+
+		$notificationForm->validateOrThrow();
+
+		$userNotification = $this->service->createNotification($message, $notificationForm->getDto());
+
+		return UserNotificationResource::make($userNotification);
 	}
 
 

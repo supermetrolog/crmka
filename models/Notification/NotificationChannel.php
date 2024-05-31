@@ -49,6 +49,14 @@ class NotificationChannel extends AR
 		];
 	}
 
+	public static function getChannels(): array
+	{
+		return [
+			self::EMAIL,
+			self::TELEGRAM,
+			self::WEB,
+		];
+	}
 
 	public static function find(): NotificationChannelQuery
 	{
