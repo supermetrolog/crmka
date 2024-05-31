@@ -8,6 +8,7 @@ use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTagQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\RelationQuery;
+use app\models\ActiveQuery\ReminderQuery;
 use app\models\ActiveQuery\TaskQuery;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -27,6 +28,7 @@ use yii\db\ActiveQuery;
  * @property Task[]                 $tasks
  * @property Alert[]                $alerts
  * @property Contact[]              $contacts
+ * @property Reminder[]             $reminders
  * @property ChatMemberMessageTag[] $tags
  */
 class ChatMemberMessage extends AR
@@ -107,6 +109,16 @@ class ChatMemberMessage extends AR
 	public function getAlerts(): AlertQuery
 	{
 		return $this->morphHasManyVia(Alert::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
+	/**
+	 * @return ActiveQuery|ReminderQuery
+	 * @throws ErrorException
+	 */
+	public function getReminders(): ReminderQuery
+	{
+		return $this->morphHasManyVia(Reminder::class, 'id', 'second')
 		            ->via('relationFirst');
 	}
 
