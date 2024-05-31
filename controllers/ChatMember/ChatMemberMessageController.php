@@ -8,6 +8,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\models\ChatMemberMessage;
 use app\models\forms\Alert\AlertForm;
 use app\models\forms\ChatMember\ChatMemberMessageForm;
+use app\models\forms\Media\MediaForm;
 use app\models\forms\Reminder\ReminderForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\ChatMemberMessageSearch;
@@ -21,6 +22,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 class ChatMemberMessageController extends AppController
 {
@@ -68,7 +70,20 @@ class ChatMemberMessageController extends AppController
 
 		$form->validateOrThrow();
 
-		$model = $this->service->create($form->getDto());
+		$mediaForm = new MediaForm();
+
+		// я хз какой должен быть путь и категория
+		// и откуда они вообще должны браться
+		$mediaForm->path = '';
+		$mediaForm->category = 'chat_member_message';
+		$mediaForm->model_id = $this->user->id;
+		$mediaForm->model_type = $this->user->identity::getMorphClass();
+
+		$mediaForm->files = UploadedFile::getInstancesByName('files');
+
+		//$mediaForm->validateOrThrow();
+
+		$model = $this->service->create($form->getDto(), $mediaForm->getDtos());
 
 		return new ChatMemberMessageResource($model);
 	}

@@ -20,6 +20,7 @@ use app\models\Relation;
 use app\models\Reminder;
 use app\models\Task;
 use app\usecases\Alert\CreateAlertService;
+use app\usecases\Media\CreateMediaService;
 use app\usecases\Relation\RelationService;
 use app\usecases\Reminder\CreateReminderService;
 use app\usecases\Task\CreateTaskService;
@@ -32,6 +33,7 @@ class ChatMemberMessageService
 	protected CreateTaskService          $createTaskService;
 	protected CreateAlertService         $createAlertService;
 	protected CreateReminderService      $createReminderService;
+	protected CreateMediaService         $createMediaService;
 	protected RelationService            $relationService;
 
 	public function __construct(
@@ -39,21 +41,23 @@ class ChatMemberMessageService
 		CreateTaskService $createTaskService,
 		RelationService $relationService,
 		CreateAlertService $createAlertService,
-		CreateReminderService $createReminderService
+		CreateReminderService $createReminderService,
+		CreateMediaService $createMediaService
 	)
 	{
-		$this->transactionBeginner = $transactionBeginner;
-		$this->createTaskService   = $createTaskService;
-		$this->relationService     = $relationService;
-		$this->createAlertService  = $createAlertService;
-		$this->createReminderService  = $createReminderService;
+		$this->transactionBeginner   = $transactionBeginner;
+		$this->createTaskService     = $createTaskService;
+		$this->relationService       = $relationService;
+		$this->createAlertService    = $createAlertService;
+		$this->createReminderService = $createReminderService;
+		$this->createMediaService    = $createMediaService;
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function create(CreateChatMemberMessageDto $dto): ChatMemberMessage
+	public function create(CreateChatMemberMessageDto $dto, array $mediaDtos = []): ChatMemberMessage
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -86,6 +90,10 @@ class ChatMemberMessageService
 			}
 
 			$message->refresh();
+
+			foreach ($mediaDtos as $mediaDto) {
+				$this->createMediaService->create($mediaDto);
+			}
 
 			$tx->commit();
 
