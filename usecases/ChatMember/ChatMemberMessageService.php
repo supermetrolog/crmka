@@ -21,6 +21,7 @@ use app\models\Alert;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
 use app\models\Contact;
+use app\models\Media;
 use app\models\Notification\NotificationChannel;
 use app\models\Notification\UserNotification;
 use app\models\Relation;
@@ -103,7 +104,14 @@ class ChatMemberMessageService
 			$message->refresh();
 
 			foreach ($mediaDtos as $mediaDto) {
-				$this->createMediaService->create($mediaDto);
+				$media = $this->createMediaService->create($mediaDto);
+
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $message::getMorphClass(),
+					'first_id'    => $message->id,
+					'second_type' => $media::getMorphClass(),
+					'second_id'   => $media->id,
+				]));
 			}
 
 			$tx->commit();
