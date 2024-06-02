@@ -12,9 +12,11 @@ use app\models\ChatMember;
 use app\models\forms\ChatMember\PinChatMemberMessageForm;
 use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
 use app\models\search\ChatMemberSearch;
+use app\repositories\MediaRepository;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
+use app\resources\MediaResource;
 use app\usecases\ChatMember\ChatMemberService;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
@@ -23,10 +25,12 @@ use yii\web\NotFoundHttpException;
 class ChatMemberController extends AppController
 {
 	private ChatMemberService $service;
+	private MediaRepository   $mediaRepository;
 
-	public function __construct($id, $module, ChatMemberService $service, array $config = [])
+	public function __construct($id, $module, ChatMemberService $service, MediaRepository $mediaRepository, array $config = [])
 	{
-		$this->service = $service;
+		$this->service         = $service;
+		$this->mediaRepository = $mediaRepository;
 		parent::__construct($id, $module, $config);
 	}
 
@@ -63,6 +67,20 @@ class ChatMemberController extends AppController
 		                   ->oneOrThrow();
 
 		return ChatMemberMessageResource::tryMake($model->pinnedChatMemberMessage);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionMedia(int $id): ActiveDataProvider
+	{
+		$fromMemberChat = ChatMember::find()
+		                            ->where(['model_type' => 'user', 'model_id' => $this->user->id])
+		                            ->oneOrThrow();
+
+		return MediaResource::fromDataProvider(
+			$this->mediaRepository->findModelsByMemberChatId($id, $fromMemberChat->id, $this->request->get('extension'))
+		);
 	}
 
 
