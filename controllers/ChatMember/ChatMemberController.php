@@ -12,6 +12,7 @@ use app\models\ChatMember;
 use app\models\forms\ChatMember\PinChatMemberMessageForm;
 use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
 use app\models\search\ChatMemberSearch;
+use app\models\User;
 use app\repositories\MediaRepository;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
@@ -75,7 +76,7 @@ class ChatMemberController extends AppController
 	public function actionMedia(int $id): ActiveDataProvider
 	{
 		$fromMemberChat = ChatMember::find()
-		                            ->where(['model_type' => 'user', 'model_id' => $this->user->id])
+		                            ->byMorph($this->user->id, User::getMorphClass())
 		                            ->oneOrThrow();
 
 		return MediaResource::fromDataProvider(
