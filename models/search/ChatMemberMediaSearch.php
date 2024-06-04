@@ -41,7 +41,13 @@ class ChatMemberMediaSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = Media::find();
+		$query = Media::find()
+		    ->select(Media::getColumn('*'))
+			->leftJoin(Relation::getTable(), Relation::getColumn('second_id') . '=' . Media::getColumn('id'))
+			->leftJoin(ChatMemberMessage::getTable(), Relation::getColumn('first_id') . '=' . ChatMemberMessage::getColumn('id'))
+			->where([Relation::getColumn('second_type') => 'media', Relation::getColumn('first_type') => 'chat_member_message'])
+			->andWhereNull(ChatMemberMessage::getColumn('deleted_at'))
+			->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -51,19 +57,10 @@ class ChatMemberMediaSearch extends Form
 
 		$this->validateOrThrow();
 
-		$query->where(['in', 'id', Relation::find()
-           ->select('second_id')
-           ->from('relation')
-           ->where(['second_type' => 'media', 'first_type' => 'chat_member_message'])
-           ->andWhere(['in', 'first_id', ChatMemberMessage::find()
-              ->select('id')
-              ->where(['to_chat_member_id' => $this->to_member_chat_id, 'from_chat_member_id' => $this->from_member_chat_id])
-              ->notDeleted()
-           ])
-		]);
+		$query->andWhere([ChatMemberMessage::getColumn('to_chat_member_id') => $this->to_member_chat_id]);
+		$query->andWhere([ChatMemberMessage::getColumn('from_chat_member_id') => $this->from_member_chat_id]);
 
-		$query->andFilterWhere(['like', 'extension', $this->extension])
-		      ->notDeleted();
+		$query->andFilterWhere(['like', 'extension', $this->extension]);
 
 		return $dataProvider;
 	}
