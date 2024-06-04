@@ -11,6 +11,7 @@ use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMember;
 use app\models\forms\ChatMember\PinChatMemberMessageForm;
 use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
+use app\models\search\ChatMemberMediaSearch;
 use app\models\search\ChatMemberSearch;
 use app\models\User;
 use app\repositories\MediaRepository;
@@ -26,12 +27,10 @@ use yii\web\NotFoundHttpException;
 class ChatMemberController extends AppController
 {
 	private ChatMemberService $service;
-	private MediaRepository   $mediaRepository;
 
-	public function __construct($id, $module, ChatMemberService $service, MediaRepository $mediaRepository, array $config = [])
+	public function __construct($id, $module, ChatMemberService $service, array $config = [])
 	{
 		$this->service         = $service;
-		$this->mediaRepository = $mediaRepository;
 		parent::__construct($id, $module, $config);
 	}
 
@@ -79,9 +78,14 @@ class ChatMemberController extends AppController
 		                            ->byMorph($this->user->id, User::getMorphClass())
 		                            ->oneOrThrow();
 
-		return MediaResource::fromDataProvider(
-			$this->mediaRepository->findModelsByMemberChatId($id, $fromMemberChat->id, $this->request->get('extension'))
-		);
+		$searchModel = new ChatMemberMediaSearch();
+
+		$searchModel->to_member_chat_id = $id;
+		$searchModel->from_member_chat_id = $fromMemberChat->id;
+
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return MediaResource::fromDataProvider($dataProvider);
 	}
 
 
