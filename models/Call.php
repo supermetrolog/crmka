@@ -19,6 +19,9 @@ use yii\db\ActiveQuery;
  */
 class Call extends \app\kernel\common\models\AR\AR
 {
+	protected bool $useSoftDelete = true;
+	protected bool $useSoftUpdate = true;
+	
     public static function tableName(): string
     {
         return 'call';
