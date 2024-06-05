@@ -197,6 +197,7 @@ return
 				'GET,OPTIONS <id>/media'          => 'media',
 				'POST,OPTIONS pin-message'        => 'pin-message',
 				'POST,OPTIONS unpin-message'      => 'unpin-message',
+				'POST,OPTIONS <id>/called'        => 'called',
 				'GET,OPTIONS <id>'                => 'view',
 			],
 		],

@@ -4,15 +4,36 @@ declare(strict_types=1);
 
 namespace app\usecases\ChatMember;
 
+use app\dto\Call\CreateCallDto;
 use app\dto\ChatMember\CreateChatMemberDto;
+use app\dto\Relation\CreateRelationDto;
 use app\helpers\DateTimeHelper;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\models\Call;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
+use app\usecases\Call\CreateCallService;
+use app\usecases\Relation\RelationService;
 use yii\db\Exception;
+use \Throwable;
 
 class ChatMemberService
 {
+	private TransactionBeginnerInterface $transactionBeginner;
+	protected RelationService            $relationService;
+	protected CreateCallService          $createCallService;
+
+	public function __construct(
+		TransactionBeginnerInterface $transactionBeginner,
+		RelationService $relationService,
+		CreateCallService $createCallService
+	)
+	{
+		$this->transactionBeginner = $transactionBeginner;
+		$this->relationService     = $relationService;
+		$this->createCallService   = $createCallService;
+	}
 
 	/**
 	 * @throws SaveModelException
@@ -70,5 +91,33 @@ class ChatMemberService
 	{
 		$member->pinned_chat_member_message_id = null;
 		$member->saveOrThrow();
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Exception
+	 * @throws Throwable
+	 */
+	public function createCall(ChatMember $member, CreateCallDto $dto): Call
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$model = $this->createCallService->create($dto);
+
+			$this->relationService->create(new CreateRelationDto([
+				'first_type'  => $member::getMorphClass(),
+				'first_id'    => $member->id,
+				'second_type' => $model::getMorphClass(),
+				'second_id'   => $model->id,
+			]));
+
+			$tx->commit();
+
+			return $model;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 }
