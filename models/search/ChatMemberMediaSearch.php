@@ -42,12 +42,15 @@ class ChatMemberMediaSearch extends Form
 	public function search(array $params): ActiveDataProvider
 	{
 		$query = Media::find()
-		    ->select(Media::getColumn('*'))
-			->leftJoin(Relation::getTable(), Relation::getColumn('second_id') . '=' . Media::getColumn('id'))
-			->leftJoin(ChatMemberMessage::getTable(), Relation::getColumn('first_id') . '=' . ChatMemberMessage::getColumn('id'))
-			->where([Relation::getColumn('second_type') => 'media', Relation::getColumn('first_type') => 'chat_member_message'])
-			->andWhereNull(ChatMemberMessage::getColumn('deleted_at'))
-			->notDeleted();
+		              ->select(Media::getColumn('*'))
+		              ->leftJoin(Relation::getTable(), Relation::getColumn('second_id') . '=' . Media::getColumn('id'))
+		              ->leftJoin(ChatMemberMessage::getTable(), Relation::getColumn('first_id') . '=' . ChatMemberMessage::getColumn('id'))
+		              ->where([
+			              Relation::getColumn('second_type') => Media::getMorphClass(),
+			              Relation::getColumn('first_type')  => ChatMemberMessage::getMorphClass(),
+		              ])
+		              ->andWhereNull(ChatMemberMessage::getColumn('deleted_at'))
+		              ->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
