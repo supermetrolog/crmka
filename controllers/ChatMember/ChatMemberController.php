@@ -11,10 +11,14 @@ use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMember;
 use app\models\forms\ChatMember\PinChatMemberMessageForm;
 use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
+use app\models\search\ChatMemberMediaSearch;
 use app\models\search\ChatMemberSearch;
+use app\models\User;
+use app\repositories\MediaRepository;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
+use app\resources\MediaResource;
 use app\usecases\ChatMember\ChatMemberService;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
@@ -26,7 +30,7 @@ class ChatMemberController extends AppController
 
 	public function __construct($id, $module, ChatMemberService $service, array $config = [])
 	{
-		$this->service = $service;
+		$this->service         = $service;
 		parent::__construct($id, $module, $config);
 	}
 
@@ -63,6 +67,25 @@ class ChatMemberController extends AppController
 		                   ->oneOrThrow();
 
 		return ChatMemberMessageResource::tryMake($model->pinnedChatMemberMessage);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionMedia(int $id): ActiveDataProvider
+	{
+		$fromMemberChat = ChatMember::find()
+		                            ->byMorph($this->user->id, User::getMorphClass())
+		                            ->oneOrThrow();
+
+		$searchModel = new ChatMemberMediaSearch();
+
+		$searchModel->to_member_chat_id = $id;
+		$searchModel->from_member_chat_id = $fromMemberChat->id;
+
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return MediaResource::fromDataProvider($dataProvider);
 	}
 
 

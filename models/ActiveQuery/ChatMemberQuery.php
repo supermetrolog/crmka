@@ -27,4 +27,19 @@ class ChatMemberQuery extends AQ
     {
         return parent::one($db);
     }
+
+	public function byModelId(int $id): self
+	{
+		return $this->andWhere([$this->field('model_id') => $id]);
+	}
+
+	public function byModelType(string $type): self
+	{
+		return $this->andWhere([$this->field('model_type') => $type]);
+	}
+
+	public function byMorph(int $id, string $type): self
+	{
+		return $this->byModelType($type)->byModelId($id);
+	}
 }
