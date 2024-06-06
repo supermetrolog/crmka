@@ -35,7 +35,7 @@ class ContactQuery extends AQ
 	}
 
 	/**
-	 * @param int $id
+	 * @param ?int $id
 	 *
 	 * @return self
 	 */
