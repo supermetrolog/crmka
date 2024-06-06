@@ -39,7 +39,7 @@ class ContactQuery extends AQ
 	 *
 	 * @return self
 	 */
-	public function byId(int $id): self
+	public function byId(?int $id): self
 	{
 		return $this->andWhere([$this->field('id') => $id]);
 	}
