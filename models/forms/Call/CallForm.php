@@ -27,6 +27,7 @@ class CallForm extends Form
 			[['user_id'], 'required'],
 			[['user_id', 'contact_id'], 'integer'],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
 		];
 	}
 
