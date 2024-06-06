@@ -31,7 +31,7 @@ class ChatMemberController extends AppController
 
 	public function __construct($id, $module, ChatMemberService $service, array $config = [])
 	{
-		$this->service         = $service;
+		$this->service = $service;
 		parent::__construct($id, $module, $config);
 	}
 
@@ -81,7 +81,7 @@ class ChatMemberController extends AppController
 
 		$searchModel = new ChatMemberMediaSearch();
 
-		$searchModel->to_member_chat_id = $id;
+		$searchModel->to_member_chat_id   = $id;
 		$searchModel->from_member_chat_id = $fromMemberChat->id;
 
 		$dataProvider = $searchModel->search($this->request->get());
@@ -144,7 +144,7 @@ class ChatMemberController extends AppController
 
 		$form->validateOrThrow();
 
-		$model = $this->service->createCall(ChatMember::find()->byId($id)->one(), $form->getDto());
+		$model = $this->service->createCall($this->findModel($id), $form->getDto());
 
 		return new CallResource($model);
 	}
