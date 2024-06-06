@@ -19,10 +19,8 @@ class m240605_155341_create_call_table extends Migration
             'contact_id'  => $this->integer()->null(),
         ], $this->timestamps(), $this->softDelete());
 
-	    $this->index(
-		    $tableName,
-		    ['user_id', 'contact_id']
-	    );
+	    $this->index($tableName, ['user_id']);
+	    $this->index($tableName, ['contact_id']);
 
 	    $this->foreignKey(
 		    $tableName,
