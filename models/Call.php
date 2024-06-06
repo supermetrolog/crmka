@@ -57,6 +57,14 @@ class Call extends \app\kernel\common\models\AR\AR
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
 	}
 
+	/**
+	 * @return ActiveQuery
+	 */
+	public function getContact(): ActiveQuery
+	{
+		return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
+	}
+
 
 	public static function find(): CallQuery
 	{
