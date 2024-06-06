@@ -28,6 +28,13 @@ class m240605_155341_create_call_table extends Migration
 		    'user',
 		    ['id']
 	    );
+
+	    $this->foreignKey(
+		    $tableName,
+		    ['contact_id'],
+		    'contact',
+		    ['id']
+	    );
     }
 
     /**
