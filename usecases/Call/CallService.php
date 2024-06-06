@@ -20,7 +20,7 @@ class CallService
 	{
 		$model->load([
 			'user_id'    => $dto->user->id,
-			'contact_id' => !! $dto->contact ? $dto->contact->id : null,
+			'contact_id' => !!$dto->contact ? $dto->contact->id : null,
 		]);
 
 		$model->saveOrThrow();
