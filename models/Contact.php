@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\ContactQuery;
 use Yii;
 use yii\data\ActiveDataProvider;
 use app\models\miniModels\WayOfInforming;
@@ -333,5 +334,10 @@ class Contact extends AR
 	public function getWebsites()
 	{
 		return $this->hasMany(Website::className(), ['contact_id' => 'id']);
+	}
+
+	public static function find(): ContactQuery
+	{
+		return new ContactQuery(get_called_class());
 	}
 }

@@ -14,22 +14,21 @@ use app\models\Call;
  */
 class CallQuery extends AQ
 {
-
-    /**
-     * @return Call[]|ActiveRecord[]
-     */
-    public function all($db = null): array
-    {
-        return parent::all($db);
-    }
+	/**
+	 * @return Call[]|ActiveRecord[]
+	 */
+	public function all($db = null): array
+	{
+		return parent::all($db);
+	}
 
 	/**
 	 * @return Call|ActiveRecord|null
 	 */
-    public function one($db = null): ?Call
-    {
-        return parent::one($db);
-    }
+	public function one($db = null): ?Call
+	{
+		return parent::one($db);
+	}
 
 	/**
 	 * @return Call|ActiveRecord

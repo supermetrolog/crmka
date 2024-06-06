@@ -54,13 +54,13 @@ class CallForm extends Form
 			case self::SCENARIO_CREATE:
 				return new CreateCallDto([
 					'user'    => User::find()->byId($this->user_id)->one(),
-					'contact' => Contact::find()->where(['id' => $this->contact_id])->one(),
+					'contact' => Contact::find()->byId($this->contact_id)->one(),
 				]);
 
 			default:
 				return new UpdateCallDto([
 					'user'    => User::find()->byId($this->user_id)->one(),
-					'contact' => Contact::find()->where(['id' => $this->contact_id])->one(),
+					'contact' => Contact::find()->byId($this->contact_id)->one(),
 				]);
 		}
 	}
