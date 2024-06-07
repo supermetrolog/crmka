@@ -40,8 +40,8 @@ class Field extends AR
 		return [
 			[['field_type', 'type'], 'required'],
 			[['field_type', 'type'], 'integer'],
-			['field_type', 'in', 'range' => self::getFieldType()],
-			['type', 'in', 'range' => self::getType()],
+			['field_type', 'in', 'range' => self::getFieldTypes()],
+			['type', 'in', 'range' => self::getTypes()],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 		];
 	}
@@ -58,7 +58,7 @@ class Field extends AR
 		];
 	}
 
-	public static function getFieldType(): array
+	public static function getFieldTypes(): array
 	{
 		return [
 			self::FIELD_TYPE_RADIO,
@@ -69,7 +69,7 @@ class Field extends AR
 		];
 	}
 
-	public static function getType(): array
+	public static function getTypes(): array
 	{
 		return [
 			self::TYPE_BOOLEAN,
