@@ -55,16 +55,16 @@ class SurveyQuestionAnswerForm extends Form
 		switch ($this->getScenario()) {
 			case self::SCENARIO_CREATE:
 				return new CreateSurveyQuestionAnswerDto([
-					'question_answer' => QuestionAnswer::find()->byId($this->question_answer_id)->one(),
-					'survey'          => Survey::find()->byId($this->survey_id)->one(),
-					'value'           => $this->value,
+					'question_answer_id' => $this->question_answer_id,
+					'survey_id'          => $this->survey_id,
+					'value'              => $this->value,
 				]);
 
 			default:
 				return new UpdateSurveyQuestionAnswerDto([
-					'question_answer' => QuestionAnswer::find()->byId($this->question_answer_id)->one(),
-					'survey'          => Survey::find()->byId($this->survey_id)->one(),
-					'value'           => $this->value,
+					'question_answer_id' => $this->question_answer_id,
+					'survey_id'          => $this->survey_id,
+					'value'              => $this->value,
 				]);
 		}
 	}

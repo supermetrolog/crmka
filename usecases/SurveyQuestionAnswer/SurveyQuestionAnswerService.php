@@ -19,8 +19,8 @@ class SurveyQuestionAnswerService
 	public function create(CreateSurveyQuestionAnswerDto $dto): SurveyQuestionAnswer
 	{
 		$model = new SurveyQuestionAnswer([
-			'question_answer_id' => $dto->question_answer->id,
-			'survey_id'          => $dto->survey->id,
+			'question_answer_id' => $dto->question_answer_id,
+			'survey_id'          => $dto->survey_id,
 			'value'              => $dto->value,
 		]);
 
@@ -35,8 +35,8 @@ class SurveyQuestionAnswerService
 	public function update(SurveyQuestionAnswer $model, UpdateSurveyQuestionAnswerDto $dto): SurveyQuestionAnswer
 	{
 		$model->load([
-			'question_answer_id' => $dto->question_answer->id,
-			'survey_id'          => $dto->survey->id,
+			'question_answer_id' => $dto->question_answer_id,
+			'survey_id'          => $dto->survey_id,
 			'value'              => $dto->value,
 		]);
 
