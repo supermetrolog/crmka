@@ -11,15 +11,14 @@ class QuestionSearch extends Form
 {
 	public $id;
 	public $text;
-	public $created_at;
-	public $updated_at;
-	public $deleted_at;
+	public $deleted;
 	
     public function rules(): array
     {
         return [
             [['id'], 'integer'],
-            [['text', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
+            [['text'], 'safe'],
+            [['deleted'], 'boolean'],
         ];
     }
 
@@ -40,12 +39,17 @@ class QuestionSearch extends Form
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
         ]);
 
         $query->andFilterWhere(['like', 'text', $this->text]);
+
+	    if ($this->isFilterTrue($this->deleted)) {
+		    $query->deleted();
+	    }
+
+	    if ($this->isFilterFalse($this->deleted)) {
+		    $query->notDeleted();
+	    }
 
         return $dataProvider;
     }

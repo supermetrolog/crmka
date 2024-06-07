@@ -3,6 +3,7 @@
 namespace app\models\ActiveQuery;
 
 use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Question;
 use yii\db\ActiveRecord;
@@ -14,8 +15,9 @@ use yii\db\ActiveRecord;
  */
 class QuestionQuery extends AQ
 {
+	use SoftDeleteTrait;
 
-    /**
+	/**
      * @return Question[]|ActiveRecord[]
      */
     public function all($db = null): array
