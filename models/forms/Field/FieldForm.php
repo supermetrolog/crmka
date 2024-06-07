@@ -51,13 +51,13 @@ class FieldForm extends Form
 			case self::SCENARIO_CREATE:
 				return new CreateFieldDto([
 					'field_type' => $this->field_type,
-					'type' => $this->type,
+					'type'       => $this->type,
 				]);
 
 			default:
 				return new UpdateFieldDto([
 					'field_type' => $this->field_type,
-					'type' => $this->type,
+					'type'       => $this->type,
 				]);
 		}
 	}
