@@ -53,13 +53,13 @@ class SurveyForm extends Form
 			case self::SCENARIO_CREATE:
 				return new CreateSurveyDto([
 					'user'    => User::find()->byId($this->user_id)->one(),
-					'contact' => Survey::find()->byId($this->contact_id)->one(),
+					'contact' => Contact::find()->byId($this->contact_id)->one(),
 				]);
 
 			default:
 				return new UpdateSurveyDto([
 					'user'    => User::find()->byId($this->user_id)->one(),
-					'contact' => Survey::find()->byId($this->contact_id)->one(),
+					'contact' => Contact::find()->byId($this->contact_id)->one(),
 				]);
 		}
 	}
