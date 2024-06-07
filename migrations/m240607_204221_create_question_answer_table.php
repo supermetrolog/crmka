@@ -17,7 +17,7 @@ class m240607_204221_create_question_answer_table extends Migration
 			'id'       => $this->primaryKey(),
 			'field_id' => $this->integer()->notNull(),
 			'category' => $this->tinyInteger()->notNull(),
-			'value'    => $this->string()->notNull(),
+			'value'    => $this->string()->null(),
 		], $this->timestamps(), $this->softDelete());
 
 		$this->index($tableName, ['field_id']);
