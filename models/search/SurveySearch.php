@@ -12,14 +12,11 @@ class SurveySearch extends Form
 	public $id;
 	public $user_id;
 	public $contact_id;
-	public $created_at;
-	public $updated_at;
 
 	public function rules(): array
 	{
 		return [
 			[['id', 'user_id', 'contact_id'], 'integer'],
-			[['created_at', 'updated_at'], 'safe'],
 		];
 	}
 
@@ -42,8 +39,6 @@ class SurveySearch extends Form
 			'id'         => $this->id,
 			'user_id'    => $this->user_id,
 			'contact_id' => $this->contact_id,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
 		]);
 
 		return $dataProvider;
