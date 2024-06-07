@@ -55,14 +55,14 @@ class QuestionAnswerForm extends Form
 		switch ($this->getScenario()) {
 			case self::SCENARIO_CREATE:
 				return new CreateQuestionAnswerDto([
-					'field'    => Field::find()->byId($this->field_id)->one(),
+					'field_id' => $this->field_id,
 					'category' => $this->category,
 					'value'    => $this->value,
 				]);
 
 			default:
 				return new UpdateQuestionAnswerDto([
-					'field'    => Field::find()->byId($this->field_id)->one(),
+					'field_id' => $this->field_id,
 					'category' => $this->category,
 					'value'    => $this->value,
 				]);
