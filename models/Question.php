@@ -16,6 +16,9 @@ use app\models\ActiveQuery\QuestionQuery;
  */
 class Question extends AR
 {
+	protected bool $useSoftDelete = true;
+	protected bool $useSoftUpdate = true;
+	
 	public static function tableName(): string
 	{
 		return 'question';
