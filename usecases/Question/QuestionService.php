@@ -33,7 +33,7 @@ class QuestionService
 	public function update(Question $model, UpdateQuestionDto $dto): Question
 	{
 		$model->load([
-			'user_id' => $dto->text,
+			'text' => $dto->text,
 		]);
 
 		$model->saveOrThrow();
