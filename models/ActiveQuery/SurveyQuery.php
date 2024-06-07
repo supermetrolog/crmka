@@ -4,18 +4,18 @@ namespace app\models\ActiveQuery;
 
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
-use app\models\Surveys;
+use app\models\Survey;
 use yii\db\ActiveRecord;
 
 /**
  * This is the ActiveQuery class for [[\app\models\Surveys]].
  *
- * @see Surveys
+ * @see Survey
  */
-class SurveysQuery extends AQ
+class SurveyQuery extends AQ
 {
     /**
-     * @return Surveys[]|ActiveRecord[]
+     * @return Survey[]|ActiveRecord[]
      */
     public function all($db = null): array
     {
@@ -23,18 +23,18 @@ class SurveysQuery extends AQ
     }
 
 	/**
-	 * @return Surveys|ActiveRecord|null
+	 * @return Survey|ActiveRecord|null
 	 */
-    public function one($db = null): ?Surveys
+    public function one($db = null): ?Survey
     {
         return parent::one($db);
     }
 
 	/**
-	 * @return Surveys|ActiveRecord
+	 * @return Survey|ActiveRecord
 	 * @throws ModelNotFoundException
 	 */
-	public function oneOrThrow($db = null): Surveys
+	public function oneOrThrow($db = null): Survey
 	{
 		return parent::oneOrThrow($db);
 	}

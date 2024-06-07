@@ -3,7 +3,7 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
-use app\models\ActiveQuery\SurveysQuery;
+use app\models\ActiveQuery\SurveyQuery;
 use yii\db\ActiveQuery;
 
 /**
@@ -18,7 +18,7 @@ use yii\db\ActiveQuery;
  * @property Contact $contact
  * @property User    $user
  */
-class Surveys extends AR
+class Survey extends AR
 {
 	public static function tableName(): string
 	{
@@ -64,8 +64,8 @@ class Surveys extends AR
 	}
 
 
-	public static function find(): SurveysQuery
+	public static function find(): SurveyQuery
 	{
-		return new SurveysQuery(get_called_class());
+		return new SurveyQuery(get_called_class());
 	}
 }
