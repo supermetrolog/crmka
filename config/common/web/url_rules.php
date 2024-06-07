@@ -197,6 +197,7 @@ return
 				'GET,OPTIONS <id>/media'          => 'media',
 				'POST,OPTIONS pin-message'        => 'pin-message',
 				'POST,OPTIONS unpin-message'      => 'unpin-message',
+				'POST,OPTIONS <id>/called'        => 'called',
 				'GET,OPTIONS <id>'                => 'view',
 			],
 		],
@@ -259,6 +260,18 @@ return
 			'extraPatterns' => [
 				'GET,OPTIONS'         => 'index',
 				'GET,OPTIONS <id>'    => 'view',
+				'DELETE,OPTIONS <id>' => 'delete',
+			],
+		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'call',
+			'except'        => [],
+			'extraPatterns' => [
+				'GET,OPTIONS'         => 'index',
+				'GET,OPTIONS <id>'    => 'view',
+				'POST,OPTIONS'        => 'create',
+				'PUT,OPTIONS <id>'    => 'update',
 				'DELETE,OPTIONS <id>' => 'delete',
 			],
 		],

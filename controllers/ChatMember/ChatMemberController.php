@@ -9,12 +9,13 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\resources\JsonResource;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMember;
+use app\models\forms\Call\CallForm;
 use app\models\forms\ChatMember\PinChatMemberMessageForm;
 use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
 use app\models\search\ChatMemberMediaSearch;
 use app\models\search\ChatMemberSearch;
 use app\models\User;
-use app\repositories\MediaRepository;
+use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
@@ -30,7 +31,7 @@ class ChatMemberController extends AppController
 
 	public function __construct($id, $module, ChatMemberService $service, array $config = [])
 	{
-		$this->service         = $service;
+		$this->service = $service;
 		parent::__construct($id, $module, $config);
 	}
 
@@ -80,7 +81,7 @@ class ChatMemberController extends AppController
 
 		$searchModel = new ChatMemberMediaSearch();
 
-		$searchModel->to_member_chat_id = $id;
+		$searchModel->to_member_chat_id   = $id;
 		$searchModel->from_member_chat_id = $fromMemberChat->id;
 
 		$dataProvider = $searchModel->search($this->request->get());
@@ -124,6 +125,28 @@ class ChatMemberController extends AppController
 		$this->service->unpinMessage($form->getChatMember());
 
 		return new SuccessResponse();
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return CallResource
+	 * @throws ValidateException
+	 * @throws \Throwable
+	 */
+	public function actionCalled(int $id): CallResource
+	{
+		$form = new CallForm();
+
+		$form->setScenario(CallForm::SCENARIO_CREATE);
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$model = $this->service->createCall($this->findModel($id), $form->getDto());
+
+		return new CallResource($model);
 	}
 
 	/**
