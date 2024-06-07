@@ -20,6 +20,8 @@ use yii\db\ActiveQuery;
  */
 class Survey extends AR
 {
+	protected bool $useSoftUpdate = true;
+	
 	public static function tableName(): string
 	{
 		return 'survey';
