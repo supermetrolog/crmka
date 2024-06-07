@@ -7,7 +7,7 @@ use app\models\ActiveQuery\SurveyQuery;
 use yii\db\ActiveQuery;
 
 /**
- * This is the model class for table "surveys".
+ * This is the model class for table "survey".
  *
  * @property int     $id
  * @property int     $user_id
@@ -22,7 +22,7 @@ class Survey extends AR
 {
 	public static function tableName(): string
 	{
-		return 'surveys';
+		return 'survey';
 	}
 
 	public function rules(): array
