@@ -27,6 +27,9 @@ class QuestionAnswer extends AR
 	public const CATEGORY_TAB         = 3;
 	public const CATEGORY_CHECKBOX    = 4;
 
+	protected bool $useSoftDelete = true;
+	protected bool $useSoftUpdate = true;
+
 	public static function tableName(): string
 	{
 		return 'question_answer';
@@ -74,7 +77,7 @@ class QuestionAnswer extends AR
 	{
 		return $this->hasOne(Field::className(), ['id' => 'field_id']);
 	}
-	
+
 	public static function find(): QuestionAnswerQuery
 	{
 		return new QuestionAnswerQuery(get_called_class());
