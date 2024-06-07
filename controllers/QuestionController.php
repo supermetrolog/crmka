@@ -7,6 +7,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Question\QuestionForm;
+use app\models\forms\QuestionAnswer\QuestionAnswerForm;
 use app\models\search\QuestionSearch;
 use app\models\Question;
 use app\repositories\QuestionRepository;
@@ -71,6 +72,38 @@ class QuestionController extends AppController
 		$form->validateOrThrow();
 
 		$model = $this->service->create($form->getDto());
+
+		return new QuestionResource($model);
+	}
+
+	/**
+	 * @return QuestionResource
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 */
+	public function actionCreateWithQuestionAnswer(): QuestionResource
+	{
+		// Create Question Answer
+
+		$answerForm = new QuestionAnswerForm();
+
+		$answerForm->setScenario(QuestionAnswerForm::SCENARIO_CREATE);
+
+		$answerForm->load($this->request->post());
+
+		$answerForm->validateOrThrow();
+
+		// Create Question
+
+		$questionForm = new QuestionForm();
+
+		$questionForm->setScenario(QuestionForm::SCENARIO_CREATE);
+
+		$questionForm->load($this->request->post());
+
+		$questionForm->validateOrThrow();
+
+		$model = $this->service->createWithQuestionAnswer($questionForm->getDto(), $answerForm->getDto());
 
 		return new QuestionResource($model);
 	}
