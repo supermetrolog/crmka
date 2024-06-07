@@ -12,15 +12,13 @@ class FieldSearch extends Form
 	public $id;
 	public $field_type;
 	public $type;
-	public $created_at;
-	public $updated_at;
-	public $deleted_at;
+	public $deleted;
 	
 	public function rules(): array
 	{
 		return [
 			[['id', 'field_type', 'type'], 'integer'],
-			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
+			[['deleted'], 'boolean'],
 		];
 	}
 
@@ -43,11 +41,16 @@ class FieldSearch extends Form
 			'id'         => $this->id,
 			'field_type' => $this->field_type,
 			'type'       => $this->type,
-			'created_at' => $this->created_at,
-			'updated_at' => $this->updated_at,
-			'deleted_at' => $this->deleted_at,
 		]);
 
+		if ($this->isFilterTrue($this->deleted)) {
+			$query->deleted();
+		}
+
+		if ($this->isFilterFalse($this->deleted)) {
+			$query->notDeleted();
+		}
+		
 		return $dataProvider;
 	}
 }
