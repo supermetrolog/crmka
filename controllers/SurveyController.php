@@ -7,6 +7,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Survey\SurveyForm;
+use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
 use app\models\search\SurveySearch;
 use app\models\Survey;
 use app\repositories\SurveyRepository;
@@ -71,6 +72,38 @@ class SurveyController extends AppController
 		$form->validateOrThrow();
 
 		$model = $this->service->create($form->getDto());
+
+		return new SurveyResource($model);
+	}
+
+	/**
+	 * @return SurveyResource
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 */
+	public function actionCreateWithSurveyQuestionAnswer(): SurveyResource
+	{
+		// Create Survey Question Answer
+
+		$surveyQuestionAnswerForm = new SurveyQuestionAnswerForm();
+
+		$surveyQuestionAnswerForm->setScenario(SurveyQuestionAnswerForm::SCENARIO_CREATE);
+
+		$surveyQuestionAnswerForm->load($this->request->post());
+
+		$surveyQuestionAnswerForm->validateOrThrow();
+
+		// Create Survey
+
+		$surveyForm = new SurveyForm();
+
+		$surveyForm->setScenario(SurveyForm::SCENARIO_CREATE);
+
+		$surveyForm->load($this->request->post());
+
+		$surveyForm->validateOrThrow();
+
+		$model = $this->service->createWithSurveyQuestionAnswer($surveyForm->getDto(), $surveyQuestionAnswerForm->getDto());
 
 		return new SurveyResource($model);
 	}

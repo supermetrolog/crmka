@@ -280,11 +280,12 @@ return
 			'controller'    => 'survey',
 			'except'        => [],
 			'extraPatterns' => [
-				'GET,OPTIONS'         => 'index',
-				'GET,OPTIONS <id>'    => 'view',
-				'POST,OPTIONS'        => 'create',
-				'PUT,OPTIONS <id>'    => 'update',
-				'DELETE,OPTIONS <id>' => 'delete',
+				'GET,OPTIONS'                              => 'index',
+				'GET,OPTIONS <id>'                         => 'view',
+				'POST,OPTIONS'                             => 'create',
+				'POST,OPTIONS with-survey-question-answer' => 'create-with-survey-question-answer',
+				'PUT,OPTIONS <id>'                         => 'update',
+				'DELETE,OPTIONS <id>'                      => 'delete',
 			],
 		],
 		[
