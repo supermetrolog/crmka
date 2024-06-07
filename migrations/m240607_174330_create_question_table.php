@@ -15,7 +15,7 @@ class m240607_174330_create_question_table extends Migration
 		$tableName = '{{%question}}';
 		$this->table($tableName, [
 			'id'   => $this->primaryKey(),
-			'text' => $this->integer()->notNull(),
+			'text' => $this->text()->notNull(),
 		], $this->timestamps(), $this->softDelete());
 	}
 
