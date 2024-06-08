@@ -13,8 +13,9 @@ use Exception;
 
 class SurveyQuestionAnswerForm extends Form
 {
-	public const SCENARIO_CREATE = 'scenario_create';
-	public const SCENARIO_UPDATE = 'scenario_update';
+	public const SCENARIO_CREATE             = 'scenario_create';
+	public const SCENARIO_CREATE_WITH_SURVEY = 'scenario_create_with_survey';
+	public const SCENARIO_UPDATE             = 'scenario_update';
 
 	public $question_answer_id;
 	public $survey_id;
@@ -36,13 +37,13 @@ class SurveyQuestionAnswerForm extends Form
 	{
 		$common = [
 			'question_answer_id',
-			'survey_id',
 			'value',
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common],
-			self::SCENARIO_UPDATE => [...$common],
+			self::SCENARIO_CREATE             => [...$common, 'survey_id'],
+			self::SCENARIO_CREATE_WITH_SURVEY => [...$common],
+			self::SCENARIO_UPDATE             => [...$common, 'survey_id'],
 		];
 	}
 
@@ -57,6 +58,11 @@ class SurveyQuestionAnswerForm extends Form
 				return new CreateSurveyQuestionAnswerDto([
 					'question_answer_id' => $this->question_answer_id,
 					'survey_id'          => $this->survey_id,
+					'value'              => $this->value,
+				]);
+			case self::SCENARIO_CREATE_WITH_SURVEY:
+				return new CreateSurveyQuestionAnswerDto([
+					'question_answer_id' => $this->question_answer_id,
 					'value'              => $this->value,
 				]);
 

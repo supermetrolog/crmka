@@ -74,11 +74,13 @@ class SurveyService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$task = $this->surveyQuestionAnswerService->create($dto);
+			$dto->survey_id = $survey->id;
+
+			$model = $this->surveyQuestionAnswerService->create($dto);
 
 			$tx->commit();
 
-			return $task;
+			return $model;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;

@@ -87,7 +87,7 @@ class SurveyController extends AppController
 
 		$surveyQuestionAnswerForm = new SurveyQuestionAnswerForm();
 
-		$surveyQuestionAnswerForm->setScenario(SurveyQuestionAnswerForm::SCENARIO_CREATE);
+		$surveyQuestionAnswerForm->setScenario(SurveyQuestionAnswerForm::SCENARIO_CREATE_WITH_SURVEY);
 
 		$surveyQuestionAnswerForm->load($this->request->post());
 
