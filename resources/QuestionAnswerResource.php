@@ -19,13 +19,14 @@ class QuestionAnswerResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'id'         => $this->resource->id,
-			'field_id'   => $this->resource->field_id,
-			'category'   => $this->resource->category,
-			'value'      => $this->resource->value,
-			'created_at' => $this->resource->created_at,
-			'updated_at' => $this->resource->updated_at,
-			'deleted_at' => $this->resource->deleted_at,
+			'id'          => $this->resource->id,
+			'question_id' => $this->resource->question_id,
+			'field_id'    => $this->resource->field_id,
+			'category'    => $this->resource->category,
+			'value'       => $this->resource->value,
+			'created_at'  => $this->resource->created_at,
+			'updated_at'  => $this->resource->updated_at,
+			'deleted_at'  => $this->resource->deleted_at,
 		];
 	}
 }

@@ -14,14 +14,17 @@ class m240607_204221_create_question_answer_table extends Migration
 	{
 		$tableName = '{{%question_answer}}';
 		$this->table($tableName, [
-			'id'       => $this->primaryKey(),
-			'field_id' => $this->integer()->notNull(),
-			'category' => $this->tinyInteger()->notNull(),
-			'value'    => $this->string()->null(),
+			'id'          => $this->primaryKey(),
+			'question_id' => $this->integer()->notNull(),
+			'field_id'    => $this->integer()->notNull(),
+			'category'    => $this->tinyInteger()->notNull(),
+			'value'       => $this->string()->null(),
 		], $this->timestamps(), $this->softDelete());
 
+		$this->index($tableName, ['question_id']);
 		$this->index($tableName, ['field_id']);
 
+		$this->foreignKey($tableName, ['question_id'], 'question', ['id']);
 		$this->foreignKey($tableName, ['field_id'], 'field', ['id']);
 	}
 
@@ -31,7 +34,8 @@ class m240607_204221_create_question_answer_table extends Migration
 	public function safeDown()
 	{
 		$tableName = '{{%question_answer}}';
-		
+
+		$this->foreignKeyDrop($tableName, ['question_id']);
 		$this->foreignKeyDrop($tableName, ['field_id']);
 		$this->dropTable($tableName);
 	}

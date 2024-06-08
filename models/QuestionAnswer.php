@@ -5,12 +5,14 @@ namespace app\models;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\FieldQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
+use app\models\ActiveQuery\QuestionQuery;
 use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "question_answer".
  *
  * @property int         $id
+ * @property int         $question_id
  * @property int         $field_id
  * @property int         $category
  * @property string      $value
@@ -38,11 +40,12 @@ class QuestionAnswer extends AR
 	public function rules(): array
 	{
 		return [
-			[['field_id', 'category', 'value'], 'required'],
-			[['field_id', 'category'], 'integer'],
+			[['question_id', 'field_id', 'category'], 'required'],
+			[['question_id', 'field_id', 'category'], 'integer'],
 			['category', 'in', 'range' => self::getCategories()],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 			[['value'], 'string', 'max' => 255],
+			[['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],
 			[['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
 		];
 	}
@@ -50,13 +53,14 @@ class QuestionAnswer extends AR
 	public function attributeLabels(): array
 	{
 		return [
-			'id'         => 'ID',
-			'field_id'   => 'Field ID',
-			'category'   => 'Category',
-			'value'      => 'Value',
-			'created_at' => 'Created At',
-			'updated_at' => 'Updated At',
-			'deleted_at' => 'Deleted At',
+			'id'          => 'ID',
+			'question_id' => 'Question ID',
+			'field_id'    => 'Field ID',
+			'category'    => 'Category',
+			'value'       => 'Value',
+			'created_at'  => 'Created At',
+			'updated_at'  => 'Updated At',
+			'deleted_at'  => 'Deleted At',
 		];
 	}
 
@@ -68,6 +72,14 @@ class QuestionAnswer extends AR
 			self::CATEGORY_TAB,
 			self::CATEGORY_CHECKBOX,
 		];
+	}
+
+	/**
+	 * @return ActiveQuery|QuestionQuery
+	 */
+	public function getQuestion(): QuestionQuery
+	{
+		return $this->hasOne(Question::className(), ['id' => 'question_id']);
 	}
 
 	/**

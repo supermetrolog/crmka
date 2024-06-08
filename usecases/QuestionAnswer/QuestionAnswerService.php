@@ -19,9 +19,10 @@ class QuestionAnswerService
 	public function create(CreateQuestionAnswerDto $dto): QuestionAnswer
 	{
 		$model = new QuestionAnswer([
-			'field_id' => $dto->field_id,
-			'category' => $dto->category,
-			'value'    => $dto->value,
+			'question_id' => $dto->question_id,
+			'field_id'    => $dto->field_id,
+			'category'    => $dto->category,
+			'value'       => $dto->value,
 		]);
 
 		$model->saveOrThrow();
@@ -35,9 +36,10 @@ class QuestionAnswerService
 	public function update(QuestionAnswer $model, UpdateQuestionAnswerDto $dto): QuestionAnswer
 	{
 		$model->load([
-			'field_id' => $dto->field_id,
-			'category' => $dto->category,
-			'value'    => $dto->value,
+			'question_id' => $dto->question_id,
+			'field_id'    => $dto->field_id,
+			'category'    => $dto->category,
+			'value'       => $dto->value,
 		]);
 
 		$model->saveOrThrow();

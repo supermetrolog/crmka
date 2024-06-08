@@ -8,6 +8,7 @@ use app\dto\QuestionAnswer\CreateQuestionAnswerDto;
 use app\dto\QuestionAnswer\UpdateQuestionAnswerDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Field;
+use app\models\Question;
 use app\models\QuestionAnswer;
 use Exception;
 
@@ -16,6 +17,7 @@ class QuestionAnswerForm extends Form
 	public const SCENARIO_CREATE = 'scenario_create';
 	public const SCENARIO_UPDATE = 'scenario_update';
 
+	public $question_id;
 	public $field_id;
 	public $category;
 	public $value;
@@ -23,11 +25,12 @@ class QuestionAnswerForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['field_id', 'category'], 'required'],
-			[['field_id', 'category'], 'integer'],
+			[['question_id', 'field_id', 'category'], 'required'],
+			[['question_id', 'field_id', 'category'], 'integer'],
 			['category', 'in', 'range' => QuestionAnswer::getCategories()],
 			[['value'], 'safe'],
 			[['value'], 'string', 'max' => 255],
+			[['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],
 			[['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
 		];
 	}
@@ -35,6 +38,7 @@ class QuestionAnswerForm extends Form
 	public function scenarios(): array
 	{
 		$common = [
+			'question_id',
 			'field_id',
 			'category',
 			'value',
@@ -55,16 +59,18 @@ class QuestionAnswerForm extends Form
 		switch ($this->getScenario()) {
 			case self::SCENARIO_CREATE:
 				return new CreateQuestionAnswerDto([
-					'field_id' => $this->field_id,
-					'category' => $this->category,
-					'value'    => $this->value,
+					'question_id' => $this->question_id,
+					'field_id'    => $this->field_id,
+					'category'    => $this->category,
+					'value'       => $this->value,
 				]);
 
 			default:
 				return new UpdateQuestionAnswerDto([
-					'field_id' => $this->field_id,
-					'category' => $this->category,
-					'value'    => $this->value,
+					'question_id' => $this->question_id,
+					'field_id'    => $this->field_id,
+					'category'    => $this->category,
+					'value'       => $this->value,
 				]);
 		}
 	}

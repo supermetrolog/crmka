@@ -10,6 +10,7 @@ use app\models\QuestionAnswer;
 class QuestionAnswerSearch extends Form
 {
 	public $id;
+	public $question_id;
 	public $field_id;
 	public $category;
 	public $value;
@@ -18,7 +19,7 @@ class QuestionAnswerSearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['id', 'field_id', 'category'], 'integer'],
+			[['id', 'question_id', 'field_id', 'category'], 'integer'],
 			[['value'], 'safe'],
 			[['deleted'], 'boolean'],
 		];
@@ -40,9 +41,10 @@ class QuestionAnswerSearch extends Form
 		$this->validateOrThrow();
 
 		$query->andFilterWhere([
-			'id'       => $this->id,
-			'field_id' => $this->field_id,
-			'category' => $this->category,
+			'id'          => $this->id,
+			'question_id' => $this->question_id,
+			'field_id'    => $this->field_id,
+			'category'    => $this->category,
 		]);
 
 		$query->andFilterWhere(['like', 'value', $this->value]);
