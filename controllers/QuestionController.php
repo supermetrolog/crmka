@@ -87,7 +87,7 @@ class QuestionController extends AppController
 
 		$answerForm = new QuestionAnswerForm();
 
-		$answerForm->setScenario(QuestionAnswerForm::SCENARIO_CREATE);
+		$answerForm->setScenario(QuestionAnswerForm::SCENARIO_CREATE_WITH_QUESTION);
 
 		$answerForm->load($this->request->post());
 

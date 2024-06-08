@@ -14,8 +14,9 @@ use Exception;
 
 class QuestionAnswerForm extends Form
 {
-	public const SCENARIO_CREATE = 'scenario_create';
-	public const SCENARIO_UPDATE = 'scenario_update';
+	public const SCENARIO_CREATE               = 'scenario_create';
+	public const SCENARIO_CREATE_WITH_QUESTION = 'scenario_create_with_question';
+	public const SCENARIO_UPDATE               = 'scenario_update';
 
 	public $question_id;
 	public $field_id;
@@ -38,15 +39,15 @@ class QuestionAnswerForm extends Form
 	public function scenarios(): array
 	{
 		$common = [
-			'question_id',
 			'field_id',
 			'category',
 			'value',
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common],
-			self::SCENARIO_UPDATE => [...$common],
+			self::SCENARIO_CREATE               => [...$common, 'question_id'],
+			self::SCENARIO_CREATE_WITH_QUESTION => [...$common],
+			self::SCENARIO_UPDATE               => [...$common, 'question_id'],
 		];
 	}
 
@@ -63,6 +64,12 @@ class QuestionAnswerForm extends Form
 					'field_id'    => $this->field_id,
 					'category'    => $this->category,
 					'value'       => $this->value,
+				]);
+			case self::SCENARIO_CREATE_WITH_QUESTION:
+				return new CreateQuestionAnswerDto([
+					'field_id' => $this->field_id,
+					'category' => $this->category,
+					'value'    => $this->value,
 				]);
 
 			default:

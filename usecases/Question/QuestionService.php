@@ -51,12 +51,12 @@ class QuestionService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$question = $this->create($dto);
-			$this->createQuestionAnswer($question, $answerDto);
+			$model = $this->create($dto);
+			$this->createQuestionAnswer($model, $answerDto);
 
 			$tx->commit();
 
-			return $question;
+			return $model;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
@@ -73,11 +73,13 @@ class QuestionService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$task = $this->questionAnswerService->create($dto);
+			$dto->question_id = $question->id;
+
+			$model = $this->questionAnswerService->create($dto);
 
 			$tx->commit();
 
-			return $task;
+			return $model;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
