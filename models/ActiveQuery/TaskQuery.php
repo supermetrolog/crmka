@@ -71,4 +71,14 @@ class TaskQuery extends AQ
 			['IS', $this->field('end'), null],
 		]);
 	}
+
+	public function completed(): self
+	{
+		return $this->andWhere([$this->field('status') => Task::STATUS_DONE]);
+	}
+
+	public function notCompleted(): self
+	{
+		return $this->andWhere(['!=', $this->field('status'), Task::STATUS_DONE]);
+	}
 }
