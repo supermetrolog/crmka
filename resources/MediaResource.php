@@ -9,7 +9,7 @@ use app\models\Media;
 
 class MediaResource extends JsonResource
 {
-	private Media          $resource;
+	private Media $resource;
 
 	public function __construct(Media $resource)
 	{
@@ -29,6 +29,7 @@ class MediaResource extends JsonResource
 			'deleted_at'    => $this->resource->deleted_at,
 			'model_type'    => $this->resource->model_type,
 			'model_id'      => $this->resource->model_id,
+			'mime_type'     => $this->resource->mime_type,
 		];
 	}
 }

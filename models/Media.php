@@ -18,6 +18,7 @@ use app\models\ActiveQuery\MediaQuery;
  * @property int         $model_id
  * @property string      $created_at
  * @property string|null $deleted_at
+ * @property string      $mime_type
  */
 class Media extends AR
 {
@@ -31,10 +32,10 @@ class Media extends AR
 	public function rules(): array
 	{
 		return [
-			[['name', 'original_name', 'extension', 'path', 'category', 'model_type', 'model_id'], 'required'],
+			[['name', 'original_name', 'extension', 'path', 'category', 'model_type', 'model_id', 'mime_type'], 'required'],
 			[['model_id'], 'integer'],
 			[['created_at', 'deleted_at'], 'safe'],
-			[['name', 'original_name', 'extension', 'path', 'category', 'model_type'], 'string', 'max' => 255],
+			[['name', 'original_name', 'extension', 'path', 'category', 'model_type', 'mime_type'], 'string', 'max' => 255],
 		];
 	}
 
@@ -51,6 +52,7 @@ class Media extends AR
 			'model_id'      => 'Model ID',
 			'created_at'    => 'Created At',
 			'deleted_at'    => 'Deleted At',
+			'mime_type'     => 'Mime Type',
 		];
 	}
 

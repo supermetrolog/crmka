@@ -19,13 +19,14 @@ class MediaSearch extends Form
 	public $model_id;
 	public $created_at;
 	public $deleted;
+	public $mime_type;
 
 	public function rules(): array
 	{
 		return [
 			[['id', 'model_id'], 'integer'],
 			[['deleted'], 'boolean'],
-			[['name', 'original_name', 'extension', 'path', 'category', 'model_type', 'created_at'], 'safe'],
+			[['name', 'original_name', 'extension', 'path', 'category', 'model_type', 'created_at', 'mime_type'], 'safe'],
 		];
 	}
 
@@ -63,7 +64,8 @@ class MediaSearch extends Form
 		      ->andFilterWhere(['like', 'extension', $this->extension])
 		      ->andFilterWhere(['like', 'path', $this->path])
 		      ->andFilterWhere(['like', 'category', $this->category])
-		      ->andFilterWhere(['like', 'model_type', $this->model_type]);
+		      ->andFilterWhere(['like', 'model_type', $this->model_type])
+		      ->andFilterWhere(['like', 'mime_type', $this->mime_type]);
 
 		return $dataProvider;
 	}
