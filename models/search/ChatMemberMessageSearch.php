@@ -36,7 +36,7 @@ class ChatMemberMessageSearch extends Form
 		                          ->with(['tasks.createdByUser.userProfile'])
 		                          ->with(['alerts.createdByUser.userProfile'])
 		                          ->with(['reminders.createdByUser.userProfile'])
-		                          ->with(['contacts', 'tags']);
+		                          ->with(['contacts', 'tags', 'notifications']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
