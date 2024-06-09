@@ -82,3 +82,29 @@ Authorization: Bearer {{token}}
   "message": "SUKA",
   "status": 1
 }
+
+###
+
+
+POST {{url}}/chat-member-messages
+Content-Type: multipart/form-data; boundary=boundary
+Accept: application/json
+Authorization: Bearer {{token}}
+
+--boundary
+Content-Disposition: form-data; name="message"
+
+SUKA
+
+--boundary
+Content-Disposition: form-data; name="to_chat_member_id"
+
+43593
+
+--boundary
+Content-Disposition: form-data; name="files"; filename="alert.http";
+
+< alert.http
+
+
+###

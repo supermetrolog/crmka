@@ -21,7 +21,8 @@ class MediaForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['files'], 'file', 'skipOnEmpty' => false],
+			[['category', 'model_type', 'model_id'], 'required'],
+			[['files'], 'each', 'rule' => ['file'], 'skipOnEmpty' => true],
 		];
 	}
 
@@ -31,9 +32,9 @@ class MediaForm extends Form
 
 		foreach ($this->files as $file) {
 			$dtos[] = new CreateMediaDto([
-				'category' => $this->category,
-				'model_type' => $this->model_type,
-				'model_id' => $this->model_id,
+				'category'     => $this->category,
+				'model_type'   => $this->model_type,
+				'model_id'     => $this->model_id,
 				'uploadedFile' => $file,
 			]);
 		}

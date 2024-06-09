@@ -74,15 +74,13 @@ class ChatMemberMessageController extends AppController
 
 		$mediaForm = new MediaForm();
 
-		// я хз какой должен быть путь и категория
-		// и откуда они вообще должны браться
-		$mediaForm->category = 'chat_member_message';
-		$mediaForm->model_id = $this->user->id;
+		$mediaForm->category   = ChatMemberMessage::DEFAULT_MEDIA_CATEGORY;
+		$mediaForm->model_id   = $this->user->id;
 		$mediaForm->model_type = $this->user->identity::getMorphClass();
 
 		$mediaForm->files = UploadedFile::getInstancesByName('files');
 
-		//$mediaForm->validateOrThrow();
+		$mediaForm->validateOrThrow();
 
 		$model = $this->service->create($form->getDto(), $mediaForm->getDtos());
 

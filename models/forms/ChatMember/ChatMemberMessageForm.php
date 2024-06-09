@@ -26,6 +26,7 @@ class ChatMemberMessageForm extends Form
 	{
 		return [
 			[['message', 'from_chat_member_id', 'to_chat_member_id'], 'required'],
+			[['from_chat_member_id', 'to_chat_member_id'], 'integer'],
 			[['message'], 'string', 'max' => 2048],
 			[['from_chat_member_id'], 'exist', 'targetClass' => ChatMember::class, 'targetAttribute' => ['from_chat_member_id' => 'id']],
 			[['to_chat_member_id'], 'exist', 'targetClass' => ChatMember::class, 'targetAttribute' => ['to_chat_member_id' => 'id']],
@@ -63,8 +64,8 @@ class ChatMemberMessageForm extends Form
 	{
 		if ($this->getScenario() === self::SCENARIO_CREATE) {
 			return new CreateChatMemberMessageDto([
-				'from'       => ChatMember::find()->byId($this->from_chat_member_id)->one(),
-				'to'         => ChatMember::find()->byId($this->to_chat_member_id)->one(),
+				'from'       => ChatMember::find()->byId((int)$this->from_chat_member_id)->one(),
+				'to'         => ChatMember::find()->byId((int)$this->to_chat_member_id)->one(),
 				'message'    => $this->message,
 				'contactIds' => $this->contact_ids,
 				'tagIds'     => $this->tag_ids,

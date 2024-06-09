@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\components;
+namespace app\components\Media;
 
 use app\components\PathBuilder\PathBuilderFactory;
 use yii\base\Component;
@@ -19,9 +19,12 @@ class Media extends Component
 		parent::__construct($config);
 
 		$this->pathBuilderFactory = $pathBuilderFactory;
-		$this->diskPath           = $this->pathBuilderFactory->create()->addPart($this->diskPath)->build()->getPath();
+		$this->diskPath           = $this->pathBuilderFactory->create()->addPart($this->diskPath)->build()->getRel();
 	}
 
+	/**
+	 * @throws SaveMediaErrorException
+	 */
 	public function put(string $path, UploadedFile $uploadedFile): void
 	{
 		$path = $this->pathBuilderFactory
@@ -29,9 +32,11 @@ class Media extends Component
 			->addPart($this->diskPath)
 			->addPart($path)
 			->build()
-			->getPath();
+			->getAbs();
 
-		$uploadedFile->saveAs($path);
+		if (!$uploadedFile->saveAs($path)) {
+			throw new SaveMediaErrorException(sprintf('Save media to path "%s" error', $path));
+		}
 	}
 
 	public function delete(string $path): void

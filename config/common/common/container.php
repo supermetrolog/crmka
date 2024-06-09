@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use app\components\Media;
+use app\components\Media\Media;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ActiveQuery\NotificationChannelQuery;
 use app\models\Notification\NotificationChannel;

@@ -6,7 +6,6 @@ namespace app\resources;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Media;
-use app\components\Media as MediaComponent;
 
 class MediaResource extends JsonResource
 {

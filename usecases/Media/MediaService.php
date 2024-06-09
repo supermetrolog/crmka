@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace app\usecases\Media;
 
-use app\components\Media as MediaComponent;
-use app\dto\Media\UpdateMediaDto;
+use app\components\Media\Media as MediaComponent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
-use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Media;
 use Throwable;
 use yii\db\StaleObjectException;

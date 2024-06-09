@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\usecases\Media;
 
-use app\components\Media as MediaComponent;
+use app\components\Media\Media as MediaComponent;
 use app\dto\Media\CreateMediaDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\Media;

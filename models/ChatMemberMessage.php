@@ -33,6 +33,8 @@ use yii\db\ActiveQuery;
  */
 class ChatMemberMessage extends AR
 {
+	public const DEFAULT_MEDIA_CATEGORY = 'chat_member_message';
+
 	protected bool $useSoftCreate = true;
 	protected bool $useSoftUpdate = true;
 	protected bool $useSoftDelete = true;

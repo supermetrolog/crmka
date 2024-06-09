@@ -13,9 +13,14 @@ class Path
 		$this->path = $path;
 	}
 
-	public function getPath(): string
+	public function getRel(): string
 	{
 		return $this->path;
+	}
+
+	public function getAbs(): string
+	{
+		return DIRECTORY_SEPARATOR . $this->path;
 	}
 
 	public function setPath(string $path): self
@@ -27,7 +32,7 @@ class Path
 
 	public function fileExists(): bool
 	{
-		return file_exists($this->path);
+		return file_exists($this->getAbs());
 	}
 
 	public function unlink(): void
@@ -36,6 +41,6 @@ class Path
 			return;
 		}
 
-		unlink($this->path);
+		unlink($this->getAbs());
 	}
 }
