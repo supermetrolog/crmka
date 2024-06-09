@@ -21,6 +21,7 @@ use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
 use app\resources\MediaResource;
 use app\usecases\ChatMember\ChatMemberService;
+use Throwable;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
@@ -71,7 +72,12 @@ class ChatMemberController extends AppController
 	}
 
 	/**
+	 * @param int $id
+	 *
+	 * @return ActiveDataProvider
+	 * @throws ErrorException
 	 * @throws ModelNotFoundException
+	 * @throws ValidateException
 	 */
 	public function actionMedia(int $id): ActiveDataProvider
 	{
@@ -132,7 +138,7 @@ class ChatMemberController extends AppController
 	 *
 	 * @return CallResource
 	 * @throws ValidateException
-	 * @throws \Throwable
+	 * @throws Throwable
 	 */
 	public function actionCalled(int $id): CallResource
 	{

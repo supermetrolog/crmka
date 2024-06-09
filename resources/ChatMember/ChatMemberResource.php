@@ -9,6 +9,7 @@ use app\models\ChatMember;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
+use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
 use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
@@ -33,6 +34,7 @@ class ChatMemberResource extends JsonResource
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'model'      => $this->getModel()->toArray(),
+			'last_call'  => CallResource::make($this->resource->lastCall)->toArray()
 		];
 	}
 

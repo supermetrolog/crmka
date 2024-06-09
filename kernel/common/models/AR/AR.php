@@ -25,7 +25,7 @@ class AR extends ActiveRecord
 	protected bool $useSoftUpdate = false;
 	protected bool $useSoftCreate = false;
 
-	
+
 	public function formName(): string
 	{
 		return '';
@@ -223,6 +223,27 @@ class AR extends ActiveRecord
 			$type => $localColumn
 		])->from([$class::tableName() => $class::getTable()]);
 	}
+
+	/**
+	 * @param string|AR $class
+	 * @param string    $column
+	 * @param string    $name
+	 * @param string    $localColumn
+	 *
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function morphHasOneVia(string $class, string $column = 'id', string $name = 'model', string $localColumn = 'morph'): ActiveQuery
+	{
+		$type = $name . '_type';
+		$id   = $name . '_id';
+
+		return $this->hasOne($class, [
+			$column      => $id,
+			$localColumn => $type,
+		])->from([$class::tableName() => $class::getTable()]);
+	}
+
 
 	/**
 	 * @param string|AR $class

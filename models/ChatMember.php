@@ -3,9 +3,13 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
+use app\models\ActiveQuery\RelationQuery;
+use app\models\ActiveQuery\TaskQuery;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
@@ -29,11 +33,16 @@ use yii\db\ActiveQuery;
  * @property ObjectChatMember      $objectChatMember
  * @property Objects               $object
  * @property ChatMemberMessage     $pinnedChatMemberMessage
+ * @property Relation[]            $relationFirst
+ * @property Call[]                $calls
+ * @property Call                  $lastCall
  */
 class ChatMember extends AR
 {
 	protected bool $useSoftCreate = true;
 	protected bool $useSoftUpdate = true;
+
+	public ?int $last_call_rel_id = null;
 
 	public static function tableName(): string
 	{
@@ -146,6 +155,44 @@ class ChatMember extends AR
 	public function getPinnedChatMemberMessage(): ChatMemberMessageQuery
 	{
 		return $this->hasOne(ChatMemberMessage::class, ['id' => 'pinned_chat_member_message_id']);
+	}
+
+	/**
+	 * @return RelationQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getRelationFirst(): RelationQuery
+	{
+		return $this->morphHasMany(Relation::class, 'id', 'first');
+	}
+
+	/**
+	 * @return RelationQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getLastCallRelationFirst(): RelationQuery
+	{
+		return $this->morphHasOne(Relation::class, 'id', 'first')->andWhere([Relation::getColumn('id') => $this->last_call_rel_id]);
+	}
+
+	/**
+	 * @return ActiveQuery|TaskQuery
+	 * @throws ErrorException
+	 */
+	public function getCalls(): CallQuery
+	{
+		return $this->morphHasManyVia(Call::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
+	/**
+	 * @return ActiveQuery|TaskQuery
+	 * @throws ErrorException
+	 */
+	public function getLastCall(): CallQuery
+	{
+		return $this->morphHasOneVia(Call::class, 'id', 'second')
+		            ->via('lastCallRelationFirst');
 	}
 
 	public static function find(): ChatMemberQuery

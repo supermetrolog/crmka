@@ -2,6 +2,7 @@
 
 namespace app\models\search;
 
+use app\helpers\DumpHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMemberMessage;
@@ -43,9 +44,9 @@ class ChatMemberMediaSearch extends Form
 	{
 		$query = Media::find()
 		              ->select(Media::getColumn('*'))
-		              ->leftJoin(Relation::getTable(), Relation::getColumn('second_id') . '=' . Media::getColumn('id'))
-		              ->leftJoin(ChatMemberMessage::getTable(), Relation::getColumn('first_id') . '=' . ChatMemberMessage::getColumn('id'))
-		              ->where([
+		              ->innerJoin(Relation::getTable(), Relation::getColumn('second_id') . '=' . Media::getColumn('id'))
+		              ->innerJoin(ChatMemberMessage::getTable(), Relation::getColumn('first_id') . '=' . ChatMemberMessage::getColumn('id'))
+		              ->andWhere([
 			              Relation::getColumn('second_type') => Media::getMorphClass(),
 			              Relation::getColumn('first_type')  => ChatMemberMessage::getMorphClass(),
 		              ])

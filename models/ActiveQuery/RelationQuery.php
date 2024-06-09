@@ -38,18 +38,20 @@ class RelationQuery extends AQ
 		]);
 	}
 
+	public function byFirstType(string $type): self
+	{
+		return $this->andWhere([$this->field('first_type') => $type]);
+	}
+
+	public function bySecondType(string $type): self
+	{
+		return $this->andWhere([$this->field('second_type') => $type]);
+	}
+
 	public function bySecond(int $id, string $type): self
 	{
 		return $this->andWhere([
 			$this->field('second_id')   => $id,
-			$this->field('second_type') => $type
-		]);
-	}
-
-
-	public function bySecondType(string $type): self
-	{
-		return $this->andWhere([
 			$this->field('second_type') => $type
 		]);
 	}

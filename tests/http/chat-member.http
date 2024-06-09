@@ -1,11 +1,11 @@
-GET {{url}}/chat-members?object_id=10951
+GET {{url}}/chat-members?id=43593
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ###
 
-GET {{url}}/chat-members/54158
+GET {{url}}/chat-members/43593
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -40,4 +40,25 @@ Authorization: Bearer {{token}}
 {
   "chat_member_id": 54158
 }
+###
+
+GET {{url}}/chat-members/43593/media
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+Origin: https://clients.pennylane.pro
+
+###
+
+POST {{url}}/chat-members/43593/called
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+Origin: https://clients.pennylane.pro
+
+{
+  "user_id": 3,
+  "contact_id": 2
+}
+
 ###

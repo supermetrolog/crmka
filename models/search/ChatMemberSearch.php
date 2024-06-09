@@ -2,6 +2,7 @@
 
 namespace app\models\search;
 
+use app\helpers\DumpHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMember;
@@ -47,10 +48,16 @@ class ChatMemberSearch extends Form
 	public function search(array $params): ActiveDataProvider
 	{
 		$query = ChatMember::find()
+		                   ->select([
+			                   ChatMember::getColumn('*'),
+			                   'last_call_rel_id' => 'last_call_rel.id'
+		                   ])
+		                   ->leftJoinLastCallRelation()
 		                   ->joinWith([
 			                   'objectChatMember.object',
 			                   'request'
 		                   ])
+		                   ->with(['lastCall.user.userProfile'])
 		                   ->with(['objectChatMember.object.company'])
 		                   ->with([
 			                   'request.company',
