@@ -1,40 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\components;
 
+use app\components\PathBuilder\PathBuilderFactory;
 use yii\base\Component;
 use yii\web\UploadedFile;
 
 class Media extends Component
 {
-	private PathBuilder $pathBuilder;
+	private PathBuilderFactory $pathBuilderFactory;
 
-	public string $diskPath = '';
-	public string $webPath = '';
+	public string $diskPath;
 
-	public function __construct(PathBuilder $pathBuilder, $config = [])
+	public function __construct(PathBuilderFactory $pathBuilderFactory, $config = [])
 	{
-		$this->pathBuilder = $pathBuilder;
-
 		parent::__construct($config);
 
-		$this->diskPath = rtrim($this->diskPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		$this->webPath = rtrim($this->webPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+		$this->pathBuilderFactory = $pathBuilderFactory;
+		$this->diskPath           = $this->pathBuilderFactory->create()->addPart($this->diskPath)->build()->getPath();
 	}
 
 	public function put(string $path, UploadedFile $uploadedFile): void
 	{
-		$uploadedFile->saveAs($this->pathBuilder->join($this->diskPath, $path));
+		$path = $this->pathBuilderFactory
+			->create()
+			->addPart($this->diskPath)
+			->addPart($path)
+			->build()
+			->getPath();
+
+		$uploadedFile->saveAs($path);
 	}
 
 	public function delete(string $path): void
 	{
-		$path = $this->pathBuilder->join($this->diskPath, $path);
+		$path = $this->pathBuilderFactory
+			->create()
+			->addPart($this->diskPath)
+			->addPart($path)
+			->build();
 
-		if (! file_exists($path)) {
-			return;
-		}
-
-		unlink($path);
+		$path->unlink();
 	}
 }

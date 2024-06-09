@@ -76,7 +76,6 @@ class ChatMemberMessageController extends AppController
 
 		// я хз какой должен быть путь и категория
 		// и откуда они вообще должны браться
-		$mediaForm->path = '';
 		$mediaForm->category = 'chat_member_message';
 		$mediaForm->model_id = $this->user->id;
 		$mediaForm->model_type = $this->user->identity::getMorphClass();

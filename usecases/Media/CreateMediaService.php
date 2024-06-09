@@ -4,33 +4,28 @@ declare(strict_types=1);
 
 namespace app\usecases\Media;
 
-use app\components\PathBuilder;
+use app\components\Media as MediaComponent;
 use app\dto\Media\CreateMediaDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
-use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Media;
-use app\components\Media as MediaComponent;
-use yii\web\UploadedFile;
+use Throwable;
 
 class CreateMediaService
 {
-	private MediaComponent $media;
+	private MediaComponent               $media;
 	private TransactionBeginnerInterface $transactionBeginner;
-	private PathBuilder $pathBuilder;
 
 	public function __construct(
 		MediaComponent $media,
-		TransactionBeginnerInterface $transactionBeginner,
-		PathBuilder $pathBuilder
+		TransactionBeginnerInterface $transactionBeginner
 	)
 	{
-		$this->media = $media;
+		$this->media               = $media;
 		$this->transactionBeginner = $transactionBeginner;
-		$this->pathBuilder = $pathBuilder;
 	}
 
 	/**
-	 * @throws \Throwable
+	 * @throws Throwable
 	 */
 	public function create(CreateMediaDto $dto): Media
 	{
@@ -38,7 +33,7 @@ class CreateMediaService
 
 		try {
 			$name = md5($dto->uploadedFile->name . time());
-			$path = $this->pathBuilder->join($dto->path, "{$name}.{$dto->uploadedFile->extension}");
+			$path = "{$name}.{$dto->uploadedFile->extension}";
 
 			$media = new Media([
 				'name'          => $name,
@@ -57,7 +52,7 @@ class CreateMediaService
 			$tx->commit();
 
 			return $media;
-		} catch (\Throwable $th) {
+		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;
 		}

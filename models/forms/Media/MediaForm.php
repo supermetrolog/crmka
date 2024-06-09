@@ -14,7 +14,6 @@ class MediaForm extends Form
 	 * @var UploadedFile[]
 	 */
 	public $files;
-	public $path;
 	public $category;
 	public $model_type;
 	public $model_id;
@@ -32,7 +31,6 @@ class MediaForm extends Form
 
 		foreach ($this->files as $file) {
 			$dtos[] = new CreateMediaDto([
-				'path' => $this->path,
 				'category' => $this->category,
 				'model_type' => $this->model_type,
 				'model_id' => $this->model_id,

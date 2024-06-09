@@ -1,6 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
+use app\components\Media;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ActiveQuery\NotificationChannelQuery;
 use app\models\Notification\NotificationChannel;
@@ -13,10 +15,9 @@ return [
 		'db'                                => $db,
 		'old_db'                            => $old_db,
 		TransactionBeginnerInterface::class => 'db',
-		\app\components\Media::class        => [
-			'class'    => \app\components\Media::class,
-			'diskPath' => dirname(__DIR__, 3) . '/public_html/storage',
-			'webPath'  => '/storage',
+		Media::class                        => [
+			'class'    => Media::class,
+			'diskPath' => YII_PROJECT_ROOT . '/public_html/uploads',
 		],
 	],
 	'definitions' => [
