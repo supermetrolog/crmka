@@ -24,10 +24,10 @@ use yii\db\ActiveQuery;
  */
 class QuestionAnswer extends AR
 {
-	public const CATEGORY_YES_NO      = 1;
-	public const CATEGORY_TEXT_ANSWER = 2;
-	public const CATEGORY_TAB         = 3;
-	public const CATEGORY_CHECKBOX    = 4;
+	public const CATEGORY_YES_NO      = 'yes-no';
+	public const CATEGORY_TEXT_ANSWER = 'text-answer';
+	public const CATEGORY_TAB         = 'tab';
+	public const CATEGORY_CHECKBOX    = 'checkbox';
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -41,10 +41,10 @@ class QuestionAnswer extends AR
 	{
 		return [
 			[['question_id', 'field_id', 'category'], 'required'],
-			[['question_id', 'field_id', 'category'], 'integer'],
+			[['question_id', 'field_id'], 'integer'],
 			['category', 'in', 'range' => self::getCategories()],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
-			[['value'], 'string', 'max' => 255],
+			[['category', 'value'], 'string', 'max' => 255],
 			[['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],
 			[['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
 		];

@@ -27,10 +27,10 @@ class QuestionAnswerForm extends Form
 	{
 		return [
 			[['question_id', 'field_id', 'category'], 'required'],
-			[['question_id', 'field_id', 'category'], 'integer'],
+			[['question_id', 'field_id'], 'integer'],
 			['category', 'in', 'range' => QuestionAnswer::getCategories()],
-			[['value'], 'safe'],
-			[['value'], 'string', 'max' => 255],
+			[['category', 'value'], 'safe'],
+			[['category', 'value'], 'string', 'max' => 255],
 			[['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],
 			[['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
 		];

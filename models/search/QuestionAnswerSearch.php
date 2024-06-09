@@ -19,8 +19,9 @@ class QuestionAnswerSearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['id', 'question_id', 'field_id', 'category'], 'integer'],
-			[['value'], 'safe'],
+			[['id', 'question_id', 'field_id'], 'integer'],
+			['category', 'in', 'range' => QuestionAnswer::getCategories()],
+			[['category', 'value'], 'safe'],
 			[['deleted'], 'boolean'],
 		];
 	}
@@ -44,10 +45,10 @@ class QuestionAnswerSearch extends Form
 			'id'          => $this->id,
 			'question_id' => $this->question_id,
 			'field_id'    => $this->field_id,
-			'category'    => $this->category,
 		]);
 
 		$query->andFilterWhere(['like', 'value', $this->value]);
+		$query->andFilterWhere(['like', 'category', $this->category]);
 
 		if ($this->isFilterTrue($this->deleted)) {
 			$query->deleted();
