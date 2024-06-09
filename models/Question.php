@@ -8,17 +8,19 @@ use app\models\ActiveQuery\QuestionQuery;
 /**
  * This is the model class for table "question".
  *
- * @property int         $id
- * @property string      $text
- * @property string      $created_at
- * @property string      $updated_at
- * @property string|null $deleted_at
+ * @property int              $id
+ * @property string           $text
+ * @property string           $created_at
+ * @property string           $updated_at
+ * @property string|null      $deleted_at
+ *
+ * @property QuestionAnswer[] $answers
  */
 class Question extends AR
 {
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
-	
+
 	public static function tableName(): string
 	{
 		return 'question';
@@ -43,7 +45,17 @@ class Question extends AR
 			'deleted_at' => 'Deleted At',
 		];
 	}
-	
+
+	/**
+	 * Gets query for [[QuestionAnswers]].
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getAnswers()
+	{
+		return $this->hasMany(QuestionAnswer::className(), ['question_id' => 'id']);
+	}
+
 	public static function find(): QuestionQuery
 	{
 		return new QuestionQuery(get_called_class());

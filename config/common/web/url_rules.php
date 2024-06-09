@@ -294,6 +294,7 @@ return
 			'except'        => [],
 			'extraPatterns' => [
 				'GET,OPTIONS'                       => 'index',
+				'GET,OPTIONS with-question-answer'  => 'index-with-question-answer',
 				'GET,OPTIONS <id>'                  => 'view',
 				'POST,OPTIONS'                      => 'create',
 				'POST,OPTIONS with-question-answer' => 'create-with-question-answer',

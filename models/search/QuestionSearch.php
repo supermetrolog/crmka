@@ -27,7 +27,7 @@ class QuestionSearch extends Form
 	 */
     public function search(array $params): ActiveDataProvider
     {
-        $query = Question::find();
+        $query = Question::find()->with('answers');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
