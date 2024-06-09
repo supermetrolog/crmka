@@ -20,6 +20,7 @@ class QuestionForm extends Form
 	{
 		return [
 			[['text'], 'required'],
+			[['text'], 'string', 'max' => 1024],
 		];
 	}
 
