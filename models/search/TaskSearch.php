@@ -16,13 +16,14 @@ class TaskSearch extends Form
 	public $created_by_id;
 	public $deleted;
 	public $expired;
+	public $completed;
 
 
 	public function rules(): array
 	{
 		return [
 			[['id', 'user_id', 'status', 'created_by_id'], 'integer'],
-			[['deleted', 'expired'], 'boolean'],
+			[['deleted', 'expired', 'completed'], 'boolean'],
 			[['message', 'start', 'end', 'created_by_type'], 'safe'],
 		];
 	}
@@ -56,6 +57,14 @@ class TaskSearch extends Form
 
 		if ($this->isFilterFalse($this->expired)) {
 			$query->notExpired();
+		}
+
+		if ($this->isFilterTrue($this->completed)) {
+			$query->completed();
+		}
+
+		if ($this->isFilterFalse($this->completed)) {
+			$query->notCompleted();
 		}
 
 		$query->andFilterWhere([
