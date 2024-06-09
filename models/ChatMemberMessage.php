@@ -32,6 +32,7 @@ use yii\db\ActiveQuery;
  * @property UserNotification[]     $notifications
  * @property Reminder[]             $reminders
  * @property ChatMemberMessageTag[] $tags
+ * @property Media[]                $files
  */
 class ChatMemberMessage extends AR
 {
@@ -154,6 +155,16 @@ class ChatMemberMessage extends AR
 	public function getTags(): ChatMemberMessageTagQuery
 	{
 		return $this->morphHasManyVia(ChatMemberMessageTag::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
+	/**
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getFiles(): ActiveQuery
+	{
+		return $this->morphHasManyVia(Media::class, 'id', 'second')
 		            ->via('relationFirst');
 	}
 
