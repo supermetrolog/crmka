@@ -1,4 +1,4 @@
-GET {{url}}/chat-members?id=43593
+GET {{url}}/chat-members
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}

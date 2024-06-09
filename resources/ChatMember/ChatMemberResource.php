@@ -34,7 +34,7 @@ class ChatMemberResource extends JsonResource
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'model'      => $this->getModel()->toArray(),
-			'last_call'  => CallResource::make($this->resource->lastCall)->toArray()
+			'last_call'  => CallResource::tryMakeArray($this->resource->lastCall)
 		];
 	}
 
