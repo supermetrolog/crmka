@@ -8,6 +8,6 @@ use yii\base\BaseObject;
 
 class CreateFieldDto extends BaseObject
 {
-	public int $field_type;
-	public int $type;
+	public string $field_type;
+	public string $type;
 }

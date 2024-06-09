@@ -22,7 +22,8 @@ class FieldForm extends Form
 	{
 		return [
 			[['field_type', 'type'], 'required'],
-			[['field_type', 'type'], 'integer'],
+			[['field_type', 'type'], 'safe'],
+			[['field_type', 'type'], 'string', 'max' => 255],
 			['field_type', 'in', 'range' => Field::getFieldTypes()],
 			['type', 'in', 'range' => Field::getTypes()],
 		];

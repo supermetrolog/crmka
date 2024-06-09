@@ -13,11 +13,14 @@ class FieldSearch extends Form
 	public $field_type;
 	public $type;
 	public $deleted;
-	
+
 	public function rules(): array
 	{
 		return [
-			[['id', 'field_type', 'type'], 'integer'],
+			[['id'], 'integer'],
+			[['field_type', 'type'], 'safe'],
+			['field_type', 'in', 'range' => Field::getFieldTypes()],
+			['type', 'in', 'range' => Field::getTypes()],
 			[['deleted'], 'boolean'],
 		];
 	}
@@ -38,10 +41,11 @@ class FieldSearch extends Form
 		$this->validateOrThrow();
 
 		$query->andFilterWhere([
-			'id'         => $this->id,
-			'field_type' => $this->field_type,
-			'type'       => $this->type,
+			'id' => $this->id,
 		]);
+
+		$query->andFilterWhere(['like', 'field_type', $this->field_type]);
+		$query->andFilterWhere(['like', 'type', $this->type]);
 
 		if ($this->isFilterTrue($this->deleted)) {
 			$query->deleted();
@@ -50,7 +54,7 @@ class FieldSearch extends Form
 		if ($this->isFilterFalse($this->deleted)) {
 			$query->notDeleted();
 		}
-		
+
 		return $dataProvider;
 	}
 }

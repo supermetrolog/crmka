@@ -17,15 +17,15 @@ use app\models\ActiveQuery\FieldQuery;
  */
 class Field extends AR
 {
-	public const FIELD_TYPE_RADIO        = 1;
-	public const FIELD_TYPE_CHECKBOX     = 2;
-	public const FIELD_TYPE_TAB_CHECKBOX = 3;
-	public const FIELD_TYPE_INPUT        = 4;
-	public const FIELD_TYPE_TEXTAREA     = 5;
+	public const FIELD_TYPE_RADIO        = 'radio';
+	public const FIELD_TYPE_CHECKBOX     = 'checkbox';
+	public const FIELD_TYPE_TAB_CHECKBOX = 'tab-checkbox';
+	public const FIELD_TYPE_INPUT        = 'input';
+	public const FIELD_TYPE_TEXTAREA     = 'textarea';
 
-	public const TYPE_BOOLEAN = 1;
-	public const TYPE_STRING  = 2;
-	public const TYPE_INTEGER = 3;
+	public const TYPE_BOOLEAN = 'boolean';
+	public const TYPE_STRING  = 'string';
+	public const TYPE_INTEGER = 'integer';
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -39,7 +39,7 @@ class Field extends AR
 	{
 		return [
 			[['field_type', 'type'], 'required'],
-			[['field_type', 'type'], 'integer'],
+			[['field_type', 'type'], 'string', 'max' => 255],
 			['field_type', 'in', 'range' => self::getFieldTypes()],
 			['type', 'in', 'range' => self::getTypes()],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],

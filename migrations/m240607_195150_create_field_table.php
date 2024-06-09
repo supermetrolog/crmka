@@ -15,8 +15,8 @@ class m240607_195150_create_field_table extends Migration
 		$tableName = '{{%field}}';
 		$this->table($tableName, [
 			'id'         => $this->primaryKey(),
-			'field_type' => $this->tinyInteger()->notNull(),
-			'type'       => $this->tinyInteger()->notNull(),
+			'field_type' => $this->string()->notNull(),
+			'type'       => $this->string()->notNull(),
 		], $this->timestamps(), $this->softDelete());
 	}
 
