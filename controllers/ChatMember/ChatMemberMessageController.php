@@ -88,8 +88,12 @@ class ChatMemberMessageController extends AppController
 	}
 
 	/**
-	 * @throws SaveModelException
+	 * @param int $id
+	 *
+	 * @return ChatMemberMessageResource
 	 * @throws NotFoundHttpException
+	 * @throws SaveModelException
+	 * @throws Throwable
 	 * @throws ValidateException
 	 */
 	public function actionUpdate(int $id): ChatMemberMessageResource

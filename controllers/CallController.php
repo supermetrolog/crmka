@@ -14,6 +14,7 @@ use app\repositories\CallRepository;
 use app\resources\CallResource;
 use app\usecases\Call\CallService;
 use app\usecases\Call\CreateCallService;
+use Exception;
 use Throwable;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -24,7 +25,6 @@ class CallController extends AppController
 {
 	private CallService       $service;
 	private CreateCallService $createCallService;
-	private CallRepository    $repository;
 
 
 	public function __construct(
@@ -32,13 +32,11 @@ class CallController extends AppController
 		$module,
 		CallService $service,
 		CreateCallService $createCallService,
-		CallRepository $repository,
 		array $config = []
 	)
 	{
 		$this->service           = $service;
 		$this->createCallService = $createCallService;
-		$this->repository        = $repository;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -89,6 +87,7 @@ class CallController extends AppController
 	 * @throws NotFoundHttpException
 	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws Exception
 	 */
 	public function actionUpdate(int $id): CallResource
 	{
