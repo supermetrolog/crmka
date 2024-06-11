@@ -17,7 +17,7 @@ class ChatMemberMessageViewService
 	public function create(CreateChatMemberMessageViewDto $dto): ChatMemberMessageView
 	{
 		$model = new ChatMemberMessageView([
-			'chat_member_id'         => $dto->message->from_chat_member_id,
+			'chat_member_id'         => $dto->message->to_chat_member_id,
 			'chat_member_message_id' => $dto->message->id,
 		]);
 
