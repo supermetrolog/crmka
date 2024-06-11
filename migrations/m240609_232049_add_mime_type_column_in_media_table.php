@@ -16,7 +16,7 @@ class m240609_232049_add_mime_type_column_in_media_table extends Migration
 		$this->addColumn(
 			$table,
 			'mime_type',
-			$this->string()->notNull()
+			$this->string()->notNull()->defaultValue('text/plain')
 		);
 	}
 
