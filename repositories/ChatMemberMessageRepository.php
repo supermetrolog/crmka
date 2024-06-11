@@ -17,6 +17,7 @@ class ChatMemberMessageRepository
 	public function findPreviousUnreadByMessage(ChatMemberMessage $message): array
 	{
 		return ChatMemberMessage::find()
+								->with('notifications')
 		                        ->leftJoin(ChatMemberMessageView::getTable(), ChatMemberMessageView::getColumn('chat_member_message_id') . '=' . ChatMemberMessage::getColumn('id'))
 		                        ->where(['<=', ChatMemberMessage::getColumn('id'), $message->id])
 		                        ->andWhere([ChatMemberMessage::getColumn('to_chat_member_id') => $message->to_chat_member_id])
