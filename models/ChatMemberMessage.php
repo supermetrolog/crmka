@@ -151,16 +151,6 @@ class ChatMemberMessage extends AR
 	}
 
 	/**
-	 * @return ActiveQuery
-	 * @throws ErrorException
-	 */
-	public function getNotifications(): ActiveQuery
-	{
-		return $this->morphHasManyVia(UserNotification::class, 'id', 'second')
-		            ->via('relationFirst');
-	}
-
-	/**
 	 * @return ActiveQuery|ChatMemberMessageTagQuery
 	 * @throws ErrorException
 	 */
@@ -182,7 +172,6 @@ class ChatMemberMessage extends AR
 
 	/**
 	 * @return ActiveQuery|ChatMemberMessageViewQuery
-	 * @throws ErrorException
 	 */
 	public function getViews(): ChatMemberMessageViewQuery
 	{
