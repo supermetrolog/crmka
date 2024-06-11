@@ -8,6 +8,7 @@ use app\components\Notification\Factories\NotifierFactory;
 use app\components\Notification\Notification;
 use app\dto\Alert\CreateAlertDto;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
+use app\dto\ChatMember\CreateChatMemberMessageViewDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
 use app\dto\Media\CreateMediaDto;
 use app\dto\Notification\CreateNotificationDto;
@@ -19,11 +20,13 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Alert;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
+use app\models\ChatMemberMessageView;
 use app\models\Contact;
 use app\models\Notification\UserNotification;
 use app\models\Relation;
 use app\models\Reminder;
 use app\models\Task;
+use app\repositories\ChatMemberMessageRepository;
 use app\usecases\Alert\CreateAlertService;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Relation\RelationService;
@@ -31,16 +34,19 @@ use app\usecases\Reminder\CreateReminderService;
 use app\usecases\Task\CreateTaskService;
 use Throwable;
 use yii\db\Exception;
+use yii\db\Query;
 
 class ChatMemberMessageService
 {
-	private TransactionBeginnerInterface $transactionBeginner;
-	protected CreateTaskService          $createTaskService;
-	protected CreateAlertService         $createAlertService;
-	protected CreateReminderService      $createReminderService;
-	protected CreateMediaService         $createMediaService;
-	protected RelationService            $relationService;
-	protected NotifierFactory            $notifierFactory;
+	private TransactionBeginnerInterface   $transactionBeginner;
+	protected CreateTaskService            $createTaskService;
+	protected CreateAlertService           $createAlertService;
+	protected CreateReminderService        $createReminderService;
+	protected CreateMediaService           $createMediaService;
+	protected ChatMemberMessageViewService $chatMemberMessageViewService;
+	protected RelationService              $relationService;
+	protected NotifierFactory              $notifierFactory;
+	protected ChatMemberMessageRepository  $chatMemberMessageRepository;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -49,16 +55,20 @@ class ChatMemberMessageService
 		CreateAlertService $createAlertService,
 		CreateReminderService $createReminderService,
 		CreateMediaService $createMediaService,
-		NotifierFactory $notifierFactory
+		ChatMemberMessageViewService $chatMemberMessageViewService,
+		NotifierFactory $notifierFactory,
+		ChatMemberMessageRepository $chatMemberMessageRepository
 	)
 	{
-		$this->transactionBeginner   = $transactionBeginner;
-		$this->createTaskService     = $createTaskService;
-		$this->relationService       = $relationService;
-		$this->createAlertService    = $createAlertService;
-		$this->createReminderService = $createReminderService;
-		$this->createMediaService    = $createMediaService;
-		$this->notifierFactory       = $notifierFactory;
+		$this->transactionBeginner          = $transactionBeginner;
+		$this->createTaskService            = $createTaskService;
+		$this->relationService              = $relationService;
+		$this->createAlertService           = $createAlertService;
+		$this->createReminderService        = $createReminderService;
+		$this->createMediaService           = $createMediaService;
+		$this->chatMemberMessageViewService = $chatMemberMessageViewService;
+		$this->notifierFactory              = $notifierFactory;
+		$this->chatMemberMessageRepository  = $chatMemberMessageRepository;
 	}
 
 	/**
@@ -111,6 +121,8 @@ class ChatMemberMessageService
 					'second_id'   => $media->id,
 				]));
 			}
+
+			$this->markMessageAsRead($message);
 
 			$tx->commit();
 
@@ -217,6 +229,8 @@ class ChatMemberMessageService
 				'second_id'   => $task->id,
 			]));
 
+			$this->markMessageAsUnread($message);
+
 			$tx->commit();
 
 			return $task;
@@ -273,6 +287,8 @@ class ChatMemberMessageService
 				'second_id'   => $reminder->id,
 			]));
 
+			$this->markMessageAsUnread($message);
+
 			$tx->commit();
 
 			return $reminder;
@@ -308,12 +324,56 @@ class ChatMemberMessageService
 				'second_id'   => $userNotification->id,
 			]));
 
+			$this->markMessageAsUnread($message);
+
 			$tx->commit();
 
 			return $userNotification;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
+		}
+	}
+
+	public function viewMessages(ChatMemberMessage $message): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			foreach ($this->chatMemberMessageRepository->findPreviousUnreadByMessage($message) as $unreadMessage) {
+				$this->markMessageAsRead($unreadMessage);
+			}
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function markMessageAsRead(ChatMemberMessage $message): void
+	{
+		$this->chatMemberMessageViewService->create(new CreateChatMemberMessageViewDto([
+			'message' => $message,
+		]));
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function markMessageAsUnread(ChatMemberMessage $message): void
+	{
+		foreach ($message->views as $view) {
+			if ($view->chat_member_id === $message->from_chat_member_id) {
+				continue;
+			}
+
+			$this->chatMemberMessageViewService->delete($view);
 		}
 	}
 }

@@ -6,10 +6,12 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\AlertQuery;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTagQuery;
+use app\models\ActiveQuery\ChatMemberMessageViewQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\ReminderQuery;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\UserNotificationQuery;
 use app\models\Notification\UserNotification;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -17,22 +19,23 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "chat_member_message".
  *
- * @property int                    $id
- * @property int                    $to_chat_member_id
- * @property int|null               $from_chat_member_id
- * @property string|null            $message
- * @property string                 $created_at
- * @property string                 $updated_at
+ * @property int                     $id
+ * @property int                     $to_chat_member_id
+ * @property int|null                $from_chat_member_id
+ * @property string|null             $message
+ * @property string                  $created_at
+ * @property string                  $updated_at
  *
- * @property ChatMember             $fromChatMember
- * @property ChatMember             $toChatMember
- * @property Task[]                 $tasks
- * @property Alert[]                $alerts
- * @property Contact[]              $contacts
- * @property UserNotification[]     $notifications
- * @property Reminder[]             $reminders
- * @property ChatMemberMessageTag[] $tags
- * @property Media[]                $files
+ * @property ChatMember              $fromChatMember
+ * @property ChatMember              $toChatMember
+ * @property Task[]                  $tasks
+ * @property Alert[]                 $alerts
+ * @property Contact[]               $contacts
+ * @property UserNotification[]      $notifications
+ * @property Reminder[]              $reminders
+ * @property ChatMemberMessageTag[]  $tags
+ * @property Media[]                 $files
+ * @property ChatMemberMessageView[] $views
  */
 class ChatMemberMessage extends AR
 {
@@ -127,6 +130,15 @@ class ChatMemberMessage extends AR
 		            ->via('relationFirst');
 	}
 
+	/**
+	 * @return ActiveQuery|UserNotificationQuery
+	 * @throws ErrorException
+	 */
+	public function getNotifications(): UserNotificationQuery
+	{
+		return $this->morphHasManyVia(UserNotification::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
 
 	/**
 	 * @return ActiveQuery
@@ -135,16 +147,6 @@ class ChatMemberMessage extends AR
 	public function getContacts(): ActiveQuery
 	{
 		return $this->morphHasManyVia(Contact::class, 'id', 'second')
-		            ->via('relationFirst');
-	}
-
-	/**
-	 * @return ActiveQuery
-	 * @throws ErrorException
-	 */
-	public function getNotifications(): ActiveQuery
-	{
-		return $this->morphHasManyVia(UserNotification::class, 'id', 'second')
 		            ->via('relationFirst');
 	}
 
@@ -166,6 +168,14 @@ class ChatMemberMessage extends AR
 	{
 		return $this->morphHasManyVia(Media::class, 'id', 'second')
 		            ->via('relationFirst');
+	}
+
+	/**
+	 * @return ActiveQuery|ChatMemberMessageViewQuery
+	 */
+	public function getViews(): ChatMemberMessageViewQuery
+	{
+		return $this->hasMany(ChatMemberMessageView::class, ['chat_member_message_id' => 'id']);
 	}
 
 

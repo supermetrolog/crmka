@@ -27,4 +27,13 @@ class UserNotificationService
 
 		return $model;
 	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function viewed(UserNotification $notification): void
+	{
+		$notification->viewed_at = (new \DateTime())->format('Y-m-d H:i:s');
+		$notification->saveOrThrow();
+	}
 }
