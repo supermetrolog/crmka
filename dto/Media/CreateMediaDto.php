@@ -14,4 +14,5 @@ class CreateMediaDto extends BaseObject
 	public string       $model_type;
 	public int          $model_id;
 	public UploadedFile $uploadedFile;
+	public string       $mime_type;
 }

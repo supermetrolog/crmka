@@ -43,7 +43,7 @@ class CreateMediaService
 				'category'      => $dto->category,
 				'model_type'    => $dto->model_type,
 				'model_id'      => $dto->model_id,
-				'mime_type'     => mime_content_type($dto->uploadedFile->tempName),
+				'mime_type'     => $dto->mime_type,
 			]);
 
 			$media->saveOrThrow();
