@@ -121,10 +121,7 @@ class ChatMemberMessageService
 				]));
 			}
 
-			$this->chatMemberMessageViewService->create(new CreateChatMemberMessageViewDto([
-				'chat_member_id'         => $message->from_chat_member_id,
-				'chat_member_message_id' => $message->id,
-			]));
+			$this->markMessageAsRead($message);
 
 			$tx->commit();
 
@@ -354,8 +351,7 @@ class ChatMemberMessageService
 	private function markMessageAsRead(ChatMemberMessage $message): ChatMemberMessageView
 	{
 		return $this->chatMemberMessageViewService->create(new CreateChatMemberMessageViewDto([
-			'chat_member_id'         => $message->from_chat_member_id,
-			'chat_member_message_id' => $message->id,
+			'message' => $message,
 		]));
 	}
 }
