@@ -6,15 +6,15 @@ namespace app\repositories;
 
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
-use yii\db\ActiveRecord;
+use yii\db\BatchQueryResult;
 use yii\db\conditions\OrCondition;
 
 class ChatMemberMessageRepository
 {
 	/**
-	 * @return ChatMemberMessage[]|ActiveRecord[]
+	 * @return BatchQueryResult
 	 */
-	public function findPreviousUnreadByMessage(ChatMemberMessage $message): array
+	public function findPreviousUnreadByMessage(ChatMemberMessage $message): BatchQueryResult
 	{
 		return ChatMemberMessage::find()
 								->with('notifications')
@@ -26,6 +26,6 @@ class ChatMemberMessageRepository
 			                        ChatMemberMessageView::getColumn('chat_member_id') . '!=' . ChatMemberMessage::getColumn('from_chat_member_id'),
 		                        ]))
 		                        ->notDeleted()
-		                        ->all();
+		                        ->each();
 	}
 }
