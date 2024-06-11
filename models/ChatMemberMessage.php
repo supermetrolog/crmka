@@ -6,6 +6,7 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\AlertQuery;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTagQuery;
+use app\models\ActiveQuery\ChatMemberMessageViewQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\ReminderQuery;
@@ -34,6 +35,7 @@ use yii\db\ActiveQuery;
  * @property Reminder[]             $reminders
  * @property ChatMemberMessageTag[] $tags
  * @property Media[]                $files
+ * @property ChatMemberMessageView[]  $views
  */
 class ChatMemberMessage extends AR
 {
@@ -176,6 +178,15 @@ class ChatMemberMessage extends AR
 	{
 		return $this->morphHasManyVia(Media::class, 'id', 'second')
 		            ->via('relationFirst');
+	}
+
+	/**
+	 * @return ActiveQuery|ChatMemberMessageViewQuery
+	 * @throws ErrorException
+	 */
+	public function getViews(): ChatMemberMessageViewQuery
+	{
+		return $this->hasMany(ChatMemberMessageView::class, ['chat_member_message_id' => 'id']);
 	}
 
 

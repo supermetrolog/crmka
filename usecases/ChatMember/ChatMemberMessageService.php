@@ -34,6 +34,7 @@ use app\usecases\Reminder\CreateReminderService;
 use app\usecases\Task\CreateTaskService;
 use Throwable;
 use yii\db\Exception;
+use yii\db\Query;
 
 class ChatMemberMessageService
 {
@@ -228,6 +229,8 @@ class ChatMemberMessageService
 				'second_id'   => $task->id,
 			]));
 
+			$this->markMessageAsUnread($message);
+
 			$tx->commit();
 
 			return $task;
@@ -284,6 +287,8 @@ class ChatMemberMessageService
 				'second_id'   => $reminder->id,
 			]));
 
+			$this->markMessageAsUnread($message);
+
 			$tx->commit();
 
 			return $reminder;
@@ -319,6 +324,8 @@ class ChatMemberMessageService
 				'second_id'   => $userNotification->id,
 			]));
 
+			$this->markMessageAsUnread($message);
+
 			$tx->commit();
 
 			return $userNotification;
@@ -348,10 +355,25 @@ class ChatMemberMessageService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function markMessageAsRead(ChatMemberMessage $message): ChatMemberMessageView
+	private function markMessageAsRead(ChatMemberMessage $message): void
 	{
-		return $this->chatMemberMessageViewService->create(new CreateChatMemberMessageViewDto([
+		$this->chatMemberMessageViewService->create(new CreateChatMemberMessageViewDto([
 			'message' => $message,
 		]));
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function markMessageAsUnread(ChatMemberMessage $message): void
+	{
+		foreach ($message->views as $view) {
+			if ($view->chat_member_id === $message->from_chat_member_id) {
+				continue;
+			}
+
+			$this->chatMemberMessageViewService->delete($view);
+		}
 	}
 }

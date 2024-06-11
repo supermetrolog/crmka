@@ -8,6 +8,7 @@ use app\components\Notification\Factories\NotifierFactory;
 use app\dto\ChatMember\CreateChatMemberMessageViewDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\usecases\Notification\UserNotificationService;
 use app\usecases\Reminder\ReminderService;
@@ -37,7 +38,7 @@ class ChatMemberMessageViewService
 
 		try {
 			$model = new ChatMemberMessageView([
-				'chat_member_id'         => $dto->message->to_chat_member_id,
+				'chat_member_id'         => $dto->message->from_chat_member_id,
 				'chat_member_message_id' => $dto->message->id,
 			]);
 
