@@ -8,6 +8,7 @@ use app\components\Notification\Factories\NotifierFactory;
 use app\components\Notification\Notification;
 use app\dto\Alert\CreateAlertDto;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
+use app\dto\ChatMember\CreateChatMemberMessageViewDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
 use app\dto\Media\CreateMediaDto;
 use app\dto\Notification\CreateNotificationDto;
@@ -19,6 +20,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Alert;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
+use app\models\ChatMemberMessageView;
 use app\models\Contact;
 use app\models\Notification\UserNotification;
 use app\models\Relation;
@@ -34,13 +36,14 @@ use yii\db\Exception;
 
 class ChatMemberMessageService
 {
-	private TransactionBeginnerInterface $transactionBeginner;
-	protected CreateTaskService          $createTaskService;
-	protected CreateAlertService         $createAlertService;
-	protected CreateReminderService      $createReminderService;
-	protected CreateMediaService         $createMediaService;
-	protected RelationService            $relationService;
-	protected NotifierFactory            $notifierFactory;
+	private TransactionBeginnerInterface   $transactionBeginner;
+	protected CreateTaskService            $createTaskService;
+	protected CreateAlertService           $createAlertService;
+	protected CreateReminderService        $createReminderService;
+	protected CreateMediaService           $createMediaService;
+	protected ChatMemberMessageViewService $chatMemberMessageViewService;
+	protected RelationService              $relationService;
+	protected NotifierFactory              $notifierFactory;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -49,16 +52,18 @@ class ChatMemberMessageService
 		CreateAlertService $createAlertService,
 		CreateReminderService $createReminderService,
 		CreateMediaService $createMediaService,
+		ChatMemberMessageViewService $chatMemberMessageViewService,
 		NotifierFactory $notifierFactory
 	)
 	{
-		$this->transactionBeginner   = $transactionBeginner;
-		$this->createTaskService     = $createTaskService;
-		$this->relationService       = $relationService;
-		$this->createAlertService    = $createAlertService;
-		$this->createReminderService = $createReminderService;
-		$this->createMediaService    = $createMediaService;
-		$this->notifierFactory       = $notifierFactory;
+		$this->transactionBeginner          = $transactionBeginner;
+		$this->createTaskService            = $createTaskService;
+		$this->relationService              = $relationService;
+		$this->createAlertService           = $createAlertService;
+		$this->createReminderService        = $createReminderService;
+		$this->createMediaService           = $createMediaService;
+		$this->chatMemberMessageViewService = $chatMemberMessageViewService;
+		$this->notifierFactory              = $notifierFactory;
 	}
 
 	/**
@@ -111,6 +116,11 @@ class ChatMemberMessageService
 					'second_id'   => $media->id,
 				]));
 			}
+
+			$this->chatMemberMessageViewService->create(new CreateChatMemberMessageViewDto([
+				'chat_member_id'         => $message->from_chat_member_id,
+				'chat_member_message_id' => $message->id,
+			]));
 
 			$tx->commit();
 
