@@ -10,6 +10,7 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\ReminderQuery;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\Notification\UserNotification;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
@@ -28,8 +29,10 @@ use yii\db\ActiveQuery;
  * @property Task[]                 $tasks
  * @property Alert[]                $alerts
  * @property Contact[]              $contacts
+ * @property UserNotification[]     $notifications
  * @property Reminder[]             $reminders
  * @property ChatMemberMessageTag[] $tags
+ * @property Media[]                $files
  */
 class ChatMemberMessage extends AR
 {
@@ -136,12 +139,32 @@ class ChatMemberMessage extends AR
 	}
 
 	/**
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getNotifications(): ActiveQuery
+	{
+		return $this->morphHasManyVia(UserNotification::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
+	/**
 	 * @return ActiveQuery|ChatMemberMessageTagQuery
 	 * @throws ErrorException
 	 */
 	public function getTags(): ChatMemberMessageTagQuery
 	{
 		return $this->morphHasManyVia(ChatMemberMessageTag::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
+	/**
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getFiles(): ActiveQuery
+	{
+		return $this->morphHasManyVia(Media::class, 'id', 'second')
 		            ->via('relationFirst');
 	}
 

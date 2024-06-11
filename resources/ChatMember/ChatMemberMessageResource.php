@@ -8,8 +8,10 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMemberMessage;
 use app\resources\AlertResource;
 use app\resources\Contact\ContactShortResource;
+use app\resources\MediaResource;
 use app\resources\ReminderResource;
 use app\resources\TaskResource;
+use app\resources\UserNotificationResource;
 
 class ChatMemberMessageResource extends JsonResource
 {
@@ -34,7 +36,9 @@ class ChatMemberMessageResource extends JsonResource
 			'alerts'              => AlertResource::collection($this->resource->alerts),
 			'reminders'           => ReminderResource::collection($this->resource->reminders),
 			'contacts'            => ContactShortResource::collection($this->resource->contacts),
+			'notifications'       => UserNotificationResource::collection($this->resource->notifications),
 			'tags'                => ChatMemberMessageTagResource::collection($this->resource->tags),
+			'files'               => MediaResource::collection($this->resource->files),
 		];
 	}
 }
