@@ -26,16 +26,16 @@ use yii\db\ActiveQuery;
  * @property string                  $created_at
  * @property string                  $updated_at
  *
- * @property ChatMember             $fromChatMember
- * @property ChatMember             $toChatMember
- * @property Task[]                 $tasks
- * @property Alert[]                $alerts
- * @property Contact[]              $contacts
- * @property UserNotification[]     $notifications
- * @property Reminder[]             $reminders
- * @property ChatMemberMessageTag[] $tags
- * @property Media[]                $files
- * @property ChatMemberMessageView[]  $views
+ * @property ChatMember              $fromChatMember
+ * @property ChatMember              $toChatMember
+ * @property Task[]                  $tasks
+ * @property Alert[]                 $alerts
+ * @property Contact[]               $contacts
+ * @property UserNotification[]      $notifications
+ * @property Reminder[]              $reminders
+ * @property ChatMemberMessageTag[]  $tags
+ * @property Media[]                 $files
+ * @property ChatMemberMessageView[] $views
  */
 class ChatMemberMessage extends AR
 {
