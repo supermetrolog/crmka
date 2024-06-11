@@ -5,9 +5,11 @@ namespace app\controllers\ChatMember;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMemberMessage;
 use app\models\forms\Alert\AlertForm;
 use app\models\forms\ChatMember\ChatMemberMessageForm;
+use app\models\forms\ChatMember\ViewChatMemberMessageForm;
 use app\models\forms\Media\MediaForm;
 use app\models\forms\Notification\NotificationForm;
 use app\models\forms\Reminder\ReminderForm;
@@ -19,6 +21,7 @@ use app\resources\ReminderResource;
 use app\resources\TaskResource;
 use app\resources\UserNotificationResource;
 use app\usecases\ChatMember\ChatMemberMessageService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Throwable;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -250,6 +253,26 @@ class ChatMemberMessageController extends AppController
 		$userNotification = $this->service->createNotification($message, $notificationForm->getDto());
 
 		return UserNotificationResource::make($userNotification);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 * @throws Throwable
+	 */
+	public function actionViewMessage(int $id): SuccessResponse
+	{
+		$form = new ViewChatMemberMessageForm();
+
+		$form->load($this->request->post());
+
+		$form->chat_member_message_id = $id;
+
+		$form->validateOrThrow();
+
+		$this->service->viewMessages($form->getChatMemberMessage());
+
+		return new SuccessResponse();
 	}
 
 

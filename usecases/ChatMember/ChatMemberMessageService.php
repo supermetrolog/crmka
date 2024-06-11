@@ -26,6 +26,7 @@ use app\models\Notification\UserNotification;
 use app\models\Relation;
 use app\models\Reminder;
 use app\models\Task;
+use app\repositories\ChatMemberMessageRepository;
 use app\usecases\Alert\CreateAlertService;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Relation\RelationService;
@@ -44,6 +45,7 @@ class ChatMemberMessageService
 	protected ChatMemberMessageViewService $chatMemberMessageViewService;
 	protected RelationService              $relationService;
 	protected NotifierFactory              $notifierFactory;
+	protected ChatMemberMessageRepository  $chatMemberMessageRepository;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -53,7 +55,8 @@ class ChatMemberMessageService
 		CreateReminderService $createReminderService,
 		CreateMediaService $createMediaService,
 		ChatMemberMessageViewService $chatMemberMessageViewService,
-		NotifierFactory $notifierFactory
+		NotifierFactory $notifierFactory,
+		ChatMemberMessageRepository $chatMemberMessageRepository
 	)
 	{
 		$this->transactionBeginner          = $transactionBeginner;
@@ -64,6 +67,7 @@ class ChatMemberMessageService
 		$this->createMediaService           = $createMediaService;
 		$this->chatMemberMessageViewService = $chatMemberMessageViewService;
 		$this->notifierFactory              = $notifierFactory;
+		$this->chatMemberMessageRepository  = $chatMemberMessageRepository;
 	}
 
 	/**
@@ -325,5 +329,33 @@ class ChatMemberMessageService
 			$tx->rollBack();
 			throw $th;
 		}
+	}
+
+	public function viewMessages(ChatMemberMessage $message): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			foreach ($this->chatMemberMessageRepository->findPreviousUnreadByMessage($message) as $unreadMessage) {
+				$this->markMessageAsRead($unreadMessage);
+			}
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function markMessageAsRead(ChatMemberMessage $message): ChatMemberMessageView
+	{
+		return $this->chatMemberMessageViewService->create(new CreateChatMemberMessageViewDto([
+			'chat_member_id'         => $message->from_chat_member_id,
+			'chat_member_message_id' => $message->id,
+		]));
 	}
 }
