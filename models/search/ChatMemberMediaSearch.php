@@ -17,12 +17,13 @@ class ChatMemberMediaSearch extends Form
 	public $from_member_chat_id;
 
 	public $extension;
+	public $mime_type;
 
 	public function rules(): array
 	{
 		return [
 			[['to_member_chat_id', 'from_member_chat_id'], 'integer'],
-			[['extension'], 'string'],
+			[['extension', 'mime_type'], 'string'],
 		];
 	}
 
@@ -65,6 +66,7 @@ class ChatMemberMediaSearch extends Form
 		$query->andWhere([ChatMemberMessage::getColumn('from_chat_member_id') => $this->from_member_chat_id]);
 
 		$query->andFilterWhere(['like', 'extension', $this->extension]);
+		$query->andFilterWhere(['like', 'mime_type', $this->mime_type]);
 
 		return $dataProvider;
 	}

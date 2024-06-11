@@ -36,6 +36,7 @@ class MediaForm extends Form
 				'model_type'   => $this->model_type,
 				'model_id'     => $this->model_id,
 				'uploadedFile' => $file,
+				'mime_type'    => mime_content_type($file->tempName),
 			]);
 		}
 
