@@ -11,7 +11,7 @@ use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
 use app\models\search\SurveySearch;
 use app\models\Survey;
 use app\repositories\SurveyRepository;
-use app\resources\SurveyResource;
+use app\resources\SurveyShortResource;
 use app\usecases\Survey\SurveyService;
 use Throwable;
 use yii\data\ActiveDataProvider;
@@ -45,23 +45,23 @@ class SurveyController extends AppController
 		$searchModel  = new SurveySearch();
 		$dataProvider = $searchModel->search($this->request->get());
 
-		return SurveyResource::fromDataProvider($dataProvider);
+		return SurveyShortResource::fromDataProvider($dataProvider);
 	}
 
 	/**
 	 * @throws NotFoundHttpException
 	 */
-	public function actionView(int $id): SurveyResource
+	public function actionView(int $id): SurveyShortResource
 	{
-		return new SurveyResource($this->findModel($id));
+		return new SurveyShortResource($this->findModel($id));
 	}
 
 	/**
-	 * @return SurveyResource
+	 * @return SurveyShortResource
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
-	public function actionCreate(): SurveyResource
+	public function actionCreate(): SurveyShortResource
 	{
 		$form = new SurveyForm();
 
@@ -73,15 +73,15 @@ class SurveyController extends AppController
 
 		$model = $this->service->create($form->getDto());
 
-		return new SurveyResource($model);
+		return new SurveyShortResource($model);
 	}
 
 	/**
-	 * @return SurveyResource
+	 * @return SurveyShortResource
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
-	public function actionCreateWithSurveyQuestionAnswer(): SurveyResource
+	public function actionCreateWithSurveyQuestionAnswer(): SurveyShortResource
 	{
 		// Create Survey Question Answer
 
@@ -105,18 +105,18 @@ class SurveyController extends AppController
 
 		$model = $this->service->createWithSurveyQuestionAnswer($surveyForm->getDto(), $surveyQuestionAnswerForm->getDto());
 
-		return new SurveyResource($model);
+		return new SurveyShortResource($model);
 	}
 
 	/**
 	 * @param int $id
 	 *
-	 * @return SurveyResource
+	 * @return SurveyShortResource
 	 * @throws NotFoundHttpException
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 */
-	public function actionUpdate(int $id): SurveyResource
+	public function actionUpdate(int $id): SurveyShortResource
 	{
 		$model = $this->findModel($id);
 
@@ -129,7 +129,7 @@ class SurveyController extends AppController
 
 		$model = $this->service->update($model, $form->getDto());
 
-		return new SurveyResource($model);
+		return new SurveyShortResource($model);
 	}
 
 	/**

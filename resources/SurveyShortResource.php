@@ -8,7 +8,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Survey;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 
-class SurveyResource extends JsonResource
+class SurveyShortResource extends JsonResource
 {
 	private Survey $resource;
 
@@ -25,7 +25,6 @@ class SurveyResource extends JsonResource
 			'contact_id' => $this->resource->contact_id,
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
-			'user'       => UserShortResource::make($this->resource->user)->toArray(),
 		];
 	}
 }
