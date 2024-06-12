@@ -9,6 +9,7 @@ use app\models\ChatMember;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
+use app\repositories\ChatMemberRepository;
 use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
 use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
@@ -34,7 +35,8 @@ class ChatMemberResource extends JsonResource
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'model'      => $this->getModel()->toArray(),
-			'last_call'  => CallResource::tryMakeArray($this->resource->lastCall)
+			'last_call'  => CallResource::tryMakeArray($this->resource->lastCall),
+			'statistic'  => $this->getStatistic(),
 		];
 	}
 
@@ -55,6 +57,17 @@ class ChatMemberResource extends JsonResource
 		}
 
 		throw new UnexpectedValueException('Unknown model type');
+	}
+
+	private function getStatistic(): array
+	{
+		$model = $this->resource->model;
+
+		if ($model instanceof User) {
+			return \Yii::$container->get(ChatMemberRepository::class)->getUnreadStatisticByUserId($model->id, $this->resource->id);
+		}
+
+		return [];
 	}
 
 	public static function fromDataProvider(ActiveDataProvider $dataProvider): ActiveDataProvider

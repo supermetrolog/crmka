@@ -56,4 +56,14 @@ class ReminderQuery extends AQ
 	{
 		return $this->byCreatedByType($type)->byCreatedById($id);
 	}
+
+	public function notified(): self
+	{
+		return $this->andWhereExpr($this->field('notify_at'), 'NOW()', '<=');
+	}
+
+	public function notNotified(): self
+	{
+		return $this->andWhereExpr($this->field('notify_at'), 'NOW()', '>');
+	}
 }
