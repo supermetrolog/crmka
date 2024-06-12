@@ -11,6 +11,7 @@ use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
 use app\models\search\SurveySearch;
 use app\models\Survey;
 use app\repositories\SurveyRepository;
+use app\resources\SurveyResource;
 use app\resources\SurveyShortResource;
 use app\usecases\Survey\SurveyService;
 use Throwable;
@@ -51,9 +52,9 @@ class SurveyController extends AppController
 	/**
 	 * @throws NotFoundHttpException
 	 */
-	public function actionView(int $id): SurveyShortResource
+	public function actionView(int $id): SurveyResource
 	{
-		return new SurveyShortResource($this->findModel($id));
+		return new SurveyResource($this->findModel($id));
 	}
 
 	/**
