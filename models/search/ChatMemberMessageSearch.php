@@ -5,7 +5,10 @@ namespace app\models\search;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMemberMessage;
+use app\models\ChatMemberMessageView;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\db\Expression;
 
 class ChatMemberMessageSearch extends Form
 {
@@ -16,10 +19,14 @@ class ChatMemberMessageSearch extends Form
 	public $created_at;
 	public $updated_at;
 
+	public $id_less_then;
+
+	public $current_from_chat_member_id;
+
 	public function rules(): array
 	{
 		return [
-			[['id', 'to_chat_member_id', 'from_chat_member_id'], 'integer'],
+			[['id', 'to_chat_member_id', 'from_chat_member_id', 'id_less_then'], 'integer'],
 			[['message', 'created_at', 'updated_at'], 'safe'],
 		];
 	}
@@ -31,6 +38,7 @@ class ChatMemberMessageSearch extends Form
 	{
 		$query = ChatMemberMessage::find()
 		                          ->notDeleted()
+		                          ->orderBy(['id' => SORT_ASC])
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
 		                          ->with(['tasks.createdByUser.userProfile'])
@@ -40,20 +48,21 @@ class ChatMemberMessageSearch extends Form
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
-			'pagination' => [
-				'defaultPageSize' => 50,
-			],
-			'sort'       => [
-				'defaultOrder' => ['id' => SORT_DESC],
-				'attributes'   => [
-					'id',
-				]
-			]
+			'pagination' => false,
+			'sort'       => false
 		]);
 
 		$this->load($params);
 
 		$this->validateOrThrow();
+
+		if ($this->id_less_then === null) {
+			$query->joinWith('views')
+			      ->andWhere([
+					  ChatMemberMessage::getColumn('from_chat_member_id') => $this->current_from_chat_member_id,
+					  ChatMemberMessageView::getColumn('id') => null,
+			      ]);
+		}
 
 		$query->andFilterWhere([
 			'id'                  => $this->id,
@@ -62,6 +71,8 @@ class ChatMemberMessageSearch extends Form
 			'created_at'          => $this->created_at,
 			'updated_at'          => $this->updated_at,
 		]);
+
+		$query->andFilterWhere(['<', 'id', $this->id_less_then]);
 
 		$query->andFilterWhere(['like', 'message', $this->message]);
 
