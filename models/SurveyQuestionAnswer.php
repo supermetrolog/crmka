@@ -21,6 +21,8 @@ use yii\db\ActiveQuery;
  */
 class SurveyQuestionAnswer extends AR
 {
+	protected bool $useSoftUpdate = true;
+	protected bool $useSoftCreate = true;
 
 	public static function tableName(): string
 	{
