@@ -9,7 +9,6 @@ use app\models\ChatMember;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
-use app\repositories\ChatMemberRepository;
 use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
 use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
@@ -61,13 +60,12 @@ class ChatMemberResource extends JsonResource
 
 	private function getStatistic(): array
 	{
-		$model = $this->resource->model;
-
-		if ($model instanceof User) {
-			return \Yii::$container->get(ChatMemberRepository::class)->getUnreadStatisticByUserId($model->id, $this->resource->id);
-		}
-
-		return [];
+		return [
+			'tasks'         => $this->resource->unread_task_count,
+			'reminders'     => $this->resource->unread_reminder_count,
+			'notifications' => $this->resource->unread_notification_count,
+			'messages'      => $this->resource->unread_message_count,
+		];
 	}
 
 	public static function fromDataProvider(ActiveDataProvider $dataProvider): ActiveDataProvider
