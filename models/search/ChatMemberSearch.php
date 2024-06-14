@@ -50,9 +50,10 @@ class ChatMemberSearch extends Form
 		$query = ChatMember::find()
 		                   ->select([
 			                   ChatMember::getColumn('*'),
-			                   'last_call_rel_id' => 'last_call_rel.id'
+			                   'last_call_rel_id' => 'last_call_rel.id',
 		                   ])
 		                   ->leftJoinLastCallRelation()
+		                   ->joinUnreadStatistic()
 		                   ->joinWith([
 			                   'objectChatMember.object',
 			                   'request'
