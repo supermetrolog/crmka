@@ -21,6 +21,7 @@ class Call extends \app\kernel\common\models\AR\AR
 {
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
+	protected bool $useSoftCreate = true;
 
 	public static function tableName(): string
 	{
