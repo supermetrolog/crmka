@@ -129,7 +129,7 @@ class ChatMemberMessageService
 
 			$this->markMessageAsRead($message);
 
-			$this->markMessageAsLatest($message);
+			$this->markMessageAsLatestForSender($message);
 
 			$tx->commit();
 
@@ -238,7 +238,7 @@ class ChatMemberMessageService
 
 			$this->markMessageAsUnread($message);
 
-			$this->markMessageAsLatest($message);
+			$this->markMessageAsLatestForReceiver($message);
 
 			$tx->commit();
 
@@ -298,7 +298,7 @@ class ChatMemberMessageService
 
 			$this->markMessageAsUnread($message);
 
-			$this->markMessageAsLatest($message);
+			$this->markMessageAsLatestForReceiver($message);
 
 			$tx->commit();
 
@@ -337,7 +337,7 @@ class ChatMemberMessageService
 
 			$this->markMessageAsUnread($message);
 
-			$this->markMessageAsLatest($message);
+			$this->markMessageAsLatestForReceiver($message);
 
 			$tx->commit();
 
@@ -394,11 +394,23 @@ class ChatMemberMessageService
 	 * @throws SaveModelException
 	 * @throws ModelNotFoundException
 	 */
-	private function markMessageAsLatest(ChatMemberMessage $message): void
+	private function markMessageAsLatestForSender(ChatMemberMessage $message): void
 	{
 		$this->chatMemberLastEventService->updateOrCreate(new CreateChatMemberLastEventDto([
 			'chat_member_id'       => $message->from_chat_member_id,
 			'event_chat_member_id' => $message->to_chat_member_id,
+		]));
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 */
+	private function markMessageAsLatestForReceiver(ChatMemberMessage $message): void
+	{
+		$this->chatMemberLastEventService->updateOrCreate(new CreateChatMemberLastEventDto([
+			'chat_member_id'       => $message->to_chat_member_id,
+			'event_chat_member_id' => $message->from_chat_member_id,
 		]));
 	}
 }

@@ -48,11 +48,9 @@ class ChatMemberSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$subQuery = ChatMemberMessage::find()
-		                             ->select([
-			                             'from_chat_member_id', 'created_at' => 'MAX(created_at)',
-		                             ])
-		                             ->groupBy('from_chat_member_id');
+		$chatMemberMessageQuery = ChatMemberMessage::find()
+		                                           ->select(['to_chat_member_id', 'chat_member_message_id' => 'MAX(id)'])
+		                                           ->groupBy(['to_chat_member_id']);
 
 		$query = ChatMember::find()
 		                   ->select([
@@ -60,7 +58,7 @@ class ChatMemberSearch extends Form
 			                   'last_call_rel_id' => 'last_call_rel.id'
 		                   ])
 		                   ->leftJoinLastCallRelation()
-		                   ->leftJoin(['cmm' => $subQuery], ChatMember::getColumn('id') . '=' . 'cmm.from_chat_member_id')
+		                   ->leftJoin(['cmm' => $chatMemberMessageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
 		                   ->joinWith([
 			                   'objectChatMember.object',
 			                   'request'
@@ -76,7 +74,7 @@ class ChatMemberSearch extends Form
 			                   'request.objectClasses',
 		                   ])
 		                   ->with(['user.userProfile'])
-		                   ->orderBy(['cmm.created_at' => SORT_DESC]);
+		                   ->orderBy(['chat_member_message_id' => SORT_DESC]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
