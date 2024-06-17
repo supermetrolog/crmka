@@ -17,7 +17,7 @@ class ChatMemberLastEventService
 	public function create(CreateChatMemberLastEventDto $dto): ChatMemberLastEvent
 	{
 		$model = new ChatMemberLastEvent([
-			'chat_member_id' => $dto->chat_member_id,
+			'chat_member_id'       => $dto->chat_member_id,
 			'event_chat_member_id' => $dto->event_chat_member_id,
 		]);
 
@@ -25,6 +25,7 @@ class ChatMemberLastEventService
 
 		return $model;
 	}
+
 	/**
 	 * @throws SaveModelException
 	 */
