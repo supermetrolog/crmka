@@ -6,6 +6,7 @@ use app\helpers\DumpHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMember;
+use app\models\ChatMemberMessage;
 use app\models\ObjectChatMember;
 use app\models\Objects;
 use app\models\Request;
@@ -47,12 +48,19 @@ class ChatMemberSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
+		$subQuery = ChatMemberMessage::find()
+		                             ->select([
+			                             'from_chat_member_id', 'created_at' => 'MAX(created_at)',
+		                             ])
+		                             ->groupBy('from_chat_member_id');
+
 		$query = ChatMember::find()
 		                   ->select([
 			                   ChatMember::getColumn('*'),
 			                   'last_call_rel_id' => 'last_call_rel.id'
 		                   ])
 		                   ->leftJoinLastCallRelation()
+		                   ->leftJoin(['cmm' => $subQuery], ChatMember::getColumn('id') . '=' . 'cmm.from_chat_member_id')
 		                   ->joinWith([
 			                   'objectChatMember.object',
 			                   'request'
@@ -67,7 +75,8 @@ class ChatMemberSearch extends Form
 			                   'request.objectTypes',
 			                   'request.objectClasses',
 		                   ])
-		                   ->with(['user.userProfile']);
+		                   ->with(['user.userProfile'])
+		                   ->orderBy(['cmm.created_at' => SORT_DESC]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
