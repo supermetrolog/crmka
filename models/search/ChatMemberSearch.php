@@ -53,6 +53,7 @@ class ChatMemberSearch extends Form
 	{
 		$messageQuery = ChatMemberMessage::find()
 		                                 ->select(['to_chat_member_id', 'chat_member_message_id' => 'MAX(id)'])
+		                                 ->notDeleted()
 		                                 ->groupBy(['to_chat_member_id']);
 
 		$eventQuery = ChatMemberLastEvent::find()
