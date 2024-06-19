@@ -6,6 +6,7 @@ use app\helpers\DumpHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMember;
+use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
 use app\models\ObjectChatMember;
 use app\models\Objects;
@@ -23,6 +24,8 @@ class ChatMemberSearch extends Form
 
 	public $company_id;
 	public $object_id;
+
+	public $current_chat_member_id;
 
 	public function rules(): array
 	{
@@ -48,9 +51,14 @@ class ChatMemberSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$chatMemberMessageQuery = ChatMemberMessage::find()
-		                                           ->select(['to_chat_member_id', 'chat_member_message_id' => 'MAX(id)'])
-		                                           ->groupBy(['to_chat_member_id']);
+		$messageQuery = ChatMemberMessage::find()
+		                                 ->select(['to_chat_member_id', 'chat_member_message_id' => 'MAX(id)'])
+		                                 ->groupBy(['to_chat_member_id']);
+
+		$eventQuery = ChatMemberLastEvent::find()
+		                                 ->select(['event_chat_member_id', 'chat_member_last_event_id' => 'MAX(id)'])
+		                                 ->where(['chat_member_id' => $this->current_chat_member_id])
+		                                 ->groupBy(['event_chat_member_id']);
 
 		$query = ChatMember::find()
 		                   ->select([
@@ -58,7 +66,8 @@ class ChatMemberSearch extends Form
 			                   'last_call_rel_id' => 'last_call_rel.id'
 		                   ])
 		                   ->leftJoinLastCallRelation()
-		                   ->leftJoin(['cmm' => $chatMemberMessageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
+		                   ->leftJoin(['cmm' => $messageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
+		                   ->leftJoin(['cmle' => $eventQuery], ChatMember::getColumn('id') . '=' . 'cmle.event_chat_member_id')
 		                   ->joinWith([
 			                   'objectChatMember.object',
 			                   'request'
@@ -74,7 +83,10 @@ class ChatMemberSearch extends Form
 			                   'request.objectClasses',
 		                   ])
 		                   ->with(['user.userProfile'])
-		                   ->orderBy(['chat_member_message_id' => SORT_DESC]);
+		                   ->orderBy([
+			                   'chat_member_last_event_id' => SORT_DESC,
+			                   'chat_member_message_id'    => SORT_DESC,
+		                   ]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -83,7 +95,6 @@ class ChatMemberSearch extends Form
 		$this->load($params);
 
 		$this->validateOrThrow();
-
 
 		$query->orFilterWhere([Request::field('company_id') => $this->company_id])
 		      ->orFilterWhere([Objects::field('company_id') => $this->company_id]);
