@@ -38,13 +38,13 @@ class ChatMemberMessageSearch extends Form
 	{
 		$query = ChatMemberMessage::find()
 		                          ->notDeleted()
-		                          ->orderBy(['id' => SORT_ASC])
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
 		                          ->with(['tasks.createdByUser.userProfile'])
 		                          ->with(['alerts.createdByUser.userProfile'])
 		                          ->with(['reminders.createdByUser.userProfile'])
-		                          ->with(['contacts', 'tags', 'notifications', 'files']);
+		                          ->with(['contacts', 'tags', 'notifications', 'files'])
+		                          ->orderBy([ChatMemberMessage::getColumn('id') => SORT_ASC]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
