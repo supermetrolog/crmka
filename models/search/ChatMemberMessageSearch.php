@@ -48,7 +48,9 @@ class ChatMemberMessageSearch extends Form
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
-			'pagination' => false,
+			'pagination' => [
+				'pageSize' => 30,
+			],
 			'sort'       => false
 		]);
 
