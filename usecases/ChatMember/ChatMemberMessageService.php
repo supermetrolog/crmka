@@ -7,6 +7,7 @@ namespace app\usecases\ChatMember;
 use app\components\Notification\Factories\NotifierFactory;
 use app\components\Notification\Notification;
 use app\dto\Alert\CreateAlertDto;
+use app\dto\ChatMember\CreateChatMemberLastEventDto;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\CreateChatMemberMessageViewDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
@@ -16,6 +17,7 @@ use app\dto\Relation\CreateRelationDto;
 use app\dto\Reminder\CreateReminderDto;
 use app\dto\Task\CreateTaskDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Alert;
 use app\models\ChatMemberMessage;
@@ -47,6 +49,7 @@ class ChatMemberMessageService
 	protected RelationService              $relationService;
 	protected NotifierFactory              $notifierFactory;
 	protected ChatMemberMessageRepository  $chatMemberMessageRepository;
+	protected ChatMemberLastEventService   $chatMemberLastEventService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -57,7 +60,8 @@ class ChatMemberMessageService
 		CreateMediaService $createMediaService,
 		ChatMemberMessageViewService $chatMemberMessageViewService,
 		NotifierFactory $notifierFactory,
-		ChatMemberMessageRepository $chatMemberMessageRepository
+		ChatMemberMessageRepository $chatMemberMessageRepository,
+		ChatMemberLastEventService $chatMemberLastEventService
 	)
 	{
 		$this->transactionBeginner          = $transactionBeginner;
@@ -69,6 +73,7 @@ class ChatMemberMessageService
 		$this->chatMemberMessageViewService = $chatMemberMessageViewService;
 		$this->notifierFactory              = $notifierFactory;
 		$this->chatMemberMessageRepository  = $chatMemberMessageRepository;
+		$this->chatMemberLastEventService   = $chatMemberLastEventService;
 	}
 
 	/**
@@ -123,6 +128,8 @@ class ChatMemberMessageService
 			}
 
 			$this->markMessageAsRead($message);
+
+			$this->markMessageAsLatestForSender($message);
 
 			$tx->commit();
 
@@ -231,6 +238,8 @@ class ChatMemberMessageService
 
 			$this->markMessageAsUnread($message);
 
+			$this->markMessageAsLatestForReceiver($message);
+
 			$tx->commit();
 
 			return $task;
@@ -289,6 +298,8 @@ class ChatMemberMessageService
 
 			$this->markMessageAsUnread($message);
 
+			$this->markMessageAsLatestForReceiver($message);
+
 			$tx->commit();
 
 			return $reminder;
@@ -325,6 +336,8 @@ class ChatMemberMessageService
 			]));
 
 			$this->markMessageAsUnread($message);
+
+			$this->markMessageAsLatestForReceiver($message);
 
 			$tx->commit();
 
@@ -375,5 +388,29 @@ class ChatMemberMessageService
 
 			$this->chatMemberMessageViewService->delete($view);
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 */
+	private function markMessageAsLatestForSender(ChatMemberMessage $message): void
+	{
+		$this->chatMemberLastEventService->updateOrCreate(new CreateChatMemberLastEventDto([
+			'chat_member_id'       => $message->from_chat_member_id,
+			'event_chat_member_id' => $message->to_chat_member_id,
+		]));
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 */
+	private function markMessageAsLatestForReceiver(ChatMemberMessage $message): void
+	{
+		$this->chatMemberLastEventService->updateOrCreate(new CreateChatMemberLastEventDto([
+			'chat_member_id'       => $message->to_chat_member_id,
+			'event_chat_member_id' => $message->from_chat_member_id,
+		]));
 	}
 }

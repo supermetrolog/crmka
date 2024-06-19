@@ -46,6 +46,8 @@ class ChatMemberController extends AppController
 
 		$searchModel = new ChatMemberSearch();
 
+		$searchModel->current_chat_member_id = $this->user->identity->chatMember->id;
+
 		$dataProvider = $searchModel->search($this->request->get());
 
 		return ChatMemberResource::fromDataProvider($dataProvider);
