@@ -37,14 +37,20 @@ class ChatMemberMessageSearch extends Form
 	public function search(array $params): ActiveDataProvider
 	{
 		$query = ChatMemberMessage::find()
-		                          ->notDeleted()
-		                          ->orderBy(['id' => SORT_ASC])
+		                          ->select([
+			                          ChatMemberMessage::field('*'),
+			                          '(chat_member_message_view.chat_member_message_id IS NOT NULL) as is_viewed'
+		                          ])
+		                          ->joinWith('fromChatMemberViews')
+		                          ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_from_chat_member_id])
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
 		                          ->with(['tasks.createdByUser.userProfile'])
 		                          ->with(['alerts.createdByUser.userProfile'])
 		                          ->with(['reminders.createdByUser.userProfile'])
-		                          ->with(['contacts', 'tags', 'notifications', 'files']);
+		                          ->with(['contacts', 'tags', 'notifications', 'files'])
+		                          ->notDeleted()
+		                          ->orderBy([ChatMemberMessage::field('id') => SORT_ASC]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
@@ -57,24 +63,21 @@ class ChatMemberMessageSearch extends Form
 		$this->validateOrThrow();
 
 		if ($this->id_less_then === null) {
-			$query->joinWith('views')
-			      ->andWhere([
-					  ChatMemberMessage::getColumn('from_chat_member_id') => $this->current_from_chat_member_id,
-					  ChatMemberMessageView::getColumn('id') => null,
-			      ]);
+			$query->andWhere([ChatMemberMessageView::getColumn('chat_member_message_id') => null]);
 		}
 
 		$query->andFilterWhere([
-			'id'                  => $this->id,
-			'to_chat_member_id'   => $this->to_chat_member_id,
-			'from_chat_member_id' => $this->from_chat_member_id,
-			'created_at'          => $this->created_at,
-			'updated_at'          => $this->updated_at,
+			ChatMemberMessage::field('id')                  => $this->id,
+			ChatMemberMessage::field('to_chat_member_id')   => $this->to_chat_member_id,
+			ChatMemberMessage::field('from_chat_member_id') => $this->from_chat_member_id,
+			ChatMemberMessage::field('created_at')          => $this->created_at,
+			ChatMemberMessage::field('updated_at')          => $this->updated_at,
 		]);
 
-		$query->andFilterWhere(['<', 'id', $this->id_less_then]);
+		$query->andFilterWhere(['<', ChatMemberMessage::field('id'), $this->id_less_then]);
 
-		$query->andFilterWhere(['like', 'message', $this->message]);
+		$query->andFilterWhere(['like', ChatMemberMessage::field('message'), $this->message]);
+
 
 		return $dataProvider;
 	}
