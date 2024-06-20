@@ -42,12 +42,6 @@ class ChatMember extends AR
 	protected bool $useSoftCreate = true;
 	protected bool $useSoftUpdate = true;
 
-	public ?int $last_call_rel_id          = null;
-	public ?int $unread_task_count         = null;
-	public ?int $unread_reminder_count     = null;
-	public ?int $unread_notification_count = null;
-	public ?int $unread_message_count      = null;
-
 	public static function tableName(): string
 	{
 		return 'chat_member';
@@ -191,16 +185,6 @@ class ChatMember extends AR
 	{
 		return $this->morphHasManyVia(Call::class, 'id', 'second')
 		            ->via('relationFirst');
-	}
-
-	/**
-	 * @return ActiveQuery|TaskQuery
-	 * @throws ErrorException
-	 */
-	public function getLastCall(): CallQuery
-	{
-		return $this->morphHasOneVia(Call::class, 'id', 'second')
-		            ->via('lastCallRelationFirst');
 	}
 
 	public static function find(): ChatMemberQuery
