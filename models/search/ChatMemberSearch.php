@@ -6,11 +6,13 @@ use app\helpers\DumpHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMember;
+use app\models\Company;
 use app\models\ObjectChatMember;
 use app\models\Objects;
 use app\models\Request;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 
 class ChatMemberSearch extends Form
 {
@@ -22,12 +24,13 @@ class ChatMemberSearch extends Form
 
 	public $company_id;
 	public $object_id;
+	public $search;
 
 	public function rules(): array
 	{
 		return [
 			[['id', 'model_id', 'company_id', 'object_id'], 'integer'],
-			[['model_type', 'created_at', 'updated_at'], 'safe'],
+			[['model_type', 'created_at', 'updated_at', 'search'], 'safe'],
 		];
 	}
 
@@ -77,6 +80,22 @@ class ChatMemberSearch extends Form
 
 		$this->validateOrThrow();
 
+		if (!empty($this->search)) {
+			$query->leftJoin(Company::tableName(), [
+				'or',
+				[Company::field('id') => new Expression(Request::field('company_id'))],
+				[Company::field('id') => new Expression(Objects::field('company_id'))],
+			]);
+
+			$query->andFilterWhere([
+				'or',
+				['like', Company::field('nameEng'), $this->search],
+				['like', Company::field('nameRu'), $this->search],
+				['like', Objects::field('address'), $this->search],
+			]);
+
+			$query->andWhereNotNull(Company::field('id'));
+		}
 
 		$query->orFilterWhere([Request::field('company_id') => $this->company_id])
 		      ->orFilterWhere([Objects::field('company_id') => $this->company_id]);
@@ -87,9 +106,8 @@ class ChatMemberSearch extends Form
 			ChatMember::field('model_type')      => $this->model_type,
 			ChatMember::field('created_at')      => $this->created_at,
 			ChatMember::field('updated_at')      => $this->updated_at,
-			ObjectChatMember::field('object_id') => $this->object_id
+			ObjectChatMember::field('object_id') => $this->object_id,
 		]);
-
 
 		return $dataProvider;
 	}
