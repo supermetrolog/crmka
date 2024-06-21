@@ -4,7 +4,9 @@ namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\events\NotificationEvent;
+use app\helpers\DbHelper;
 use Throwable;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\CompanyFile;
@@ -94,6 +96,22 @@ class Company extends ActiveRecord
     {
         return 'company';
     }
+
+	/**
+	 * @throws ErrorException
+	 */
+	public static function getColumn(string $field): string
+	{
+		return DbHelper::getFullPathAR(static::class, $field);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public static function field(string $name): string
+	{
+		return static::getColumn($name);
+	}
 
     /**
      * {@inheritdoc}
