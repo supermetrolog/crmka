@@ -65,7 +65,11 @@ class ChatMemberMessageSearch extends Form
 		$this->validateOrThrow();
 
 		if ($this->id_less_then === null) {
-			$query->andWhere([ChatMemberMessageView::getColumn('chat_member_message_id') => null]);
+			$query->joinWith('views')
+			      ->andWhere([
+					  ChatMemberMessage::field('from_chat_member_id') => $this->current_from_chat_member_id,
+					  ChatMemberMessageView::field('id') => null,
+			      ]);
 		}
 
 		$query->andFilterWhere([
