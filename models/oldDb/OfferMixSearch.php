@@ -1261,12 +1261,17 @@ class OfferMixSearch extends Search
     public function search(array $params): ActiveDataProvider
     {
         $query = OfferMix::find()
-            ->select($this->getSelect())
+            ->select(array_merge(
+				$this->getSelect(),
+				['last_call_rel_id' => 'last_call_rel.id']
+            ))
             ->joinForSearch(true)
+            ->leftJoinLastCallRelation()
             ->with([
                 'object.objectFloors',
                 'consultant.userProfile'
             ])
+            ->with(['lastCall.user.userProfile'])
             ->groupBy($this->getField('id'));
 
         $this->load($params, '');
