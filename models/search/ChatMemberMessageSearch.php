@@ -38,13 +38,13 @@ class ChatMemberMessageSearch extends Form
 	{
 		$query = ChatMemberMessage::find()
 		                          ->notDeleted()
+		                          ->orderBy([ChatMemberMessage::getColumn('id') => SORT_ASC])
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
 		                          ->with(['tasks.createdByUser.userProfile'])
 		                          ->with(['alerts.createdByUser.userProfile'])
 		                          ->with(['reminders.createdByUser.userProfile'])
-		                          ->with(['contacts', 'tags', 'notifications', 'files'])
-		                          ->orderBy([ChatMemberMessage::getColumn('id') => SORT_ASC]);
+		                          ->with(['contacts', 'tags', 'notifications', 'files']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
@@ -64,6 +64,8 @@ class ChatMemberMessageSearch extends Form
 					  ChatMemberMessage::getColumn('from_chat_member_id') => $this->current_from_chat_member_id,
 					  ChatMemberMessageView::getColumn('id') => null,
 			      ]);
+
+			$query->andWhere(['<', 'id', $this->id_less_then]);
 		}
 
 		$query->andFilterWhere([
@@ -73,8 +75,6 @@ class ChatMemberMessageSearch extends Form
 			'created_at'          => $this->created_at,
 			'updated_at'          => $this->updated_at,
 		]);
-
-		$query->andFilterWhere(['<', 'id', $this->id_less_then]);
 
 		$query->andFilterWhere(['like', 'message', $this->message]);
 
