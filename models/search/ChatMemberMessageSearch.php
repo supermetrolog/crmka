@@ -38,7 +38,7 @@ class ChatMemberMessageSearch extends Form
 	{
 		$query = ChatMemberMessage::find()
 		                          ->notDeleted()
-		                          ->orderBy([ChatMemberMessage::getColumn('id') => SORT_ASC])
+		                          ->orderBy([ChatMemberMessage::field('id') => SORT_ASC])
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
 		                          ->with(['tasks.createdByUser.userProfile'])
@@ -61,22 +61,24 @@ class ChatMemberMessageSearch extends Form
 		if ($this->id_less_then === null) {
 			$query->joinWith('views')
 			      ->andWhere([
-					  ChatMemberMessage::getColumn('from_chat_member_id') => $this->current_from_chat_member_id,
-					  ChatMemberMessageView::getColumn('id') => null,
+					  ChatMemberMessage::field('from_chat_member_id') => $this->current_from_chat_member_id,
+					  ChatMemberMessageView::field('id') => null,
 			      ]);
-
-			$query->andWhere(['<', 'id', $this->id_less_then]);
 		}
 
 		$query->andFilterWhere([
-			'id'                  => $this->id,
-			'to_chat_member_id'   => $this->to_chat_member_id,
-			'from_chat_member_id' => $this->from_chat_member_id,
-			'created_at'          => $this->created_at,
-			'updated_at'          => $this->updated_at,
+			ChatMemberMessage::field('id')                  => $this->id,
+			ChatMemberMessage::field('to_chat_member_id')   => $this->to_chat_member_id,
+			ChatMemberMessage::field('from_chat_member_id') => $this->from_chat_member_id,
+			ChatMemberMessage::field('created_at')          => $this->created_at,
+			ChatMemberMessage::field('updated_at')          => $this->updated_at,
 		]);
 
-		$query->andFilterWhere(['like', 'message', $this->message]);
+		$query->andFilterWhere(['<', ChatMemberMessage::field('id'), $this->id_less_then]);
+
+		$query->andFilterWhere(['like', ChatMemberMessage::field('message'), $this->message]);
+
+		dd($query->getRawSql());
 
 		return $dataProvider;
 	}
