@@ -36,11 +36,13 @@ class EquipmentSearch extends Form
 	public $updated_at;
 	public $deleted_at;
 
+	public $search;
+
 	public function rules(): array
 	{
 		return [
 			[['id', 'company_id', 'contact_id', 'consultant_id', 'preview_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id'], 'integer'],
-			[['name', 'address', 'description', 'passive_comment', 'archived_at', 'created_by_type', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
+			[['name', 'address', 'description', 'passive_comment', 'archived_at', 'created_by_type', 'created_at', 'updated_at', 'deleted_at', 'search'], 'safe'],
 		];
 	}
 
@@ -103,6 +105,8 @@ class EquipmentSearch extends Form
 		      ->andFilterWhere(['like', 'passive_comment', $this->passive_comment])
 		      ->andFilterWhere(['like', 'created_by_type', $this->created_by_type]);
 
+		$query->filterWhere();
+		
 		return $dataProvider;
 	}
 }
