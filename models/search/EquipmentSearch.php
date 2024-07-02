@@ -35,60 +35,73 @@ class EquipmentSearch extends Form
 	public $created_at;
 	public $updated_at;
 	public $deleted_at;
-	
-    public function rules(): array
-    {
-        return [
-            [['id', 'company_id', 'contact_id', 'consultant_id', 'preview_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id'], 'integer'],
-            [['name', 'address', 'description', 'passive_comment', 'archived_at', 'created_by_type', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
-        ];
-    }
+
+	public function rules(): array
+	{
+		return [
+			[['id', 'company_id', 'contact_id', 'consultant_id', 'preview_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id'], 'integer'],
+			[['name', 'address', 'description', 'passive_comment', 'archived_at', 'created_by_type', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
+		];
+	}
 
 	/**
 	 * @throws ValidateException
 	 */
-    public function search(array $params): ActiveDataProvider
-    {
-        $query = Equipment::find();
+	public function search(array $params): ActiveDataProvider
+	{
+		$query = Equipment::find()
+		                  ->select([
+			                  Equipment::field('*'),
+			                  'last_call_rel_id' => 'last_call_rel.id'
+		                  ])
+		                  ->leftJoinLastCallRelation()
+		                  ->with([
+			                  'company',
+			                  'contact',
+			                  'consultant.userProfile',
+			                  'preview',
+			                  'files',
+			                  'photos',
+		                  ]);
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
+		$dataProvider = new ActiveDataProvider([
+			'query' => $query,
+		]);
 
-        $this->load($params);
+		$this->load($params);
 
 		$this->validateOrThrow();
 
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'company_id' => $this->company_id,
-            'contact_id' => $this->contact_id,
-            'consultant_id' => $this->consultant_id,
-            'preview_id' => $this->preview_id,
-            'category' => $this->category,
-            'availability' => $this->availability,
-            'delivery' => $this->delivery,
-            'deliveryPrice' => $this->deliveryPrice,
-            'price' => $this->price,
-            'benefit' => $this->benefit,
-            'tax' => $this->tax,
-            'count' => $this->count,
-            'state' => $this->state,
-            'status' => $this->status,
-            'passive_type' => $this->passive_type,
-            'archived_at' => $this->archived_at,
-            'created_by_id' => $this->created_by_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
-        ]);
+		$query->andFilterWhere([
+			'id'            => $this->id,
+			'company_id'    => $this->company_id,
+			'contact_id'    => $this->contact_id,
+			'consultant_id' => $this->consultant_id,
+			'preview_id'    => $this->preview_id,
+			'category'      => $this->category,
+			'availability'  => $this->availability,
+			'delivery'      => $this->delivery,
+			'deliveryPrice' => $this->deliveryPrice,
+			'price'         => $this->price,
+			'benefit'       => $this->benefit,
+			'tax'           => $this->tax,
+			'count'         => $this->count,
+			'state'         => $this->state,
+			'status'        => $this->status,
+			'passive_type'  => $this->passive_type,
+			'archived_at'   => $this->archived_at,
+			'created_by_id' => $this->created_by_id,
+			'created_at'    => $this->created_at,
+			'updated_at'    => $this->updated_at,
+			'deleted_at'    => $this->deleted_at,
+		]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'address', $this->address])
-            ->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['like', 'passive_comment', $this->passive_comment])
-            ->andFilterWhere(['like', 'created_by_type', $this->created_by_type]);
+		$query->andFilterWhere(['like', 'name', $this->name])
+		      ->andFilterWhere(['like', 'address', $this->address])
+		      ->andFilterWhere(['like', 'description', $this->description])
+		      ->andFilterWhere(['like', 'passive_comment', $this->passive_comment])
+		      ->andFilterWhere(['like', 'created_by_type', $this->created_by_type]);
 
-        return $dataProvider;
-    }
+		return $dataProvider;
+	}
 }

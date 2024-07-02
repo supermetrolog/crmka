@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\EquipmentQuery;
 use app\models\ActiveQuery\MediaQuery;
@@ -47,6 +48,7 @@ use yii\db\ActiveQuery;
  * @property Media       $preview
  * @property Media[]     $files
  * @property Media[]     $photos
+ * @property Call        $lastCall
  */
 class Equipment extends AR
 {
@@ -86,6 +88,8 @@ class Equipment extends AR
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
+
+	public ?int $last_call_rel_id = null;
 
 	public static function tableName(): string
 	{
@@ -283,6 +287,29 @@ class Equipment extends AR
 		return $this->morphHasManyVia(Media::class, 'id', 'second')
 		            ->via('relationFirst')
 		            ->andWhere([Media::field('category') => 'equipment_photo']);
+	}
+
+	/**
+	 * @return RelationQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getLastCallRelationFirst(): RelationQuery
+	{
+		return $this->hasOne(Relation::class, [
+			'first_id'   => 'id',
+			'first_type' => 'morph',
+			'id'         => 'last_call_rel_id'
+		])->from([Relation::tableName() => Relation::getTable()]);
+	}
+
+	/**
+	 * @return ActiveQuery|EquipmentQuery
+	 * @throws ErrorException
+	 */
+	public function getLastCall(): CallQuery
+	{
+		return $this->morphHasOneVia(Call::class, 'id', 'second')
+		            ->via('lastCallRelationFirst');
 	}
 
 	public static function find(): EquipmentQuery

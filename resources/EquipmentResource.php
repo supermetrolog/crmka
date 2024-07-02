@@ -6,9 +6,11 @@ namespace app\resources;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Equipment;
+use app\models\User;
 use app\resources\ChatMember\ChatMemberModel\CompanyShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Contact\ContactShortResource;
+use app\resources\User\UserResource;
 
 class EquipmentResource extends JsonResource
 {
@@ -26,10 +28,10 @@ class EquipmentResource extends JsonResource
 			'name'            => $this->resource->name,
 			'address'         => $this->resource->address,
 			'description'     => $this->resource->description,
-			'company'         => CompanyShortResource::make($this->resource->company)->toArray(),
-			'contact'         => ContactShortResource::make($this->resource->contact)->toArray(),
-			'consultant'      => UserShortResource::make($this->resource->consultant)->toArray(),
-			'preview'         => MediaResource::make($this->resource->preview)->toArray(),
+			'company_id'      => $this->resource->company_id,
+			'contact_id'      => $this->resource->contact_id,
+			'consultant_id'   => $this->resource->consultant_id,
+			'preview_id'      => $this->resource->preview_id,
 			'category'        => $this->resource->category,
 			'availability'    => $this->resource->availability,
 			'delivery'        => $this->resource->delivery,
@@ -48,6 +50,14 @@ class EquipmentResource extends JsonResource
 			'created_at'      => $this->resource->created_at,
 			'updated_at'      => $this->resource->updated_at,
 			'deleted_at'      => $this->resource->deleted_at,
+
+			'company'    => CompanyShortResource::make($this->resource->company)->toArray(),
+			'contact'    => ContactShortResource::make($this->resource->contact)->toArray(),
+			'consultant' => UserShortResource::make($this->resource->consultant)->toArray(),
+			'preview'    => MediaResource::make($this->resource->preview)->toArray(),
+			'files'      => $this->resource->files,
+			'photos'     => $this->resource->photos,
+			'last_call'  => CallResource::tryMakeArray($this->resource->lastCall)
 		];
 	}
 }
