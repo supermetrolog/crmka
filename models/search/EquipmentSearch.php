@@ -105,8 +105,6 @@ class EquipmentSearch extends Form
 		      ->andFilterWhere(['like', 'passive_comment', $this->passive_comment])
 		      ->andFilterWhere(['like', 'created_by_type', $this->created_by_type]);
 
-		$query->filterWhere();
-		
 		return $dataProvider;
 	}
 }
