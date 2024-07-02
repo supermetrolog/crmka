@@ -55,6 +55,7 @@ class EquipmentSearch extends Form
 			                  'last_call_rel_id' => 'last_call_rel.id'
 		                  ])
 		                  ->leftJoinLastCallRelation()
+		                  ->with(['lastCall.user.userProfile'])
 		                  ->with([
 			                  'company',
 			                  'contact',
