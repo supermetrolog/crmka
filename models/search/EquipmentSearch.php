@@ -75,7 +75,19 @@ class EquipmentSearch extends Form
 		                  ]);
 
 		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
+			'query'        => $query,
+			'sort' => [
+				'defaultOrder' => [
+					'default' => SORT_DESC
+				],
+				'attributes'   => [
+					'created_at',
+					'updated_at',
+					'archived_at',
+					'price',
+					'count',
+				],
+			],
 		]);
 
 		$this->load($params);
