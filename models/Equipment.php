@@ -6,7 +6,9 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\EquipmentQuery;
 use app\models\ActiveQuery\MediaQuery;
+use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\UserQuery;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
@@ -43,42 +45,44 @@ use yii\db\ActiveQuery;
  * @property User        $consultant
  * @property Contact     $contact
  * @property Media       $preview
+ * @property Media[]     $files
+ * @property Media[]     $photos
  */
 class Equipment extends AR
 {
-	public const CATEGORY_RACKING = 1;
-	public const CATEGORY_MACHINE_TOOLS = 2;
-	public const CATEGORY_CRANE = 3;
-	public const CATEGORY_LIFTING = 4;
+	public const CATEGORY_RACKING               = 1;
+	public const CATEGORY_MACHINE_TOOLS         = 2;
+	public const CATEGORY_CRANE                 = 3;
+	public const CATEGORY_LIFTING               = 4;
 	public const CATEGORY_LOADING_AND_UNLOADING = 5;
-	public const CATEGORY_SERVER = 6;
-	public const CATEGORY_OTHER = 7;
+	public const CATEGORY_SERVER                = 6;
+	public const CATEGORY_OTHER                 = 7;
 
 	public const AVAILABILITY_STOCK = 1;
 	public const AVAILABILITY_ORDER = 2;
 
-	public const DELIVERY_PAY = 1;
+	public const DELIVERY_PAY      = 1;
 	public const DELIVERY_IN_PRICE = 2;
-	public const DELIVERY_PICKUP = 3;
+	public const DELIVERY_PICKUP   = 3;
 
-	public const BENEFIT_YES = 1;
+	public const BENEFIT_YES      = 1;
 	public const BENEFIT_STANDARD = 2;
 
 	public const TAX_VAT = 1;
-	public const TAX_NO = 2;
+	public const TAX_NO  = 2;
 
-	public const STATE_NEW = 1;
-	public const STATE_USED = 2;
+	public const STATE_NEW    = 1;
+	public const STATE_USED   = 2;
 	public const STATE_BROKEN = 3;
 
-	public const STATUS_ACTIVE = 1;
+	public const STATUS_ACTIVE  = 1;
 	public const STATUS_PASSIVE = 2;
 
-	public const PASSIVE_TYPE_SOLD = 1;
-	public const PASSIVE_TYPE_OUTDATED = 2;
-	public const PASSIVE_TYPE_CANCELED = 3;
+	public const PASSIVE_TYPE_SOLD      = 1;
+	public const PASSIVE_TYPE_OUTDATED  = 2;
+	public const PASSIVE_TYPE_CANCELED  = 3;
 	public const PASSIVE_TYPE_MODERATOR = 4;
-	public const PASSIVE_TYPE_OTHER = 5;
+	public const PASSIVE_TYPE_OTHER     = 5;
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -250,6 +254,36 @@ class Equipment extends AR
 		return $this->hasOne(Media::className(), ['id' => 'preview_id']);
 	}
 
+	/**
+	 * @return RelationQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getRelationFirst(): RelationQuery
+	{
+		return $this->morphHasMany(Relation::class, 'id', 'first');
+	}
+
+	/**
+	 * @return ActiveQuery|MediaQuery
+	 * @throws ErrorException
+	 */
+	public function getFiles(): MediaQuery
+	{
+		return $this->morphHasManyVia(Media::class, 'id', 'second')
+		            ->via('relationFirst')
+		            ->andWhere([Media::field('category') => 'equipment_file']);
+	}
+
+	/**
+	 * @return ActiveQuery|MediaQuery
+	 * @throws ErrorException
+	 */
+	public function getPhotos(): MediaQuery
+	{
+		return $this->morphHasManyVia(Media::class, 'id', 'second')
+		            ->via('relationFirst')
+		            ->andWhere([Media::field('category') => 'equipment_photo']);
+	}
 
 	public static function find(): EquipmentQuery
 	{
