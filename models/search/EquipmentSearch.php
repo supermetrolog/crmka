@@ -77,9 +77,6 @@ class EquipmentSearch extends Form
 		$dataProvider = new ActiveDataProvider([
 			'query'        => $query,
 			'sort' => [
-				'defaultOrder' => [
-					'default' => SORT_DESC
-				],
 				'attributes'   => [
 					'created_at',
 					'updated_at',
