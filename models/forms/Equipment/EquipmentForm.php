@@ -10,7 +10,6 @@ use app\kernel\common\models\Form\Form;
 use app\models\Company;
 use app\models\Contact;
 use app\models\Equipment;
-use app\models\Media;
 use app\models\User;
 use Exception;
 
@@ -25,7 +24,9 @@ class EquipmentForm extends Form
 	public $company_id;
 	public $contact_id;
 	public $consultant_id;
-	public $preview_id;
+	public $preview;
+	public $files;
+	public $photos;
 	public $category;
 	public $availability;
 	public $delivery;
@@ -45,8 +46,8 @@ class EquipmentForm extends Form
 	{
 		return [
 			[['description', 'passive_comment'], 'string'],
-			[['company_id', 'contact_id', 'consultant_id', 'preview_id', 'created_by_type', 'created_by_id'], 'required'],
-			[['company_id', 'contact_id', 'consultant_id', 'preview_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id'], 'integer'],
+			[['company_id', 'contact_id', 'consultant_id', 'created_by_type', 'created_by_id'], 'required'],
+			[['company_id', 'contact_id', 'consultant_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id'], 'integer'],
 			[['name'], 'string', 'max' => 60],
 			[['address', 'created_by_type'], 'string', 'max' => 255],
 			['category', 'in', 'range' => Equipment::getCategories()],
@@ -60,7 +61,6 @@ class EquipmentForm extends Form
 			[['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::className(), 'targetAttribute' => ['company_id' => 'id']],
 			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
-			[['preview_id'], 'exist', 'skipOnError' => true, 'targetClass' => Media::className(), 'targetAttribute' => ['preview_id' => 'id']],
 		];
 	}
 
@@ -73,7 +73,6 @@ class EquipmentForm extends Form
 			'company_id',
 			'contact_id',
 			'consultant_id',
-			'preview_id',
 			'category',
 			'availability',
 			'delivery',
@@ -86,8 +85,6 @@ class EquipmentForm extends Form
 			'status',
 			'passive_type',
 			'passive_comment',
-			'created_by_type',
-			'created_by_id',
 		];
 
 		return [
@@ -106,20 +103,19 @@ class EquipmentForm extends Form
 			'name'            => $this->name,
 			'address'         => $this->address,
 			'description'     => $this->description,
-			'company_id'      => $this->company_id,
-			'contact_id'      => $this->contact_id,
-			'consultant_id'   => $this->consultant_id,
-			'preview_id'      => $this->preview_id,
-			'category'        => $this->category,
-			'availability'    => $this->availability,
-			'delivery'        => $this->delivery,
+			'company_id'      => (int)$this->company_id,
+			'contact_id'      => (int)$this->contact_id,
+			'consultant_id'   => (int)$this->consultant_id,
+			'category'        => (int)$this->category,
+			'availability'    => (int)$this->availability,
+			'delivery'        => (int)$this->delivery,
 			'deliveryPrice'   => $this->deliveryPrice,
-			'price'           => $this->price,
-			'benefit'         => $this->benefit,
-			'tax'             => $this->tax,
-			'count'           => $this->count,
-			'state'           => $this->state,
-			'status'          => $this->status,
+			'price'           => (int)$this->price,
+			'benefit'         => (int)$this->benefit,
+			'tax'             => (int)$this->tax,
+			'count'           => (int)$this->count,
+			'state'           => (int)$this->state,
+			'status'          => (int)$this->status,
 			'passive_type'    => $this->passive_type,
 			'passive_comment' => $this->passive_comment,
 			'created_by_type' => $this->created_by_type,

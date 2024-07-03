@@ -6,8 +6,10 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\ChatMemberMessage;
 use app\models\Equipment;
 use app\models\forms\Equipment\EquipmentForm;
+use app\models\forms\Media\MediaForm;
 use app\models\search\EquipmentSearch;
 use app\resources\EquipmentResource;
 use app\usecases\Equipment\EquipmentService;
@@ -16,6 +18,7 @@ use Throwable;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 class EquipmentController extends AppController
 {
@@ -63,9 +66,16 @@ class EquipmentController extends AppController
 
 		$form->load($this->request->post());
 
+		$form->created_by_id   = $this->user->id;
+		$form->created_by_type = $this->user->identity::getMorphClass();
+
 		$form->validateOrThrow();
 
-		$model = $this->service->create($form->getDto());
+		$previewForm = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_PREVIEW, 'preview');
+		$filesForm = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_FILE, 'files');
+		$photosForm = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_PHOTO, 'photos');
+
+		$model = $this->service->create($form->getDto(), $previewForm->getDtos(), $filesForm->getDtos(), $photosForm->getDtos());
 
 		return new EquipmentResource($model);
 	}
@@ -117,5 +127,23 @@ class EquipmentController extends AppController
 		}
 
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeMediaForm(string $category, string $name): MediaForm
+	{
+		$form = new MediaForm();
+
+		$form->category   = $category;
+		$form->model_id   = $this->user->id;
+		$form->model_type = $this->user->identity::getMorphClass();
+
+		$form->files = UploadedFile::getInstancesByName($name);
+
+		$form->validateOrThrow();
+
+		return $form;
 	}
 }

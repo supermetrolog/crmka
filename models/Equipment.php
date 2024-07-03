@@ -52,6 +52,10 @@ use yii\db\ActiveQuery;
  */
 class Equipment extends AR
 {
+	public const MEDIA_CATEGORY_PREVIEW = 'equipment_preview';
+	public const MEDIA_CATEGORY_FILE = 'equipment_file';
+	public const MEDIA_CATEGORY_PHOTO = 'equipment_photo';
+
 	public const CATEGORY_RACKING               = 1;
 	public const CATEGORY_MACHINE_TOOLS         = 2;
 	public const CATEGORY_CRANE                 = 3;

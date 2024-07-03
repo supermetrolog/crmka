@@ -6,45 +6,109 @@ namespace app\usecases\Equipment;
 
 use app\dto\Equipment\CreateEquipmentDto;
 use app\dto\Equipment\UpdateEquipmentDto;
+use app\dto\Media\CreateMediaDto;
+use app\dto\Relation\CreateRelationDto;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Equipment;
+use app\usecases\Media\CreateMediaService;
+use app\usecases\Relation\RelationService;
 use Throwable;
 use yii\db\StaleObjectException;
 
 class EquipmentService
 {
+	private TransactionBeginnerInterface $transactionBeginner;
+	protected CreateMediaService         $createMediaService;
+	protected RelationService            $relationService;
+
+	public function __construct(
+		TransactionBeginnerInterface $transactionBeginner,
+		RelationService $relationService,
+		CreateMediaService $createMediaService
+	)
+	{
+		$this->transactionBeginner = $transactionBeginner;
+		$this->relationService     = $relationService;
+		$this->createMediaService  = $createMediaService;
+	}
+
 	/**
+	 * @param CreateMediaDto[] $previewDtos
+	 * @param CreateMediaDto[] $filesDtos
+	 * @param CreateMediaDto[] $photosDtos
+	 *
 	 * @throws SaveModelException
 	 */
-	public function create(CreateEquipmentDto $dto): Equipment
+	public function create(CreateEquipmentDto $dto, array $previewDtos, array $filesDtos, array $photosDtos): Equipment
 	{
-		$model = new Equipment([
-			'name'            => $dto->name,
-			'address'         => $dto->address,
-			'description'     => $dto->description,
-			'company_id'      => $dto->company_id,
-			'contact_id'      => $dto->contact_id,
-			'consultant_id'   => $dto->consultant_id,
-			'preview_id'      => $dto->preview_id,
-			'category'        => $dto->category,
-			'availability'    => $dto->availability,
-			'delivery'        => $dto->delivery,
-			'deliveryPrice'   => $dto->deliveryPrice,
-			'price'           => $dto->price,
-			'benefit'         => $dto->benefit,
-			'tax'             => $dto->tax,
-			'count'           => $dto->count,
-			'state'           => $dto->state,
-			'status'          => $dto->status,
-			'passive_type'    => $dto->passive_type,
-			'passive_comment' => $dto->passive_comment,
-			'created_by_type' => $dto->created_by_type,
-			'created_by_id'   => $dto->created_by_id,
-		]);
+		$tx = $this->transactionBeginner->begin();
 
-		$model->saveOrThrow();
+		try {
+			$preview = $this->createMediaService->create($previewDtos[0]);
 
-		return $model;
+			$model = new Equipment([
+				'name'            => $dto->name,
+				'address'         => $dto->address,
+				'description'     => $dto->description,
+				'company_id'      => $dto->company_id,
+				'contact_id'      => $dto->contact_id,
+				'consultant_id'   => $dto->consultant_id,
+				'preview_id'      => $preview->id,
+				'category'        => $dto->category,
+				'availability'    => $dto->availability,
+				'delivery'        => $dto->delivery,
+				'deliveryPrice'   => $dto->deliveryPrice,
+				'price'           => $dto->price,
+				'benefit'         => $dto->benefit,
+				'tax'             => $dto->tax,
+				'count'           => $dto->count,
+				'state'           => $dto->state,
+				'status'          => $dto->status,
+				'passive_type'    => $dto->passive_type,
+				'passive_comment' => $dto->passive_comment,
+				'created_by_type' => $dto->created_by_type,
+				'created_by_id'   => $dto->created_by_id,
+			]);
+
+			$model->saveOrThrow();
+
+			$this->relationService->create(new CreateRelationDto([
+				'first_type'  => $model::getMorphClass(),
+				'first_id'    => $model->id,
+				'second_type' => $preview::getMorphClass(),
+				'second_id'   => $preview->id,
+			]));
+
+			foreach ($filesDtos as $mediaDto) {
+				$media = $this->createMediaService->create($mediaDto);
+
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $model::getMorphClass(),
+					'first_id'    => $model->id,
+					'second_type' => $media::getMorphClass(),
+					'second_id'   => $media->id,
+				]));
+			}
+
+			foreach ($photosDtos as $mediaDto) {
+				$media = $this->createMediaService->create($mediaDto);
+
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $model::getMorphClass(),
+					'first_id'    => $model->id,
+					'second_type' => $media::getMorphClass(),
+					'second_id'   => $media->id,
+				]));
+			}
+
+			$tx->commit();
+
+			return $model;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 	/**
@@ -59,7 +123,6 @@ class EquipmentService
 			'company_id'      => $dto->company_id,
 			'contact_id'      => $dto->contact_id,
 			'consultant_id'   => $dto->consultant_id,
-			'preview_id'      => $dto->preview_id,
 			'category'        => $dto->category,
 			'availability'    => $dto->availability,
 			'delivery'        => $dto->delivery,

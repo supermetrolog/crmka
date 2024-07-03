@@ -14,7 +14,6 @@ class UpdateEquipmentDto extends BaseObject
 	public int     $company_id;
 	public int     $contact_id;
 	public int     $consultant_id;
-	public int     $preview_id;
 	public int     $category;
 	public int     $availability;
 	public int     $delivery;
