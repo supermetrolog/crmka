@@ -8,9 +8,11 @@ use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMemberMessage;
 use app\models\Equipment;
+use app\models\forms\Call\CallForm;
 use app\models\forms\Equipment\EquipmentForm;
 use app\models\forms\Media\MediaForm;
 use app\models\search\EquipmentSearch;
+use app\resources\CallResource;
 use app\resources\EquipmentResource;
 use app\usecases\Equipment\EquipmentService;
 use Exception;
@@ -115,6 +117,28 @@ class EquipmentController extends AppController
 		$this->service->delete($this->findModel($id));
 
 		return new SuccessResponse();
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return CallResource
+	 * @throws ValidateException
+	 * @throws Throwable
+	 */
+	public function actionCalled(int $id): CallResource
+	{
+		$form = new CallForm();
+
+		$form->setScenario(CallForm::SCENARIO_CREATE);
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$model = $this->service->createCall($this->findModel($id), $form->getDto());
+
+		return new CallResource($model);
 	}
 
 	/**
