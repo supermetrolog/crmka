@@ -26,6 +26,4 @@ class UpdateEquipmentDto extends BaseObject
 	public int     $status;
 	public ?int    $passive_type    = null;
 	public ?string $passive_comment = null;
-	public string  $created_by_type;
-	public int     $created_by_id;
 }

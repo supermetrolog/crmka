@@ -143,8 +143,6 @@ class EquipmentService
 			'status'          => $dto->status,
 			'passive_type'    => $dto->passive_type,
 			'passive_comment' => $dto->passive_comment,
-			'created_by_type' => $dto->created_by_type,
-			'created_by_id'   => $dto->created_by_id,
 		]);
 
 		$model->saveOrThrow();

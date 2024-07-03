@@ -99,35 +99,52 @@ class EquipmentForm extends Form
 	 */
 	public function getDto()
 	{
-		$common = [
-			'name'            => $this->name,
-			'address'         => $this->address,
-			'description'     => $this->description,
-			'company_id'      => (int)$this->company_id,
-			'contact_id'      => (int)$this->contact_id,
-			'consultant_id'   => (int)$this->consultant_id,
-			'category'        => (int)$this->category,
-			'availability'    => (int)$this->availability,
-			'delivery'        => (int)$this->delivery,
-			'deliveryPrice'   => $this->deliveryPrice,
-			'price'           => (int)$this->price,
-			'benefit'         => (int)$this->benefit,
-			'tax'             => (int)$this->tax,
-			'count'           => (int)$this->count,
-			'state'           => (int)$this->state,
-			'status'          => (int)$this->status,
-			'passive_type'    => $this->passive_type,
-			'passive_comment' => $this->passive_comment,
-			'created_by_type' => $this->created_by_type,
-			'created_by_id'   => $this->created_by_id,
-		];
-
 		switch ($this->getScenario()) {
 			case self::SCENARIO_CREATE:
-				return new CreateEquipmentDto($common);
+				return new CreateEquipmentDto([
+					'name'            => $this->name,
+					'address'         => $this->address,
+					'description'     => $this->description,
+					'company_id'      => (int)$this->company_id,
+					'contact_id'      => (int)$this->contact_id,
+					'consultant_id'   => (int)$this->consultant_id,
+					'category'        => (int)$this->category,
+					'availability'    => (int)$this->availability,
+					'delivery'        => (int)$this->delivery,
+					'deliveryPrice'   => $this->deliveryPrice,
+					'price'           => (int)$this->price,
+					'benefit'         => (int)$this->benefit,
+					'tax'             => (int)$this->tax,
+					'count'           => (int)$this->count,
+					'state'           => (int)$this->state,
+					'status'          => (int)$this->status,
+					'passive_type'    => $this->passive_type,
+					'passive_comment' => $this->passive_comment,
+					'created_by_type' => $this->created_by_type,
+					'created_by_id'   => $this->created_by_id,
+				]);
 
 			default:
-				return new UpdateEquipmentDto($common);
+				return new UpdateEquipmentDto([
+					'name'            => $this->name,
+					'address'         => $this->address,
+					'description'     => $this->description,
+					'company_id'      => (int)$this->company_id,
+					'contact_id'      => (int)$this->contact_id,
+					'consultant_id'   => (int)$this->consultant_id,
+					'category'        => (int)$this->category,
+					'availability'    => (int)$this->availability,
+					'delivery'        => (int)$this->delivery,
+					'deliveryPrice'   => $this->deliveryPrice,
+					'price'           => (int)$this->price,
+					'benefit'         => (int)$this->benefit,
+					'tax'             => (int)$this->tax,
+					'count'           => (int)$this->count,
+					'state'           => (int)$this->state,
+					'status'          => (int)$this->status,
+					'passive_type'    => $this->passive_type,
+					'passive_comment' => $this->passive_comment,
+				]);
 		}
 	}
 }
