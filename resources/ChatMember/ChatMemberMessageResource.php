@@ -31,6 +31,7 @@ class ChatMemberMessageResource extends JsonResource
 			'message'             => $this->resource->message,
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
+			'is_viewed'           => $this->resource->is_viewed,
 			'from'                => ChatMemberShortResource::make($this->resource->fromChatMember)->toArray(),
 			'tasks'               => TaskResource::collection($this->resource->tasks),
 			'alerts'              => AlertResource::collection($this->resource->alerts),

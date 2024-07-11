@@ -45,6 +45,7 @@ class ChatMemberMessage extends AR
 	protected bool $useSoftUpdate = true;
 	protected bool $useSoftDelete = true;
 
+	public ?bool $is_viewed = null;
 
 	public static function tableName(): string
 	{
@@ -176,6 +177,17 @@ class ChatMemberMessage extends AR
 	public function getViews(): ChatMemberMessageViewQuery
 	{
 		return $this->hasMany(ChatMemberMessageView::class, ['chat_member_message_id' => 'id']);
+	}
+
+	/**
+	 * @return ActiveQuery|ChatMemberMessageViewQuery
+	 */
+	public function getFromChatMemberViews(): ChatMemberMessageViewQuery
+	{
+		return $this->hasMany(ChatMemberMessageView::class, [
+			'chat_member_message_id' => 'id',
+			'chat_member_id' => 'from_chat_member_id',
+		]);
 	}
 
 
