@@ -136,24 +136,22 @@ class ChatMemberSearch extends Form
 	 */
 	private function makeTaskQuery(): AQ
 	{
-		$subQuery = Task::find()
-		                ->notCompleted()
-		                ->notDeleted();
-
-		return ChatMemberMessage::find()
-		                        ->select([
-			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
-			                        'id'                => 'tasks.id',
-		                        ])
-		                        ->leftJoin(Relation::getTable(), [
-			                        Relation::field('first_id')    => new Expression(ChatMemberMessage::field('id')),
-			                        Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
-			                        Relation::field('second_type') => Task::getMorphClass(),
-		                        ])
-		                        ->leftJoin(['tasks' => $subQuery], [
-			                        'tasks.id'      => new Expression(Relation::field('second_id')),
-			                        'tasks.user_id' => $this->current_user_id,
-		                        ]);
+		return Task::find()
+		               ->select([
+			               'id'                => Task::field('id'),
+			               'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
+		               ])
+		               ->leftJoin(Relation::getTable(), [
+			               Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
+			               Relation::field('second_type') => Task::getMorphClass(),
+			               Relation::field('second_id')   => new Expression(Task::field('id')),
+		               ])
+		               ->leftJoin(ChatMemberMessage::getTable(), [
+			               ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+		               ])
+		               ->andWhere([Task::field('user_id') => $this->current_user_id])
+		               ->notCompleted()
+		               ->notDeleted();
 	}
 
 	/**
@@ -161,24 +159,22 @@ class ChatMemberSearch extends Form
 	 */
 	private function makeReminderQuery(): AQ
 	{
-		$subQuery = Reminder::find()
-		                    ->notNotified()
-		                    ->notDeleted();
-
-		return ChatMemberMessage::find()
-		                        ->select([
-			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
-			                        'id'                => 'reminders.id',
-		                        ])
-		                        ->leftJoin(Relation::getTable(), [
-			                        Relation::field('first_id')    => new Expression(ChatMemberMessage::field('id')),
-			                        Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
-			                        Relation::field('second_type') => Reminder::getMorphClass(),
-		                        ])
-		                        ->leftJoin(['reminders' => $subQuery], [
-			                        'reminders.id'      => new Expression(Relation::field('second_id')),
-			                        'reminders.user_id' => $this->current_user_id,
-		                        ]);
+		return Reminder::find()
+		               ->select([
+			               'id'                => Reminder::field('id'),
+			               'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
+		               ])
+		               ->leftJoin(Relation::getTable(), [
+			               Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
+			               Relation::field('second_type') => Reminder::getMorphClass(),
+			               Relation::field('second_id')   => new Expression(Reminder::field('id')),
+		               ])
+		               ->leftJoin(ChatMemberMessage::getTable(), [
+			               ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+		               ])
+		               ->andWhere([Reminder::field('user_id') => $this->current_user_id])
+		               ->notNotified()
+		               ->notDeleted();
 	}
 
 	/**
@@ -186,23 +182,21 @@ class ChatMemberSearch extends Form
 	 */
 	private function makeNotificationQuery(): AQ
 	{
-		$subQuery = UserNotification::find()
-		                            ->andWhereNull('viewed_at');
-
-		return ChatMemberMessage::find()
-		                        ->select([
-			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
-			                        'id'                => 'notification.id',
-		                        ])
-		                        ->leftJoin(Relation::getTable(), [
-			                        Relation::field('first_id')    => new Expression(ChatMemberMessage::field('id')),
-			                        Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
-			                        Relation::field('second_type') => UserNotification::getMorphClass(),
-		                        ])
-		                        ->leftJoin(['notification' => $subQuery], [
-			                        'notification.id'      => new Expression(Relation::field('second_id')),
-			                        'notification.user_id' => $this->current_user_id,
-		                        ]);
+		return UserNotification::find()
+		                       ->select([
+			                       'id'                => UserNotification::field('id'),
+			                       'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
+		                       ])
+		                       ->leftJoin(Relation::getTable(), [
+			                       Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
+			                       Relation::field('second_type') => UserNotification::getMorphClass(),
+			                       Relation::field('second_id')   => new Expression(UserNotification::field('id')),
+		                       ])
+		                       ->leftJoin(ChatMemberMessage::getTable(), [
+			                       ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+		                       ])
+		                       ->andWhereNull('viewed_at')
+		                       ->andWhere([UserNotification::field('user_id') => $this->current_user_id]);
 	}
 
 	/**
