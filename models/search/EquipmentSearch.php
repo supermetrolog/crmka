@@ -47,8 +47,8 @@ class EquipmentSearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['id', 'company_id', 'contact_id', 'consultant_id', 'preview_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id'], 'integer'],
-			[['minPrice', 'maxPrice', 'minCount', 'maxCount'], 'boolean'],
+			[['id', 'company_id', 'contact_id', 'consultant_id', 'preview_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id', 'minCount', 'maxCount'], 'integer'],
+			[['minPrice', 'maxPrice'], 'boolean'],
 			[['name', 'address', 'description', 'passive_comment', 'archived_at', 'created_by_type', 'created_at', 'updated_at', 'deleted_at', 'search'], 'safe'],
 		];
 	}
