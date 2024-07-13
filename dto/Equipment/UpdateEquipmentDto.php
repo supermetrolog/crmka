@@ -8,9 +8,9 @@ use yii\base\BaseObject;
 
 class UpdateEquipmentDto extends BaseObject
 {
-	public string  $name;
+	public ?string $name;
 	public string  $address;
-	public string  $description;
+	public ?string $description;
 	public int     $company_id;
 	public int     $contact_id;
 	public int     $consultant_id;
