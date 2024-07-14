@@ -5,8 +5,16 @@ namespace app\models\ActiveQuery;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
 use app\models\ChatMember;
+use app\models\ChatMemberMessage;
+use app\models\ChatMemberMessageView;
+use app\models\Notification\UserNotification;
 use app\models\Relation;
+use app\models\Reminder;
+use app\models\Task;
+use app\models\views\ChatMemberSearchView;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
+use yii\db\Query;
 
 /**
  * @see ChatMember
@@ -15,7 +23,7 @@ class ChatMemberQuery extends AQ
 {
 
 	/**
-	 * @return ChatMember[]|ActiveRecord[]
+	 * @return ChatMember[]|ChatMemberSearchView[]|ActiveRecord[]
 	 */
 	public function all($db = null): array
 	{
@@ -23,7 +31,7 @@ class ChatMemberQuery extends AQ
 	}
 
 	/**
-	 * @return ChatMember|ActiveRecord|null
+	 * @return ChatMember|ChatMemberSearchView|ActiveRecord|null
 	 */
 	public function one($db = null): ?ChatMember
 	{

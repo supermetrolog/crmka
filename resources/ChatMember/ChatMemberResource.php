@@ -34,7 +34,8 @@ class ChatMemberResource extends JsonResource
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'model'      => $this->getModel()->toArray(),
-			'last_call'  => CallResource::tryMakeArray($this->resource->lastCall)
+			'last_call'  => CallResource::tryMakeArray($this->resource->lastCall),
+			'statistic'  => $this->getStatistic(),
 		];
 	}
 
@@ -55,6 +56,16 @@ class ChatMemberResource extends JsonResource
 		}
 
 		throw new UnexpectedValueException('Unknown model type');
+	}
+
+	private function getStatistic(): array
+	{
+		return [
+			'tasks'         => $this->resource->unread_task_count,
+			'reminders'     => $this->resource->unread_reminder_count,
+			'notifications' => $this->resource->unread_notification_count,
+			'messages'      => $this->resource->unread_message_count,
+		];
 	}
 
 	public static function fromDataProvider(ActiveDataProvider $dataProvider): ActiveDataProvider
