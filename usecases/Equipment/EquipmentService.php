@@ -48,12 +48,13 @@ class EquipmentService
 	 *
 	 * @throws SaveModelException
 	 */
-	public function create(CreateEquipmentDto $dto, array $previewDtos, array $filesDtos, array $photosDtos): Equipment
+	public function create(CreateEquipmentDto $dto, array $filesDtos, array $photosDtos): Equipment
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$preview = $this->createMediaService->create($previewDtos[0]);
+			$previewDto = $photosDtos[0] ?? null;
+			$preview = !empty($previewDto) ? $this->createMediaService->create($previewDto) : null;
 
 			$model = new Equipment([
 				'name'            => $dto->name,
@@ -62,7 +63,7 @@ class EquipmentService
 				'company_id'      => $dto->company_id,
 				'contact_id'      => $dto->contact_id,
 				'consultant_id'   => $dto->consultant_id,
-				'preview_id'      => $preview->id,
+				'preview_id'      => $preview ? $preview->id : null,
 				'category'        => $dto->category,
 				'availability'    => $dto->availability,
 				'delivery'        => $dto->delivery,
@@ -81,12 +82,14 @@ class EquipmentService
 
 			$model->saveOrThrow();
 
-			$this->relationService->create(new CreateRelationDto([
-				'first_type'  => $model::getMorphClass(),
-				'first_id'    => $model->id,
-				'second_type' => $preview::getMorphClass(),
-				'second_id'   => $preview->id,
-			]));
+			if (!empty($preview)) {
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $model::getMorphClass(),
+					'first_id'    => $model->id,
+					'second_type' => $preview::getMorphClass(),
+					'second_id'   => $preview->id,
+				]));
+			}
 
 			foreach ($filesDtos as $mediaDto) {
 				$media = $this->createMediaService->create($mediaDto);

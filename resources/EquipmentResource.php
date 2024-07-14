@@ -54,7 +54,7 @@ class EquipmentResource extends JsonResource
 			'company'    => CompanyShortResource::make($this->resource->company)->toArray(),
 			'contact'    => ContactShortResource::make($this->resource->contact)->toArray(),
 			'consultant' => UserShortResource::make($this->resource->consultant)->toArray(),
-			'preview'    => MediaResource::make($this->resource->preview)->toArray(),
+			'preview'    => MediaResource::tryMakeArray($this->resource->preview),
 			'files'      => $this->resource->files,
 			'photos'     => $this->resource->photos,
 			'last_call'  => CallResource::tryMakeArray($this->resource->lastCall)
