@@ -23,6 +23,9 @@ class ChatMemberMessageSearch extends Form
 
 	public $current_from_chat_member_id;
 
+	private const MAX_UNREAD_COUNT = 30;
+	private const EXTRA_READ_COUNT = 5;
+
 	public function rules(): array
 	{
 		return [
@@ -78,7 +81,7 @@ class ChatMemberMessageSearch extends Form
 				      '(CASE WHEN ' . ChatMemberMessageView::field('id') . ' IS NULL THEN 0 ELSE 1 END)' => SORT_ASC,
 				      ChatMemberMessage::field('id')                                                     => SORT_DESC,
 			      ])
-			      ->limit($unreadCount < 30 ? 30 : $unreadCount + 5);
+			      ->limit($unreadCount < self::MAX_UNREAD_COUNT ? self::MAX_UNREAD_COUNT : $unreadCount + self::EXTRA_READ_COUNT);
 
 			$orderedQuery = ChatMemberMessage::find()->from(['messages' => $query])->orderBy(['messages.id' => SORT_ASC]);
 
