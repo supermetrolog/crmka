@@ -37,14 +37,11 @@ class ChatMemberMessageSearch extends Form
 	public function search(array $params): ActiveDataProvider
 	{
 		$unreadCount = ChatMemberMessage::find()
-		                                ->select([
-			                                'count' => 'COUNT(' . ChatMemberMessage::field('id') . ')',
-		                                ])
 		                                ->joinWith('views')
 		                                ->byFromChatMemberId($this->current_from_chat_member_id)
 		                                ->andWhereNull(ChatMemberMessageView::getColumn('id'))
 		                                ->notDeleted()
-		                                ->asArray()->all()[0]['count'];
+										->count();
 
 		$query = ChatMemberMessage::find()
 		                          ->select([
