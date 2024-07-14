@@ -73,11 +73,10 @@ class EquipmentController extends AppController
 
 		$form->validateOrThrow();
 
-		$previewForm = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_PREVIEW, 'preview');
 		$filesForm = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_FILE, 'files');
 		$photosForm = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_PHOTO, 'photos');
 
-		$model = $this->service->create($form->getDto(), $previewForm->getDtos(), $filesForm->getDtos(), $photosForm->getDtos());
+		$model = $this->service->create($form->getDto(), $filesForm->getDtos(), $photosForm->getDtos());
 
 		return new EquipmentResource($model);
 	}

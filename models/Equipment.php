@@ -22,7 +22,7 @@ use yii\db\ActiveQuery;
  * @property int         $company_id
  * @property int         $contact_id
  * @property int         $consultant_id
- * @property int         $preview_id
+ * @property ?int        $preview_id
  * @property int|null    $category
  * @property int|null    $availability
  * @property int|null    $delivery
@@ -53,8 +53,8 @@ use yii\db\ActiveQuery;
 class Equipment extends AR
 {
 	public const MEDIA_CATEGORY_PREVIEW = 'equipment_preview';
-	public const MEDIA_CATEGORY_FILE = 'equipment_file';
-	public const MEDIA_CATEGORY_PHOTO = 'equipment_photo';
+	public const MEDIA_CATEGORY_FILE    = 'equipment_file';
+	public const MEDIA_CATEGORY_PHOTO   = 'equipment_photo';
 
 	public const CATEGORY_RACKING               = 1;
 	public const CATEGORY_MACHINE_TOOLS         = 2;
@@ -104,7 +104,7 @@ class Equipment extends AR
 	{
 		return [
 			[['description', 'passive_comment'], 'string'],
-			[['company_id', 'contact_id', 'consultant_id', 'preview_id', 'created_by_type', 'created_by_id'], 'required'],
+			[['company_id', 'contact_id', 'consultant_id', 'created_by_type', 'created_by_id'], 'required'],
 			[['company_id', 'contact_id', 'consultant_id', 'preview_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id'], 'integer'],
 			[['archived_at', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
 			[['name'], 'string', 'max' => 60],
