@@ -47,8 +47,10 @@ class EquipmentSearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['id', 'company_id', 'contact_id', 'consultant_id', 'preview_id', 'category', 'availability', 'delivery', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id'], 'integer'],
-			[['minPrice', 'maxPrice', 'minCount', 'maxCount'], 'boolean'],
+			[['id', 'company_id', 'contact_id', 'preview_id', 'availability', 'deliveryPrice', 'price', 'benefit', 'tax', 'count', 'state', 'status', 'passive_type', 'created_by_id', 'minCount', 'maxCount', 'minPrice', 'maxPrice'], 'integer'],
+			['category', 'each', 'rule' => ['integer']],
+			['delivery', 'each', 'rule' => ['integer']],
+			['consultant_id', 'each', 'rule' => ['integer']],
 			[['name', 'address', 'description', 'passive_comment', 'archived_at', 'created_by_type', 'created_at', 'updated_at', 'deleted_at', 'search'], 'safe'],
 		];
 	}
@@ -115,21 +117,10 @@ class EquipmentSearch extends Form
 			'deleted_at'    => $this->deleted_at,
 		]);
 
-		if ($this->isFilterTrue($this->minPrice)) {
-			$query->andWhere(['price' => Equipment::find()->select('MIN(price)')]);
-		}
-
-		if ($this->isFilterTrue($this->maxPrice)) {
-			$query->andWhere(['price' => Equipment::find()->select('MAX(price)')]);
-		}
-
-		if ($this->isFilterTrue($this->minCount)) {
-			$query->andWhere(['count' => Equipment::find()->select('MIN(count)')]);
-		}
-
-		if ($this->isFilterTrue($this->maxCount)) {
-			$query->andWhere(['count' => Equipment::find()->select('MAX(count)')]);
-		}
+		$query->andFilterWhere(['>', 'price', $this->minPrice])
+		      ->andFilterWhere(['<', 'price', $this->maxPrice])
+		      ->andFilterWhere(['>', 'count', $this->minCount])
+		      ->andFilterWhere(['<', 'count', $this->maxCount]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
 		      ->andFilterWhere(['like', 'address', $this->address])
