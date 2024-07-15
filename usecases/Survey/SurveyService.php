@@ -45,15 +45,20 @@ class SurveyService
 	}
 
 	/**
+	 * @param CreateSurveyQuestionAnswerDto[] $answerDtos
+	 *
 	 * @throws SaveModelException
 	 */
-	public function createWithSurveyQuestionAnswer(CreateSurveyDto $dto, CreateSurveyQuestionAnswerDto $answerDto): Survey
+	public function createWithSurveyQuestionAnswer(CreateSurveyDto $dto, array $answerDtos = []): Survey
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
 			$question = $this->create($dto);
-			$this->createSurveyQuestionAnswer($question, $answerDto);
+
+			foreach ($answerDtos as $answerDto) {
+				$this->createSurveyQuestionAnswer($question, $answerDto);
+			}
 
 			$tx->commit();
 
@@ -71,20 +76,9 @@ class SurveyService
 	 */
 	public function createSurveyQuestionAnswer(Survey $survey, CreateSurveyQuestionAnswerDto $dto): SurveyQuestionAnswer
 	{
-		$tx = $this->transactionBeginner->begin();
+		$dto->survey_id = $survey->id;
 
-		try {
-			$dto->survey_id = $survey->id;
-
-			$model = $this->surveyQuestionAnswerService->create($dto);
-
-			$tx->commit();
-
-			return $model;
-		} catch (Throwable $th) {
-			$tx->rollBack();
-			throw $th;
-		}
+		return $this->surveyQuestionAnswerService->create($dto);
 	}
 
 	/**
