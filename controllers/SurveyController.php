@@ -2,17 +2,20 @@
 
 namespace app\controllers;
 
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Survey\SurveyForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
+use app\models\Question;
 use app\models\search\SurveySearch;
 use app\models\Survey;
 use app\repositories\SurveyRepository;
 use app\resources\SurveyResource;
 use app\resources\SurveyShortResource;
+use app\resources\SurveyWithQuestionsResource;
 use app\usecases\Survey\SurveyService;
 use Throwable;
 use yii\data\ActiveDataProvider;
@@ -23,7 +26,7 @@ class SurveyController extends AppController
 {
 	private SurveyService    $service;
 	private SurveyRepository $repository;
-	
+
 	public function __construct(
 		$id,
 		$module,
@@ -55,6 +58,17 @@ class SurveyController extends AppController
 	public function actionView(int $id): SurveyResource
 	{
 		return new SurveyResource($this->findModel($id));
+	}
+
+	/**
+	 * @throws NotFoundHttpException
+	 */
+	public function actionViewWithQuestions(int $id): SurveyWithQuestionsResource
+	{
+		return new SurveyWithQuestionsResource(
+			$this->findModel($id),
+			Question::find()->with('answers.surveyQuestionAnswer')->all(),
+		);
 	}
 
 	/**
