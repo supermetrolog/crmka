@@ -44,7 +44,7 @@ class ChatMemberMessageSearch extends Form
 		                                ->byFromChatMemberId($this->current_from_chat_member_id)
 		                                ->andWhereNull(ChatMemberMessageView::getColumn('id'))
 		                                ->notDeleted()
-										->count();
+		                                ->count();
 
 		$query = ChatMemberMessage::find()
 		                          ->select([
@@ -52,7 +52,6 @@ class ChatMemberMessageSearch extends Form
 			                          '(chat_member_message_view.chat_member_message_id IS NOT NULL) as is_viewed'
 		                          ])
 		                          ->joinWith('fromChatMemberViews')
-		                          ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_from_chat_member_id])
 		                          ->byFromChatMemberId($this->current_from_chat_member_id)
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
