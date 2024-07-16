@@ -104,9 +104,10 @@ class ChatMemberSearch extends Form
 			                             'request.objectClasses',
 		                             ])
 		                             ->with(['user.userProfile'])
+									->groupBy(ChatMember::field('id'))
 		                             ->orderBy([
-			                             'chat_member_last_event_id' => SORT_DESC,
-			                             'chat_member_message_id'    => SORT_DESC,
+			                             'cmle.chat_member_last_event_id' => SORT_DESC,
+			                             'cmm.chat_member_message_id'    => SORT_DESC,
 		                             ]);
 
 		$dataProvider = new ActiveDataProvider([
@@ -213,7 +214,7 @@ class ChatMemberSearch extends Form
 		                       ->leftJoin(ChatMemberMessage::getTable(), [
 			                       ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		                       ])
-		                       ->andWhereNull('viewed_at')
+		                       ->andWhereNull(UserNotification::field('viewed_at'))
 		                       ->andWhere([UserNotification::field('user_id') => $this->current_user_id]);
 	}
 
