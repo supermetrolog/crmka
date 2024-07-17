@@ -72,7 +72,7 @@ class Equipment extends AR
 	public const DELIVERY_PICKUP   = 3;
 
 	public const BENEFIT_YES      = 1;
-	public const BENEFIT_STANDARD = 2;
+	public const BENEFIT_STANDARD = 0;
 
 	public const TAX_VAT = 1;
 	public const TAX_NO  = 2;
