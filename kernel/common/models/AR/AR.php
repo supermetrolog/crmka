@@ -108,12 +108,14 @@ class AR extends ActiveRecord
 			$this->setAttribute(self::SOFT_UPDATE_ATTRIBUTE, DateTimeHelper::nowf());
 		}
 
-		if ($this->useSoftCreate && !$this->hasAttribute(self::SOFT_CREATE_ATTRIBUTE)) {
-			throw new ErrorException('Soft create attribute (' . self::SOFT_CREATE_ATTRIBUTE . ') not exist');
-		}
+		if ($this->isNewRecord) {
+			if ($this->useSoftCreate && !$this->hasAttribute(self::SOFT_CREATE_ATTRIBUTE)) {
+				throw new ErrorException('Soft create attribute (' . self::SOFT_CREATE_ATTRIBUTE . ') not exist');
+			}
 
-		if ($this->useSoftCreate) {
-			$this->setAttribute(self::SOFT_CREATE_ATTRIBUTE, DateTimeHelper::nowf());
+			if ($this->useSoftCreate) {
+				$this->setAttribute(self::SOFT_CREATE_ATTRIBUTE, DateTimeHelper::nowf());
+			}
 		}
 
 		return parent::save($runValidation, $attributeNames);
