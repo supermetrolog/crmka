@@ -84,15 +84,21 @@ class SurveyController extends AppController
 	 */
 	public function actionCreateWithSurveyQuestionAnswer(): SurveyShortResource
 	{
-		// Create Survey Question Answer
+		// Create Survey Question Answers
 
-		$surveyQuestionAnswerForm = new SurveyQuestionAnswerForm();
+		$answerDtos = [];
 
-		$surveyQuestionAnswerForm->setScenario(SurveyQuestionAnswerForm::SCENARIO_CREATE_WITH_SURVEY);
+		foreach ($this->request->post('question_answers') ?? [] as $questionAnswer) {
+			$surveyQuestionAnswerForm = new SurveyQuestionAnswerForm();
 
-		$surveyQuestionAnswerForm->load($this->request->post());
+			$surveyQuestionAnswerForm->setScenario(SurveyQuestionAnswerForm::SCENARIO_CREATE_WITH_SURVEY);
 
-		$surveyQuestionAnswerForm->validateOrThrow();
+			$surveyQuestionAnswerForm->load($questionAnswer);
+
+			$surveyQuestionAnswerForm->validateOrThrow();
+
+			$answerDtos[] = $surveyQuestionAnswerForm->getDto();
+		}
 
 		// Create Survey
 
@@ -104,7 +110,7 @@ class SurveyController extends AppController
 
 		$surveyForm->validateOrThrow();
 
-		$model = $this->service->createWithSurveyQuestionAnswer($surveyForm->getDto(), $surveyQuestionAnswerForm->getDto());
+		$model = $this->service->createWithSurveyQuestionAnswer($surveyForm->getDto(), $answerDtos);
 
 		return new SurveyShortResource($model);
 	}
