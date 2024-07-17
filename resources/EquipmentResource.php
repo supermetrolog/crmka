@@ -7,8 +7,10 @@ namespace app\resources;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Equipment;
 use app\models\User;
+use app\resources\ChatMember\ChatMemberModel\CompanyResource;
 use app\resources\ChatMember\ChatMemberModel\CompanyShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\Contact\ContactResource;
 use app\resources\Contact\ContactShortResource;
 use app\resources\User\UserResource;
 
@@ -51,8 +53,8 @@ class EquipmentResource extends JsonResource
 			'updated_at'      => $this->resource->updated_at,
 			'deleted_at'      => $this->resource->deleted_at,
 
-			'company'    => CompanyShortResource::make($this->resource->company)->toArray(),
-			'contact'    => ContactShortResource::make($this->resource->contact)->toArray(),
+			'company'    => $this->resource->company->toArray(),
+			'contact'    => ContactResource::make($this->resource->contact)->toArray(),
 			'consultant' => UserShortResource::make($this->resource->consultant)->toArray(),
 			'preview'    => MediaResource::tryMakeArray($this->resource->preview),
 			'files'      => $this->resource->files,
