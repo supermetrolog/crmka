@@ -283,6 +283,7 @@ return
 			'extraPatterns' => [
 				'GET,OPTIONS'                              => 'index',
 				'GET,OPTIONS <id>'                         => 'view',
+				'GET,OPTIONS <id>/with-questions'          => 'view-with-questions',
 				'POST,OPTIONS'                             => 'create',
 				'POST,OPTIONS with-survey-question-answer' => 'create-with-survey-question-answer',
 				'PUT,OPTIONS <id>'                         => 'update',

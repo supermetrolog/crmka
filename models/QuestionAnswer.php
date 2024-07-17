@@ -6,21 +6,23 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\FieldQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\QuestionQuery;
+use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
 use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "question_answer".
  *
- * @property int         $id
- * @property int         $question_id
- * @property int         $field_id
- * @property int         $category
- * @property string      $value
- * @property string      $created_at
- * @property string      $updated_at
- * @property string|null $deleted_at
+ * @property int                  $id
+ * @property int                  $question_id
+ * @property int                  $field_id
+ * @property int                  $category
+ * @property string               $value
+ * @property string               $created_at
+ * @property string               $updated_at
+ * @property string|null          $deleted_at
  *
- * @property Field       $field
+ * @property Field                $field
+ * @property SurveyQuestionAnswer $surveyQuestionAnswer
  */
 class QuestionAnswer extends AR
 {
@@ -89,6 +91,14 @@ class QuestionAnswer extends AR
 	public function getField(): FieldQuery
 	{
 		return $this->hasOne(Field::className(), ['id' => 'field_id']);
+	}
+
+	/**
+	 * @return ActiveQuery|SurveyQuestionAnswerQuery
+	 */
+	public function getSurveyQuestionAnswer(): SurveyQuestionAnswerQuery
+	{
+		return $this->hasOne(SurveyQuestionAnswer::className(), ['question_answer_id' => 'id']);
 	}
 
 	public static function find(): QuestionAnswerQuery
