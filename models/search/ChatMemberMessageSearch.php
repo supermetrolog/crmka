@@ -21,9 +21,8 @@ class ChatMemberMessageSearch extends Form
 
 	public $id_less_then;
 
-	public $current_from_chat_member_id;
-
-	private const MAX_UNREAD_COUNT = 30;
+	private const UNREAD_LIMIT     = 30;
+	private const MAX_UNREAD_COUNT = 25;
 	private const EXTRA_READ_COUNT = 5;
 
 	public function rules(): array
@@ -39,10 +38,16 @@ class ChatMemberMessageSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
+		$this->load($params);
+
+		$this->validateOrThrow();
+
 		$unreadCount = ChatMemberMessage::find()
 		                                ->joinWith('views')
-		                                ->byFromChatMemberId($this->current_from_chat_member_id)
 		                                ->andWhereNull(ChatMemberMessageView::getColumn('id'))
+		                                ->andFilterWhere([
+			                                ChatMemberMessage::field('to_chat_member_id') => $this->to_chat_member_id,
+		                                ])
 		                                ->notDeleted()
 		                                ->count();
 
@@ -52,7 +57,6 @@ class ChatMemberMessageSearch extends Form
 			                          '(chat_member_message_view.chat_member_message_id IS NOT NULL) as is_viewed'
 		                          ])
 		                          ->joinWith('fromChatMemberViews')
-		                          ->byFromChatMemberId($this->current_from_chat_member_id)
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
 		                          ->with(['tasks.createdByUser.userProfile'])
@@ -60,19 +64,8 @@ class ChatMemberMessageSearch extends Form
 		                          ->with(['reminders.createdByUser.userProfile'])
 		                          ->with(['contacts', 'tags', 'notifications', 'files'])
 		                          ->notDeleted()
-		                          ->orderBy([ChatMemberMessage::field('id') => SORT_ASC]);
-
-		$dataProvider = new ActiveDataProvider([
-			'query'      => $query,
-			'pagination' => [
-				'pageSize' => 30,
-			],
-			'sort'       => false
-		]);
-
-		$this->load($params);
-
-		$this->validateOrThrow();
+		                          ->orderBy([ChatMemberMessage::field('id') => SORT_DESC])
+		                          ->limit(30);
 
 		if ($this->id_less_then === null && 0 < $unreadCount) {
 			$query->joinWith('views')
@@ -80,13 +73,16 @@ class ChatMemberMessageSearch extends Form
 				      '(CASE WHEN ' . ChatMemberMessageView::field('id') . ' IS NULL THEN 0 ELSE 1 END)' => SORT_ASC,
 				      ChatMemberMessage::field('id')                                                     => SORT_DESC,
 			      ])
-			      ->limit($unreadCount < self::MAX_UNREAD_COUNT ? self::MAX_UNREAD_COUNT : $unreadCount + self::EXTRA_READ_COUNT);
-
-			$orderedQuery = ChatMemberMessage::find()->from(['messages' => $query])->orderBy(['messages.id' => SORT_ASC]);
-
-			$dataProvider->pagination = false;
-			$dataProvider->query      = $orderedQuery;
+			      ->limit($unreadCount < self::MAX_UNREAD_COUNT ? self::UNREAD_LIMIT : $unreadCount + self::EXTRA_READ_COUNT);
 		}
+
+		$orderedQuery = ChatMemberMessage::find()->from(['messages' => $query])->orderBy(['messages.id' => SORT_ASC]);
+
+		$dataProvider = new ActiveDataProvider([
+			'query'      => $orderedQuery,
+			'pagination' => false,
+			'sort'       => false,
+		]);
 
 		$query->andFilterWhere([
 			ChatMemberMessage::field('id')                => $this->id,
@@ -98,6 +94,8 @@ class ChatMemberMessageSearch extends Form
 		$query->andFilterWhere(['<', ChatMemberMessage::field('id'), $this->id_less_then]);
 
 		$query->andFilterWhere(['like', ChatMemberMessage::field('message'), $this->message]);
+
+		dd($orderedQuery->getRawSql());
 
 		return $dataProvider;
 	}
