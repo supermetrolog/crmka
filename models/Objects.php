@@ -8,6 +8,7 @@ use app\models\crane\Crane;
 use app\models\location\Location;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\helpers\Json;
 
 /**
  * @property ObjectClass $objectClassRecord
@@ -100,9 +101,12 @@ class Objects extends oldDb\Objects
 		return JsonFieldNormalizer::jsonToArrayIntElements($this->buildings_on_territory_id);
 	}
 
-	public function getInternetType(): ?int
+	/**
+	 * @return array|mixed
+	 */
+	public function getInternetType()
 	{
-		return $this->internet_type !== null ? (int)$this->internet_type : null;
+		return Json::decode($this->internet_type) ?? [];
 	}
 
 	public function getPower(): ?int
