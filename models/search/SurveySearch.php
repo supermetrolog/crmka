@@ -25,7 +25,11 @@ class SurveySearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = Survey::find();
+		$query = Survey::find()
+		               ->with([
+			               'user.userProfile',
+			               'contact',
+		               ]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
