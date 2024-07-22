@@ -22,7 +22,7 @@ class SurveyQuestionAnswerResource extends JsonResource
 			'id'                 => $this->resource->id,
 			'question_answer_id' => $this->resource->question_answer_id,
 			'survey_id'          => $this->resource->survey_id,
-			'value'              => $this->resource->value,
+			'value'              => json_decode($this->resource->value),
 		];
 	}
 }
