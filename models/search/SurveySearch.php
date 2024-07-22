@@ -14,6 +14,7 @@ class SurveySearch extends Form
 	public $id;
 	public $user_id;
 	public $contact_id;
+	public $chat_member_id;
 
 	public $user_name;
 	public $contact_name;
@@ -21,7 +22,7 @@ class SurveySearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['id', 'user_id', 'contact_id'], 'integer'],
+			[['id', 'user_id', 'contact_id', 'chat_member_id'], 'integer'],
 			[['user_name', 'contact_name'], 'safe'],
 		];
 	}
@@ -44,9 +45,10 @@ class SurveySearch extends Form
 		$this->validateOrThrow();
 
 		$query->andFilterWhere([
-			Survey::field('id')         => $this->id,
-			Survey::field('user_id')    => $this->user_id,
-			Survey::field('contact_id') => $this->contact_id,
+			Survey::field('id')             => $this->id,
+			Survey::field('user_id')        => $this->user_id,
+			Survey::field('contact_id')     => $this->contact_id,
+			Survey::field('chat_member_id') => $this->chat_member_id,
 		]);
 
 		$query->orFilterWhere(

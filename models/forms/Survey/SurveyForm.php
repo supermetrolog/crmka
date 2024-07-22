@@ -7,6 +7,7 @@ namespace app\models\forms\Survey;
 use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
 use app\kernel\common\models\Form\Form;
+use app\models\ChatMember;
 use app\models\Contact;
 use app\models\Survey;
 use app\models\User;
@@ -19,14 +20,16 @@ class SurveyForm extends Form
 
 	public $user_id;
 	public $contact_id;
+	public $chat_member_id;
 
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'contact_id'], 'required'],
-			[['user_id', 'contact_id'], 'integer'],
+			[['user_id', 'contact_id', 'chat_member_id'], 'required'],
+			[['user_id', 'contact_id', 'chat_member_id'], 'integer'],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
+			[['chat_member_id'], 'exist', 'skipOnError' => true, 'targetClass' => ChatMember::class, 'targetAttribute' => ['chat_member_id' => 'id']],
 		];
 	}
 
@@ -35,6 +38,7 @@ class SurveyForm extends Form
 		$common = [
 			'user_id',
 			'contact_id',
+			'chat_member_id',
 		];
 
 		return [
@@ -54,12 +58,14 @@ class SurveyForm extends Form
 				return new CreateSurveyDto([
 					'user'    => User::find()->byId($this->user_id)->one(),
 					'contact' => Contact::find()->byId($this->contact_id)->one(),
+					'chatMember' => ChatMember::find()->byId($this->chat_member_id)->one(),
 				]);
 
 			default:
 				return new UpdateSurveyDto([
 					'user'    => User::find()->byId($this->user_id)->one(),
 					'contact' => Contact::find()->byId($this->contact_id)->one(),
+					'chatMember' => ChatMember::find()->byId($this->chat_member_id)->one(),
 				]);
 		}
 	}
