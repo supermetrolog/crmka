@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\kernel\common\models\AR\AR;
 use Yii;
 use app\exceptions\ValidationErrorHttpException;
 use app\models\miniModels\UserProfileEmail;
@@ -27,7 +28,7 @@ use yii\helpers\ArrayHelper;
  * @property CallList[] $callLists
  * @property User $user
  */
-class UserProfile extends \yii\db\ActiveRecord
+class UserProfile extends AR
 {
     /**
      * {@inheritdoc}
@@ -155,7 +156,7 @@ class UserProfile extends \yii\db\ActiveRecord
     {
         return trim($this->first_name . " " . $this->middle_name);
     }
-    public function fields()
+    public function fields(): array
     {
         $fields = parent::fields();
         $fields['full_name'] = function () {
