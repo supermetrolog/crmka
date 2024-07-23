@@ -12,6 +12,7 @@ use yii\db\ActiveQuery;
  * @property int     $id
  * @property int     $user_id
  * @property int     $contact_id
+ * @property int     $chat_member_id
  * @property string  $created_at
  * @property string  $updated_at
  *
@@ -31,8 +32,8 @@ class Survey extends AR
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'contact_id'], 'required'],
-			[['user_id', 'contact_id'], 'integer'],
+			[['user_id', 'contact_id', 'chat_member_id'], 'required'],
+			[['user_id', 'contact_id', 'chat_member_id'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -64,6 +65,14 @@ class Survey extends AR
 	public function getUser(): ActiveQuery
 	{
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
+	}
+
+	/**
+	 * @return ActiveQuery
+	 */
+	public function getChatMember(): ActiveQuery
+	{
+		return $this->hasOne(ChatMember::className(), ['id' => 'chat_member_id']);
 	}
 
 

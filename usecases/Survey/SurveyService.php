@@ -35,8 +35,9 @@ class SurveyService
 	public function create(CreateSurveyDto $dto): Survey
 	{
 		$model = new Survey([
-			'user_id'    => $dto->user->id,
-			'contact_id' => $dto->contact->id,
+			'user_id'        => $dto->user->id,
+			'contact_id'     => $dto->contact->id,
+			'chat_member_id' => $dto->chatMember->id,
 		]);
 
 		$model->saveOrThrow();
@@ -87,8 +88,9 @@ class SurveyService
 	public function update(Survey $model, UpdateSurveyDto $dto): Survey
 	{
 		$model->load([
-			'user_id'    => $dto->user->id,
-			'contact_id' => $dto->contact->id,
+			'user_id'        => $dto->user->id,
+			'contact_id'     => $dto->contact->id,
+			'chat_member_id' => $dto->chatMember->id,
 		]);
 
 		$model->saveOrThrow();

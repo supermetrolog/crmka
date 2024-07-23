@@ -49,7 +49,7 @@ class SurveyController extends AppController
 		$searchModel  = new SurveySearch();
 		$dataProvider = $searchModel->search($this->request->get());
 
-		return SurveyShortResource::fromDataProvider($dataProvider);
+		return SurveyResource::fromDataProvider($dataProvider);
 	}
 
 	/**
