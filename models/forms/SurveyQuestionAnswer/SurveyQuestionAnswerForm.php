@@ -27,7 +27,6 @@ class SurveyQuestionAnswerForm extends Form
 			[['question_answer_id', 'survey_id'], 'required'],
 			[['question_answer_id', 'survey_id'], 'integer'],
 			[['value'], 'safe'],
-			[['value'], 'string', 'max' => 255],
 			[['question_answer_id'], 'exist', 'skipOnError' => true, 'targetClass' => QuestionAnswer::className(), 'targetAttribute' => ['question_answer_id' => 'id']],
 			[['survey_id'], 'exist', 'skipOnError' => true, 'targetClass' => Survey::className(), 'targetAttribute' => ['survey_id' => 'id']],
 		];

@@ -8,7 +8,11 @@ use yii\base\BaseObject;
 
 class CreateSurveyQuestionAnswerDto extends BaseObject
 {
-	public int     $question_answer_id;
-	public int     $survey_id;
-	public ?string $value;
+	public int $question_answer_id;
+	public int $survey_id;
+	
+	/**
+	 * @var mixed
+	 */
+	public $value;
 }
