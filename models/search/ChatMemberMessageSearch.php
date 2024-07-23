@@ -21,6 +21,8 @@ class ChatMemberMessageSearch extends Form
 
 	public $id_less_then;
 
+	public $current_from_chat_member_id;
+
 	private const UNREAD_LIMIT     = 30;
 	private const MAX_UNREAD_COUNT = 25;
 	private const EXTRA_READ_COUNT = 5;
@@ -48,6 +50,7 @@ class ChatMemberMessageSearch extends Form
 		                                ->andFilterWhere([
 			                                ChatMemberMessage::field('to_chat_member_id') => $this->to_chat_member_id,
 		                                ])
+		                                ->byFromChatMemberId($this->current_from_chat_member_id)
 		                                ->notDeleted()
 		                                ->count();
 
@@ -63,6 +66,7 @@ class ChatMemberMessageSearch extends Form
 		                          ->with(['alerts.createdByUser.userProfile'])
 		                          ->with(['reminders.createdByUser.userProfile'])
 		                          ->with(['contacts', 'tags', 'notifications', 'files'])
+		                          ->byFromChatMemberId($this->current_from_chat_member_id)
 		                          ->notDeleted()
 		                          ->orderBy([ChatMemberMessage::field('id') => SORT_DESC])
 		                          ->limit(30);
@@ -94,8 +98,6 @@ class ChatMemberMessageSearch extends Form
 		$query->andFilterWhere(['<', ChatMemberMessage::field('id'), $this->id_less_then]);
 
 		$query->andFilterWhere(['like', ChatMemberMessage::field('message'), $this->message]);
-
-		dd($orderedQuery->getRawSql());
 
 		return $dataProvider;
 	}
