@@ -73,7 +73,6 @@ class SurveySearch extends Form
 				$this->search
 			],
 		]);
-		dd($query->getRawSql());
 
 		return $dataProvider;
 	}
