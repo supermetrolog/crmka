@@ -54,7 +54,7 @@ class ChatMemberMessageController extends AppController
 
 		$searchModel->current_from_chat_member_id = $this->user->identity->chatMember->id;
 
-		$dataProvider = $searchModel->search(Yii::$app->request->get());
+		$dataProvider = $searchModel->search($this->request->get());
 
 		return ChatMemberMessageResource::fromDataProvider($dataProvider);
 	}
