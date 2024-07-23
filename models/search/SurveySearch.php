@@ -16,14 +16,13 @@ class SurveySearch extends Form
 	public $contact_id;
 	public $chat_member_id;
 
-	public $user_name;
-	public $contact_name;
+	public $search;
 
 	public function rules(): array
 	{
 		return [
 			[['id', 'user_id', 'contact_id', 'chat_member_id'], 'integer'],
-			[['user_name', 'contact_name'], 'safe'],
+			[['search'], 'safe'],
 		];
 	}
 
@@ -51,7 +50,8 @@ class SurveySearch extends Form
 			Survey::field('chat_member_id') => $this->chat_member_id,
 		]);
 
-		$query->orFilterWhere(
+		$query->andFilterWhere([
+			'or',
 			[
 				'like',
 				sprintf(
@@ -60,11 +60,8 @@ class SurveySearch extends Form
 					UserProfile::field('middle_name'),
 					UserProfile::field('last_name'),
 				),
-				$this->user_name
+				$this->search
 			],
-		);
-
-		$query->orFilterWhere(
 			[
 				'like',
 				sprintf(
@@ -73,9 +70,9 @@ class SurveySearch extends Form
 					Contact::field('middle_name'),
 					Contact::field('last_name'),
 				),
-				$this->contact_name
+				$this->search
 			],
-		);
+		]);
 
 		return $dataProvider;
 	}
