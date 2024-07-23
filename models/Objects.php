@@ -8,6 +8,7 @@ use app\models\crane\Crane;
 use app\models\location\Location;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\helpers\Json;
 
 /**
  * @property ObjectClass $objectClassRecord
@@ -110,6 +111,21 @@ class Objects extends oldDb\Objects
 		return $this->power !== null ? (int)$this->power : null;
 	}
 
+	public function getVideos(): array
+	{
+		return Json::decode($this->videos) ?? [];
+	}
+
+	public function getBuildingPropertyDocuments(): array
+	{
+		return Json::decode($this->building_property_documents) ?? [];
+	}
+
+	public function getPhotos360(): array
+	{
+		return Json::decode($this->photos_360) ?? [];
+	}
+
 	public function getThumb(): ?string
 	{
 		$photos = $this->getPhotos();
@@ -167,6 +183,15 @@ class Objects extends oldDb\Objects
 		};
 		$fields['power']         = function () {
 			return $this->getPower();
+		};
+		$fields['videos']         = function () {
+			return $this->getVideos();
+		};
+		$fields['building_property_documents']         = function () {
+			return $this->getBuildingPropertyDocuments();
+		};
+		$fields['photos_360']         = function () {
+			return $this->getPhotos360();
 		};
 
 

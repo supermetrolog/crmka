@@ -233,6 +233,30 @@ class Floor extends ActiveRecord
 	/**
 	 * @return array
 	 */
+	public function getGates(): ?array
+	{
+		return $this->gates ? JsonFieldNormalizer::jsonToArrayStringElements($this->gates) : null;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLighting(): ?array
+	{
+		return $this->lighting ? JsonFieldNormalizer::jsonToArrayStringElements($this->lighting) : null;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getColumnGrids(): ?array
+	{
+		return $this->column_grids ? JsonFieldNormalizer::jsonToArrayStringElements($this->column_grids) : null;
+	}
+
+	/**
+	 * @return array
+	 */
 	public function fields(): array
 	{
 		$f = parent::fields();
@@ -247,6 +271,15 @@ class Floor extends ActiveRecord
 		};
 		$f['floor_types_land']      = function () {
 			return $this->getFloorTypesLand();
+		};
+		$f['gates']      = function () {
+			return $this->getGates();
+		};
+		$f['lighting']      = function () {
+			return $this->getLighting();
+		};
+		$f['column_grids']      = function () {
+			return $this->getColumnGrids();
 		};
 
 		return $f;

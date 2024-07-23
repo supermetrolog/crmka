@@ -79,6 +79,22 @@ class Complex extends oldDb\Complex
 	/**
 	 * @return array
 	 */
+	public function getBuildingPropertyDocuments(): array
+	{
+		return Json::decode($this->building_property_documents) ?? [];
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPhotos360(): array
+	{
+		return Json::decode($this->photos_360) ?? [];
+	}
+
+	/**
+	 * @return array
+	 */
 	public function getHeatingAutonomousType(): array
 	{
 		return JsonFieldNormalizer::jsonToArrayIntElements($this->heating_autonomous_type);
@@ -99,35 +115,41 @@ class Complex extends oldDb\Complex
 	{
 		$fields = parent::fields();
 		unset($fields['photo']);
-		$fields['photos']                  = function () {
+		$fields['photos']                      = function () {
 			return $this->getPhotos();
 		};
-		$fields['internet_type']           = function () {
+		$fields['internet_type']               = function () {
 			return $this->getInternetType();
 		};
-		$fields['guard_type']              = function () {
+		$fields['guard_type']                  = function () {
 			return $this->getGuardType();
 		};
-		$fields['cranes_gantry']           = function () {
+		$fields['cranes_gantry']               = function () {
 			return $this->getCranesGantry();
 		};
-		$fields['cranes_railway']          = function () {
+		$fields['cranes_railway']              = function () {
 			return $this->getCranesRailway();
 		};
-		$fields['water_type']              = function () {
+		$fields['water_type']                  = function () {
 			return $this->getWaterType();
 		};
-		$fields['building_layouts']        = function () {
+		$fields['building_layouts']            = function () {
 			return $this->getBuildingLayout();
 		};
-		$fields['building_presentations']  = function () {
+		$fields['building_presentations']      = function () {
 			return $this->getBuildingPresentation();
 		};
-		$fields['heating_autonomous_type'] = function () {
+		$fields['heating_autonomous_type']     = function () {
 			return $this->getHeatingAutonomousType();
 		};
-		$fields['mixer_parts']             = function () {
+		$fields['mixer_parts']                 = function () {
 			return $this->getMixerParts();
+		};
+		$fields['building_property_documents'] = function () {
+			return $this->getBuildingPropertyDocuments();
+		};
+		$fields['photos_360'] = function () {
+			return $this->getPhotos360();
 		};
 
 		return $fields;

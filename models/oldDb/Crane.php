@@ -2,7 +2,9 @@
 
 namespace app\models\oldDb;
 
+use app\helpers\JsonFieldNormalizer;
 use Yii;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "l_cranes".
@@ -95,4 +97,33 @@ class Crane extends \yii\db\ActiveRecord
             'last_update' => 'Last Update',
         ];
     }
+
+	/**
+	 * @return array
+	 */
+	public function getControls(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->crane_controls);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPhotos(): array
+	{
+		return Json::decode($this->photo) ?? [];
+	}
+
+	/**
+	 * @return array
+	 */
+	public function fields(): array
+	{
+		$f = parent::fields();
+
+		$f['crane_controls'] = function () { return $this->getControls(); };
+		$f['photo'] = function () { return $this->getPhotos(); };
+
+		return $f;
+	}
 }
