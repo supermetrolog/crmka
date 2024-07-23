@@ -54,11 +54,12 @@ class SurveySearch extends Form
 		$query->orFilterWhere(
 			[
 				'like',
-				'concat(' .
-				'coalesce(' . UserProfile::field('first_name') . ', ""), " ", ' .
-				'coalesce(' . UserProfile::field('middle_name') . ', ""), " ", ' .
-				'coalesce(' . UserProfile::field('last_name') . ', "")' .
-				')',
+				sprintf(
+					'concat(coalesce(%s, ""), " ", coalesce(%s, ""), " ", coalesce(%s, ""))',
+					UserProfile::field('first_name'),
+					UserProfile::field('middle_name'),
+					UserProfile::field('last_name'),
+				),
 				$this->user_name
 			],
 		);
@@ -66,11 +67,12 @@ class SurveySearch extends Form
 		$query->orFilterWhere(
 			[
 				'like',
-				'concat(' .
-				'coalesce(' . Contact::field('first_name') . ', ""), " ", ' .
-				'coalesce(' . Contact::field('middle_name') . ', ""), " ", ' .
-				'coalesce(' . Contact::field('last_name') . ', "")' .
-				')',
+				sprintf(
+					'concat(coalesce(%s, ""), " ", coalesce(%s, ""), " ", coalesce(%s, ""))',
+					Contact::field('first_name'),
+					Contact::field('middle_name'),
+					Contact::field('last_name'),
+				),
 				$this->contact_name
 			],
 		);
