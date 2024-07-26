@@ -35,7 +35,6 @@ use yii\db\ActiveQuery;
  * @property ChatMemberMessage     $pinnedChatMemberMessage
  * @property Relation[]            $relationFirst
  * @property Call[]                $calls
- * @property Call                  $lastCall
  */
 class ChatMember extends AR
 {
@@ -162,19 +161,6 @@ class ChatMember extends AR
 	public function getRelationFirst(): RelationQuery
 	{
 		return $this->morphHasMany(Relation::class, 'id', 'first');
-	}
-
-	/**
-	 * @return RelationQuery|ActiveQuery
-	 * @throws ErrorException
-	 */
-	public function getLastCallRelationFirst(): RelationQuery
-	{
-		return $this->hasOne(Relation::class, [
-			'first_id'   => 'id',
-			'first_type' => 'morph',
-			'id'         => 'last_call_rel_id'
-		])->from([Relation::tableName() => Relation::getTable()]);
 	}
 
 	/**
