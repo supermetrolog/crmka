@@ -15,6 +15,7 @@ use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
 use app\models\search\ChatMemberMediaSearch;
 use app\models\search\ChatMemberSearch;
 use app\models\User;
+use app\repositories\ChatMemberRepository;
 use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
@@ -28,11 +29,13 @@ use yii\web\NotFoundHttpException;
 
 class ChatMemberController extends AppController
 {
-	private ChatMemberService $service;
+	private ChatMemberService    $service;
+	private ChatMemberRepository $repository;
 
-	public function __construct($id, $module, ChatMemberService $service, array $config = [])
+	public function __construct($id, $module, ChatMemberService $service, ChatMemberRepository $repository, array $config = [])
 	{
-		$this->service = $service;
+		$this->service    = $service;
+		$this->repository = $repository;
 		parent::__construct($id, $module, $config);
 	}
 
@@ -46,7 +49,7 @@ class ChatMemberController extends AppController
 
 		$searchModel = new ChatMemberSearch();
 
-		$searchModel->current_chat_member_id = $this->user->identity->chatMember->id;
+		$searchModel->current_chat_member_id      = $this->user->identity->chatMember->id;
 		$searchModel->current_user_id             = $this->user->id;
 		$searchModel->current_from_chat_member_id = $this->user->identity->chatMember->id;
 
@@ -61,6 +64,13 @@ class ChatMemberController extends AppController
 	public function actionView(int $id): JsonResource
 	{
 		return ChatMemberFullResource::make($this->findModel($id));
+	}
+
+	public function actionStatistic(): array
+	{
+		return $this->repository->getStatisticByIds(
+			$this->request->get('chat_member_ids')
+		);
 	}
 
 	/**
