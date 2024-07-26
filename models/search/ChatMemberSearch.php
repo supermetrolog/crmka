@@ -36,7 +36,6 @@ class ChatMemberSearch extends Form
 
 	public $current_chat_member_id;
 	public $current_user_id;
-	public $current_from_chat_member_id;
 
 	public function rules(): array
 	{
@@ -227,12 +226,15 @@ class ChatMemberSearch extends Form
 	{
 		return ChatMemberMessage::find()
 		                        ->select([
-			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
 			                        'id'                => ChatMemberMessage::field('id'),
+			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
 		                        ])
 		                        ->joinWith('views')
-		                        ->byFromChatMemberId($this->current_from_chat_member_id)
-		                        ->andWhereNull(ChatMemberMessageView::getColumn('id'))
+		                        ->andWhere([
+			                        'or',
+			                        ['!=', ChatMemberMessageView::field('chat_member_id'), $this->current_chat_member_id],
+			                        ['is', ChatMemberMessageView::field('chat_member_id'), null],
+		                        ])
 		                        ->notDeleted();
 	}
 }
