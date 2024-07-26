@@ -31,7 +31,7 @@ class ChatMemberRepository
 
 		$chatMemberQuery = ChatMemberSearchView::find()
 		                                       ->select([
-			                                       ChatMemberSearchView::field('id'),
+			                                       'chat_member_id'            => ChatMemberSearchView::field('id'),
 			                                       'unread_task_count'         => 'COUNT(DISTINCT tasks.id)',
 			                                       'unread_reminder_count'     => 'COUNT(DISTINCT reminders.id)',
 			                                       'unread_notification_count' => 'COUNT(DISTINCT notifications.id)',
@@ -47,13 +47,13 @@ class ChatMemberRepository
 			                                       'notifications.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
 		                                       ])
 		                                       ->leftJoin(['messages' => $this->makeMessageQuery()], [
-												   'and',
+			                                       'and',
 			                                       ['messages.to_chat_member_id' => $messageSubQuery],
-												   [
-													   'or',
-													   ['!=', 'messages.from_chat_member_id', new Expression(ChatMemberSearchView::field('id'))],
-													   ['messages.from_chat_member_id' => null],
-												   ]
+			                                       [
+				                                       'or',
+				                                       ['!=', 'messages.from_chat_member_id', new Expression(ChatMemberSearchView::field('id'))],
+				                                       ['messages.from_chat_member_id' => null],
+			                                       ]
 		                                       ])
 		                                       ->andWhere([ChatMemberSearchView::field('id') => $chat_member_ids])
 		                                       ->groupBy(ChatMemberSearchView::field('id'));
