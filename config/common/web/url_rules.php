@@ -193,6 +193,7 @@ return
 			'controller'    => ['chat-members' => 'ChatMember/chat-member'],
 			'extraPatterns' => [
 				'GET,OPTIONS'                     => 'index',
+				'GET,OPTIONS statistic'           => 'statistic',
 				'GET,OPTIONS <id>/pinned-message' => 'pinned-message',
 				'GET,OPTIONS <id>/media'          => 'media',
 				'POST,OPTIONS pin-message'        => 'pin-message',
