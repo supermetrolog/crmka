@@ -61,7 +61,11 @@ class ChatMemberSearchView extends ChatMember
 	 */
 	public function getLastCallRelationFirst(): RelationQuery
 	{
-		return $this->morphHasOne(Relation::class, 'id', 'first')->andWhere([Relation::getColumn('id') => $this->last_call_rel_id]);
+		return $this->hasOne(Relation::class, [
+			'first_id'   => 'id',
+			'first_type' => 'morph',
+			'id'         => 'last_call_rel_id'
+		])->from([Relation::tableName() => Relation::getTable()]);
 	}
 
 	/**
