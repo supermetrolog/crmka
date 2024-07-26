@@ -1,93 +1,94 @@
 {
-    "name": "supermetrolog/crmka",
-    "description": "Pennylane CRM",
-    "type": "project",
-    "license": "BSD-3-Clause",
-    "support": {
-        "issues": "https://github.com/yiisoft/yii2/issues?state=open",
-        "forum": "http://www.yiiframework.com/forum/",
-        "wiki": "http://www.yiiframework.com/wiki/",
-        "irc": "irc://irc.freenode.net/yii",
-        "source": "https://github.com/yiisoft/yii2"
+  "name": "supermetrolog/crmka",
+  "description": "Pennylane CRM",
+  "type": "project",
+  "license": "BSD-3-Clause",
+  "support": {
+    "issues": "https://github.com/yiisoft/yii2/issues?state=open",
+    "forum": "http://www.yiiframework.com/forum/",
+    "wiki": "http://www.yiiframework.com/wiki/",
+    "irc": "irc://irc.freenode.net/yii",
+    "source": "https://github.com/yiisoft/yii2"
+  },
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.4.0",
+    "yiisoft/yii2": "~2.0.14",
+    "yiisoft/yii2-bootstrap": "~2.0.0",
+    "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+    "floor12/yii2-phone": "^2.0",
+    "consik/yii2-websocket": "^1.0",
+    "dompdf/dompdf": "^1.1",
+    "enqueue/amqp-lib": "^0.10.9",
+    "yiisoft/yii2-queue": "^2.3",
+    "airani/yii2-telegram-log": "^1.0",
+    "librasoft-fr/php-ssh-connection": "^3.1",
+    "monolog/monolog": "^2.8",
+    "supermetrolog/synchronizer-local-to-ftp-builder": "^1.1",
+    "php-amqplib/php-amqplib": "^3.5",
+    "ext-dom": "*",
+    "ext-intl": "*",
+    "ext-zip": "*",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "yiisoft/yii2-debug": "~2.1.0",
+    "yiisoft/yii2-gii": "~2.1.0",
+    "yiisoft/yii2-faker": "~2.0.0",
+    "codeception/specify": "~0.4.6",
+    "yiisoft/yii2-codeception": "^2.0",
+    "phpunit/phpunit": "~9.5.0",
+    "codeception/codeception": "^5.0.0 || ^4.0",
+    "codeception/lib-innerbrowser": "^3.0 || ^1.1",
+    "codeception/module-asserts": "^3.0 || ^1.1",
+    "codeception/module-yii2": "^1.1",
+    "codeception/module-filesystem": "^2.0 || ^1.1",
+    "codeception/verify": "^2.2",
+    "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4",
+    "phpmetrics/phpmetrics": "^2.8",
+    "symfony/var-dumper": "^5.4"
+  },
+  "config": {
+    "process-timeout": 1800,
+    "fxp-asset": {
+      "enabled": false
     },
-    "minimum-stability": "stable",
-    "require": {
-        "php": ">=7.4.0",
-        "yiisoft/yii2": "~2.0.14",
-        "yiisoft/yii2-bootstrap": "~2.0.0",
-        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
-        "floor12/yii2-phone": "^2.0",
-        "consik/yii2-websocket": "^1.0",
-        "dompdf/dompdf": "^1.1",
-        "enqueue/amqp-lib": "^0.10.9",
-        "yiisoft/yii2-queue": "^2.3",
-        "airani/yii2-telegram-log": "^1.0",
-        "librasoft-fr/php-ssh-connection": "^3.1",
-        "monolog/monolog": "^2.8",
-        "supermetrolog/synchronizer-local-to-ftp-builder": "^1.1",
-        "php-amqplib/php-amqplib": "^3.5",
-        "ext-dom": "*",
-        "ext-intl": "*",
-      "ext-zip": "*",
-      "ext-json": "*"
-    },
-    "require-dev": {
-        "yiisoft/yii2-debug": "~2.1.0",
-        "yiisoft/yii2-gii": "~2.1.0",
-        "yiisoft/yii2-faker": "~2.0.0",
-        "codeception/specify": "~0.4.6",
-        "yiisoft/yii2-codeception": "^2.0",
-        "phpunit/phpunit": "~9.5.0",
-        "codeception/codeception": "^5.0.0 || ^4.0",
-        "codeception/lib-innerbrowser": "^3.0 || ^1.1",
-        "codeception/module-asserts": "^3.0 || ^1.1",
-        "codeception/module-yii2": "^1.1",
-        "codeception/module-filesystem": "^2.0 || ^1.1",
-        "codeception/verify": "^2.2",
-        "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4",
-        "phpmetrics/phpmetrics": "^2.8",
-        "symfony/var-dumper": "^5.4"
-    },
-    "config": {
-        "process-timeout": 1800,
-        "fxp-asset": {
-            "enabled": false
-        },
-        "allow-plugins": {
-            "yiisoft/yii2-composer": false
-        }
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "yii\\composer\\Installer::postInstall"
-        ],
-        "post-create-project-cmd": [
-            "yii\\composer\\Installer::postCreateProject",
-            "yii\\composer\\Installer::postInstall"
-        ],
-        "test": "./vendor/bin/codecept run",
-        "testd": "./vendor/bin/codecept run --debug"
-    },
-    "extra": {
-        "yii\\composer\\Installer::postCreateProject": {
-            "setPermission": [
-                {
-                    "runtime": "0777",
-                    "web/assets": "0777",
-                    "yii": "0755"
-                }
-            ]
-        },
-        "yii\\composer\\Installer::postInstall": {
-            "generateCookieValidationKey": [
-                "config/web.php"
-            ]
-        }
-    },
-    "repositories": [
+    "allow-plugins": {
+      "yiisoft/yii2-composer": false
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "yii\\composer\\Installer::postInstall"
+    ],
+    "post-create-project-cmd": [
+      "yii\\composer\\Installer::postCreateProject",
+      "yii\\composer\\Installer::postInstall"
+    ],
+    "test": "./vendor/bin/codecept run",
+    "testd": "./vendor/bin/codecept run --debug",
+    "dump-server": "./vendor/bin/var-dump-server"
+  },
+  "extra": {
+    "yii\\composer\\Installer::postCreateProject": {
+      "setPermission": [
         {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
+          "runtime": "0777",
+          "web/assets": "0777",
+          "yii": "0755"
         }
-    ]
+      ]
+    },
+    "yii\\composer\\Installer::postInstall": {
+      "generateCookieValidationKey": [
+        "config/web.php"
+      ]
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]
 }

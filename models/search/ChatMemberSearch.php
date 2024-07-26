@@ -2,7 +2,6 @@
 
 namespace app\models\search;
 
-use app\helpers\DumpHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
@@ -10,8 +9,8 @@ use app\models\ChatMember;
 use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
-use app\models\Notification\UserNotification;
 use app\models\Company;
+use app\models\Notification\UserNotification;
 use app\models\ObjectChatMember;
 use app\models\Objects;
 use app\models\Relation;
@@ -104,10 +103,10 @@ class ChatMemberSearch extends Form
 			                             'request.objectClasses',
 		                             ])
 		                             ->with(['user.userProfile'])
-									->groupBy(ChatMember::field('id'))
+		                             ->groupBy(ChatMember::field('id'))
 		                             ->orderBy([
 			                             'cmle.chat_member_last_event_id' => SORT_DESC,
-			                             'cmm.chat_member_message_id'    => SORT_DESC,
+			                             'cmm.chat_member_message_id'     => SORT_DESC,
 		                             ]);
 
 		$dataProvider = new ActiveDataProvider([
@@ -119,20 +118,23 @@ class ChatMemberSearch extends Form
 		$this->validateOrThrow();
 
 		if (!empty($this->search)) {
-			$query->leftJoin(Company::tableName(), [
-				'or',
-				[Company::field('id') => new Expression(Request::field('company_id'))],
-				[Company::field('id') => new Expression(Objects::field('company_id'))],
-			]);
+			$query->leftJoin(['request_company' => Company::tableName()], ['request_company.id' => new Expression(Request::field('company_id'))]);
+			$query->leftJoin(['object_company' => Company::tableName()], ['object_company.id' => new Expression(Objects::field('company_id'))]);
 
 			$query->andFilterWhere([
 				'or',
-				['like', Company::field('nameEng'), $this->search],
-				['like', Company::field('nameRu'), $this->search],
+				['like', 'request_company.nameEng', $this->search],
+				['like', 'request_company.nameRu', $this->search],
+				['like', 'object_company.nameEng', $this->search],
+				['like', 'object_company.nameRu', $this->search],
 				['like', Objects::field('address'), $this->search],
 			]);
 
-			$query->andWhereNotNull(Company::field('id'));
+			$query->andWhere([
+				'OR',
+				['IS NOT', 'request_company.id', null],
+				['IS NOT', 'object_company.id', null],
+			]);
 		}
 
 		$query->orFilterWhere([Request::field('company_id') => $this->company_id])
@@ -156,21 +158,21 @@ class ChatMemberSearch extends Form
 	private function makeTaskQuery(): AQ
 	{
 		return Task::find()
-		               ->select([
-			               'id'                => Task::field('id'),
-			               'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
-		               ])
-		               ->leftJoin(Relation::getTable(), [
-			               Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
-			               Relation::field('second_type') => Task::getMorphClass(),
-			               Relation::field('second_id')   => new Expression(Task::field('id')),
-		               ])
-		               ->leftJoin(ChatMemberMessage::getTable(), [
-			               ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
-		               ])
-		               ->andWhere([Task::field('user_id') => $this->current_user_id])
-		               ->notCompleted()
-		               ->notDeleted();
+		           ->select([
+			           'id'                => Task::field('id'),
+			           'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
+		           ])
+		           ->leftJoin(Relation::getTable(), [
+			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
+			           Relation::field('second_type') => Task::getMorphClass(),
+			           Relation::field('second_id')   => new Expression(Task::field('id')),
+		           ])
+		           ->leftJoin(ChatMemberMessage::getTable(), [
+			           ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+		           ])
+		           ->andWhere([Task::field('user_id') => $this->current_user_id])
+		           ->notCompleted()
+		           ->notDeleted();
 	}
 
 	/**
