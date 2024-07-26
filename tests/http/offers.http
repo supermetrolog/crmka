@@ -1,0 +1,6 @@
+GET {{url}}/oldDb/objects/offers?all=Ногинск&type_id=2,3
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
