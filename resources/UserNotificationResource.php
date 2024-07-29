@@ -27,10 +27,13 @@ class UserNotificationResource extends JsonResource
 			'id'          => $this->resource->id,
 			'mailing_id'  => $this->resource->mailing_id,
 			'user_id'     => $this->resource->user_id,
+			'subject'     => $this->resource->getSubject(),
+			'message'     => $this->resource->getMessage(),
 			'notified_at' => $this->resource->notified_at,
 			'viewed_at'   => $this->resource->viewed_at,
 			'created_at'  => $this->resource->created_at,
 			'updated_at'  => $this->resource->updated_at,
+			'user'        => UserShortResource::make($this->resource->user)->toArray(),
 		];
 	}
 }
