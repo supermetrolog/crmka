@@ -72,7 +72,7 @@ class ChatMemberRepository
 			           'id'                  => Task::field('id'),
 			           'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
 		           ])
-		           ->leftJoin([Relation::tableName() => $relationQuery], [
+		           ->leftJoin(Relation::getTable(), [
 			           Relation::field('second_id') => new Expression(Task::field('id')),
 		           ])
 		           ->leftJoin(ChatMemberMessage::getTable(), [
@@ -94,7 +94,7 @@ class ChatMemberRepository
 			               'id'                  => Reminder::field('id'),
 			               'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
 		               ])
-		               ->leftJoin([Relation::tableName() => $relationQuery], [
+		               ->leftJoin(Relation::getTable(), [
 			               Relation::field('second_id') => new Expression(Reminder::field('id')),
 		               ])
 		               ->leftJoin(ChatMemberMessage::getTable(), [
@@ -116,7 +116,7 @@ class ChatMemberRepository
 			                       'id'                  => UserNotification::field('id'),
 			                       'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
 		                       ])
-		                       ->leftJoin([Relation::tableName() => $relationQuery], [
+		                       ->leftJoin(Relation::getTable(), [
 			                       Relation::field('second_id') => new Expression(UserNotification::field('id')),
 		                       ])
 		                       ->leftJoin(ChatMemberMessage::getTable(), [
