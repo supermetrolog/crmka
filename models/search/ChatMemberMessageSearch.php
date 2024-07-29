@@ -21,6 +21,8 @@ class ChatMemberMessageSearch extends Form
 
 	public $id_less_then;
 
+	public $current_chat_member_id;
+
 	private const UNREAD_LIMIT     = 30;
 	private const MAX_UNREAD_COUNT = 25;
 	private const EXTRA_READ_COUNT = 5;
@@ -44,9 +46,10 @@ class ChatMemberMessageSearch extends Form
 
 		$unreadCount = ChatMemberMessage::find()
 		                                ->joinWith('views')
-		                                ->andWhereNull(ChatMemberMessageView::getColumn('id'))
-		                                ->andFilterWhere([
-			                                ChatMemberMessage::field('to_chat_member_id') => $this->to_chat_member_id,
+		                                ->andWhere([
+			                                'or',
+			                                ['!=', ChatMemberMessageView::field('chat_member_id'), $this->current_chat_member_id],
+			                                ['is', ChatMemberMessageView::field('chat_member_id'), null],
 		                                ])
 		                                ->notDeleted()
 		                                ->count();
@@ -54,7 +57,7 @@ class ChatMemberMessageSearch extends Form
 		$query = ChatMemberMessage::find()
 		                          ->select([
 			                          ChatMemberMessage::field('*'),
-			                          '(chat_member_message_view.chat_member_message_id IS NOT NULL) as is_viewed'
+			                          '(views.id IS NOT NULL) as is_viewed'
 		                          ])
 		                          ->joinWith('fromChatMemberViews')
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
@@ -68,12 +71,28 @@ class ChatMemberMessageSearch extends Form
 		                          ->limit(30);
 
 		if ($this->id_less_then === null && 0 < $unreadCount) {
-			$query->joinWith('views')
-			      ->orderBy([
-				      '(CASE WHEN ' . ChatMemberMessageView::field('id') . ' IS NULL THEN 0 ELSE 1 END)' => SORT_ASC,
-				      ChatMemberMessage::field('id')                                                     => SORT_DESC,
-			      ])
-			      ->limit($unreadCount < self::MAX_UNREAD_COUNT ? self::UNREAD_LIMIT : $unreadCount + self::EXTRA_READ_COUNT);
+			$subQuery = ChatMemberMessage::find()
+			                             ->select([
+				                             'id'                => ChatMemberMessage::field('id'),
+				                             'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
+			                             ])
+			                             ->joinWith('views')
+			                             ->andWhere([
+				                             'or',
+				                             [ChatMemberMessageView::field('chat_member_id') => $this->current_chat_member_id],
+				                             [ChatMemberMessageView::field('chat_member_id') => null],
+			                             ])
+			                             ->notDeleted();
+
+			$query
+				->leftJoin(['views' => $subQuery], [
+					'views.id' => new Expression(ChatMemberMessage::field('id')),
+				])
+				->orderBy([
+					'(CASE WHEN ' . ChatMemberMessageView::field('id') . ' IS NULL THEN 0 ELSE 1 END)' => SORT_ASC,
+					ChatMemberMessage::field('id')                   => SORT_DESC,
+				])
+				->limit($unreadCount < self::MAX_UNREAD_COUNT ? self::UNREAD_LIMIT : $unreadCount + self::EXTRA_READ_COUNT);
 		}
 
 		$orderedQuery = ChatMemberMessage::find()->from(['messages' => $query])->orderBy(['messages.id' => SORT_ASC]);
