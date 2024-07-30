@@ -178,6 +178,7 @@ class ChatMemberSearch extends Form
 		           ])
 		           ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_chat_member_id])
 		           ->notCompleted()
+		           ->notImpossible()
 		           ->notDeleted();
 	}
 

@@ -81,4 +81,14 @@ class TaskQuery extends AQ
 	{
 		return $this->andWhere(['!=', $this->field('status'), Task::STATUS_DONE]);
 	}
+
+	public function impossible(): self
+	{
+		return $this->andWhere([$this->field('status') => Task::STATUS_IMPOSSIBLE]);
+	}
+
+	public function notImpossible(): self
+	{
+		return $this->andWhere(['!=', $this->field('status'), Task::STATUS_IMPOSSIBLE]);
+	}
 }
