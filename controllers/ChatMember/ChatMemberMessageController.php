@@ -52,7 +52,7 @@ class ChatMemberMessageController extends AppController
 	{
 		$searchModel = new ChatMemberMessageSearch();
 
-		$searchModel->current_chat_member_id      = $this->user->identity->chatMember->id;
+		$searchModel->current_chat_member_id = $this->user->identity->chatMember->id;
 
 		$dataProvider = $searchModel->search($this->request->get());
 
@@ -269,10 +269,11 @@ class ChatMemberMessageController extends AppController
 		$form->load($this->request->post());
 
 		$form->chat_member_message_id = $id;
+		$form->from_chat_member_id    = $this->user->identity->chatMember->id;
 
 		$form->validateOrThrow();
 
-		$this->service->viewMessages($form->getChatMemberMessage());
+		$this->service->viewMessages($form->getChatMemberMessage(), $form->from_chat_member_id);
 
 		return new SuccessResponse();
 	}
