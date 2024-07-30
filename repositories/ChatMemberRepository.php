@@ -78,6 +78,7 @@ class ChatMemberRepository
 		           ])
 		           ->andWhereNotNull(ChatMemberMessage::field('id'))
 		           ->notCompleted()
+		           ->notImpossible()
 		           ->notDeleted();
 	}
 
