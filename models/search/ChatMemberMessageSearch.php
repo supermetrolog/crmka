@@ -51,12 +51,16 @@ class ChatMemberMessageSearch extends Form
 			                                ['!=', ChatMemberMessageView::field('chat_member_id'), $this->current_chat_member_id],
 			                                ['is', ChatMemberMessageView::field('chat_member_id'), null],
 		                                ])
+		                                ->andFilterWhere([
+			                                ChatMemberMessage::field('to_chat_member_id') => $this->to_chat_member_id,
+		                                ])
 		                                ->notDeleted()
 		                                ->count();
 
 		$subQuery = ChatMemberMessage::find()
 		                             ->select([
 			                             'id'                => ChatMemberMessage::field('id'),
+			                             'view_id'           => ChatMemberMessageView::field('id'),
 			                             'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
 		                             ])
 		                             ->joinWith('views')
@@ -66,11 +70,11 @@ class ChatMemberMessageSearch extends Form
 			                             [ChatMemberMessageView::field('chat_member_id') => null],
 		                             ])
 		                             ->notDeleted();
-		
+
 		$query = ChatMemberMessage::find()
 		                          ->select([
 			                          ChatMemberMessage::field('*'),
-			                          '(views.id IS NOT NULL) as is_viewed'
+			                          '(views.view_id IS NOT NULL) as is_viewed'
 		                          ])
 		                          ->leftJoin(['views' => $subQuery], [
 			                          'views.id' => new Expression(ChatMemberMessage::field('id')),
@@ -95,7 +99,9 @@ class ChatMemberMessageSearch extends Form
 				->limit($unreadCount < self::MAX_UNREAD_COUNT ? self::UNREAD_LIMIT : $unreadCount + self::EXTRA_READ_COUNT);
 		}
 
-		$orderedQuery = ChatMemberMessage::find()->from(['messages' => $query])->orderBy(['messages.id' => SORT_ASC]);
+		$orderedQuery = ChatMemberMessage::find()
+		                                 ->from(['messages' => $query])
+		                                 ->orderBy(['messages.id' => SORT_ASC]);
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $orderedQuery,
