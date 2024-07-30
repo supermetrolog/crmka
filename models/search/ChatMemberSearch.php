@@ -35,7 +35,6 @@ class ChatMemberSearch extends Form
 	public $search;
 
 	public $current_chat_member_id;
-	public $current_user_id;
 
 	public function rules(): array
 	{
@@ -81,10 +80,18 @@ class ChatMemberSearch extends Form
 			                             'unread_message_count'      => 'COUNT(DISTINCT m.id)',
 		                             ])
 		                             ->leftJoinLastCallRelation()
-		                             ->leftJoin(['t' => $this->makeTaskQuery()], ['t.to_chat_member_id' => new Expression(ChatMember::field('id'))])
-		                             ->leftJoin(['r' => $this->makeReminderQuery()], ['r.to_chat_member_id' => new Expression(ChatMember::field('id'))])
-		                             ->leftJoin(['un' => $this->makeNotificationQuery()], ['un.to_chat_member_id' => new Expression(ChatMember::field('id'))])
-		                             ->leftJoin(['m' => $this->makeMessageQuery()], ['m.to_chat_member_id' => new Expression(ChatMember::field('id'))])
+		                             ->leftJoin(['t' => $this->makeTaskQuery()], [
+			                             't.to_chat_member_id' => new Expression(ChatMember::field('id'))
+		                             ])
+		                             ->leftJoin(['r' => $this->makeReminderQuery()], [
+			                             'r.to_chat_member_id' => new Expression(ChatMember::field('id'))
+		                             ])
+		                             ->leftJoin(['un' => $this->makeNotificationQuery()], [
+			                             'un.to_chat_member_id' => new Expression(ChatMember::field('id'))
+		                             ])
+		                             ->leftJoin(['m' => $this->makeMessageQuery()], [
+			                             'm.to_chat_member_id' => new Expression(ChatMember::field('id'))
+		                             ])
 		                             ->leftJoin(['cmm' => $messageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
 		                             ->leftJoin(['cmle' => $eventQuery], ChatMember::getColumn('id') . '=' . 'cmle.event_chat_member_id')
 		                             ->joinWith([
@@ -169,7 +176,7 @@ class ChatMemberSearch extends Form
 		           ->leftJoin(ChatMemberMessage::getTable(), [
 			           ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		           ])
-		           ->andWhere([Task::field('user_id') => $this->current_user_id])
+		           ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_chat_member_id])
 		           ->notCompleted()
 		           ->notDeleted();
 	}
@@ -192,7 +199,7 @@ class ChatMemberSearch extends Form
 		               ->leftJoin(ChatMemberMessage::getTable(), [
 			               ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		               ])
-		               ->andWhere([Reminder::field('user_id') => $this->current_user_id])
+		               ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_chat_member_id])
 		               ->notNotified()
 		               ->notDeleted();
 	}
@@ -215,8 +222,8 @@ class ChatMemberSearch extends Form
 		                       ->leftJoin(ChatMemberMessage::getTable(), [
 			                       ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		                       ])
-		                       ->andWhereNull(UserNotification::field('viewed_at'))
-		                       ->andWhere([UserNotification::field('user_id') => $this->current_user_id]);
+		                       ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_chat_member_id])
+		                       ->andWhereNull(UserNotification::field('viewed_at'));
 	}
 
 	/**
