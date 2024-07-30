@@ -10,4 +10,5 @@ use yii\base\BaseObject;
 class CreateChatMemberMessageViewDto extends BaseObject
 {
 	public ChatMemberMessage $message;
+	public int               $from_chat_member_id;
 }

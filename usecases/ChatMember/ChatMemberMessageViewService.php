@@ -38,7 +38,7 @@ class ChatMemberMessageViewService
 
 		try {
 			$model = new ChatMemberMessageView([
-				'chat_member_id'         => $dto->message->from_chat_member_id,
+				'chat_member_id'         => $dto->from_chat_member_id,
 				'chat_member_message_id' => $dto->message->id,
 			]);
 
