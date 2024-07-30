@@ -52,7 +52,7 @@ class ChatMemberRepository
 			                                       [
 				                                       'or',
 				                                       ['!=', 'messages.from_chat_member_id', new Expression(ChatMemberSearchView::field('id'))],
-				                                       ['messages.from_chat_member_id' => null],
+				                                       ['is', 'messages.from_chat_member_id', null],
 			                                       ]
 		                                       ])
 		                                       ->andWhere([ChatMemberSearchView::field('id') => $chat_member_ids])
@@ -63,61 +63,55 @@ class ChatMemberRepository
 
 	private function makeTaskQuery(): AQ
 	{
-		$relationQuery = Relation::find()
-		                         ->byFirstType(ChatMemberMessage::getMorphClass())
-		                         ->bySecondType(Task::getMorphClass());
-
 		return Task::find()
 		           ->select([
 			           'id'                  => Task::field('id'),
 			           'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
 		           ])
 		           ->leftJoin(Relation::getTable(), [
-			           Relation::field('second_id') => new Expression(Task::field('id')),
+			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
+			           Relation::field('second_type') => Task::getMorphClass(),
+			           Relation::field('second_id')   => new Expression(Task::field('id')),
 		           ])
 		           ->leftJoin(ChatMemberMessage::getTable(), [
 			           ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		           ])
+		           ->andWhereNotNull(ChatMemberMessage::field('id'))
 		           ->notCompleted()
-		           ->notDeleted()
-		           ->andWhereNotNull(ChatMemberMessage::field('id'));
+		           ->notDeleted();
 	}
 
 	private function makeReminderQuery(): AQ
 	{
-		$relationQuery = Relation::find()
-		                         ->byFirstType(ChatMemberMessage::getMorphClass())
-		                         ->bySecondType(Reminder::getMorphClass());
-
 		return Reminder::find()
 		               ->select([
 			               'id'                  => Reminder::field('id'),
 			               'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
 		               ])
 		               ->leftJoin(Relation::getTable(), [
-			               Relation::field('second_id') => new Expression(Reminder::field('id')),
+			               Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
+			               Relation::field('second_type') => Reminder::getMorphClass(),
+			               Relation::field('second_id')   => new Expression(Reminder::field('id')),
 		               ])
 		               ->leftJoin(ChatMemberMessage::getTable(), [
 			               ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		               ])
+		               ->andWhereNotNull(ChatMemberMessage::field('id'))
 		               ->notNotified()
-		               ->notDeleted()
-		               ->andWhereNotNull(ChatMemberMessage::field('id'));
+		               ->notDeleted();
 	}
 
 	private function makeNotificationQuery(): AQ
 	{
-		$relationQuery = Relation::find()
-		                         ->byFirstType(ChatMemberMessage::getMorphClass())
-		                         ->bySecondType(UserNotification::getMorphClass());
-
 		return UserNotification::find()
 		                       ->select([
 			                       'id'                  => UserNotification::field('id'),
 			                       'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
 		                       ])
 		                       ->leftJoin(Relation::getTable(), [
-			                       Relation::field('second_id') => new Expression(UserNotification::field('id')),
+			                       Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
+			                       Relation::field('second_type') => UserNotification::getMorphClass(),
+			                       Relation::field('second_id')   => new Expression(UserNotification::field('id')),
 		                       ])
 		                       ->leftJoin(ChatMemberMessage::getTable(), [
 			                       ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
