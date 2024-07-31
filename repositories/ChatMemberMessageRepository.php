@@ -14,17 +14,19 @@ class ChatMemberMessageRepository
 	/**
 	 * @return BatchQueryResult
 	 */
-	public function findPreviousUnreadByMessage(ChatMemberMessage $message): BatchQueryResult
+	public function findPreviousUnreadByMessage(ChatMemberMessage $message, int $from_chat_member_id): BatchQueryResult
 	{
+		$subQuery = ChatMemberMessageView::find()
+		                                 ->andWhere([ChatMemberMessageView::field('chat_member_id') => $from_chat_member_id]);
+
 		return ChatMemberMessage::find()
 		                        ->with('notifications')
-		                        ->joinWith('views')
-		                        ->andWhere(['<=', ChatMemberMessage::getColumn('id'), $message->id])
-		                        ->andWhere([ChatMemberMessage::getColumn('to_chat_member_id') => $message->to_chat_member_id])
-		                        ->andWhere(['OR',
-		                                    ['IS', ChatMemberMessageView::getColumn('id'), null],
-		                                    ['!=', ChatMemberMessageView::getColumn('chat_member_id'), new Expression(ChatMemberMessage::getColumn('from_chat_member_id'))],
+		                        ->leftJoin(['views' => $subQuery], [
+			                        'views.chat_member_message_id' => new Expression(ChatMemberMessage::field('id')),
 		                        ])
+		                        ->andWhere(['<=', ChatMemberMessage::field('id'), $message->id])
+		                        ->andWhere([ChatMemberMessage::field('to_chat_member_id') => $message->to_chat_member_id])
+		                        ->andWhere(['views.chat_member_id' => null])
 		                        ->notDeleted()
 		                        ->each();
 	}

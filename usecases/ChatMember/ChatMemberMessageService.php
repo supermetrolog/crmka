@@ -353,7 +353,7 @@ class ChatMemberMessageService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			foreach ($this->chatMemberMessageRepository->findPreviousUnreadByMessage($message) as $unreadMessage) {
+			foreach ($this->chatMemberMessageRepository->findPreviousUnreadByMessage($message, $from_chat_member_id) as $unreadMessage) {
 				$this->markMessageAsRead($unreadMessage, $from_chat_member_id);
 			}
 
