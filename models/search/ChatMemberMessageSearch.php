@@ -95,8 +95,6 @@ class ChatMemberMessageSearch extends Form
 
 		$query->andFilterWhere(['like', ChatMemberMessage::field('message'), $this->message]);
 
-		dd($query->getRawSql());
-
 		return $dataProvider;
 	}
 
