@@ -232,17 +232,18 @@ class ChatMemberSearch extends Form
 	 */
 	private function makeMessageQuery(): AQ
 	{
+		$subQuery = ChatMemberMessageView::find()
+		                                 ->andWhere([ChatMemberMessageView::field('chat_member_id') => $this->current_chat_member_id]);
+
 		return ChatMemberMessage::find()
 		                        ->select([
 			                        'id'                => ChatMemberMessage::field('id'),
 			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
 		                        ])
-		                        ->joinWith('views')
-		                        ->andWhere([
-			                        'or',
-			                        ['!=', ChatMemberMessageView::field('chat_member_id'), $this->current_chat_member_id],
-			                        ['is', ChatMemberMessageView::field('chat_member_id'), null],
+		                        ->leftJoin(['views' => $subQuery], [
+			                        'views.chat_member_message_id' => new Expression(ChatMemberMessage::field('id')),
 		                        ])
+		                        ->andWhere(['views.chat_member_id' => null])
 		                        ->notDeleted();
 	}
 }
