@@ -35,6 +35,7 @@ class ChatMemberSearch extends Form
 	public $search;
 
 	public $current_chat_member_id;
+	public $current_user_id;
 
 	public function rules(): array
 	{
@@ -176,7 +177,7 @@ class ChatMemberSearch extends Form
 		           ->leftJoin(ChatMemberMessage::getTable(), [
 			           ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		           ])
-		           ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_chat_member_id])
+		           ->andWhere([Task::field('user_id') => $this->current_user_id])
 		           ->notCompleted()
 		           ->notImpossible()
 		           ->notDeleted();
@@ -200,7 +201,7 @@ class ChatMemberSearch extends Form
 		               ->leftJoin(ChatMemberMessage::getTable(), [
 			               ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		               ])
-		               ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_chat_member_id])
+		               ->andWhere([Reminder::field('user_id') => $this->current_user_id])
 		               ->notNotified()
 		               ->notDeleted();
 	}
@@ -223,7 +224,7 @@ class ChatMemberSearch extends Form
 		                       ->leftJoin(ChatMemberMessage::getTable(), [
 			                       ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		                       ])
-		                       ->andWhere([ChatMemberMessage::field('from_chat_member_id') => $this->current_chat_member_id])
+		                       ->andWhere([UserNotification::field('user_id') => $this->current_user_id])
 		                       ->andWhereNull(UserNotification::field('viewed_at'));
 	}
 
