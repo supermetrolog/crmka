@@ -40,13 +40,13 @@ class ChatMemberRepository
 			                                       'unread_message_count'      => 'SUM(message_views.id is null)',
 		                                       ])
 		                                       ->leftJoin(['tasks' => $this->makeTaskQuery()], [
-			                                       'tasks.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
+			                                       'tasks.user_id' => new Expression(ChatMemberSearchView::field('model_id'))
 		                                       ])
 		                                       ->leftJoin(['reminders' => $this->makeReminderQuery()], [
-			                                       'reminders.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
+			                                       'reminders.user_id' => new Expression(ChatMemberSearchView::field('model_id'))
 		                                       ])
 		                                       ->leftJoin(['notifications' => $this->makeNotificationQuery()], [
-			                                       'notifications.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
+			                                       'notifications.user_id' => new Expression(ChatMemberSearchView::field('model_id'))
 		                                       ])
 		                                       ->leftJoin(['messages' => ChatMemberMessage::find()->notDeleted()], [
 			                                       'messages.to_chat_member_id' => $messageSubQuery,
@@ -70,8 +70,8 @@ class ChatMemberRepository
 	{
 		return Task::find()
 		           ->select([
-			           'id'                  => Task::field('id'),
-			           'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
+			           'id'      => Task::field('id'),
+			           'user_id' => Task::field('user_id'),
 		           ])
 		           ->leftJoin(Relation::getTable(), [
 			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -91,8 +91,8 @@ class ChatMemberRepository
 	{
 		return Reminder::find()
 		               ->select([
-			               'id'                  => Reminder::field('id'),
-			               'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
+			               'id'      => Reminder::field('id'),
+			               'user_id' => Reminder::field('user_id'),
 		               ])
 		               ->leftJoin(Relation::getTable(), [
 			               Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -111,8 +111,8 @@ class ChatMemberRepository
 	{
 		return UserNotification::find()
 		                       ->select([
-			                       'id'                  => UserNotification::field('id'),
-			                       'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
+			                       'id'      => UserNotification::field('id'),
+			                       'user_id' => UserNotification::field('user_id'),
 		                       ])
 		                       ->leftJoin(Relation::getTable(), [
 			                       Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
