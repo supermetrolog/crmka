@@ -22,7 +22,9 @@ class ChatMemberRepository
 		$chat_member_ids = is_array($chat_member_ids) ? $chat_member_ids : [(int)$chat_member_ids];
 
 		$messageSubQuery = ChatMemberMessage::find()
-		                                    ->select(ChatMemberMessage::field('to_chat_member_id'))
+		                                    ->select([
+			                                    ChatMemberMessage::field('to_chat_member_id')
+		                                    ])
 		                                    ->andWhere([
 			                                    ChatMemberMessage::field('from_chat_member_id') => new Expression(ChatMemberSearchView::field('id')),
 		                                    ])
@@ -35,7 +37,7 @@ class ChatMemberRepository
 			                                       'unread_task_count'         => 'COUNT(DISTINCT tasks.id)',
 			                                       'unread_reminder_count'     => 'COUNT(DISTINCT reminders.id)',
 			                                       'unread_notification_count' => 'COUNT(DISTINCT notifications.id)',
-			                                       'unread_message_count'      => 'COUNT(DISTINCT messages.id)',
+			                                       'unread_message_count'      => 'SUM(message_views.id is null)',
 		                                       ])
 		                                       ->leftJoin(['tasks' => $this->makeTaskQuery()], [
 			                                       'tasks.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
@@ -46,13 +48,16 @@ class ChatMemberRepository
 		                                       ->leftJoin(['notifications' => $this->makeNotificationQuery()], [
 			                                       'notifications.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
 		                                       ])
-		                                       ->leftJoin(['messages' => $this->makeMessageQuery()], [
+		                                       ->leftJoin(['messages' => ChatMemberMessage::find()->notDeleted()], [
+			                                       'messages.to_chat_member_id' => $messageSubQuery,
+		                                       ])
+		                                       ->leftJoin(['message_views' => ChatMemberMessageView::getTable()], [
 			                                       'and',
-			                                       ['messages.to_chat_member_id' => $messageSubQuery],
+			                                       ['message_views.chat_member_message_id' => new Expression('messages.id')],
 			                                       [
 				                                       'or',
-				                                       ['!=', 'messages.from_chat_member_id', new Expression(ChatMemberSearchView::field('id'))],
-				                                       ['is', 'messages.from_chat_member_id', null],
+				                                       ['message_views.chat_member_id' => new Expression(ChatMemberSearchView::field('id'))],
+				                                       ['message_views.chat_member_id' => null],
 			                                       ]
 		                                       ])
 		                                       ->andWhere([ChatMemberSearchView::field('id') => $chat_member_ids])
@@ -119,17 +124,5 @@ class ChatMemberRepository
 		                       ])
 		                       ->andWhereNull(UserNotification::field('viewed_at'))
 		                       ->andWhereNotNull(ChatMemberMessage::field('id'));
-	}
-
-	private function makeMessageQuery(): AQ
-	{
-		return ChatMemberMessage::find()
-		                        ->select([
-			                        'id'                  => ChatMemberMessage::field('id'),
-			                        'to_chat_member_id'   => ChatMemberMessage::field('to_chat_member_id'),
-			                        'from_chat_member_id' => ChatMemberMessageView::field('chat_member_id'),
-		                        ])
-		                        ->joinWith('views')
-		                        ->notDeleted();
 	}
 }
