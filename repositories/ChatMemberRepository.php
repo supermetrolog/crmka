@@ -37,7 +37,7 @@ class ChatMemberRepository
 			                                       'unread_task_count'         => 'COUNT(DISTINCT tasks.id)',
 			                                       'unread_reminder_count'     => 'COUNT(DISTINCT reminders.id)',
 			                                       'unread_notification_count' => 'COUNT(DISTINCT notifications.id)',
-			                                       'unread_message_count'      => 'SUM(message_views.id is null)',
+			                                       'unread_message_count'      => 'COUNT(DISTINCT messages.id) - COUNT(DISTINCT message_views.id)',
 		                                       ])
 		                                       ->leftJoin(['tasks' => $this->makeTaskQuery()], [
 			                                       'tasks.user_id' => new Expression(ChatMemberSearchView::field('model_id'))
