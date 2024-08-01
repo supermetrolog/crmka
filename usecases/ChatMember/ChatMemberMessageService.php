@@ -20,6 +20,7 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Alert;
+use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
 use app\models\ChatMemberMessageView;
@@ -28,6 +29,7 @@ use app\models\Notification\UserNotification;
 use app\models\Relation;
 use app\models\Reminder;
 use app\models\Task;
+use app\models\User;
 use app\repositories\ChatMemberMessageRepository;
 use app\usecases\Alert\CreateAlertService;
 use app\usecases\Media\CreateMediaService;
@@ -36,6 +38,7 @@ use app\usecases\Reminder\CreateReminderService;
 use app\usecases\Task\CreateTaskService;
 use Throwable;
 use yii\db\Exception;
+use yii\db\Expression;
 use yii\db\Query;
 
 class ChatMemberMessageService
@@ -236,7 +239,7 @@ class ChatMemberMessageService
 				'second_id'   => $task->id,
 			]));
 
-			$this->markMessageAsUnread($message);
+			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $task->user_id);
 
 			$this->markMessageAsLatestForReceiver($message);
 
@@ -296,7 +299,7 @@ class ChatMemberMessageService
 				'second_id'   => $reminder->id,
 			]));
 
-			$this->markMessageAsUnread($message);
+			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $reminder->user_id);
 
 			$this->markMessageAsLatestForReceiver($message);
 
@@ -335,7 +338,7 @@ class ChatMemberMessageService
 				'second_id'   => $userNotification->id,
 			]));
 
-			$this->markMessageAsUnread($message);
+			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $userNotification->user_id);
 
 			$this->markMessageAsLatestForReceiver($message);
 
@@ -380,15 +383,23 @@ class ChatMemberMessageService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function markMessageAsUnread(ChatMemberMessage $message): void
+	private function markMessageAsUnreadForChatMember(ChatMemberMessage $message, string $model_type, int $model_id): void
 	{
-		foreach ($message->views as $view) {
-			if ($view->chat_member_id === $message->from_chat_member_id) {
-				continue;
-			}
+		$view = ChatMemberMessageView::find()
+		                             ->leftJoin(ChatMember::getTable(), [
+			                             ChatMember::field('id')         => new Expression(ChatMemberMessageView::field('chat_member_id')),
+			                             ChatMember::field('model_type') => $model_type,
+			                             ChatMember::field('model_id')   => $model_id,
+		                             ])
+		                             ->andWhere([ChatMemberMessageView::field('chat_member_message_id') => $message->id])
+		                             ->andWhereNotNull(ChatMember::field('id'))
+		                             ->one();
 
-			$this->chatMemberMessageViewService->delete($view);
+		if ($view === null) {
+			return;
 		}
+
+		$this->chatMemberMessageViewService->delete($view);
 	}
 
 	/**
