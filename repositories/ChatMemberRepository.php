@@ -22,7 +22,9 @@ class ChatMemberRepository
 		$chat_member_ids = is_array($chat_member_ids) ? $chat_member_ids : [(int)$chat_member_ids];
 
 		$messageSubQuery = ChatMemberMessage::find()
-		                                    ->select(ChatMemberMessage::field('to_chat_member_id'))
+		                                    ->select([
+			                                    ChatMemberMessage::field('to_chat_member_id')
+		                                    ])
 		                                    ->andWhere([
 			                                    ChatMemberMessage::field('from_chat_member_id') => new Expression(ChatMemberSearchView::field('id')),
 		                                    ])
@@ -35,24 +37,27 @@ class ChatMemberRepository
 			                                       'unread_task_count'         => 'COUNT(DISTINCT tasks.id)',
 			                                       'unread_reminder_count'     => 'COUNT(DISTINCT reminders.id)',
 			                                       'unread_notification_count' => 'COUNT(DISTINCT notifications.id)',
-			                                       'unread_message_count'      => 'COUNT(DISTINCT messages.id)',
+			                                       'unread_message_count'      => 'COUNT(DISTINCT messages.id) - COUNT(DISTINCT message_views.id)',
 		                                       ])
 		                                       ->leftJoin(['tasks' => $this->makeTaskQuery()], [
-			                                       'tasks.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
+			                                       'tasks.user_id' => new Expression(ChatMemberSearchView::field('model_id'))
 		                                       ])
 		                                       ->leftJoin(['reminders' => $this->makeReminderQuery()], [
-			                                       'reminders.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
+			                                       'reminders.user_id' => new Expression(ChatMemberSearchView::field('model_id'))
 		                                       ])
 		                                       ->leftJoin(['notifications' => $this->makeNotificationQuery()], [
-			                                       'notifications.from_chat_member_id' => new Expression(ChatMemberSearchView::field('id'))
+			                                       'notifications.user_id' => new Expression(ChatMemberSearchView::field('model_id'))
 		                                       ])
-		                                       ->leftJoin(['messages' => $this->makeMessageQuery()], [
+		                                       ->leftJoin(['messages' => ChatMemberMessage::find()->notDeleted()], [
+			                                       'messages.to_chat_member_id' => $messageSubQuery,
+		                                       ])
+		                                       ->leftJoin(['message_views' => ChatMemberMessageView::getTable()], [
 			                                       'and',
-			                                       ['messages.to_chat_member_id' => $messageSubQuery],
+			                                       ['message_views.chat_member_message_id' => new Expression('messages.id')],
 			                                       [
 				                                       'or',
-				                                       ['!=', 'messages.from_chat_member_id', new Expression(ChatMemberSearchView::field('id'))],
-				                                       ['is', 'messages.from_chat_member_id', null],
+				                                       ['message_views.chat_member_id' => new Expression(ChatMemberSearchView::field('id'))],
+				                                       ['message_views.chat_member_id' => null],
 			                                       ]
 		                                       ])
 		                                       ->andWhere([ChatMemberSearchView::field('id') => $chat_member_ids])
@@ -65,8 +70,8 @@ class ChatMemberRepository
 	{
 		return Task::find()
 		           ->select([
-			           'id'                  => Task::field('id'),
-			           'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
+			           'id'      => Task::field('id'),
+			           'user_id' => Task::field('user_id'),
 		           ])
 		           ->leftJoin(Relation::getTable(), [
 			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -86,8 +91,8 @@ class ChatMemberRepository
 	{
 		return Reminder::find()
 		               ->select([
-			               'id'                  => Reminder::field('id'),
-			               'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
+			               'id'      => Reminder::field('id'),
+			               'user_id' => Reminder::field('user_id'),
 		               ])
 		               ->leftJoin(Relation::getTable(), [
 			               Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -106,8 +111,8 @@ class ChatMemberRepository
 	{
 		return UserNotification::find()
 		                       ->select([
-			                       'id'                  => UserNotification::field('id'),
-			                       'from_chat_member_id' => ChatMemberMessage::field('from_chat_member_id'),
+			                       'id'      => UserNotification::field('id'),
+			                       'user_id' => UserNotification::field('user_id'),
 		                       ])
 		                       ->leftJoin(Relation::getTable(), [
 			                       Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -119,17 +124,5 @@ class ChatMemberRepository
 		                       ])
 		                       ->andWhereNull(UserNotification::field('viewed_at'))
 		                       ->andWhereNotNull(ChatMemberMessage::field('id'));
-	}
-
-	private function makeMessageQuery(): AQ
-	{
-		return ChatMemberMessage::find()
-		                        ->select([
-			                        'id'                  => ChatMemberMessage::field('id'),
-			                        'to_chat_member_id'   => ChatMemberMessage::field('to_chat_member_id'),
-			                        'from_chat_member_id' => ChatMemberMessageView::field('chat_member_id'),
-		                        ])
-		                        ->joinWith('views')
-		                        ->notDeleted();
 	}
 }

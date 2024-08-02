@@ -2,6 +2,7 @@
 
 namespace app\models\search;
 
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
@@ -44,42 +45,14 @@ class ChatMemberMessageSearch extends Form
 
 		$this->validateOrThrow();
 
-		$unreadCount = ChatMemberMessage::find()
-		                                ->joinWith('views')
-		                                ->andWhere([
-			                                'or',
-			                                ['!=', ChatMemberMessageView::field('chat_member_id'), $this->current_chat_member_id],
-			                                ['is', ChatMemberMessageView::field('chat_member_id'), null],
-		                                ])
-		                                ->andFilterWhere([
-			                                ChatMemberMessage::field('to_chat_member_id') => $this->to_chat_member_id,
-		                                ])
-		                                ->notDeleted()
-		                                ->count();
-
-		$subQuery = ChatMemberMessage::find()
-		                             ->select([
-			                             'id'                => ChatMemberMessage::field('id'),
-			                             'view_id'           => ChatMemberMessageView::field('id'),
-			                             'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
-		                             ])
-		                             ->joinWith('views')
-		                             ->andWhere([
-			                             'or',
-			                             [ChatMemberMessageView::field('chat_member_id') => $this->current_chat_member_id],
-			                             [ChatMemberMessageView::field('chat_member_id') => null],
-		                             ])
-		                             ->notDeleted();
-
 		$query = ChatMemberMessage::find()
 		                          ->select([
 			                          ChatMemberMessage::field('*'),
-			                          '(views.view_id IS NOT NULL) as is_viewed'
+			                          '(views.view_id is not null) as is_viewed'
 		                          ])
-		                          ->leftJoin(['views' => $subQuery], [
+		                          ->leftJoin(['views' => $this->makeMessageViews()], [
 			                          'views.id' => new Expression(ChatMemberMessage::field('id')),
 		                          ])
-		                          ->joinWith('fromChatMemberViews')
 		                          ->with(['fromChatMember.objectChatMember', 'fromChatMember.request'])
 		                          ->with(['fromChatMember.user.userProfile'])
 		                          ->with(['tasks.createdByUser.userProfile'])
@@ -90,11 +63,13 @@ class ChatMemberMessageSearch extends Form
 		                          ->orderBy([ChatMemberMessage::field('id') => SORT_DESC])
 		                          ->limit(30);
 
+		$unreadCount = $this->getUnreadMessageCount();
+
 		if ($this->id_less_then === null && 0 < $unreadCount) {
 			$query
 				->orderBy([
-					'(CASE WHEN ' . ChatMemberMessageView::field('id') . ' IS NULL THEN 0 ELSE 1 END)' => SORT_ASC,
-					ChatMemberMessage::field('id')                                                     => SORT_DESC,
+					'(views.view_id is null)'      => SORT_DESC,
+					ChatMemberMessage::field('id') => SORT_DESC,
 				])
 				->limit($unreadCount < self::MAX_UNREAD_COUNT ? self::UNREAD_LIMIT : $unreadCount + self::EXTRA_READ_COUNT);
 		}
@@ -121,5 +96,37 @@ class ChatMemberMessageSearch extends Form
 		$query->andFilterWhere(['like', ChatMemberMessage::field('message'), $this->message]);
 
 		return $dataProvider;
+	}
+
+	private function makeMessageViews(): AQ
+	{
+		return ChatMemberMessage::find()
+		                        ->select([
+			                        'id'                => ChatMemberMessage::field('id'),
+			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
+			                        'view_id'           => ChatMemberMessageView::field('id'),
+		                        ])
+		                        ->joinWith('views')
+		                        ->andWhere([
+			                        'or',
+			                        [ChatMemberMessageView::field('chat_member_id') => $this->current_chat_member_id],
+			                        [ChatMemberMessageView::field('chat_member_id') => null],
+		                        ])
+		                        ->notDeleted();
+	}
+
+	private function getUnreadMessageCount(): int
+	{
+		$subQuery = ChatMemberMessageView::find()
+		                                 ->andWhere([ChatMemberMessageView::field('chat_member_id') => $this->current_chat_member_id]);
+
+		return ChatMemberMessage::find()
+		                        ->leftJoin(['views' => $subQuery], [
+			                        'views.chat_member_message_id' => new Expression(ChatMemberMessage::field('id')),
+		                        ])
+		                        ->andFilterWhere([ChatMemberMessage::field('to_chat_member_id') => $this->to_chat_member_id])
+		                        ->andWhere(['views.chat_member_id' => null])
+		                        ->notDeleted()
+		                        ->count();
 	}
 }
