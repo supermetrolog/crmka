@@ -1,0 +1,64 @@
+GET {{url}}/chat-members?search=Ногинск&model_type=object
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/chat-members/43593
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+Origin: https://clients.pennylane.pro
+
+###
+
+GET {{url}}/chat-members/47/pinned-message
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+Origin: https://clients.supermetrolog.ru
+
+###
+
+POST {{url}}/chat-members/pin-message
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "chat_member_id": 54158,
+  "chat_member_message_id": 5
+}
+###
+
+POST {{url}}/chat-members/unpin-message
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "chat_member_id": 54158
+}
+###
+
+GET {{url}}/chat-members/43593/media
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+Origin: https://clients.pennylane.pro
+
+###
+
+POST {{url}}/chat-members/43593/called
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+Origin: https://clients.pennylane.pro
+
+{
+  "user_id": 3,
+  "contact_id": 2
+}
+
+###

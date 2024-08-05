@@ -3,16 +3,23 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
+use app\kernel\common\models\AQ\AQ;
 use app\models\crane\Crane;
 use app\models\location\Location;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
 /**
  * @property ObjectClass $objectClassRecord
+ * @property Company     $company
  */
 class Objects extends oldDb\Objects
 {
+	public bool $rentOrSale      = false;
+	public bool $sublease        = false;
+	public bool $responseStorage = false;
+
 	/**
 	 * @return array
 	 */
@@ -94,14 +101,43 @@ class Objects extends oldDb\Objects
 		return JsonFieldNormalizer::jsonToArrayIntElements($this->buildings_on_territory_id);
 	}
 
-	public function getInternetType(): ?int
+	/**
+	 * @return array|mixed
+	 */
+	public function getInternetType()
 	{
-		return $this->internet_type !== null ? (int)$this->internet_type : null;
+		return Json::decode($this->internet_type) ?? [];
 	}
 
 	public function getPower(): ?int
 	{
 		return $this->power !== null ? (int)$this->power : null;
+	}
+
+	public function getVideos(): array
+	{
+		return Json::decode($this->videos) ?? [];
+	}
+
+	public function getBuildingPropertyDocuments(): array
+	{
+		return Json::decode($this->building_property_documents) ?? [];
+	}
+
+	public function getPhotos360(): array
+	{
+		return Json::decode($this->photos_360) ?? [];
+	}
+
+	public function getThumb(): ?string
+	{
+		$photos = $this->getPhotos();
+
+		if ($photos) {
+			return Yii::$app->params['url']['objects'] . $photos[0];
+		}
+
+		return Yii::$app->params['url']['image_not_found'];
 	}
 
 	/**
@@ -148,8 +184,17 @@ class Objects extends oldDb\Objects
 		$fields['internet_type'] = function () {
 			return $this->getInternetType();
 		};
-		$fields['power'] = function () {
+		$fields['power']         = function () {
 			return $this->getPower();
+		};
+		$fields['videos']         = function () {
+			return $this->getVideos();
+		};
+		$fields['building_property_documents']         = function () {
+			return $this->getBuildingPropertyDocuments();
+		};
+		$fields['photos_360']         = function () {
+			return $this->getPhotos360();
 		};
 
 
@@ -235,5 +280,10 @@ class Objects extends oldDb\Objects
 	public function getElevatorsRecords(): ActiveQuery
 	{
 		return $this->hasMany(Elevator::class, ['object_id' => 'id']);
+	}
+
+	public static function find(): AQ
+	{
+		return new AQ(get_called_class());
 	}
 }

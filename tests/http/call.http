@@ -1,0 +1,9 @@
+POST {{url}}/calls
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "contact_id": 2
+}

@@ -405,6 +405,45 @@ class FloorPart extends ActiveRecord
 		return JsonFieldNormalizer::jsonToArrayIntElements($this->elevators);
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getPhotoBlock(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayStringElements($this->photo_block);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getCranes()
+	{
+		return Json::decode($this->cranes);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getRackTypes()
+	{
+		return Json::decode($this->rack_types);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getSafeType()
+	{
+		return Json::decode($this->safe_type);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getLighting()
+	{
+		return Json::decode($this->lighting);
+	}
 
 	/**
 	 * @return array
@@ -446,11 +485,26 @@ class FloorPart extends ActiveRecord
 		$f['internet_type']               = function () {
 			return $this->getInternetType();
 		};
-		$f['floor_types_land']               = function () {
+		$f['floor_types_land']            = function () {
 			return $this->getFloorTypesLand();
 		};
-		$f['elevators']               = function () {
+		$f['elevators']                   = function () {
 			return $this->getElevators();
+		};
+		$f['photo_block']                 = function () {
+			return $this->getPhotoBlock();
+		};
+		$f['cranes']                 = function () {
+			return $this->getCranes();
+		};
+		$f['rack_types']                 = function () {
+			return $this->getRackTypes();
+		};
+		$f['safe_type']                 = function () {
+			return $this->getSafeType();
+		};
+		$f['lighting']                 = function () {
+			return $this->getLighting();
 		};
 
 		return $f;

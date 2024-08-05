@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\helpers\JsonFieldNormalizer;
+use app\models\ActiveQuery\BlockQuery;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
@@ -153,6 +154,27 @@ class Block extends oldDb\ObjectsBlock
 		return $this->jsonToArrayIntElements($this->cranes);
 	}
 
+	public function getBuildingLayoutsBlock(): array
+	{
+		return Json::decode($this->building_layouts_block) ?? [];
+	}
+
+	public function getPhotos360Block(): array
+	{
+		return Json::decode($this->photos_360_block) ?? [];
+	}
+
+	public function getBuildingPresentationsBlock(): array
+	{
+		return Json::decode($this->building_presentations_block) ?? [];
+	}
+
+	public function getExcludedAreas(): array
+	{
+		return Json::decode($this->excluded_areas) ?? [];
+	}
+
+
 	/**
 	 * @return array
 	 */
@@ -216,6 +238,21 @@ class Block extends oldDb\ObjectsBlock
 		$f['cranes']    = function () {
 			return $this->getCranes();
 		};
+		$f['building_layouts_block']    = function () {
+			return $this->getBuildingLayoutsBlock();
+		};
+		$f['photos_360_block']    = function () {
+			return $this->getPhotos360Block();
+		};
+		$f['building_presentations_block']    = function () {
+			return $this->getBuildingPresentationsBlock();
+		};
+		$f['excluded_areas']    = function () {
+			return $this->getExcludedAreas();
+		};
+		$f['excluded_areas']    = function () {
+			return $this->getExcludedAreas();
+		};
 
 		return $f;
 	}
@@ -259,5 +296,10 @@ class Block extends oldDb\ObjectsBlock
 	public function getDeal(): ActiveQuery
 	{
 		return $this->hasOne(Deal::class, ['original_id' => 'id']);
+	}
+
+	public static function find(): BlockQuery
+	{
+		return new BlockQuery(get_called_class());
 	}
 }

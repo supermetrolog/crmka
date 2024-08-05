@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\kernel\common\controller\AppController;
 use app\models\Complex;
 use yii\web\NotFoundHttpException;
 

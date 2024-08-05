@@ -6,7 +6,6 @@ namespace app\commands;
 
 use app\models\oldDb\OfferMix;
 use app\models\oldDb\User;
-use app\models\User as ModelsUser;
 use yii\console\Controller;
 
 class DatatransferController extends Controller

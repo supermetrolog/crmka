@@ -6,6 +6,7 @@ namespace app\models;
 
 use app\helpers\ArrayHelper;
 use app\helpers\JsonFieldNormalizer;
+use app\models\ActiveQuery\BlockQuery;
 use yii\db\ActiveQuery;
 
 class SummaryBlock extends Block
@@ -57,7 +58,7 @@ class SummaryBlock extends Block
 		return array_unique($result);
 	}
 
-	public static function find(?int $offer_id = null): ActiveQuery
+	public static function find(?int $offer_id = null): BlockQuery
 	{
 		$query = parent::find();
 
@@ -66,7 +67,7 @@ class SummaryBlock extends Block
 		}
 
 		$query->andWhere(['offer_id' => $offer_id])
-		      ->andWhere(['status' => 1])
+		      ->active()
 		      ->groupBy('offer_id');
 
 		$query->select([
@@ -127,7 +128,7 @@ class SummaryBlock extends Block
 
 
 			'area_min'           => 'MIN(IFNULL(area_min, 0))',
-			'area_max'           => 'MIN(IFNULL(area_max, 0))',
+			'area_max'           => 'MAX(IFNULL(area_max, 0))',
 			'area_floor_min'     => 'MIN(IFNULL(area_floor_min, 0))',
 			'area_floor_max'     => 'MAX(IFNULL(area_floor_max, 0))',
 			'area_field_min'     => 'MIN(IFNULL(area_field_min, 0))',

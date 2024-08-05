@@ -1,0 +1,66 @@
+GET {{url}}/tasks?expired=1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/tasks
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "message": "SUKA",
+  "start": "2024-04-25 16:00:12",
+  "end": "2024-04-26",
+  "status": 1
+}
+###
+
+PUT {{url}}/tasks/9
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": 3,
+  "message": "ANAL3",
+  "status": 1,
+  "start": "2024-04-25 16:00:12",
+  "end": "2024-04-26 12:00"
+}
+###
+
+POST {{url}}/tasks/for-users
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_ids": [3, 10, 32],
+  "message": "SUKA",
+  "start": "2024-04-25 16:00:12",
+  "end": "2024-04-26",
+  "status": 1
+}
+###
+
+
+POST {{url}}/tasks/change-status/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "status": 2
+}
+###
+
+DELETE {{url}}/tasks/4
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###

@@ -2,17 +2,25 @@
 
 namespace app\models\oldDb;
 
+use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\oldDb\OfferMixQuery;
+use app\models\ActiveQuery\RelationQuery;
+use app\models\ActiveQuery\TaskQuery;
+use app\models\Call;
 use app\models\Company;
 use app\models\Contact;
 use app\models\miniModels\TimelineStepObjectComment;
 use app\models\oldDb\User as OldDbUser;
+use app\models\Relation;
 use app\models\Request;
 use app\models\User;
+use app\resources\CallResource;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Yii;
+use yii\base\ErrorException;
+use yii\data\Pagination;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "c_industry_offers_mix".
@@ -274,7 +282,7 @@ use yii\helpers\ArrayHelper;
  * @property $this[]      $miniOffersMix
  * @property Offers       $offer
  */
-class OfferMix extends ActiveRecord
+class OfferMix extends AR
 {
 	public const STATUS_ACTIVE  = 1;
 	public const STATUS_PASSIVE = 2;
@@ -341,6 +349,12 @@ class OfferMix extends ActiveRecord
 		'340' => 73
 	];
 
+	public ?int $last_call_rel_id = null;
+
+	public static function getMorphClass(): string
+	{
+		return 'offer_mix';
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -707,7 +721,7 @@ class OfferMix extends ActiveRecord
 		return $extraFields;
 	}
 
-	public function fields()
+	public function fields(): array
 	{
 		$fields                           = parent::fields();
 		$fields['last_update_format']     = function ($fields) {
@@ -836,6 +850,9 @@ class OfferMix extends ActiveRecord
 			}
 
 			return $this->calcPriceGeneralForRent($fields);
+		};
+		$fields['last_call'] = function ($fields) {
+			return empty($fields->lastCall) ? null : CallResource::tryMake($fields->lastCall)->toArray();
 		};
 
 		return $fields;
@@ -1142,6 +1159,30 @@ class OfferMix extends ActiveRecord
 	public function getConsultant(): ActiveQuery
 	{
 		return $this->hasOne(User::class, ['id' => 'user_id_new'])->via('agent');
+	}
+
+	/**
+	 * @return RelationQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getLastCallRelationFirst(): RelationQuery
+	{
+		return $this->hasOne(Relation::class, [
+			'first_id'   => 'id',
+			'first_type' => 'morph',
+			'id'         => 'last_call_rel_id'
+		])->from([Relation::tableName() => Relation::getTable()]);
+	}
+
+
+	/**
+	 * @return ActiveQuery|TaskQuery
+	 * @throws ErrorException
+	 */
+	public function getLastCall(): CallQuery
+	{
+		return $this->morphHasOneVia(Call::class, 'id', 'second')
+		            ->via('lastCallRelationFirst');
 	}
 
 	public static function find(): OfferMixQuery

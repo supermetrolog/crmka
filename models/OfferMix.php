@@ -3,435 +3,466 @@
 namespace app\models;
 
 use app\components\interfaces\OfferInterface;
+use app\helpers\DbHelper;
+use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use Throwable;
 use Yii;
+use yii\base\ErrorException;
+use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
+/**
+ * @property ChatMember $chatMember
+ */
 class OfferMix extends oldDb\OfferMix implements OfferInterface
 {
-    public const HEATING_CENTRAL_STRING = 'Центральное';
-    public const HEATING_AUTO_STRING = 'Автономное';
-    public const OPEX_INCLUDED = 1;
-    public const PUBLIC_SERVICE_INCLUDED = 1;
+	public const HEATING_CENTRAL_STRING  = 'Центральное';
+	public const HEATING_AUTO_STRING     = 'Автономное';
+	public const OPEX_INCLUDED           = 1;
+	public const PUBLIC_SERVICE_INCLUDED = 1;
 
-    /**
-     * @return bool
-     */
-    public function isSaleType(): bool
-    {
-        return $this->deal_type === self::DEAL_TYPE_SALE;
-    }
+	public static function getMorphClass(): string
+	{
+		return 'offer_mix';
+	}
 
-    /**
-     * @return bool
-     */
-    public function isRentType(): bool
-    {
-        return $this->deal_type === self::DEAL_TYPE_RENT;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isSaleType(): bool
+	{
+		return $this->deal_type === self::DEAL_TYPE_SALE;
+	}
 
-    /**
-     * @return bool
-     */
-    function isResponseStorageType(): bool
-    {
-        return $this->deal_type === self::DEAL_TYPE_RESPONSE_STORAGE;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isRentType(): bool
+	{
+		return $this->deal_type === self::DEAL_TYPE_RENT;
+	}
 
-    /**
-     * @return bool
-     */
-    public function isSubleaseType(): bool
-    {
-        return $this->deal_type === self::DEAL_TYPE_SUBLEASE;
-    }
+	/**
+	 * @return bool
+	 */
+	function isResponseStorageType(): bool
+	{
+		return $this->deal_type === self::DEAL_TYPE_RESPONSE_STORAGE;
+	}
 
-    /**
-     * @return OfferMixQuery
-     */
-    public static function find(): OfferMixQuery
-    {
-        return new OfferMixQuery(get_called_class());
-    }
+	/**
+	 * @return bool
+	 */
+	public function isSubleaseType(): bool
+	{
+		return $this->deal_type === self::DEAL_TYPE_SUBLEASE;
+	}
 
-    /**
-     * @return string
-     */
-    function getVisibleID(): string
-    {
-        return $this->visual_id;
-    }
+	/**
+	 * @return OfferMixQuery
+	 */
+	public static function find(): OfferMixQuery
+	{
+		return new OfferMixQuery(get_called_class());
+	}
 
-    /**
-     * @return int
-     */
-    function getVisualId(): string
-    {
-        return $this->visual_id;
-    }
+	/**
+	 * @return string
+	 */
+	function getVisibleID(): string
+	{
+		return $this->visual_id;
+	}
 
-    /**
-     * @return bool
-     */
-    public function isBlock(): bool
-    {
-        return $this->type_id === self::MINI_TYPE_ID;
-    }
+	/**
+	 * @return int
+	 */
+	function getVisualId(): string
+	{
+		return $this->visual_id;
+	}
 
-    /**
-     * @return bool
-     */
-    public function isGeneral(): bool
-    {
-        return $this->type_id === self::GENERAL_TYPE_ID;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isBlock(): bool
+	{
+		return $this->type_id === self::MINI_TYPE_ID;
+	}
 
-    /**
-     * @return bool
-     */
-    public function isObject(): bool
-    {
-        return $this->type_id === self::OBJECT_TYPE_ID;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isGeneral(): bool
+	{
+		return $this->type_id === self::GENERAL_TYPE_ID;
+	}
 
-    /**
-     * @return string
-     */
-    function getDescription(): string
-    {
-        if ($this->isGeneral()) {
-            return $this->description ?? '';
-        }
+	/**
+	 * @return bool
+	 */
+	public function isObject(): bool
+	{
+		return $this->type_id === self::OBJECT_TYPE_ID;
+	}
 
-        try {
-            if ($this->isBlock() || $this->block || !$this->block->description_manual_use) {
-                $url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->original_id . '/' . $this->type_id . '?api=1';
-                return file_get_contents($url);
-            } else {
-                return $this->block->description;
-            }
-        } catch (Throwable $th) {
-            return '';
-        }
-    }
+	/**
+	 * @return string
+	 */
+	function getDescription(): string
+	{
+		if ($this->isGeneral()) {
+			return $this->description ?? '';
+		}
 
-    /**
-     * @return string
-     */
-    function getAddress(): string
-    {
-        return $this->address;
-    }
+		try {
+			if ($this->isBlock() || $this->block || !$this->block->description_manual_use) {
+				$url = Yii::$app->params['url']['objects'] . 'autodesc.php/' . $this->original_id . '/' . $this->type_id . '?api=1';
 
-    /**
-     * @return string
-     */
-    function getLatitude(): string
-    {
-        return $this->latitude;
-    }
+				return file_get_contents($url);
+			} else {
+				return $this->block->description;
+			}
+		} catch (Throwable $th) {
+			return '';
+		}
+	}
 
-    /**
-     * @return string
-     */
-    function getLongitude(): string
-    {
-        return $this->longitude;
-    }
+	/**
+	 * @return string
+	 */
+	function getAddress(): string
+	{
+		return $this->address;
+	}
 
-    /**
-     * @return array
-     */
-    function getObjectTypes(): array
-    {
-        return Json::decode($this->object_type) ?? [];
-    }
+	/**
+	 * @return string
+	 */
+	function getLatitude(): string
+	{
+		return $this->latitude;
+	}
 
-    /**
-     * @return bool
-     */
-    function isWarehouse(): bool
-    {
-        return in_array(self::OBJECT_TYPE_WAREHOUSE, $this->getObjectTypes());
-    }
+	/**
+	 * @return string
+	 */
+	function getLongitude(): string
+	{
+		return $this->longitude;
+	}
 
-    /**
-     * @return bool
-     */
-    function isProduction(): bool
-    {
-        return in_array(self::OBJECT_TYPE_PRODUCTION, $this->getObjectTypes());
-    }
+	/**
+	 * @return array
+	 */
+	function getObjectTypes(): array
+	{
+		return Json::decode($this->object_type) ?? [];
+	}
 
-    /**
-     * @return bool
-     */
-    public function isLandObjectType(): bool
-    {
-        return in_array(self::OBJECT_TYPE_LAND, $this->getObjectTypes());
-    }
+	/**
+	 * @return bool
+	 */
+	function isWarehouse(): bool
+	{
+		return in_array(self::OBJECT_TYPE_WAREHOUSE, $this->getObjectTypes());
+	}
 
-    /**
-     * @return bool
-     */
-    public function isLand(): bool
-    {
-        return !!$this->is_land;
-    }
+	/**
+	 * @return bool
+	 */
+	function isProduction(): bool
+	{
+		return in_array(self::OBJECT_TYPE_PRODUCTION, $this->getObjectTypes());
+	}
 
-    /**
-     * @return bool
-     */
-    public function hasDeposit(): bool
-    {
-        return !!$this->deposit;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isLandObjectType(): bool
+	{
+		return in_array(self::OBJECT_TYPE_LAND, $this->getObjectTypes());
+	}
 
-    /**
-     * @return float
-     */
-    public function getDepositMonth(): float
-    {
-        if ($this->isBlock()) {
-            return $this->offer->deposit_value ?? 0;
-        }
+	/**
+	 * @return bool
+	 */
+	public function isLand(): bool
+	{
+		return !!$this->is_land;
+	}
 
-        if ($this->isGeneral()) {
-            $max = 0;
-            foreach ($this->miniOffersMix as $miniOffer) {
-                if (($miniOffer->offer->deposit_value ?? 0) > $max) {
-                    $max = $miniOffer->offer->deposit_value;
-                }
-            }
+	/**
+	 * @return bool
+	 */
+	public function hasDeposit(): bool
+	{
+		return !!$this->deposit;
+	}
 
-            return $max;
-        }
+	/**
+	 * @return float
+	 */
+	public function getDepositMonth(): float
+	{
+		if ($this->isBlock()) {
+			return $this->offer->deposit_value ?? 0;
+		}
 
-        return 0;
-    }
+		if ($this->isGeneral()) {
+			$max = 0;
+			foreach ($this->miniOffersMix as $miniOffer) {
+				if (($miniOffer->offer->deposit_value ?? 0) > $max) {
+					$max = $miniOffer->offer->deposit_value;
+				}
+			}
 
-    /**
-     * @return string
-     */
-    public function getFullConsultantName(): string
-    {
-        return $this->consultant->userProfile->getFullName();
-    }
+			return $max;
+		}
 
-    /**
-     * @return string
-     */
-    public function getContactPhone(): string
-    {
-        return Yii::$app->params['company_phone'];
-    }
+		return 0;
+	}
 
-    /**
-     * @return string[]
-     */
-    public function getImages(): array
-    {
-        return Json::decode($this->photos);
-    }
+	/**
+	 * @return string
+	 */
+	public function getFullConsultantName(): string
+	{
+		return $this->consultant->userProfile->getFullName();
+	}
 
-    /**
-     * @return float
-     */
-    public function getCeilingHeightMin(): float
-    {
-        return min($this->ceiling_height_min, $this->ceiling_height_max);
-    }
+	/**
+	 * @return string
+	 */
+	public function getContactPhone(): string
+	{
+		return Yii::$app->params['company_phone'];
+	}
 
-    /**
-     * @return float
-     */
-    public function getPower(): float
-    {
-        if ($this->isBlock()) {
-            if (!$this->block) return 0;
-            return (float) $this->block->power;
-        }
+	/**
+	 * @return string[]
+	 */
+	public function getImages(): array
+	{
+		return Json::decode($this->photos);
+	}
 
-        if ($this->isGeneral()) {
-            $power = 0;
-            if (!$this->miniOffersMix) return 0;
-            foreach ($this->miniOffersMix as  $miniOffer) {
-                if (!$miniOffer->block) return 0;
-                $power += (float)$miniOffer->block->power;
-            }
+	/**
+	 * @return float
+	 */
+	public function getCeilingHeightMin(): float
+	{
+		return min($this->ceiling_height_min, $this->ceiling_height_max);
+	}
 
-            return $power;
-        }
+	/**
+	 * @return float
+	 */
+	public function getPower(): float
+	{
+		if ($this->isBlock()) {
+			if (!$this->block) {
+				return 0;
+			}
 
-        return $this->power;
-    }
+			return (float)$this->block->power;
+		}
 
-    /**
-     * @return float
-     */
-    public function getPowerCapacity(): float
-    {
-        return $this->getPower();
-    }
+		if ($this->isGeneral()) {
+			$power = 0;
+			if (!$this->miniOffersMix) {
+				return 0;
+			}
+			foreach ($this->miniOffersMix as $miniOffer) {
+				if (!$miniOffer->block) {
+					return 0;
+				}
+				$power += (float)$miniOffer->block->power;
+			}
 
-    /**
-     * @return bool
-     */
-    public function hasRentalHolidays(): bool
-    {
-        return !!$this->holidays;
-    }
+			return $power;
+		}
 
-    /**
-     * @return int
-     */
-    public function getFloorMin(): int
-    {
-        return min($this->floor_min, $this->floor_max);
-    }
+		return $this->power;
+	}
 
-    /**
-     * @return int
-     */
-    public function getFloorMax(): int
-    {
-        return max($this->floor_min, $this->floor_max);
-    }
+	/**
+	 * @return float
+	 */
+	public function getPowerCapacity(): float
+	{
+		return $this->getPower();
+	}
 
-    /**
-     * @return bool
-     */
-    public function hasSeveralFloors(): bool
-    {
-        return $this->floor_min !== $this->floor_max;
-    }
+	/**
+	 * @return bool
+	 */
+	public function hasRentalHolidays(): bool
+	{
+		return !!$this->holidays;
+	}
 
-    /**
-     * @return bool
-     */
-    public function hasHeating(): bool
-    {
-        return $this->heated === 1 && in_array($this->heating, [self::HEATING_CENTRAL_STRING, self::HEATING_AUTO_STRING]);
-    }
+	/**
+	 * @return int
+	 */
+	public function getFloorMin(): int
+	{
+		return min($this->floor_min, $this->floor_max);
+	}
 
-    /**
-     * @return int
-     */
-    public function getHeatingType(): int
-    {
-        if ($this->heating === self::HEATING_CENTRAL_STRING) {
-            return self::HEATING_CENTRAL;
-        }
+	/**
+	 * @return int
+	 */
+	public function getFloorMax(): int
+	{
+		return max($this->floor_min, $this->floor_max);
+	}
 
-        if ($this->heating === self::HEATING_AUTO_STRING) {
-            return self::HEATING_AUTO;
-        }
+	/**
+	 * @return bool
+	 */
+	public function hasSeveralFloors(): bool
+	{
+		return $this->floor_min !== $this->floor_max;
+	}
 
-        return 0;
-    }
+	/**
+	 * @return bool
+	 */
+	public function hasHeating(): bool
+	{
+		return $this->heated === 1 && in_array($this->heating, [self::HEATING_CENTRAL_STRING, self::HEATING_AUTO_STRING]);
+	}
 
-    /**
-     * @return string
-     */
-    public function getClass(): string
-    {
-        return $this->class_name;
-    }
+	/**
+	 * @return int
+	 */
+	public function getHeatingType(): int
+	{
+		if ($this->heating === self::HEATING_CENTRAL_STRING) {
+			return self::HEATING_CENTRAL;
+		}
 
-    /**
-     * @return bool
-     */
-    public function isIncludeOPEX(): bool
-    {
-        return $this->price_opex === self::OPEX_INCLUDED;
-    }
+		if ($this->heating === self::HEATING_AUTO_STRING) {
+			return self::HEATING_AUTO;
+		}
 
-    /**
-     * @return bool
-     */
-    public function isIncludePublicService(): bool
-    {
-        return $this->public_services === self::PUBLIC_SERVICE_INCLUDED;
-    }
+		return 0;
+	}
 
-    /**
-     * @return float
-     */
-    public function getMaxRentPrice(): float
-    {
-        return max($this->price_floor_min, $this->price_floor_max) ?? 0;
-    }
+	/**
+	 * @return string
+	 */
+	public function getClass(): string
+	{
+		return $this->class_name;
+	}
 
-    /**
-     * @return float
-     */
-    public function getMaxSalePrice(): float
-    {
-        return max($this->price_sale_min, $this->price_sale_max) ?? 0;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isIncludeOPEX(): bool
+	{
+		return $this->price_opex === self::OPEX_INCLUDED;
+	}
 
-    /**
-     * @return float
-     */
-    public function getMaxPrice(): float
-    {
-        if ($this->isRentType() || $this->isSubleaseType()) {
-            return $this->getMaxRentPrice();
-        }
+	/**
+	 * @return bool
+	 */
+	public function isIncludePublicService(): bool
+	{
+		return $this->public_services === self::PUBLIC_SERVICE_INCLUDED;
+	}
 
-        return $this->getMaxSalePrice();
-    }
+	/**
+	 * @return float
+	 */
+	public function getMaxRentPrice(): float
+	{
+		return max($this->price_floor_min, $this->price_floor_max) ?? 0;
+	}
 
-    /**
-     * @return float
-     */
-    public function getMaxArea(): float
-    {
-        return max($this->area_min, $this->area_max) ?? 0;
-    }
+	/**
+	 * @return float
+	 */
+	public function getMaxSalePrice(): float
+	{
+		return max($this->price_sale_min, $this->price_sale_max) ?? 0;
+	}
 
-    /**
-     * @return float
-     */
-    public function getMaxAreaPerSotka(): float
-    {
-        return $this->getMaxArea() / 100;
-    }
+	/**
+	 * @return float
+	 */
+	public function getMaxPrice(): float
+	{
+		if ($this->isRentType() || $this->isSubleaseType()) {
+			return $this->getMaxRentPrice();
+		}
 
-    /**
-     * @return bool
-     */
-    public function isSolid(): bool
-    {
-        if ($this->isBlock() && $this->block) {
-            return !!$this->block->is_solid;
-        }
+		return $this->getMaxSalePrice();
+	}
 
-        if ($this->isGeneral()) {
-            return true;
-        }
+	/**
+	 * @return float
+	 */
+	public function getMaxArea(): float
+	{
+		return max($this->area_min, $this->area_max) ?? 0;
+	}
 
-        return false;
-    }
+	/**
+	 * @return float
+	 */
+	public function getMaxAreaPerSotka(): float
+	{
+		return $this->getMaxArea() / 100;
+	}
 
-    /**
-     * @return string
-     */
-    public function getAvitoAdStartDate(): string
-    {
-        if ($this->isBlock() && $this->block) {
-            return $this->block->ad_avito_date_start;
-        }
+	/**
+	 * @return bool
+	 */
+	public function isSolid(): bool
+	{
+		if ($this->isBlock() && $this->block) {
+			return !!$this->block->is_solid;
+		}
 
-        return '';
-    }
+		if ($this->isGeneral()) {
+			return true;
+		}
 
-    /**
-     * @return string
-     */
-    public function getUniqueId(): string
-    {
-        return $this->original_id . '-' . $this->getVisualId();
-    }
+		return false;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAvitoAdStartDate(): string
+	{
+		if ($this->isBlock() && $this->block) {
+			return $this->block->ad_avito_date_start;
+		}
+
+		return '';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUniqueId(): string
+	{
+		return $this->original_id . '-' . $this->getVisualId();
+	}
+
+	/**
+	 * @return ChatMemberQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getChatMember(): ChatMemberQuery
+	{
+		return $this->morphHasOne(ChatMember::class, 'original_id');
+//		return $this->hasOne(ChatMember::class, ['model_id' => 'id'])
+//		            ->andOnCondition([DbHelper::getDsnAttribute('dbname', ChatMember::getDb()->dsn) . '.' . ChatMember::tableName() . '.model_type' => self::tableName()]);
+	}
 }

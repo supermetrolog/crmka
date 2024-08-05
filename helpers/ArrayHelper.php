@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
-use yii\helpers\ArrayHelper as BaseArrayHelper;
-
 class ArrayHelper
 {
 	public static function walk(array &$array, callable $callback): void

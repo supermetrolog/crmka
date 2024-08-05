@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use app\components\archiver\ArchiverFactory;
 use app\components\archiver\File;
+use app\kernel\common\controller\AppController;
 use SplFileInfo;
 use Yii;
 use yii\base\ErrorException;

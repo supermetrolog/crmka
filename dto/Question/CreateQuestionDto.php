@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+namespace app\dto\Question;
+
+use yii\base\BaseObject;
+
+class CreateQuestionDto extends BaseObject
+{
+	public string $text;
+}

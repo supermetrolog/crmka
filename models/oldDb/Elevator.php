@@ -2,7 +2,9 @@
 
 namespace app\models\oldDb;
 
+use app\helpers\JsonFieldNormalizer;
 use Yii;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "l_elevators".
@@ -92,4 +94,29 @@ class Elevator extends \yii\db\ActiveRecord
             'last_update' => 'Last Update',
         ];
     }
+
+	public function getElevatorControls(): array
+	{
+		return JsonFieldNormalizer::jsonToArrayIntElements($this->elevator_controls);
+	}
+
+	public function getPhoto(): array
+	{
+		return Json::decode($this->photo) ?? [];
+	}
+
+	public function fields()
+	{
+		$f = parent::fields();
+
+		$f['elevator_controls'] = function () {
+			return $this->getElevatorControls();
+		};
+
+		$f['photo'] = function () {
+			return $this->getPhoto();
+		};
+
+		return $f;
+	}
 }
