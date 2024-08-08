@@ -49,11 +49,12 @@ use yii\db\ActiveQuery;
  */
 class ChatMemberSearchView extends ChatMember
 {
-	public ?int $last_call_rel_id          = null;
-	public ?int $unread_task_count         = null;
-	public ?int $unread_reminder_count     = null;
-	public ?int $unread_notification_count = null;
-	public ?int $unread_message_count      = null;
+	public ?int  $last_call_rel_id          = null;
+	public ?bool $is_linked                 = null;
+	public ?int  $unread_task_count         = null;
+	public ?int  $unread_reminder_count     = null;
+	public ?int  $unread_notification_count = null;
+	public ?int  $unread_message_count      = null;
 
 	/**
 	 * @return RelationQuery|ActiveQuery

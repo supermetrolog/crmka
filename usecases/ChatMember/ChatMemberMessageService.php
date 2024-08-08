@@ -132,7 +132,7 @@ class ChatMemberMessageService
 
 			$this->markMessageAsRead($message, $message->from_chat_member_id);
 
-			$this->markMessageAsLatestForSender($message);
+			$this->markChatAsLatestForMember($message->to_chat_member_id, $message->from_chat_member_id);
 
 			$tx->commit();
 
@@ -241,7 +241,7 @@ class ChatMemberMessageService
 
 			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $task->user_id);
 
-			$this->markMessageAsLatestForReceiver($message);
+			$this->markChatAsLatestForModel($message->to_chat_member_id, User::getMorphClass(), $task->user_id);
 
 			$tx->commit();
 
@@ -301,7 +301,7 @@ class ChatMemberMessageService
 
 			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $reminder->user_id);
 
-			$this->markMessageAsLatestForReceiver($message);
+			$this->markChatAsLatestForModel($message->to_chat_member_id, User::getMorphClass(), $reminder->user_id);
 
 			$tx->commit();
 
@@ -340,7 +340,7 @@ class ChatMemberMessageService
 
 			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $userNotification->user_id);
 
-			$this->markMessageAsLatestForReceiver($message);
+			$this->markChatAsLatestForModel($message->to_chat_member_id, User::getMorphClass(), $userNotification->user_id);
 
 			$tx->commit();
 
@@ -359,6 +359,8 @@ class ChatMemberMessageService
 			foreach ($this->chatMemberMessageRepository->findPreviousUnreadByMessage($message, $from_chat_member_id) as $unreadMessage) {
 				$this->markMessageAsRead($unreadMessage, $from_chat_member_id);
 			}
+
+			$this->markChatAsLatestForMember($message->to_chat_member_id, $from_chat_member_id);
 
 			$tx->commit();
 		} catch (Throwable $th) {
@@ -406,23 +408,25 @@ class ChatMemberMessageService
 	 * @throws SaveModelException
 	 * @throws ModelNotFoundException
 	 */
-	private function markMessageAsLatestForSender(ChatMemberMessage $message): void
+	private function markChatAsLatestForModel(int $chat_id, string $model_type, int $model_id): void
 	{
-		$this->chatMemberLastEventService->updateOrCreate(new CreateChatMemberLastEventDto([
-			'chat_member_id'       => $message->from_chat_member_id,
-			'event_chat_member_id' => $message->to_chat_member_id,
-		]));
+		$chatMember = ChatMember::find()
+		                        ->byModelType($model_type)
+		                        ->byModelId($model_id)
+		                        ->one();
+
+		$this->markChatAsLatestForMember($chat_id, $chatMember->id);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws ModelNotFoundException
 	 */
-	private function markMessageAsLatestForReceiver(ChatMemberMessage $message): void
+	private function markChatAsLatestForMember(int $chat_id, int $member_id): void
 	{
 		$this->chatMemberLastEventService->updateOrCreate(new CreateChatMemberLastEventDto([
-			'chat_member_id'       => $message->to_chat_member_id,
-			'event_chat_member_id' => $message->from_chat_member_id,
+			'chat_member_id'       => $member_id,
+			'event_chat_member_id' => $chat_id,
 		]));
 	}
 }

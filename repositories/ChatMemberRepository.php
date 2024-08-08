@@ -6,6 +6,7 @@ namespace app\repositories;
 
 use app\kernel\common\models\AQ\AQ;
 use app\models\ChatMember;
+use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\models\Notification\UserNotification;
@@ -21,15 +22,13 @@ class ChatMemberRepository
 	{
 		$chat_member_ids = is_array($chat_member_ids) ? $chat_member_ids : [(int)$chat_member_ids];
 
-		$messageSubQuery = ChatMemberMessage::find()
-		                                    ->select([
-			                                    ChatMemberMessage::field('to_chat_member_id')
-		                                    ])
-		                                    ->andWhere([
-			                                    ChatMemberMessage::field('from_chat_member_id') => new Expression(ChatMemberSearchView::field('id')),
-		                                    ])
-		                                    ->notDeleted()
-		                                    ->groupBy(ChatMemberMessage::field('to_chat_member_id'));
+		$lastEventQuery = ChatMemberLastEvent::find()
+		                                     ->select([
+			                                     ChatMemberLastEvent::field('event_chat_member_id')
+		                                     ])
+		                                     ->andWhere([
+												 ChatMemberLastEvent::field('chat_member_id') => new Expression(ChatMemberSearchView::field('id'))
+		                                     ]);
 
 		$chatMemberQuery = ChatMemberSearchView::find()
 		                                       ->select([
@@ -49,7 +48,7 @@ class ChatMemberRepository
 			                                       'notifications.user_id' => new Expression(ChatMemberSearchView::field('model_id'))
 		                                       ])
 		                                       ->leftJoin(['messages' => ChatMemberMessage::find()->notDeleted()], [
-			                                       'messages.to_chat_member_id' => $messageSubQuery,
+			                                       'messages.to_chat_member_id' => $lastEventQuery,
 		                                       ])
 		                                       ->leftJoin(['message_views' => ChatMemberMessageView::getTable()], [
 			                                       'and',
