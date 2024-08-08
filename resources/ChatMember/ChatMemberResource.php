@@ -60,6 +60,15 @@ class ChatMemberResource extends JsonResource
 
 	private function getStatistic(): array
 	{
+		if (!$this->resource->is_linked) {
+			return [
+				'tasks'         => 0,
+				'reminders'     => 0,
+				'notifications' => 0,
+				'messages'      => 0,
+			];
+		}
+
 		return [
 			'tasks'         => $this->resource->unread_task_count,
 			'reminders'     => $this->resource->unread_reminder_count,

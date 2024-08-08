@@ -73,6 +73,7 @@ class ChatMemberSearch extends Form
 		                             ->select([
 			                             ChatMember::getColumn('*'),
 			                             'last_call_rel_id'          => 'last_call_rel.id',
+			                             'is_linked'                 => '(cmle.id is not null)',
 			                             'unread_task_count'         => 'COUNT(DISTINCT t.id)',
 			                             'unread_reminder_count'     => 'COUNT(DISTINCT r.id)',
 			                             'unread_notification_count' => 'COUNT(DISTINCT un.id)',
