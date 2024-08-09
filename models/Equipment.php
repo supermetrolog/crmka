@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
+use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\EquipmentQuery;
 use app\models\ActiveQuery\MediaQuery;
@@ -314,6 +315,15 @@ class Equipment extends AR
 	{
 		return $this->morphHasOneVia(Call::class, 'id', 'second')
 		            ->via('lastCallRelationFirst');
+	}
+
+	/**
+	 * @return ChatMemberQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getChatMember(): ChatMemberQuery
+	{
+		return $this->morphHasOne(ChatMember::class);
 	}
 
 	public static function find(): EquipmentQuery

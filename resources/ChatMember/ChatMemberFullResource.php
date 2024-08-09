@@ -6,9 +6,11 @@ namespace app\resources\ChatMember;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
+use app\models\Equipment;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
+use app\resources\EquipmentResource;
 use app\resources\Object\ObjectChatMemberResource;
 use app\resources\Request\RequestResource;
 use app\resources\User\UserResource;
@@ -46,6 +48,10 @@ class ChatMemberFullResource extends JsonResource
 
 		if ($model instanceof ObjectChatMember) {
 			return new ObjectChatMemberResource($model);
+		}
+
+		if ($model instanceof Equipment) {
+			return new EquipmentResource($model);
 		}
 
 		if ($model instanceof User) {

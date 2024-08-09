@@ -6,6 +6,7 @@ namespace app\resources\ChatMember;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
+use app\models\Equipment;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
@@ -13,6 +14,7 @@ use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
 use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\EquipmentResource;
 use UnexpectedValueException;
 use yii\data\ActiveDataProvider;
 
@@ -49,6 +51,10 @@ class ChatMemberResource extends JsonResource
 
 		if ($model instanceof ObjectChatMember) {
 			return new ObjectChatMemberShortResource($model);
+		}
+
+		if ($model instanceof Equipment) {
+			return new EquipmentResource($model);
 		}
 
 		if ($model instanceof User) {

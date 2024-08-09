@@ -31,6 +31,7 @@ use yii\db\ActiveQuery;
  * @property Request               $request
  * @property CommercialOffer       $commercialOffer
  * @property ObjectChatMember      $objectChatMember
+ * @property Equipment             $equipment
  * @property Objects               $object
  * @property ChatMemberMessage     $pinnedChatMemberMessage
  * @property Relation[]            $relationFirst
@@ -141,9 +142,20 @@ class ChatMember extends AR
 		return $this->morphBelongTo(User::class);
 	}
 
+	/**
+	 * @return ActiveQuery
+	 */
+	public function getEquipment(): ActiveQuery
+	{
+		return $this->morphBelongTo(Equipment::class);
+	}
+
 	public function getModel(): AR
 	{
-		return $this->request ?? $this->objectChatMember ?? $this->user;
+		return $this->request ??
+		       $this->objectChatMember ??
+		       $this->equipment ??
+		       $this->user;
 	}
 
 	/**
