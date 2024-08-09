@@ -4,6 +4,7 @@ namespace app\models\search;
 
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\Contact;
 use app\models\Equipment;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -66,6 +67,7 @@ class EquipmentSearch extends Form
 			                  'last_call_rel_id' => 'last_call_rel.id'
 		                  ])
 		                  ->leftJoinLastCallRelation()
+		                  ->joinWith('contact')
 		                  ->with(['lastCall.user.userProfile'])
 		                  ->with([
 			                  'company',
@@ -77,9 +79,9 @@ class EquipmentSearch extends Form
 		                  ]);
 
 		$dataProvider = new ActiveDataProvider([
-			'query'        => $query,
-			'sort' => [
-				'attributes'   => [
+			'query' => $query,
+			'sort'  => [
+				'attributes' => [
 					'created_at',
 					'updated_at',
 					'archived_at',
@@ -130,7 +132,17 @@ class EquipmentSearch extends Form
 
 		$query->orFilterWhere(['like', 'name', $this->search])
 		      ->orFilterWhere(['like', 'address', $this->search])
-		      ->orFilterWhere(['like', 'description', $this->search]);
+		      ->orFilterWhere(['like', 'description', $this->search])
+		      ->orFilterWhere([
+				  'like',
+				  sprintf(
+					  'concat(coalesce(%s, ""), " ", coalesce(%s, ""), " ", coalesce(%s, ""))',
+					  Contact::field('first_name'),
+					  Contact::field('middle_name'),
+					  Contact::field('last_name'),
+				  ),
+				  $this->search
+		      ]);
 
 		return $dataProvider;
 	}
