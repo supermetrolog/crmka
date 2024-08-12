@@ -67,14 +67,13 @@ class ChatMemberSearch extends Form
 		                                 ->groupBy(['to_chat_member_id']);
 
 		$eventQuery = ChatMemberLastEvent::find()
-		                                 ->select(['event_chat_member_id', 'chat_member_last_event_id' => 'MAX(id)'])
-		                                 ->where(['chat_member_id' => $this->current_chat_member_id])
-		                                 ->groupBy(['event_chat_member_id']);
+		                                 ->where(['chat_member_id' => $this->current_chat_member_id]);
 
 		$query = ChatMemberSearchView::find()
 		                             ->select([
 			                             ChatMember::getColumn('*'),
 			                             'last_call_rel_id'          => 'last_call_rel.id',
+			                             'is_linked'                 => '(cmle.id is not null)',
 			                             'unread_task_count'         => 'COUNT(DISTINCT t.id)',
 			                             'unread_reminder_count'     => 'COUNT(DISTINCT r.id)',
 			                             'unread_notification_count' => 'COUNT(DISTINCT un.id)',
@@ -112,8 +111,8 @@ class ChatMemberSearch extends Form
 		                             ->with(['user.userProfile'])
 		                             ->groupBy(ChatMember::field('id'))
 		                             ->orderBy([
-			                             'cmle.chat_member_last_event_id' => SORT_DESC,
-			                             'cmm.chat_member_message_id'     => SORT_DESC,
+			                             'cmle.updated_at'            => SORT_DESC,
+			                             'cmm.chat_member_message_id' => SORT_DESC,
 		                             ]);
 
 		$dataProvider = new ActiveDataProvider([
