@@ -169,15 +169,23 @@ class Company extends AR
 		$fields['progress_percent']  = function () {
 			return rand(10, 100);
 		};
+
 		$fields['request_count']     = function () {
-			return rand(10, 100);
+			return (int)$this->getRequests()->count();
 		};
+
 		$fields['offer_count']       = function () {
-			return rand(10, 100);
+			return (int)$this->getOffers()->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => 2])->count();
 		};
+
 		$fields['object_count']      = function () {
-			return rand(10, 100);
+			return (int)$this->getObjects()->count();
 		};
+
+        $fields['deal_count']       = function () {
+            return (int)$this->getDeals()->count();
+        };
+
 		$fields['created_at_format'] = function ($fields) {
 			return Yii::$app->formatter->format($fields['created_at'], 'datetime');
 		};
