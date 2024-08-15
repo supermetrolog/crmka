@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1038b1b1bb888e7b4ed4bab77482f3ed",
+    "content-hash": "c3bcb5bc5f3b46c098955b3cee5b2fe7",
     "packages": [
         {
             "name": "airani/yii2-telegram-log",
@@ -2346,16 +2346,16 @@
         },
         {
             "name": "supermetrolog/synchronizer",
-            "version": "v2.0.2",
+            "version": "v2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/supermetrolog/synchronizer.git",
-                "reference": "6579a2b4a9f0de466329ad65887d5207090ecf1b"
+                "reference": "7b9e6ecec310698d1c15b42b6994c18b1b04afe9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/supermetrolog/synchronizer/zipball/6579a2b4a9f0de466329ad65887d5207090ecf1b",
-                "reference": "6579a2b4a9f0de466329ad65887d5207090ecf1b",
+                "url": "https://api.github.com/repos/supermetrolog/synchronizer/zipball/7b9e6ecec310698d1c15b42b6994c18b1b04afe9",
+                "reference": "7b9e6ecec310698d1c15b42b6994c18b1b04afe9",
                 "shasum": ""
             },
             "require": {
@@ -2394,9 +2394,9 @@
             ],
             "support": {
                 "issues": "https://github.com/supermetrolog/synchronizer/issues",
-                "source": "https://github.com/supermetrolog/synchronizer/tree/v2.0.2"
+                "source": "https://github.com/supermetrolog/synchronizer/tree/v2.0.3"
             },
-            "time": "2023-01-20T23:33:23+00:00"
+            "time": "2024-06-16T18:40:16+00:00"
         },
         {
             "name": "supermetrolog/synchronizer-already-sync-repo",
@@ -8306,7 +8306,8 @@
     "platform": {
         "php": ">=7.4.0",
         "ext-dom": "*",
-        "ext-intl": "*"
+        "ext-intl": "*",
+        "ext-zip": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"
