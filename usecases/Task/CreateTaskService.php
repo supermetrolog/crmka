@@ -9,6 +9,7 @@ use app\dto\Task\CreateTaskForUsersDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
+use app\models\TaskTag;
 use Throwable;
 
 class CreateTaskService
@@ -24,22 +25,39 @@ class CreateTaskService
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function create(CreateTaskDto $dto): Task
 	{
-		$task = new Task([
-			'user_id'         => $dto->user->id,
-			'message'         => $dto->message,
-			'status'          => $dto->status,
-			'start'           => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
-			'end'             => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
-			'created_by_type' => $dto->created_by_type,
-			'created_by_id'   => $dto->created_by_id,
-		]);
+		$tx = $this->transactionBeginner->begin();
 
-		$task->saveOrThrow();
+		try {
+			$task = new Task([
+				'user_id'         => $dto->user->id,
+				'message'         => $dto->message,
+				'status'          => $dto->status,
+				'start'           => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
+				'end'             => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
+				'created_by_type' => $dto->created_by_type,
+				'created_by_id'   => $dto->created_by_id,
+			]);
 
-		return $task;
+			$task->saveOrThrow();
+
+			$tags = TaskTag::find()->select('id')->where(['id' => $dto->tagIds])->all();
+			foreach ($tags as $tag) {
+				$task->link('tags', $tag);
+			}
+
+			$task->refresh();
+
+			$tx->commit();
+
+			return $task;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 	/**

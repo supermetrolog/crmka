@@ -354,4 +354,17 @@ return
 				'POST,OPTIONS <id>/called' => 'called',
 			],
 		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'task-tag',
+			'except'        => [],
+			'extraPatterns' => [
+				'GET,OPTIONS'              => 'index',
+				'GET,OPTIONS <id>'         => 'view',
+				'POST,OPTIONS'             => 'create',
+				'PUT,OPTIONS <id>'         => 'update',
+				'DELETE,OPTIONS <id>'      => 'delete',
+				'POST,OPTIONS <id>/called' => 'called',
+			],
+		],
 	];

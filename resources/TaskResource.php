@@ -36,6 +36,7 @@ class TaskResource extends JsonResource
 			'deleted_at'      => $this->resource->deleted_at,
 			'user'            => UserShortResource::make($this->resource->user)->toArray(),
 			'created_by'      => $this->getCreatedBy()->toArray(),
+			'tags'            => TaskTagResource::collection($this->resource->tags)
 		];
 	}
 
