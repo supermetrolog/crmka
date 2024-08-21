@@ -4,7 +4,6 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\TaskQuery;
-use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 
 /**
@@ -88,13 +87,19 @@ class Task extends AR
 	}
 
 	/**
+	 * @return ActiveQuery
+	 */
+	public function getTaskTags(): ActiveQuery
+	{
+		return $this->hasMany(TaskTaskTag::class, ['task_id' => 'id']);
+	}
+
+	/**
 	 * @return ActiveQuery|TaskQuery
-	 * @throws InvalidConfigException
 	 */
 	public function getTags(): ActiveQuery
 	{
-		return $this->hasMany(TaskTag::class, ['id' => 'task_tag_id'])
-		            ->viaTable('task_task_tag', ['task_id' => 'id']);
+		return $this->hasMany(TaskTag::class, ['id' => 'task_tag_id'])->via('taskTags');
 	}
 
 	/**

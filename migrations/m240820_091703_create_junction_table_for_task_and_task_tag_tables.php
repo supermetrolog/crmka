@@ -19,9 +19,9 @@ class m240820_091703_create_junction_table_for_task_and_task_tag_tables extends 
 		$tableName = '{{%task_task_tag}}';
 
 		$this->table($tableName, [
+			'id'          => $this->primaryKey(),
 			'task_id'     => $this->integer(),
 			'task_tag_id' => $this->integer(),
-			'PRIMARY KEY(task_id, task_tag_id)',
 		], $this->timestamps(), $this->softDelete());
 
 		$this->index(
@@ -58,8 +58,6 @@ class m240820_091703_create_junction_table_for_task_and_task_tag_tables extends 
 
 		$this->foreignKeyDrop($tableName, ['task_id']);
 		$this->foreignKeyDrop($tableName, ['task_tag_id']);
-		$this->indexDrop($tableName, ['task_id']);
-		$this->indexDrop($tableName, ['task_tag_id']);
 		$this->dropTable($tableName);
 	}
 }

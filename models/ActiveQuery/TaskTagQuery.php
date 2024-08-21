@@ -36,12 +36,4 @@ class TaskTagQuery extends AQ
 	{
 		return parent::oneOrThrow($db);
 	}
-
-	/**
-	 * @return self
-	 */
-	public function notDeleted(): self
-	{
-		return $this->andWhereNull($this->field('deleted_at'));
-	}
 }
