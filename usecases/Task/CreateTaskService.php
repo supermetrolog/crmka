@@ -9,7 +9,6 @@ use app\dto\Task\CreateTaskForUsersDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
-use app\models\TaskTag;
 use Throwable;
 
 class CreateTaskService
@@ -43,14 +42,7 @@ class CreateTaskService
 			]);
 
 			$task->saveOrThrow();
-
-			$tags = TaskTag::find()->select('id')->where(['id' => $dto->tagIds])->all();
-			foreach ($tags as $tag) {
-				$task->link('tags', $tag);
-			}
-
-			$task->refresh();
-
+			$task->linkManyToManyRelations('tags', $dto->tagIds);
 			$tx->commit();
 
 			return $task;
@@ -72,7 +64,7 @@ class CreateTaskService
 			$tasks = [];
 
 			foreach ($dto->users as $user) {
-				$tasks[] = $this->create(new CreateTaskDto([
+				$task = $this->create(new CreateTaskDto([
 					'user'            => $user,
 					'message'         => $dto->message,
 					'status'          => $dto->status,
@@ -81,6 +73,9 @@ class CreateTaskService
 					'created_by_type' => $dto->created_by_type,
 					'created_by_id'   => $dto->created_by_id,
 				]));
+
+				$task->linkManyToManyRelations('tags', $dto->tagIds);
+				$tasks[] = $task;
 			}
 
 			$tx->commit();

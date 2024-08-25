@@ -3,7 +3,9 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\TaskTaskTagQuery;
 use yii\db\ActiveQuery;
 
 /**
@@ -28,6 +30,8 @@ use yii\db\ActiveQuery;
  */
 class Task extends AR
 {
+	use ManyToManyTrait;
+
 	public const STATUS_CREATED    = 1;
 	public const STATUS_ACCEPTED   = 2;
 	public const STATUS_DONE       = 3;
@@ -87,9 +91,9 @@ class Task extends AR
 	}
 
 	/**
-	 * @return ActiveQuery
+	 * @return TaskTaskTagQuery|ActiveQuery
 	 */
-	public function getTaskTags(): ActiveQuery
+	public function getTaskTags(): TaskTaskTagQuery
 	{
 		return $this->hasMany(TaskTaskTag::class, ['task_id' => 'id']);
 	}

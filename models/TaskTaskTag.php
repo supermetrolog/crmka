@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\TaskTaskTagQuery;
 use yii\db\ActiveQuery;
 
 /**
@@ -19,6 +20,8 @@ use yii\db\ActiveQuery;
  */
 class TaskTaskTag extends AR
 {
+	protected bool $useSoftDelete = true;
+	protected bool $useSoftUpdate = true;
 
 	public static function tableName(): string
 	{
@@ -62,5 +65,10 @@ class TaskTaskTag extends AR
 	public function getTaskTag(): ActiveQuery
 	{
 		return $this->hasOne(TaskTag::className(), ['id' => 'task_tag_id']);
+	}
+
+	public static function find(): TaskTaskTagQuery
+	{
+		return new TaskTaskTagQuery(get_called_class());
 	}
 }

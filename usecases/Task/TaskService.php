@@ -16,6 +16,7 @@ class TaskService
 
 	/**
 	 * @throws SaveModelException
+	 * @throws \Exception
 	 */
 	public function update(Task $task, UpdateTaskDto $dto): Task
 	{
@@ -28,6 +29,7 @@ class TaskService
 		]);
 
 		$task->saveOrThrow();
+		$task->updateManyToManyRelations('tags', $dto->tagIds);
 
 		return $task;
 	}
