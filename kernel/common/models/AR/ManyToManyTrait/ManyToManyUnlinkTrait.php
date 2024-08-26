@@ -15,7 +15,13 @@ use yii\db\Expression;
 trait ManyToManyUnlinkTrait
 {
 	/**
-	 * @throws Exception
+	 * @param string         $column    - Условное название поля со связью
+	 * @param (int|string)[] $relations - Связи в виде ID
+	 *
+	 * Отвяжет существующие $relations, если они привязаны к модели
+	 *
+	 * @return void
+	 * @throws \yii\db\Exception
 	 */
 	public function unlinkManyToManyRelations(string $column, array $relations)
 	{

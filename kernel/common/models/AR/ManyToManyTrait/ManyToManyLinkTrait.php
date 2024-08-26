@@ -14,6 +14,12 @@ use Exception;
 trait ManyToManyLinkTrait
 {
 	/**
+	 * @param string         $column    - Условное название поля со связью
+	 * @param (int|string)[] $relations - Новые связи в виде ID
+	 *
+	 * Привяжет новые $relations, если таковых не существует уже в текущих связях
+	 *
+	 * @return void
 	 * @throws \yii\db\Exception
 	 */
 	public function linkManyToManyRelations(string $column, array $relations)
@@ -63,7 +69,7 @@ trait ManyToManyLinkTrait
 				$connection->createCommand()
 				           ->batchInsert($viaTableName, [$junctionColumnName, $relatedColumnName], $junctionRows)
 				           ->execute();
-				
+
 				$this->refresh();
 			}
 

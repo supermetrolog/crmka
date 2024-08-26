@@ -15,6 +15,13 @@ use yii\db\Expression;
 trait ManyToManyUpdateTrait
 {
 	/**
+	 * @param string         $column    - Условное название поля со связью
+	 * @param (int|string)[] $relations - Связи для обновления в виде ID
+	 *
+	 * Обновит текущие связи у модели. Если ключ из $relations отсутствует в активных связах, то добавит его.
+	 * Отвяжет все текущие связи, не входящие в $relations
+	 *
+	 * @return void
 	 * @throws \yii\db\Exception
 	 */
 	public function updateManyToManyRelations(string $column, array $relations)

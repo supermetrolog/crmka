@@ -21,15 +21,15 @@ class TaskForm extends Form
 	public const SCENARIO_CREATE           = 'scenario_create';
 	public const SCENARIO_UPDATE           = 'scenario_update';
 
-	public array $user_ids = [];
-	public       $user_id;
-	public       $created_by_type;
-	public       $created_by_id;
-	public       $message;
-	public       $status;
-	public       $start;
-	public       $end;
-	public array $tag_ids  = [];
+	public $user_ids = [];
+	public $user_id;
+	public $created_by_type;
+	public $created_by_id;
+	public $message;
+	public $status;
+	public $start;
+	public $end;
+	public $tag_ids  = [];
 
 	public function rules(): array
 	{
