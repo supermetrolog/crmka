@@ -3,30 +3,35 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\TaskTaskTagQuery;
 use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "task".
  *
- * @property int                     $id
- * @property int                     $user_id
- * @property string                  $message
- * @property int                     $status
- * @property string|null             $start
- * @property string|null             $end
- * @property string                  $created_by_type
- * @property int                     $created_by_id
- * @property string                  $created_at
- * @property string                  $updated_at
- * @property string                  $deleted_at
+ * @property int         $id
+ * @property int         $user_id
+ * @property string      $message
+ * @property int         $status
+ * @property string|null $start
+ * @property string|null $end
+ * @property string      $created_by_type
+ * @property int         $created_by_id
+ * @property string      $created_at
+ * @property string      $updated_at
+ * @property string      $deleted_at
  *
- * @property User                    $user
- * @property User                    $createdByUser
- * @property User                    $createdBy
+ * @property User        $user
+ * @property User        $createdByUser
+ * @property TaskTag[]   $tags
+ * @property User        $createdBy
  */
 class Task extends AR
 {
+	use ManyToManyTrait;
+
 	public const STATUS_CREATED    = 1;
 	public const STATUS_ACCEPTED   = 2;
 	public const STATUS_DONE       = 3;
@@ -66,7 +71,7 @@ class Task extends AR
 			'created_by_type' => 'Created By Type',
 			'created_by_id'   => 'Created By ID',
 			'created_at'      => 'Created At',
-			'updated_at'      => 'Updated At',
+			'updated_at'      => 'Updated At'
 		];
 	}
 
@@ -83,6 +88,22 @@ class Task extends AR
 	public function getUser(): ActiveQuery
 	{
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
+	}
+
+	/**
+	 * @return TaskTaskTagQuery|ActiveQuery
+	 */
+	public function getTaskTags(): TaskTaskTagQuery
+	{
+		return $this->hasMany(TaskTaskTag::class, ['task_id' => 'id']);
+	}
+
+	/**
+	 * @return ActiveQuery|TaskQuery
+	 */
+	public function getTags(): ActiveQuery
+	{
+		return $this->hasMany(TaskTag::class, ['id' => 'task_tag_id'])->via('taskTags');
 	}
 
 	/**

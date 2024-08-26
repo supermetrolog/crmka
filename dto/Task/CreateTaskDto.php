@@ -17,4 +17,5 @@ class CreateTaskDto extends BaseObject
 	public ?DateTimeInterface $end   = null;
 	public string             $created_by_type;
 	public int                $created_by_id;
+	public array              $tagIds;
 }

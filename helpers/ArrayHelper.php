@@ -21,4 +21,43 @@ class ArrayHelper
 		return array_merge(...$array);
 	}
 
+	public static function diff(array ...$array): array
+	{
+		return array_diff(...$array);
+	}
+
+	public static function values(array $array): array
+	{
+		return array_values($array);
+	}
+
+	public static function keys(array $array): array
+	{
+		return array_keys($array);
+	}
+
+	public static function filteredKeys(array $array, $filters): array
+	{
+		return array_keys($array, $filters);
+	}
+
+	public static function empty(array $array): bool
+	{
+		return empty($array);
+	}
+
+	public static function notEmpty(array $array): bool
+	{
+		return !self::empty($array);
+	}
+
+	public static function isArray($array): bool
+	{
+		return is_array($array);
+	}
+
+	public static function intersect(array ...$array): array
+	{
+		return array_intersect(...$array);
+	}
 }

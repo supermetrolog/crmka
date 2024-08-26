@@ -24,22 +24,32 @@ class CreateTaskService
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function create(CreateTaskDto $dto): Task
 	{
-		$task = new Task([
-			'user_id'         => $dto->user->id,
-			'message'         => $dto->message,
-			'status'          => $dto->status,
-			'start'           => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
-			'end'             => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
-			'created_by_type' => $dto->created_by_type,
-			'created_by_id'   => $dto->created_by_id,
-		]);
+		$tx = $this->transactionBeginner->begin();
 
-		$task->saveOrThrow();
+		try {
+			$task = new Task([
+				'user_id'         => $dto->user->id,
+				'message'         => $dto->message,
+				'status'          => $dto->status,
+				'start'           => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
+				'end'             => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
+				'created_by_type' => $dto->created_by_type,
+				'created_by_id'   => $dto->created_by_id,
+			]);
 
-		return $task;
+			$task->saveOrThrow();
+			$task->linkManyToManyRelations('tags', $dto->tagIds);
+			$tx->commit();
+
+			return $task;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 	/**
@@ -54,7 +64,7 @@ class CreateTaskService
 			$tasks = [];
 
 			foreach ($dto->users as $user) {
-				$tasks[] = $this->create(new CreateTaskDto([
+				$task = $this->create(new CreateTaskDto([
 					'user'            => $user,
 					'message'         => $dto->message,
 					'status'          => $dto->status,
@@ -63,6 +73,9 @@ class CreateTaskService
 					'created_by_type' => $dto->created_by_type,
 					'created_by_id'   => $dto->created_by_id,
 				]));
+
+				$task->linkManyToManyRelations('tags', $dto->tagIds);
+				$tasks[] = $task;
 			}
 
 			$tx->commit();
