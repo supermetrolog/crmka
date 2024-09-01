@@ -95,6 +95,32 @@ class TaskController extends AppController
 	}
 
 	/**
+	 * @throws ErrorException
+	 */
+	public function actionCounts()
+	{
+		$user_id       = $this->request->get('user_id');
+		$created_by_id = $this->request->get('created_by_id');
+		$observer_id   = $this->request->get('observer_id');
+
+		if (empty($observer_id)) {
+			return $this->repository->getCountsByUserIdOrCreatedById($user_id, $created_by_id);
+		} else {
+			return $this->repository->getCountsByObserverIdAndByUserIdOrCreatedById($user_id, $created_by_id, $observer_id);
+		}
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function actionRelations()
+	{
+		$user_id = $this->request->get('user_id');
+
+		return $this->repository->getRelationsStatisticByUserId($user_id);
+	}
+
+	/**
 	 * @return TaskResource
 	 * @throws SaveModelException
 	 * @throws ValidateException

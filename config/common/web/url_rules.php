@@ -180,6 +180,8 @@ return
 			'extraPatterns' => [
 				'GET,OPTIONS'                     => 'index',
 				'GET,OPTIONS statistic'           => 'statistic',
+				'GET,OPTIONS counts'              => 'counts',
+				'GET,OPTIONS relations'           => 'relations',
 				'GET,OPTIONS <id>'                => 'view',
 				'POST,OPTIONS'                    => 'create',
 				'POST,OPTIONS for-users'          => 'create-for-users',
