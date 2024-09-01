@@ -186,6 +186,8 @@ return
 				'PUT,OPTIONS <id>'                => 'update',
 				'DELETE,OPTIONS <id>'             => 'delete',
 				'POST,OPTIONS change-status/<id>' => 'change-status',
+				'GET,OPTIONS <id>/comments'       => 'comments',
+				'POST,OPTIONS <id>/comments'      => 'create-comment',
 			],
 		],
 		[
@@ -359,12 +361,23 @@ return
 			'controller'    => 'task-tag',
 			'except'        => [],
 			'extraPatterns' => [
-				'GET,OPTIONS'              => 'index',
-				'GET,OPTIONS <id>'         => 'view',
-				'POST,OPTIONS'             => 'create',
-				'PUT,OPTIONS <id>'         => 'update',
-				'DELETE,OPTIONS <id>'      => 'delete',
-				'POST,OPTIONS <id>/called' => 'called',
+				'GET,OPTIONS'         => 'index',
+				'GET,OPTIONS all'     => 'all',
+				'GET,OPTIONS <id>'    => 'view',
+				'POST,OPTIONS'        => 'create',
+				'PUT,OPTIONS <id>'    => 'update',
+				'DELETE,OPTIONS <id>' => 'delete',
+			],
+		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'task-comment',
+			'except'        => [],
+			'extraPatterns' => [
+				'GET,OPTIONS'         => 'index',
+				'GET,OPTIONS <id>'    => 'view',
+				'PUT,OPTIONS <id>'    => 'update',
+				'DELETE,OPTIONS <id>' => 'delete',
 			],
 		],
 	];

@@ -51,19 +51,25 @@ class TaskService
 	}
 
 	/**
+	 * Установить статус задачи "Отложена"
+	 *
+	 * @param Task $task
+	 *
+	 * @return void
 	 * @throws SaveModelException
 	 */
-	public function impossible(Task $task): void
+	public function impossible(Task $task, ?DateTimeInterface $impossibleToDate): void
 	{
+		$task->impossible_to = $impossibleToDate ? $impossibleToDate->format('Y-m-d H:i:s') : null;
 		$this->setStatus($task, Task::STATUS_IMPOSSIBLE);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 */
-	public function changeStatus(Task $task, int $status): void
+	public function changeStatus(Task $task, ChangeTaskStatusDto $dto): void
 	{
-		switch ($status) {
+		switch ($dto->status) {
 			case Task::STATUS_DONE:
 				$this->done($task);
 				break;
@@ -71,7 +77,7 @@ class TaskService
 				$this->accept($task);
 				break;
 			case Task::STATUS_IMPOSSIBLE:
-				$this->impossible($task);
+				$this->impossible($task, $dto->impossible_to);
 				break;
 			default:
 				throw new UnexpectedValueException('Unexpected status');

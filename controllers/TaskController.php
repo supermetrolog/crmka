@@ -2,22 +2,29 @@
 
 namespace app\controllers;
 
+use app\dto\Task\CreateTaskCommentDto;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Task\TaskChangeStatusForm;
+use app\models\forms\Task\TaskCommentForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\TaskSearch;
 use app\models\Task;
+use app\repositories\TaskCommentRepository;
+use app\repositories\TaskObserverRepository;
 use app\repositories\TaskRepository;
-use app\resources\TaskResource;
+use app\resources\Task\TaskCommentResource;
+use app\resources\Task\TaskResource;
+use app\resources\Task\TaskWithRelationResource;
+use app\usecases\Task\CreateTaskCommentService;
 use app\usecases\Task\CreateTaskService;
 use app\usecases\Task\TaskService;
+use app\usecases\TaskObserver\TaskObserverService;
 use Exception;
 use Throwable;
-use Yii;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
@@ -25,9 +32,11 @@ use yii\web\NotFoundHttpException;
 
 class TaskController extends AppController
 {
-	private TaskService       $service;
-	private CreateTaskService $createTaskService;
-	private TaskRepository    $repository;
+	private TaskService              $service;
+	private CreateTaskService        $createTaskService;
+	private TaskRepository           $repository;
+	private CreateTaskCommentService $createTaskCommentService;
+	private TaskCommentRepository    $taskCommentRepository;
 
 
 	public function __construct(
@@ -35,19 +44,24 @@ class TaskController extends AppController
 		$module,
 		TaskService $service,
 		CreateTaskService $createTaskService,
+		CreateTaskCommentService $createTaskCommentService,
+		TaskCommentRepository $taskCommentRepository,
 		TaskRepository $repository,
 		array $config = []
 	)
 	{
-		$this->service           = $service;
-		$this->createTaskService = $createTaskService;
-		$this->repository        = $repository;
+		$this->service                  = $service;
+		$this->createTaskService        = $createTaskService;
+		$this->createTaskCommentService = $createTaskCommentService;
+		$this->repository               = $repository;
+		$this->taskCommentRepository    = $taskCommentRepository;
 
 		parent::__construct($id, $module, $config);
 	}
 
 	/**
 	 * @throws ValidateException
+	 * @throws ErrorException
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
@@ -77,7 +91,7 @@ class TaskController extends AppController
 	 * @return TaskResource
 	 * @throws SaveModelException
 	 * @throws ValidateException
-	 * @throws Exception
+	 * @throws Exception|Throwable
 	 */
 	public function actionCreate(): TaskResource
 	{
@@ -129,6 +143,7 @@ class TaskController extends AppController
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws Exception
 	 */
 	public function actionUpdate(int $id): TaskResource
 	{
@@ -139,6 +154,7 @@ class TaskController extends AppController
 		$form->setScenario(TaskForm::SCENARIO_UPDATE);
 
 		$form->load($this->request->post());
+		$form->created_by_id = $this->user->id;
 		$form->validateOrThrow();
 
 		$model = $this->service->update($model, $form->getDto());
@@ -149,12 +165,14 @@ class TaskController extends AppController
 	/**
 	 * @param int $id
 	 *
-	 * @return SuccessResponse
+	 * @return array
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws Exception
+	 * @throws Throwable
 	 */
-	public function actionChangeStatus(int $id): SuccessResponse
+	public function actionChangeStatus(int $id): array
 	{
 		$task = $this->findModelByIdAndCreatedByOrUserId($id);
 
@@ -163,9 +181,19 @@ class TaskController extends AppController
 
 		$form->validateOrThrow();
 
-		$this->service->changeStatus($task, $form->status);
+		$this->service->changeStatus($task, $form->getDto());
 
-		return new SuccessResponse();
+		if ($form->comment) {
+			$this->createTaskCommentService->create(new CreateTaskCommentDto([
+				'message'       => $form->comment,
+				'created_by_id' => $this->user->id,
+				'task_id'       => $id
+			]));
+		}
+
+		$task->refresh();
+
+		return TaskWithRelationResource::tryMake($task)->toArray();
 	}
 
 	/**
@@ -179,6 +207,35 @@ class TaskController extends AppController
 
 		return new SuccessResponse();
 	}
+
+	public function actionComments(int $id): array
+	{
+		$models = $this->taskCommentRepository->findModelsByTaskId($id);
+
+		return TaskCommentResource::collection($models);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function actionCreateComment(int $id): TaskCommentResource
+	{
+		$form = new TaskCommentForm();
+
+		$form->setScenario(TaskCommentForm::SCENARIO_UPDATE);
+
+		$form->load($this->request->post());
+		$form->task_id       = $id;
+		$form->created_by_id = $this->user->id;
+
+		$form->validateOrThrow();
+
+		$model = $this->createTaskCommentService->create($form->getDto());
+
+		return new TaskCommentResource($model);
+	}
+
 
 	/**
 	 * @param int $id

@@ -11,17 +11,18 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "task".
  *
- * @property int         $id
- * @property int         $user_id
- * @property string      $message
- * @property int         $status
- * @property string|null $start
- * @property string|null $end
- * @property string      $created_by_type
- * @property int         $created_by_id
- * @property string      $created_at
- * @property string      $updated_at
- * @property string      $deleted_at
+ * @property int               $id
+ * @property int               $user_id
+ * @property string            $message
+ * @property int               $status
+ * @property string|null       $start
+ * @property string|null       $end
+ * @property string            $created_by_type
+ * @property int               $created_by_id
+ * @property string            $created_at
+ * @property string            $updated_at
+ * @property string            $deleted_at
+ * @property string|null       $impossible_to
  *
  * @property User        $user
  * @property User        $createdByUser
@@ -52,7 +53,7 @@ class Task extends AR
 			[['user_id', 'message', 'status', 'created_by_type', 'created_by_id'], 'required'],
 			[['user_id', 'status', 'created_by_id'], 'integer'],
 			[['message'], 'string'],
-			[['start', 'end', 'created_at', 'updated_at'], 'safe'],
+			[['start', 'end', 'created_at', 'updated_at', 'impossible_to'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
 			['status', 'in', 'range' => self::getStatuses()],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -71,7 +72,8 @@ class Task extends AR
 			'created_by_type' => 'Created By Type',
 			'created_by_id'   => 'Created By ID',
 			'created_at'      => 'Created At',
-			'updated_at'      => 'Updated At'
+			'updated_at'      => 'Updated At',
+			'impossible_to'   => 'Impossible To'
 		];
 	}
 

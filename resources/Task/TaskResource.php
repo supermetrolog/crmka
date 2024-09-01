@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\resources;
+namespace app\resources\Task;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Task;
@@ -34,6 +34,7 @@ class TaskResource extends JsonResource
 			'created_at'      => $this->resource->created_at,
 			'updated_at'      => $this->resource->updated_at,
 			'deleted_at'      => $this->resource->deleted_at,
+			'impossible_to'   => $this->resource->impossible_to,
 			'user'            => UserShortResource::make($this->resource->user)->toArray(),
 			'created_by'      => $this->getCreatedBy()->toArray(),
 			'tags'            => TaskTagResource::collection($this->resource->tags)
