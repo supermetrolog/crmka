@@ -36,8 +36,10 @@ class TaskResource extends JsonResource
 			'deleted_at'      => $this->resource->deleted_at,
 			'impossible_to'   => $this->resource->impossible_to,
 			'user'            => UserShortResource::make($this->resource->user)->toArray(),
+			'is_viewed'       => $this->resource->isViewed,
 			'created_by'      => $this->getCreatedBy()->toArray(),
-			'tags'            => TaskTagResource::collection($this->resource->tags)
+			'tags'            => TaskTagResource::collection($this->resource->tags),
+			'observers'       => TaskObserverResource::collection($this->resource->observers),
 		];
 	}
 

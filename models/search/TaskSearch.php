@@ -33,7 +33,7 @@ class TaskSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = Task::find()->with(['user.userProfile', 'createdByUser.userProfile', 'tags']);
+		$query = Task::find()->with(['user.userProfile', 'createdByUser.userProfile', 'tags', 'observers.user.userProfile'])->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -74,7 +74,9 @@ class TaskSearch extends Form
 			'created_by_id' => $this->created_by_id,
 		]);
 
-		$query->andFilterWhere(['like', 'message', $this->message]);
+		$query->andFilterWhere(['or',
+		                        ['like', Task::getColumn('message'), $this->message],
+		                        ['like', Task::getColumn('id'), $this->message]]);
 
 		return $dataProvider;
 	}

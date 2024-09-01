@@ -6,6 +6,8 @@ namespace app\repositories;
 
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Task;
+use app\models\TaskObserver;
+use yii\base\ErrorException;
 
 class TaskRepository
 {
@@ -18,6 +20,20 @@ class TaskRepository
 		           ->byId($id)
 		           ->notDeleted()
 		           ->byMorph($createdById, $createdByType)
+		           ->oneOrThrow();
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return Task
+	 * @throws ModelNotFoundException
+	 */
+	public function findModelById(int $id): Task
+	{
+		return Task::find()
+		           ->byId($id)
+		           ->notDeleted()
 		           ->oneOrThrow();
 	}
 

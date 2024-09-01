@@ -39,6 +39,9 @@ class TaskController extends AppController
 	private TaskCommentRepository    $taskCommentRepository;
 
 
+	private TaskObserverService    $taskObserverService;
+	private TaskObserverRepository $taskObserverRepository;
+
 	public function __construct(
 		$id,
 		$module,
@@ -47,6 +50,8 @@ class TaskController extends AppController
 		CreateTaskCommentService $createTaskCommentService,
 		TaskCommentRepository $taskCommentRepository,
 		TaskRepository $repository,
+		TaskObserverRepository $taskObserverRepository,
+		TaskObserverService $taskObserverService,
 		array $config = []
 	)
 	{
@@ -57,6 +62,9 @@ class TaskController extends AppController
 		$this->taskCommentRepository    = $taskCommentRepository;
 
 		parent::__construct($id, $module, $config);
+
+		$this->taskObserverService    = $taskObserverService;
+		$this->taskObserverRepository = $taskObserverRepository;
 	}
 
 	/**
@@ -233,6 +241,20 @@ class TaskController extends AppController
 		$model = $this->createTaskCommentService->create($form->getDto());
 
 		return new TaskCommentResource($model);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 */
+	public function actionRead(int $id): SuccessResponse
+	{
+		$task     = $this->findModelById($id);
+		$observer = $this->taskObserverRepository->findModelByTaskIdAndUserId($task->id, $this->user->id);
+
+		$this->taskObserverService->observe($observer);
+
+		return new SuccessResponse();
 	}
 
 

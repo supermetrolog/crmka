@@ -4,9 +4,16 @@ declare(strict_types=1);
 
 namespace app\usecases\Task;
 
+use app\dto\Task\ChangeTaskStatusDto;
 use app\dto\Task\UpdateTaskDto;
+use app\dto\TaskObserver\CreateTaskObserverDto;
+use app\helpers\ArrayHelper;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
+use app\usecases\TaskObserver\TaskObserverService;
+use DateTimeInterface;
+use Exception;
 use Throwable;
 use UnexpectedValueException;
 use yii\db\StaleObjectException;
@@ -14,22 +21,61 @@ use yii\db\StaleObjectException;
 class TaskService
 {
 
+	private TransactionBeginnerInterface $transactionBeginner;
+	private TaskObserverService          $taskObserverService;
+
+	public function __construct(
+		TransactionBeginnerInterface $transactionBeginner,
+		TaskObserverService $taskObserverService
+	)
+	{
+		$this->transactionBeginner = $transactionBeginner;
+		$this->taskObserverService = $taskObserverService;
+	}
+
 	/**
 	 * @throws SaveModelException
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function update(Task $task, UpdateTaskDto $dto): Task
 	{
-		$task->load([
-			'user_id' => $dto->user->id,
-			'message' => $dto->message,
-			'status'  => $dto->status,
-			'start'   => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
-			'end'     => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
-		]);
+		$tx = $this->transactionBeginner->begin();
 
-		$task->saveOrThrow();
-		$task->updateManyToManyRelations('tags', $dto->tagIds);
+		try {
+			$task->load([
+				'user_id' => $dto->user->id,
+				'message' => $dto->message,
+				'status'  => $dto->status,
+				'start'   => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
+				'end'     => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null
+			]);
+
+			$task->saveOrThrow();
+			$task->updateManyToManyRelations('tags', $dto->tagIds);
+
+			$currentObservers = $task->getUserIdsInObservers();
+			$addedObservers   = ArrayHelper::diff($dto->observerIds, $currentObservers);
+			$removedObservers = ArrayHelper::diff($currentObservers, $dto->observerIds);
+
+			foreach ($addedObservers as $observerId) {
+				$this->taskObserverService->create(new CreateTaskObserverDto([
+					'task_id'       => $task->id,
+					'user_id'       => $observerId,
+					'created_by_id' => $dto->created_by_id,
+				]));
+			}
+
+			if (ArrayHelper::notEmpty($removedObservers)) {
+				$this->taskObserverService->deleteAll([
+					'task_id' => $task->id,
+					'user_id' => $removedObservers,
+				]);
+			}
+
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 
 		return $task;
 	}

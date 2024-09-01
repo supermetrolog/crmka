@@ -17,4 +17,5 @@ class UpdateTaskDto extends BaseObject
 	public ?DateTimeInterface $start = null;
 	public ?DateTimeInterface $end   = null;
 	public array              $tagIds;
+	public array              $observerIds;
 }

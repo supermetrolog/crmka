@@ -188,6 +188,7 @@ return
 				'POST,OPTIONS change-status/<id>' => 'change-status',
 				'GET,OPTIONS <id>/comments'       => 'comments',
 				'POST,OPTIONS <id>/comments'      => 'create-comment',
+				'POST,OPTIONS <id>/read'          => 'read',
 			],
 		],
 		[
