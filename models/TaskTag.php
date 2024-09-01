@@ -35,7 +35,8 @@ class TaskTag extends AR
 		return [
 			[['name', 'color'], 'required'],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
-			[['name', 'description'], 'string', 'max' => 255],
+			[['name'], 'string', 'max' => 30],
+			[['description'], 'string', 'max' => 255],
 			[['color'], 'string', 'max' => 6],
 		];
 	}

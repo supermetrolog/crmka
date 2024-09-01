@@ -35,6 +35,11 @@ class TaskService
 	}
 
 	/**
+	 * Установить статус задачи "В работе"
+	 *
+	 * @param Task $task
+	 *
+	 * @return void
 	 * @throws SaveModelException
 	 */
 	public function accept(Task $task): void
@@ -43,6 +48,11 @@ class TaskService
 	}
 
 	/**
+	 * Установить статус задачи "Выполнена"
+	 *
+	 * @param Task $task
+	 *
+	 * @return void
 	 * @throws SaveModelException
 	 */
 	public function done(Task $task): void

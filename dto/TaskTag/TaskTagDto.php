@@ -8,7 +8,7 @@ use yii\base\BaseObject;
 
 class TaskTagDto extends BaseObject
 {
-	public string $name;
-	public string $description;
-	public string $color;
+	public string  $name;
+	public ?string $description = null;
+	public string  $color;
 }

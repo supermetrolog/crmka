@@ -10,15 +10,16 @@ use Exception;
 
 class TaskTagForm extends Form
 {
-	public string $name;
-	public string $description;
-	public string $color;
+	public string  $name;
+	public ?string $description;
+	public string  $color;
 
 	public function rules(): array
 	{
 		return [
 			[['name', 'color'], 'required'],
-			[['name', 'description'], 'string', 'max' => 255],
+			[['name'], 'string', 'max' => 30],
+			[['description'], 'string', 'max' => 255],
 			[['color'], 'string', 'max' => 6],
 		];
 	}

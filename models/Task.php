@@ -97,7 +97,7 @@ class Task extends AR
 	 */
 	public function getTaskTags(): TaskTaskTagQuery
 	{
-		return $this->hasMany(TaskTaskTag::class, ['task_id' => 'id']);
+		return $this->hasMany(TaskTaskTag::class, ['task_id' => 'id'])->andWhere([self::SOFT_DELETE_ATTRIBUTE => null]);
 	}
 
 	/**

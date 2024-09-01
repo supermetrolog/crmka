@@ -74,7 +74,6 @@ class CreateTaskService
 					'created_by_id'   => $dto->created_by_id,
 				]));
 
-				$task->linkManyToManyRelations('tags', $dto->tagIds);
 				$tasks[] = $task;
 			}
 
