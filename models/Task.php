@@ -6,6 +6,7 @@ use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskTaskTagQuery;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
@@ -24,10 +25,13 @@ use yii\db\ActiveQuery;
  * @property string            $deleted_at
  * @property string|null       $impossible_to
  *
- * @property User        $user
- * @property User        $createdByUser
- * @property TaskTag[]   $tags
- * @property User        $createdBy
+ * @property User              $user
+ * @property User              $createdByUser
+ * @property TaskTag[]         $tags
+ * @property User              $createdBy
+ * @property ChatMemberMessage $chatMemberMessage
+ * @property ChatMember        $chatMember
+ * @property TaskComment       $lastComment
  */
 class Task extends AR
 {
@@ -125,5 +129,43 @@ class Task extends AR
 	public static function find(): TaskQuery
 	{
 		return new TaskQuery(get_called_class());
+	}
+
+	/**
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getChatMemberMessageRelationSecond(): ActiveQuery
+	{
+		return $this->morphHasOne(Relation::class, 'id', 'second');
+	}
+
+	/**
+	 * Test description
+	 *
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getChatMemberMessage(): ActiveQuery
+	{
+		return $this->morphHasOneVia(ChatMemberMessage::class, 'id', 'first')->via('chatMemberMessageRelationSecond');
+	}
+
+	/**
+	 * @return ActiveQuery
+	 */
+	public function getChatMember(): ActiveQuery
+	{
+		return $this->hasOne(ChatMember::class, ['id' => 'to_chat_member_id'])->via('chatMemberMessage');
+	}
+
+	public function getLastComment(): ActiveQuery
+	{
+		return $this->hasOne(TaskComment::class, ['task_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+	}
+
+	public function getComments(): ActiveQuery
+	{
+		return $this->hasMany(TaskComment::class, ['task_id' => 'id']);
 	}
 }

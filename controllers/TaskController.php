@@ -74,12 +74,11 @@ class TaskController extends AppController
 	/**
 	 * @param int $id
 	 *
-	 * @return TaskResource
-	 * @throws ModelNotFoundException
+	 * @return TaskWithRelationResource
 	 */
-	public function actionView(int $id): TaskResource
+	public function actionView(int $id): TaskWithRelationResource
 	{
-		return new TaskResource($this->findModelByIdAndCreatedBy($id));
+		return new TaskWithRelationResource($this->findModelById($id));
 	}
 
 	public function actionStatistic(): array
@@ -257,5 +256,13 @@ class TaskController extends AppController
 	protected function findModelByIdAndCreatedByOrUserId(int $id): Task
 	{
 		return $this->repository->findModelByIdAndCreatedByOrUserId($id, $this->user->id, $this->user->identity::getMorphClass());
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	protected function findModelById(int $id): Task
+	{
+		return $this->repository->findModelById($id);
 	}
 }
