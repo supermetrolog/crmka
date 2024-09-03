@@ -16,7 +16,9 @@ use app\repositories\TaskCommentRepository;
 use app\repositories\TaskObserverRepository;
 use app\repositories\TaskRepository;
 use app\resources\Task\TaskCommentResource;
+use app\resources\Task\TaskRelationStatisticResource;
 use app\resources\Task\TaskResource;
+use app\resources\Task\TaskStatusStatisticResource;
 use app\resources\Task\TaskWithRelationResource;
 use app\usecases\Task\ChangeTaskStatusService;
 use app\usecases\Task\CreateTaskCommentService;
@@ -103,12 +105,11 @@ class TaskController extends AppController
 		$created_by_id = $this->request->get('created_by_id');
 		$observer_id   = $this->request->get('observer_id');
 
-		if (empty($observer_id)) {
-			return $this->repository->getCountsByUserIdOrCreatedById($user_id, $created_by_id);
-		} else {
-			return $this->repository->getCountsByObserverIdAndByUserIdOrCreatedById($user_id, $created_by_id, $observer_id);
-		}
+		$resource = $this->repository->getCountsStatistic($user_id, $created_by_id, $observer_id);
+
+		return new TaskStatusStatisticResource($resource);
 	}
+
 
 	/**
 	 * @throws ErrorException
@@ -117,7 +118,9 @@ class TaskController extends AppController
 	{
 		$user_id = $this->request->get('user_id');
 
-		return $this->repository->getRelationsStatisticByUserId($user_id);
+		$resource = $this->repository->getRelationsStatisticByUserId($user_id);
+
+		return new TaskRelationStatisticResource($resource);
 	}
 
 	/**

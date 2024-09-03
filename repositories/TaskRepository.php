@@ -7,6 +7,8 @@ namespace app\repositories;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Task;
 use app\models\TaskObserver;
+use app\models\views\TaskRelationStatisticView;
+use app\models\views\TaskStatusStatisticView;
 use yii\base\ErrorException;
 
 class TaskRepository
@@ -67,58 +69,64 @@ class TaskRepository
 		])->filterWhere(['user_id' => $user_id])->notDeleted()->asArray()->all();
 	}
 
-	public function getCountsByUserIdOrCreatedById(?int $user_id = null, ?int $created_by_id = null)
+	/**
+	 * @throws ErrorException
+	 */
+	public function getCountsStatistic(?int $user_id = null, ?int $created_by_id = null, ?int $observer_id = null): TaskStatusStatisticView
 	{
-		return Task::find()->select([
-			'COUNT(*) AS all',
-			'SUM(IF(status=' . Task::STATUS_CREATED . ', 1, 0)) AS created',
-			'SUM(IF(status=' . Task::STATUS_ACCEPTED . ', 1, 0)) AS accepted',
-			'SUM(IF(status=' . Task::STATUS_DONE . ', 1, 0)) AS done',
-			'SUM(IF(status=' . Task::STATUS_IMPOSSIBLE . ', 1, 0)) AS impossible',
-		])->filterWhere(['or', ['user_id' => $user_id], ['created_by_id' => $created_by_id]])->notDeleted()->asArray()->all()[0];
+		$subQuery = TaskStatusStatisticView::find()->notDeleted();
+
+		if (!empty($observer_id)) {
+			$subQuery->joinWith('observers')->groupBy(TaskStatusStatisticView::getColumn('id'));
+		}
+
+		$subQuery->andFilterWhere(['or',
+		                           [TaskStatusStatisticView::getColumn('user_id') => $user_id],
+		                           [TaskStatusStatisticView::getColumn('created_by_id') => $created_by_id],
+		                           [TaskObserver::getColumn('user_id') => $observer_id]
+		]);
+
+		$query = TaskStatusStatisticView::find()->from($subQuery)->select([
+			'total'      => 'COUNT(*)',
+			'created'    => 'SUM(IF(status=' . Task::STATUS_CREATED . ', 1, 0))',
+			'accepted'   => 'SUM(IF(status=' . Task::STATUS_ACCEPTED . ', 1, 0))',
+			'done'       => 'SUM(IF(status=' . Task::STATUS_DONE . ', 1, 0))',
+			'impossible' => 'SUM(IF(status=' . Task::STATUS_IMPOSSIBLE . ', 1, 0))',
+		]);
+
+		/** @var TaskStatusStatisticView $model */
+		$model = $query->one();
+
+		return $model;
 	}
 
 	/**
 	 * @throws ErrorException
 	 */
-	public function getCountsByObserverIdAndByUserIdOrCreatedById(?int $user_id = null, ?int $created_by_id = null, ?int $observer_id = null)
+	public function getRelationsStatisticByUserId(int $user_id): TaskRelationStatisticView
 	{
-		$query = Task::find()->select([
-			'COUNT(*) AS all',
-			'SUM(IF(status=' . Task::STATUS_CREATED . ', 1, 0)) AS created',
-			'SUM(IF(status=' . Task::STATUS_ACCEPTED . ', 1, 0)) AS accepted',
-			'SUM(IF(status=' . Task::STATUS_DONE . ', 1, 0)) AS done',
-			'SUM(IF(status=' . Task::STATUS_IMPOSSIBLE . ', 1, 0)) AS impossible',
+		$subQuery = TaskRelationStatisticView::find()->notDeleted();
+		$subQuery->select([
+			'created_by_id' => 'IF(' . TaskRelationStatisticView::field('created_by_id') . ' = ' . $user_id . ', 1, 0)',
+			'user_id'       => 'IF(' . TaskRelationStatisticView::field('user_id') . ' = ' . $user_id . ', 1, 0)',
+			'observer_id'   => 'IF(' . TaskObserver::field('user_id') . ' = ' . $user_id . ', 1, 0)',
+		]);
+		$subQuery->joinWith('observers')->groupBy(TaskRelationStatisticView::getColumn('id'));
+		$subQuery->andFilterWhere(['or',
+		                           [TaskRelationStatisticView::getColumn('user_id') => $user_id],
+		                           [TaskRelationStatisticView::getColumn('created_by_id') => $user_id],
+		                           [TaskObserver::getColumn('user_id') => $user_id]
 		]);
 
-		$query->notDeleted();
-		$query->leftJoin(TaskObserver::tableName(), TaskObserver::getColumn('task_id') . ' = ' . Task::getColumn('id'));
-		$query->filterWhere(['or',
-		                     [Task::getColumn('user_id') => $user_id],
-		                     [Task::getColumn('created_by_id') => $created_by_id],
-		                     [TaskObserver::getColumn('user_id') => $observer_id]
+		$query = TaskRelationStatisticView::find()->from($subQuery)->select([
+			'by_created_by' => 'SUM(created_by_id)',
+			'by_user'       => 'SUM(user_id)',
+			'by_observer'   => 'SUM(observer_id)',
 		]);
 
-		return $query->asArray()->all()[0];
-	}
+		/** @var TaskRelationStatisticView $model */
+		$model = $query->one();
 
-	/**
-	 * @throws ErrorException
-	 */
-	public function getRelationsStatisticByUserId(int $user_id)
-	{
-		$query = Task::find()->select([
-			'SUM(IF(' . Task::getColumn('user_id') . '=' . $user_id . ', 1, 0)) AS by_user',
-			'SUM(IF(' . Task::getColumn('created_by_id') . '=' . $user_id . ', 1, 0))  AS by_created_by',
-			'SUM(IF(' . TaskObserver::getColumn('user_id') . '=' . $user_id . ', 1, 0)) AS by_observer',
-		]);
-
-		$query->notDeleted();
-		$query->leftJoin(TaskObserver::tableName(), TaskObserver::getColumn('task_id') . ' = ' . Task::getColumn('id'));
-		$query->filterWhere(['or',
-		                     [Task::getColumn('user_id') => $user_id],
-		                     [Task::getColumn('created_by_id') => $user_id]]);
-
-		return $query->asArray()->all()[0];
+		return $model;
 	}
 }
