@@ -93,6 +93,20 @@ class Task extends AR
 		];
 	}
 
+	/**
+	 * Список статусов, на которые можно перевести задачу
+	 *
+	 * @return int[]
+	 */
+	public static function getEditableStatuses(): array
+	{
+		return [
+			self::STATUS_ACCEPTED,
+			self::STATUS_DONE,
+			self::STATUS_IMPOSSIBLE
+		];
+	}
+
 	public function getUser(): ActiveQuery
 	{
 		return $this->hasOne(User::className(), ['id' => 'user_id']);

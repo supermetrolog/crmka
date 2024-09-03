@@ -28,7 +28,7 @@ class TaskChangeStatusForm extends Form
 			[['status'], 'required'],
 			[['comment'], 'string'],
 			[['status'], 'integer'],
-			[['status'], 'in', 'range' => [Task::STATUS_DONE, Task::STATUS_ACCEPTED, Task::STATUS_IMPOSSIBLE]],
+			[['status'], 'in', 'range' => Task::getEditableStatuses()],
 		];
 	}
 
