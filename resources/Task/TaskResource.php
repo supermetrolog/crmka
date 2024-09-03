@@ -36,7 +36,7 @@ class TaskResource extends JsonResource
 			'deleted_at'      => $this->resource->deleted_at,
 			'impossible_to'   => $this->resource->impossible_to,
 			'user'            => UserShortResource::make($this->resource->user)->toArray(),
-			'is_viewed'       => $this->resource->isViewed,
+			'is_viewed'       => $this->isViewed(),
 			'created_by'      => $this->getCreatedBy()->toArray(),
 			'tags'            => TaskTagResource::collection($this->resource->tags),
 			'observers'       => TaskObserverResource::collection($this->resource->observers),
@@ -52,5 +52,16 @@ class TaskResource extends JsonResource
 		}
 
 		throw new UnexpectedValueException('Unknown created by type');
+	}
+
+	private function isViewed(): bool
+	{
+		$targetUserObserver = $this->resource->targetUserObserver;
+
+		if ($targetUserObserver === null) {
+			return false;
+		}
+
+		return $targetUserObserver->viewed_at !== null;
 	}
 }

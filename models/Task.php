@@ -32,8 +32,8 @@ use yii\db\ActiveQuery;
  * @property ChatMemberMessage $chatMemberMessage
  * @property ChatMember        $chatMember
  * @property TaskComment       $lastComment
- * @property bool              $isViewed
  * @property TaskObserver[]    $observers
+ * @property TaskObserver      $targetUserObserver
  */
 class Task extends AR
 {
@@ -188,11 +188,17 @@ class Task extends AR
 		return $this->hasMany(TaskComment::class, ['task_id' => 'id']);
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function getObservers(): ActiveQuery
 	{
-		return $this->hasMany(TaskObserver::class, ['task_id' => 'id'])->andWhere(['not', ['user_id' => $this->user_id]]);
+		return $this->hasMany(TaskObserver::class, ['task_id' => 'id'])->andFilterWhere(['not', [TaskObserver::field('user_id') => $this->user_id]]);
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function getUserIdsInObservers(): array
 	{
 		return $this->getObservers()->select('user_id')->column();
@@ -201,10 +207,5 @@ class Task extends AR
 	public function getTargetUserObserver(): ActiveQuery
 	{
 		return $this->hasOne(TaskObserver::class, ['task_id' => 'id'])->andWhere(['user_id' => $this->user_id]);
-	}
-
-	public function getIsViewed(): bool
-	{
-		return $this->getTargetUserObserver()->andWhere(['not', ['viewed_at' => null]])->exists();
 	}
 }

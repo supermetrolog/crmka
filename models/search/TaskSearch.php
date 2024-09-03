@@ -8,6 +8,7 @@ use app\models\Task;
 use app\models\TaskObserver;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 
 class TaskSearch extends Form
 {
@@ -80,14 +81,16 @@ class TaskSearch extends Form
 			]);
 
 			if ($this->observer_id) {
-				$query->leftJoin(TaskObserver::tableName(), TaskObserver::getColumn('task_id') . ' = ' . Task::getColumn('id'));
-				$query->andFilterWhere(['or',
-				                        [TaskObserver::getColumn('user_id') => $this->observer_id],
-				                        [Task::getColumn('user_id') => $this->user_id],
-				                        [Task::getColumn('created_by_id') => $this->created_by_id]]);
-			} else {
-				$query->andFilterWhere(['or', [Task::getColumn('user_id') => $this->user_id], [Task::getColumn('created_by_id') => $this->created_by_id]]);
+				$query->joinWith('observers')->groupBy(Task::getColumn('id'));
+				$query->andWhere(['or',
+				                  [TaskObserver::getColumn('id') => null],
+				                  ['<>', TaskObserver::getColumn('user_id'), new Expression(Task::getColumn('user_id'))]]);
 			}
+
+			$query->andFilterWhere(['or',
+			                        [TaskObserver::getColumn('user_id') => $this->observer_id],
+			                        [Task::getColumn('user_id') => $this->user_id],
+			                        [Task::getColumn('created_by_id') => $this->created_by_id]]);
 		} else {
 			$query->andFilterWhere([
 				'id'            => $this->id,
