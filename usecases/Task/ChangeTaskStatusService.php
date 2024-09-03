@@ -8,7 +8,6 @@ use app\dto\Task\ChangeTaskStatusDto;
 use app\dto\Task\CreateTaskCommentDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\kernel\web\http\responses\SuccessResponse;
 use app\models\Task;
 use Throwable;
 
@@ -33,7 +32,7 @@ class ChangeTaskStatusService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function changeStatus(Task $task, ChangeTaskStatusDto $dto): SuccessResponse
+	public function changeStatus(Task $task, ChangeTaskStatusDto $dto): void
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -49,8 +48,6 @@ class ChangeTaskStatusService
 			}
 
 			$tx->commit();
-
-			return new SuccessResponse();
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;
