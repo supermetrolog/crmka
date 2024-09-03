@@ -188,17 +188,11 @@ class Task extends AR
 		return $this->hasMany(TaskComment::class, ['task_id' => 'id']);
 	}
 
-	/**
-	 * @throws ErrorException
-	 */
 	public function getObservers(): ActiveQuery
 	{
-		return $this->hasMany(TaskObserver::class, ['task_id' => 'id'])->andFilterWhere(['not', [TaskObserver::field('user_id') => $this->user_id]]);
+		return $this->hasMany(TaskObserver::class, ['task_id' => 'id']);
 	}
 
-	/**
-	 * @throws ErrorException
-	 */
 	public function getUserIdsInObservers(): array
 	{
 		return $this->getObservers()->select('user_id')->column();

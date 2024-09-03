@@ -75,22 +75,32 @@ class TaskSearch extends Form
 		}
 
 		if ($this->isFilterTrue($this->multiple)) {
+			$tasksWithObserver = null;
+
+			if ($this->observer_id) {
+				$observerQuery = Task::find()->notDeleted()->joinWith('observers')->andWhere(
+					['and',
+					 [TaskObserver::getColumn('user_id') => $this->observer_id],
+					 ['<>', new Expression(TaskObserver::getColumn('user_id')), new Expression(Task::getColumn('user_id'))]
+					]
+				);
+
+				$observerQuery->select([
+					Task::getColumn('id'),
+				])->groupBy(Task::getColumn('id'));
+
+				$tasksWithObserver = $observerQuery->column();
+			}
+
+			$query->andFilterWhere(['or',
+			                        [Task::getColumn('user_id') => $this->user_id],
+			                        [Task::getColumn('created_by_id') => $this->created_by_id],
+			                        [Task::getColumn('id') => $tasksWithObserver]]);
+
 			$query->andFilterWhere([
 				Task::getColumn('id')     => $this->id,
 				Task::getColumn('status') => $this->status
 			]);
-
-			if ($this->observer_id) {
-				$query->joinWith('observers')->groupBy(Task::getColumn('id'));
-				$query->andWhere(['or',
-				                  [TaskObserver::getColumn('id') => null],
-				                  ['<>', TaskObserver::getColumn('user_id'), new Expression(Task::getColumn('user_id'))]]);
-			}
-
-			$query->andFilterWhere(['or',
-			                        [TaskObserver::getColumn('user_id') => $this->observer_id],
-			                        [Task::getColumn('user_id') => $this->user_id],
-			                        [Task::getColumn('created_by_id') => $this->created_by_id]]);
 		} else {
 			$query->andFilterWhere([
 				'id'            => $this->id,
@@ -105,5 +115,18 @@ class TaskSearch extends Form
 		                        ['like', Task::getColumn('id'), $this->message]]);
 
 		return $dataProvider;
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	private function createObserverRelationConditions(): array
+	{
+		$conditions = ['or',
+		               [TaskObserver::getColumn('id') => null],
+		               ['<>', TaskObserver::getColumn('user_id'), new Expression(Task::getColumn('user_id'))]
+		];
+
+		return $conditions;
 	}
 }

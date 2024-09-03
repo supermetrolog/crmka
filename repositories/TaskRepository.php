@@ -10,6 +10,7 @@ use app\models\TaskObserver;
 use app\models\views\TaskRelationStatisticView;
 use app\models\views\TaskStatusStatisticView;
 use yii\base\ErrorException;
+use yii\db\Expression;
 
 class TaskRepository
 {
@@ -78,6 +79,9 @@ class TaskRepository
 
 		if (!empty($observer_id)) {
 			$subQuery->joinWith('observers')->groupBy(TaskStatusStatisticView::getColumn('id'));
+			$subQuery->andWhere(['or',
+			                     [TaskObserver::getColumn('id') => null],
+			                     ['<>', TaskObserver::getColumn('user_id'), new Expression(TaskStatusStatisticView::getColumn('user_id'))]]);
 		}
 
 		$subQuery->andFilterWhere(['or',
@@ -109,7 +113,7 @@ class TaskRepository
 		$subQuery->select([
 			'created_by_id' => 'IF(' . TaskRelationStatisticView::field('created_by_id') . ' = ' . $user_id . ', 1, 0)',
 			'user_id'       => 'IF(' . TaskRelationStatisticView::field('user_id') . ' = ' . $user_id . ', 1, 0)',
-			'observer_id'   => 'IF(' . TaskObserver::field('user_id') . ' = ' . $user_id . ', 1, 0)',
+			'observer_id'   => 'IF(' . TaskObserver::field('user_id') . ' = ' . $user_id . ' and ' . Task::getColumn('user_id') . ' <> ' . $user_id . ', 1, 0)',
 		]);
 		$subQuery->joinWith('observers')->groupBy(TaskRelationStatisticView::getColumn('id'));
 		$subQuery->andFilterWhere(['or',
