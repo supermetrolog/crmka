@@ -12,4 +12,5 @@ class ChangeTaskStatusDto extends BaseObject
 	public int                $status;
 	public ?string            $comment       = null;
 	public ?DateTimeInterface $impossible_to = null;
+	public int                $changed_by_id;
 }

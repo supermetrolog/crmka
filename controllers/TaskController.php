@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 
-use app\dto\Task\CreateTaskCommentDto;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -19,6 +18,7 @@ use app\repositories\TaskRepository;
 use app\resources\Task\TaskCommentResource;
 use app\resources\Task\TaskResource;
 use app\resources\Task\TaskWithRelationResource;
+use app\usecases\Task\ChangeTaskStatusService;
 use app\usecases\Task\CreateTaskCommentService;
 use app\usecases\Task\CreateTaskService;
 use app\usecases\Task\TaskService;
@@ -37,10 +37,9 @@ class TaskController extends AppController
 	private TaskRepository           $repository;
 	private CreateTaskCommentService $createTaskCommentService;
 	private TaskCommentRepository    $taskCommentRepository;
-
-
-	private TaskObserverService    $taskObserverService;
-	private TaskObserverRepository $taskObserverRepository;
+	private TaskObserverService      $taskObserverService;
+	private TaskObserverRepository   $taskObserverRepository;
+	private ChangeTaskStatusService  $changeTaskStatusService;
 
 	public function __construct(
 		$id,
@@ -52,6 +51,7 @@ class TaskController extends AppController
 		TaskRepository $repository,
 		TaskObserverRepository $taskObserverRepository,
 		TaskObserverService $taskObserverService,
+		ChangeTaskStatusService $changeTaskStatusService,
 		array $config = []
 	)
 	{
@@ -60,11 +60,11 @@ class TaskController extends AppController
 		$this->createTaskCommentService = $createTaskCommentService;
 		$this->repository               = $repository;
 		$this->taskCommentRepository    = $taskCommentRepository;
+		$this->changeTaskStatusService  = $changeTaskStatusService;
+		$this->taskObserverService      = $taskObserverService;
+		$this->taskObserverRepository   = $taskObserverRepository;
 
 		parent::__construct($id, $module, $config);
-
-		$this->taskObserverService    = $taskObserverService;
-		$this->taskObserverRepository = $taskObserverRepository;
 	}
 
 	/**
@@ -212,19 +212,11 @@ class TaskController extends AppController
 		$form = new TaskChangeStatusForm();
 		$form->load($this->request->post());
 
+		$form->changed_by_id = $this->user->id;
+
 		$form->validateOrThrow();
 
-		$this->service->changeStatus($task, $form->getDto());
-
-		if ($form->comment) {
-			$this->createTaskCommentService->create(new CreateTaskCommentDto([
-				'message'       => $form->comment,
-				'created_by_id' => $this->user->id,
-				'task_id'       => $id
-			]));
-		}
-
-		$task->refresh();
+		$this->changeTaskStatusService->changeStatus($task, $form->getDto());
 
 		return TaskWithRelationResource::tryMake($task)->toArray();
 	}
