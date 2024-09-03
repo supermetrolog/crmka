@@ -12,7 +12,7 @@ class TaskObserverRepository
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	public function findModelByTaskIdAndUserId(int $taskId, int $userId): ?TaskObserver
+	public function findOneByTaskIdAndUserId(int $taskId, int $userId): ?TaskObserver
 	{
 		return TaskObserver::find()
 		                   ->andWhere([

@@ -113,11 +113,14 @@ class Task extends AR
 	}
 
 	/**
-	 * @return TaskTaskTagQuery|ActiveQuery
+	 * @return TaskTaskTagQuery
 	 */
 	public function getTaskTags(): TaskTaskTagQuery
 	{
-		return $this->hasMany(TaskTaskTag::class, ['task_id' => 'id'])->andWhere([self::SOFT_DELETE_ATTRIBUTE => null]);
+		/** @var TaskTaskTagQuery $query */
+		$query = $this->hasMany(TaskTaskTag::class, ['task_id' => 'id']);
+
+		return $query->notDeleted();
 	}
 
 	/**

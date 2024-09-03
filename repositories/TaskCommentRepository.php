@@ -15,7 +15,7 @@ class TaskCommentRepository
 	 *
 	 * @return array
 	 */
-	public function findModelsByTaskId(int $id): array
+	public function findAllByTaskId(int $id): array
 	{
 		return TaskComment::find()->andWhere(['task_id' => $id])->notDeleted()->all();
 	}

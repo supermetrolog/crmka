@@ -54,20 +54,8 @@ class TaskObserverService
 	{
 		$observer->viewed_at = DateTimeHelper::nowf();
 		$observer->saveOrThrow();
-		
-		return $observer;
-	}
 
-	public function update(TaskObserver $observer): void
-	{
-//		$alert->load([
-//			'user_id' => $dto->user->id,
-//			'message' => $dto->message,
-//		]);
-//
-//		$alert->saveOrThrow();
-//
-//		return $alert;
+		return $observer;
 	}
 
 	/**

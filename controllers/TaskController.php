@@ -124,7 +124,7 @@ class TaskController extends AppController
 	 * @return TaskResource
 	 * @throws SaveModelException
 	 * @throws ValidateException
-	 * @throws Exception|Throwable
+	 * @throws Throwable
 	 */
 	public function actionCreate(): TaskResource
 	{
@@ -235,7 +235,7 @@ class TaskController extends AppController
 
 	public function actionComments(int $id): array
 	{
-		$models = $this->taskCommentRepository->findModelsByTaskId($id);
+		$models = $this->taskCommentRepository->findAllByTaskId($id);
 
 		return TaskCommentResource::collection($models);
 	}
@@ -248,7 +248,7 @@ class TaskController extends AppController
 	{
 		$form = new TaskCommentForm();
 
-		$form->setScenario(TaskCommentForm::SCENARIO_UPDATE);
+		$form->setScenario(TaskCommentForm::SCENARIO_CREATE);
 
 		$form->load($this->request->post());
 		$form->task_id       = $id;
@@ -268,7 +268,7 @@ class TaskController extends AppController
 	public function actionRead(int $id): SuccessResponse
 	{
 		$task     = $this->findModelById($id);
-		$observer = $this->taskObserverRepository->findModelByTaskIdAndUserId($task->id, $this->user->id);
+		$observer = $this->taskObserverRepository->findOneByTaskIdAndUserId($task->id, $this->user->id);
 
 		$this->taskObserverService->observe($observer);
 
