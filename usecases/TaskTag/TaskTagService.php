@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\usecases\TaskTag;
 
-use app\dto\TaskTag\CreateTaskObserverDto;
+use app\dto\TaskTag\TaskTagDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\TaskTag;
 use Throwable;
@@ -15,7 +15,7 @@ class TaskTagService
 	/**
 	 * @throws SaveModelException
 	 */
-	public function create(CreateTaskObserverDto $dto): TaskTag
+	public function create(TaskTagDto $dto): TaskTag
 	{
 		$model = new TaskTag([
 			'name'        => $dto->name,
@@ -31,7 +31,7 @@ class TaskTagService
 	/**
 	 * @throws SaveModelException
 	 */
-	public function update(TaskTag $model, CreateTaskObserverDto $dto): TaskTag
+	public function update(TaskTag $model, TaskTagDto $dto): TaskTag
 	{
 		$model->load([
 			'name'        => $dto->name,

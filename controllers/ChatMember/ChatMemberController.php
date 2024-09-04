@@ -15,6 +15,7 @@ use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
 use app\models\search\ChatMemberMediaSearch;
 use app\models\search\ChatMemberSearch;
 use app\models\User;
+use app\models\views\ChatMemberSearchView;
 use app\repositories\ChatMemberRepository;
 use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberFullResource;
@@ -170,27 +171,31 @@ class ChatMemberController extends AppController
 
 	/**
 	 * @throws NotFoundHttpException
+	 * @throws ErrorException
 	 */
 	protected function findModel(int $id): ?ChatMember
 	{
 		// TODO: add in generator
 
-		$model = ChatMember::find()
-		                   ->byId($id)
+		$model = ChatMemberSearchView::find()
+		                             ->select([ChatMember::field('*'), 'last_call_rel_id' => 'last_call_rel.id'])
+		                             ->byId($id)
+		                             ->leftJoinLastCallRelation()
+		                             ->with(['lastCall.user.userProfile'])
 //		                   ->with(['messages' => function (ChatMemberMessageQuery $query) {
 //			                   $query->notDeleted();
 //		                   }])
-                           ->with(['objectChatMember.object.company'])
-		                   ->with([
-			                   'request.company',
-			                   'request.regions',
-			                   'request.directions',
-			                   'request.districts',
-			                   'request.objectTypes',
-			                   'request.objectClasses',
-		                   ])
-		                   ->with(['user.userProfile'])
-		                   ->one();
+                                     ->with(['objectChatMember.object.company'])
+		                             ->with([
+			                             'request.company',
+			                             'request.regions',
+			                             'request.directions',
+			                             'request.districts',
+			                             'request.objectTypes',
+			                             'request.objectClasses',
+		                             ])
+		                             ->with(['user.userProfile'])
+		                             ->one();
 
 		if ($model) {
 			return $model;

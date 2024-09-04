@@ -38,7 +38,8 @@ class TaskTagSearch extends Form
 		$query = TaskTag::find()->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
+			'query'      => $query,
+			'pagination' => false
 		]);
 
 		$this->load($params);
