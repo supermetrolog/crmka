@@ -90,6 +90,10 @@ class TaskSearch extends Form
 				])->groupBy(Task::getColumn('id'));
 
 				$tasksWithObserver = $observerQuery->column();
+
+				if (empty($this->user_id) and empty($this->created_by_id)) {
+					$query->andWhere([Task::getColumn('id') => $tasksWithObserver]);
+				}
 			}
 
 			$query->andFilterWhere(['or',

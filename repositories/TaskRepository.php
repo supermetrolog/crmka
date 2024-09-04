@@ -75,19 +75,32 @@ class TaskRepository
 	 */
 	public function getCountsStatistic(?int $user_id = null, ?int $created_by_id = null, ?int $observer_id = null): TaskStatusStatisticView
 	{
-		$subQuery = TaskStatusStatisticView::find()->notDeleted();
+		$subQuery          = TaskStatusStatisticView::find()->notDeleted();
+		$tasksWithObserver = null;
 
-		if (!empty($observer_id)) {
-			$subQuery->joinWith('observers')->groupBy(TaskStatusStatisticView::getColumn('id'));
-			$subQuery->andWhere(['or',
-			                     [TaskObserver::getColumn('id') => null],
-			                     ['<>', TaskObserver::getColumn('user_id'), new Expression(TaskStatusStatisticView::getColumn('user_id'))]]);
+		if ($observer_id) {
+			$observerQuery = Task::find()->notDeleted()->joinWith('observers')->andWhere(
+				['and',
+				 [TaskObserver::getColumn('user_id') => $observer_id],
+				 ['<>', new Expression(TaskObserver::getColumn('user_id')), new Expression(Task::getColumn('user_id'))]
+				]
+			);
+
+			$observerQuery->select([
+				Task::getColumn('id'),
+			])->groupBy(Task::getColumn('id'));
+
+			$tasksWithObserver = $observerQuery->column();
+
+			if (empty($user_id) and empty($created_by_id)) {
+				$subQuery->andWhere([Task::getColumn('id') => $tasksWithObserver]);
+			}
 		}
 
 		$subQuery->andFilterWhere(['or',
 		                           [TaskStatusStatisticView::getColumn('user_id') => $user_id],
 		                           [TaskStatusStatisticView::getColumn('created_by_id') => $created_by_id],
-		                           [TaskObserver::getColumn('user_id') => $observer_id]
+		                           [Task::getColumn('id') => $tasksWithObserver]
 		]);
 
 		$query = TaskStatusStatisticView::find()->from($subQuery)->select([
