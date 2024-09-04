@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\resources;
+namespace app\resources\Task;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Task;
@@ -34,9 +34,12 @@ class TaskResource extends JsonResource
 			'created_at'      => $this->resource->created_at,
 			'updated_at'      => $this->resource->updated_at,
 			'deleted_at'      => $this->resource->deleted_at,
+			'impossible_to'   => $this->resource->impossible_to,
 			'user'            => UserShortResource::make($this->resource->user)->toArray(),
+			'is_viewed'       => $this->isViewed(),
 			'created_by'      => $this->getCreatedBy()->toArray(),
-			'tags'            => TaskTagResource::collection($this->resource->tags)
+			'tags'            => TaskTagResource::collection($this->resource->tags),
+			'observers'       => TaskObserverResource::collection($this->resource->observers),
 		];
 	}
 
@@ -49,5 +52,16 @@ class TaskResource extends JsonResource
 		}
 
 		throw new UnexpectedValueException('Unknown created by type');
+	}
+
+	private function isViewed(): bool
+	{
+		$targetUserObserver = $this->resource->targetUserObserver;
+
+		if ($targetUserObserver === null) {
+			return false;
+		}
+
+		return $targetUserObserver->viewed_at !== null;
 	}
 }

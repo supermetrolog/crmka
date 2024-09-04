@@ -6,27 +6,34 @@ use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskTaskTagQuery;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "task".
  *
- * @property int         $id
- * @property int         $user_id
- * @property string      $message
- * @property int         $status
- * @property string|null $start
- * @property string|null $end
- * @property string      $created_by_type
- * @property int         $created_by_id
- * @property string      $created_at
- * @property string      $updated_at
- * @property string      $deleted_at
+ * @property int               $id
+ * @property int               $user_id
+ * @property string            $message
+ * @property int               $status
+ * @property string|null       $start
+ * @property string|null       $end
+ * @property string            $created_by_type
+ * @property int               $created_by_id
+ * @property string            $created_at
+ * @property string            $updated_at
+ * @property string            $deleted_at
+ * @property string|null       $impossible_to
  *
- * @property User        $user
- * @property User        $createdByUser
- * @property TaskTag[]   $tags
- * @property User        $createdBy
+ * @property User              $user
+ * @property User              $createdByUser
+ * @property TaskTag[]         $tags
+ * @property User              $createdBy
+ * @property ChatMemberMessage $chatMemberMessage
+ * @property ChatMember        $chatMember
+ * @property TaskComment       $lastComment
+ * @property TaskObserver[]    $observers
+ * @property TaskObserver      $targetUserObserver
  */
 class Task extends AR
 {
@@ -52,7 +59,7 @@ class Task extends AR
 			[['user_id', 'message', 'status', 'created_by_type', 'created_by_id'], 'required'],
 			[['user_id', 'status', 'created_by_id'], 'integer'],
 			[['message'], 'string'],
-			[['start', 'end', 'created_at', 'updated_at'], 'safe'],
+			[['start', 'end', 'created_at', 'updated_at', 'impossible_to'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
 			['status', 'in', 'range' => self::getStatuses()],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -71,7 +78,8 @@ class Task extends AR
 			'created_by_type' => 'Created By Type',
 			'created_by_id'   => 'Created By ID',
 			'created_at'      => 'Created At',
-			'updated_at'      => 'Updated At'
+			'updated_at'      => 'Updated At',
+			'impossible_to'   => 'Impossible To'
 		];
 	}
 
@@ -85,17 +93,34 @@ class Task extends AR
 		];
 	}
 
+	/**
+	 * Список статусов, на которые можно перевести задачу
+	 *
+	 * @return int[]
+	 */
+	public static function getEditableStatuses(): array
+	{
+		return [
+			self::STATUS_ACCEPTED,
+			self::STATUS_DONE,
+			self::STATUS_IMPOSSIBLE
+		];
+	}
+
 	public function getUser(): ActiveQuery
 	{
 		return $this->hasOne(User::className(), ['id' => 'user_id']);
 	}
 
 	/**
-	 * @return TaskTaskTagQuery|ActiveQuery
+	 * @return TaskTaskTagQuery
 	 */
 	public function getTaskTags(): TaskTaskTagQuery
 	{
-		return $this->hasMany(TaskTaskTag::class, ['task_id' => 'id']);
+		/** @var TaskTaskTagQuery $query */
+		$query = $this->hasMany(TaskTaskTag::class, ['task_id' => 'id']);
+
+		return $query->notDeleted();
 	}
 
 	/**
@@ -123,5 +148,58 @@ class Task extends AR
 	public static function find(): TaskQuery
 	{
 		return new TaskQuery(get_called_class());
+	}
+
+	/**
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getChatMemberMessageRelationSecond(): ActiveQuery
+	{
+		return $this->morphHasOne(Relation::class, 'id', 'second');
+	}
+
+	/**
+	 * Test description
+	 *
+	 * @return ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getChatMemberMessage(): ActiveQuery
+	{
+		return $this->morphHasOneVia(ChatMemberMessage::class, 'id', 'first')->via('chatMemberMessageRelationSecond');
+	}
+
+	/**
+	 * @return ActiveQuery
+	 */
+	public function getChatMember(): ActiveQuery
+	{
+		return $this->hasOne(ChatMember::class, ['id' => 'to_chat_member_id'])->via('chatMemberMessage');
+	}
+
+	public function getLastComment(): ActiveQuery
+	{
+		return $this->hasOne(TaskComment::class, ['task_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+	}
+
+	public function getComments(): ActiveQuery
+	{
+		return $this->hasMany(TaskComment::class, ['task_id' => 'id']);
+	}
+
+	public function getObservers(): ActiveQuery
+	{
+		return $this->hasMany(TaskObserver::class, ['task_id' => 'id']);
+	}
+
+	public function getUserIdsInObservers(): array
+	{
+		return $this->getObservers()->select('user_id')->column();
+	}
+
+	public function getTargetUserObserver(): ActiveQuery
+	{
+		return $this->hasOne(TaskObserver::class, ['task_id' => 'id'])->andWhere(['user_id' => $this->user_id]);
 	}
 }

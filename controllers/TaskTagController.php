@@ -9,7 +9,7 @@ use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\TaskTag\TaskTagForm;
 use app\models\search\TaskTagSearch;
 use app\models\TaskTag;
-use app\resources\TaskTagResource;
+use app\resources\Task\TaskTagResource;
 use app\usecases\TaskTag\TaskTagService;
 use Exception;
 use Throwable;
@@ -111,5 +111,12 @@ class TaskTagController extends AppController
 		}
 
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	public function actionAll(): array
+	{
+		$tasks = TaskTag::find()->all();
+
+		return TaskTagResource::collection($tasks);
 	}
 }

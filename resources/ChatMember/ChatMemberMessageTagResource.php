@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace app\resources\ChatMember;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
-use app\resources\Contact\ContactShortResource;
-use app\resources\TaskResource;
 
 class ChatMemberMessageTagResource extends JsonResource
 {
