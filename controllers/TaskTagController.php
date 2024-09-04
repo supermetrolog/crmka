@@ -13,6 +13,7 @@ use app\resources\Task\TaskTagResource;
 use app\usecases\TaskTag\TaskTagService;
 use Exception;
 use Throwable;
+use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
@@ -35,12 +36,12 @@ class TaskTagController extends AppController
 	/**
 	 * @throws ValidateException
 	 */
-	public function actionIndex(): array
+	public function actionIndex(): ActiveDataProvider
 	{
-		$searchModel = new TaskTagSearch();
-		$resource    = $searchModel->search($this->request->get())->all();
+		$searchModel  = new TaskTagSearch();
+		$dataProvider = $searchModel->search($this->request->get());
 
-		return TaskTagResource::collection($resource);
+		return TaskTagResource::fromDataProvider($dataProvider);
 	}
 
 	/**

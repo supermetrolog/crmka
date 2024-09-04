@@ -4,8 +4,8 @@ namespace app\models\search;
 
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
-use app\models\ActiveQuery\TaskTagQuery;
 use app\models\TaskTag;
+use yii\data\ActiveDataProvider;
 
 class TaskTagSearch extends Form
 {
@@ -30,12 +30,17 @@ class TaskTagSearch extends Form
 	/**
 	 * @param array $params
 	 *
-	 * @return TaskTagQuery
+	 * @return ActiveDataProvider
 	 * @throws ValidateException
 	 */
-	public function search(array $params): TaskTagQuery
+	public function search(array $params): ActiveDataProvider
 	{
 		$query = TaskTag::find()->notDeleted();
+
+		$dataProvider = new ActiveDataProvider([
+			'query'      => $query,
+			'pagination' => false
+		]);
 
 		$this->load($params);
 
@@ -63,6 +68,6 @@ class TaskTagSearch extends Form
 			]);
 		}
 
-		return $query;
+		return $dataProvider;
 	}
 }
