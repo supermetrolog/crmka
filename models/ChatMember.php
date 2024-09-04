@@ -173,6 +173,16 @@ class ChatMember extends AR
 		            ->via('relationFirst');
 	}
 
+	/**
+	 * @return ActiveQuery|TaskQuery
+	 * @throws ErrorException
+	 */
+	public function getLastCall(): ActiveQuery
+	{
+		return $this->morphHasOneVia(Call::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
 	public static function find(): ChatMemberQuery
 	{
 		return new ChatMemberQuery(get_called_class());
