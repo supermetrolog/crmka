@@ -101,6 +101,13 @@ class Migration extends \yii\db\Migration
 		);
 	}
 
+	// TODO: Override SchemaBuilderTrait
+	public function color(): array
+	{
+		return [
+			'color' => $this->string(6)->notNull()
+		];
+	}
 
 	public function foreignKey(
 		string $table,

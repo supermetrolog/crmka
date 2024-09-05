@@ -10,7 +10,7 @@ use app\resources\AlertResource;
 use app\resources\Contact\ContactShortResource;
 use app\resources\MediaResource;
 use app\resources\ReminderResource;
-use app\resources\TaskResource;
+use app\resources\Task\TaskResource;
 use app\resources\UserNotificationResource;
 
 class ChatMemberMessageResource extends JsonResource

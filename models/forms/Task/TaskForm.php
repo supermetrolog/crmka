@@ -10,6 +10,7 @@ use app\dto\Task\UpdateTaskDto;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\models\Form\Form;
 use app\models\Task;
+use app\models\TaskTag;
 use app\models\User;
 use Exception;
 
@@ -20,7 +21,7 @@ class TaskForm extends Form
 	public const SCENARIO_CREATE           = 'scenario_create';
 	public const SCENARIO_UPDATE           = 'scenario_update';
 
-	public $user_ids;
+	public $user_ids     = [];
 	public $user_id;
 	public $created_by_type;
 	public $created_by_id;
@@ -28,6 +29,8 @@ class TaskForm extends Form
 	public $status;
 	public $start;
 	public $end;
+	public $tag_ids      = [];
+	public $observer_ids = [];
 
 	public function rules(): array
 	{
@@ -43,7 +46,12 @@ class TaskForm extends Form
 				'exist',
 				'targetClass'     => User::class,
 				'targetAttribute' => ['user_ids' => 'id'],
-			],]
+			]],
+			['tag_ids', 'each', 'rule' => [
+				'exist',
+				'targetClass'     => TaskTag::class,
+				'targetAttribute' => ['tag_ids' => 'id'],
+			]]
 		];
 	}
 
@@ -53,7 +61,9 @@ class TaskForm extends Form
 			'message',
 			'status',
 			'start',
-			'end'
+			'end',
+			'tag_ids',
+			'observer_ids'
 		];
 
 		return [
@@ -78,6 +88,8 @@ class TaskForm extends Form
 				'end'             => DateTimeHelper::tryMake($this->end),
 				'created_by_type' => $this->created_by_type,
 				'created_by_id'   => $this->created_by_id,
+				'tagIds'          => $this->tag_ids,
+				'observerIds'     => $this->observer_ids
 			]);
 		}
 
@@ -90,15 +102,20 @@ class TaskForm extends Form
 				'end'             => DateTimeHelper::tryMake($this->end),
 				'created_by_type' => $this->created_by_type,
 				'created_by_id'   => $this->created_by_id,
+				'tagIds'          => $this->tag_ids,
+				'observerIds'     => $this->observer_ids
 			]);
 		}
 
 		return new UpdateTaskDto([
-			'user'    => User::find()->byId($this->user_id)->one(),
-			'message' => $this->message,
-			'status'  => $this->status,
-			'start'   => DateTimeHelper::tryMake($this->start),
-			'end'     => DateTimeHelper::tryMake($this->end),
+			'user'          => User::find()->byId($this->user_id)->one(),
+			'message'       => $this->message,
+			'status'        => $this->status,
+			'start'         => DateTimeHelper::tryMake($this->start),
+			'end'           => DateTimeHelper::tryMake($this->end),
+			'tagIds'        => $this->tag_ids,
+			'observerIds'   => $this->observer_ids,
+			'created_by_id' => $this->created_by_id
 		]);
 	}
 }

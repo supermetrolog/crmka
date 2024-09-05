@@ -3,6 +3,7 @@
 namespace app\models\ActiveQuery;
 
 use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\models\ChatMemberMessageTag;
 use yii\db\ActiveRecord;
 
@@ -13,6 +14,7 @@ use yii\db\ActiveRecord;
  */
 class ChatMemberMessageTagQuery extends AQ
 {
+    use SoftDeleteTrait;
 
 	/**
 	 * @return ChatMemberMessageTag[]|ActiveRecord[]

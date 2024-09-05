@@ -16,6 +16,7 @@ use app\models\ActiveQuery\ChatMemberMessageTagQuery;
  */
 class ChatMemberMessageTag extends AR
 {
+    protected bool $useSoftDelete = true;
 
 	public static function tableName(): string
 	{
