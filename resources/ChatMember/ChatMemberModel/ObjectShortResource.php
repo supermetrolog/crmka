@@ -6,7 +6,6 @@ namespace app\resources\ChatMember\ChatMemberModel;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Objects;
-use app\models\Request;
 
 class ObjectShortResource extends JsonResource
 {
@@ -28,8 +27,18 @@ class ObjectShortResource extends JsonResource
 			'object_class' => $this->resource->object_class,
 			'test_only'    => $this->resource->test_only,
 			'thumb'        => $this->resource->getThumb(),
-			'updated_at'   => $this->resource->last_update,
+			'updated_at'   => $this->getUpdatedAt(),
+			'created_at'   => $this->resource->publ_time,
 			'company'      => CompanyShortResource::tryMakeArray($this->resource->company),
 		];
+	}
+
+	public function getUpdatedAt(): int
+	{
+		if ($this->resource->last_update > 0) {
+			return $this->resource->last_update;
+		}
+
+		return $this->resource->publ_time;
 	}
 }
