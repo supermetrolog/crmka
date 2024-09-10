@@ -114,14 +114,60 @@ class ChatMemberSearch extends Form
 			                             'request.objectClasses',
 		                             ])
 		                             ->with(['user.userProfile'])
-		                             ->groupBy(ChatMember::field('id'))
-		                             ->orderBy([
-			                             'cmle.updated_at'            => SORT_DESC,
-			                             'cmm.chat_member_message_id' => SORT_DESC,
-		                             ]);
+		                             ->groupBy(ChatMember::field('id'));
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort'  => [
+				'enableMultiSort' => true,
+				'defaultOrder'    => [
+					'default' => SORT_DESC
+				],
+				'attributes'      => [
+					'task'         => [
+						'asc'  => ['t.id' => SORT_ASC],
+						'desc' => ['t.id' => SORT_DESC]
+					],
+					'notification' => [
+						'asc'  => ['un.id' => SORT_ASC],
+						'desc' => ['un.id' => SORT_DESC]
+					],
+					'message'      => [
+						'asc'  => ['cmm.chat_member_message_id' => SORT_ASC],
+						'desc' => ['cmm.chat_member_message_id' => SORT_DESC]
+					],
+					'call'         => [
+						'asc'  => [
+							'last_call_rel.created_at'                                        => SORT_ASC,
+							'IF (request.updated_at, request.updated_at, request.created_at)' => SORT_ASC,
+							new Expression(
+								'IF(' . Objects::field('last_update')
+								. ', ' . Objects::field('last_update')
+								. ', ' . Objects::field('publ_time') . ') ASC')
+						],
+						'desc' => [
+							'last_call_rel.created_at'                                        => SORT_DESC,
+							'IF (request.updated_at, request.updated_at, request.created_at)' => SORT_DESC,
+							new Expression(
+								'IF(' . Objects::field('last_update')
+								. ', ' . Objects::field('last_update')
+								. ', ' . Objects::field('publ_time') . ') DESC'),
+						]
+					],
+					'default'      => [
+						'asc'  => [
+							'cmle.updated_at'            => SORT_ASC,
+							'cmm.chat_member_message_id' => SORT_ASC,
+							ChatMember::field('id')      => SORT_ASC,
+						],
+						'desc' => [
+							'cmle.updated_at'            => SORT_DESC,
+							'cmm.chat_member_message_id' => SORT_DESC,
+							ChatMember::field('id')      => SORT_ASC,
+						],
+					]
+				]
+			]
 		]);
 
 		$this->load($params);
@@ -193,7 +239,15 @@ class ChatMemberSearch extends Form
 		           ->leftJoin(ChatMemberMessage::getTable(), [
 			           ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
 		           ])
-		           ->andWhere([Task::field('user_id') => $this->current_user_id])
+		           ->leftJoin(['observer' => TaskObserver::getTable()], [
+			           'observer.task_id'   => new Expression(Task::field('id')),
+			           'observer.user_id'   => $this->current_user_id,
+			           'observer.viewed_at' => null
+		           ])
+		           ->andWhere([
+			           Task::field('user_id') => $this->current_user_id,
+			           'observer.user_id'     => $this->current_user_id
+		           ])
 		           ->notCompleted()
 		           ->notImpossible()
 		           ->notDeleted();
