@@ -17,6 +17,9 @@ use app\models\Relation;
 use app\models\Reminder;
 use app\models\Request;
 use app\models\Task;
+use app\models\TaskObserver;
+use app\models\User;
+use app\models\UserProfile;
 use app\models\views\ChatMemberSearchView;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
@@ -33,6 +36,7 @@ class ChatMemberSearch extends Form
 	public $company_id;
 	public $object_id;
 	public $search;
+	public $status;
 
 	public $current_chat_member_id;
 	public $current_user_id;
@@ -40,7 +44,7 @@ class ChatMemberSearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['id', 'model_id', 'company_id', 'object_id'], 'integer'],
+			[['id', 'model_id', 'company_id', 'object_id', 'status'], 'integer'],
 			[['model_type', 'created_at', 'updated_at', 'search'], 'safe'],
 		];
 	}
@@ -96,7 +100,8 @@ class ChatMemberSearch extends Form
 		                             ->leftJoin(['cmle' => $eventQuery], ChatMember::getColumn('id') . '=' . 'cmle.event_chat_member_id')
 		                             ->joinWith([
 			                             'objectChatMember.object',
-			                             'request'
+			                             'request',
+			                             'user'
 		                             ])
 		                             ->with(['lastCall.user.userProfile'])
 		                             ->with(['objectChatMember.object.company'])
@@ -126,6 +131,7 @@ class ChatMemberSearch extends Form
 		if (!empty($this->search)) {
 			$query->leftJoin(['request_company' => Company::tableName()], ['request_company.id' => new Expression(Request::field('company_id'))]);
 			$query->leftJoin(['object_company' => Company::tableName()], ['object_company.id' => new Expression(Objects::field('company_id'))]);
+			$query->leftJoin(['user_profile' => UserProfile::tableName()], ['user_profile.user_id' => new Expression(User::field('id'))]);
 
 			$query->andFilterWhere([
 				'or',
@@ -134,12 +140,22 @@ class ChatMemberSearch extends Form
 				['like', 'object_company.nameEng', $this->search],
 				['like', 'object_company.nameRu', $this->search],
 				['like', Objects::field('address'), $this->search],
+				[
+					'like',
+					sprintf(
+						'concat(coalesce(%s, ""), " ", coalesce(%s, ""), " ", coalesce(%s, ""))',
+						'user_profile.first_name',
+						'user_profile.middle_name',
+						'user_profile.last_name'),
+					$this->search
+				],
 			]);
 
 			$query->andWhere([
 				'OR',
 				['IS NOT', 'request_company.id', null],
 				['IS NOT', 'object_company.id', null],
+				['IS NOT', 'user_profile.id', null],
 			]);
 		}
 
@@ -153,6 +169,7 @@ class ChatMemberSearch extends Form
 			ChatMember::field('created_at')      => $this->created_at,
 			ChatMember::field('updated_at')      => $this->updated_at,
 			ObjectChatMember::field('object_id') => $this->object_id,
+			User::field('status')                => $this->status
 		]);
 
 		return $dataProvider;
