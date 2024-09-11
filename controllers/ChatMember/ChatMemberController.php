@@ -21,6 +21,7 @@ use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
+use app\resources\ChatMember\ChatMemberStatisticResource;
 use app\resources\MediaResource;
 use app\usecases\ChatMember\ChatMemberService;
 use Throwable;
@@ -66,11 +67,17 @@ class ChatMemberController extends AppController
 		return ChatMemberFullResource::make($this->findModel($id));
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function actionStatistic(): array
 	{
-		return $this->repository->getStatisticByIds(
-			$this->request->get('chat_member_ids')
+		$resource = $this->repository->getStatisticByIdsAndModelTypes(
+			$this->request->get('chat_member_ids'),
+			$this->request->get('model_types')
 		);
+
+		return ChatMemberStatisticResource::collection($resource);
 	}
 
 	/**
