@@ -2,6 +2,7 @@
 
 namespace app\models\search;
 
+use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
@@ -140,18 +141,22 @@ class ChatMemberSearch extends Form
 						'asc'  => [
 							'last_call_rel.created_at'                                        => SORT_ASC,
 							'IF (request.updated_at, request.updated_at, request.created_at)' => SORT_ASC,
-							new Expression(
-								'IF(' . Objects::field('last_update')
-								. ', ' . Objects::field('last_update')
-								. ', ' . Objects::field('publ_time') . ') ASC')
+							IfExpressionBuilder::create()
+							                   ->condition(Objects::field('last_update'))
+							                   ->left(Objects::field('last_update'))
+							                   ->right(Objects::field('publ_time'))
+							                   ->beforeBuild(fn($expression) => "$expression ASC")
+							                   ->build()
 						],
 						'desc' => [
 							'last_call_rel.created_at'                                        => SORT_DESC,
 							'IF (request.updated_at, request.updated_at, request.created_at)' => SORT_DESC,
-							new Expression(
-								'IF(' . Objects::field('last_update')
-								. ', ' . Objects::field('last_update')
-								. ', ' . Objects::field('publ_time') . ') DESC'),
+							IfExpressionBuilder::create()
+							                   ->condition(Objects::field('last_update'))
+							                   ->left(Objects::field('last_update'))
+							                   ->right(Objects::field('publ_time'))
+							                   ->beforeBuild(fn($expression) => "$expression DESC")
+							                   ->build()
 						]
 					],
 					'default'      => [
