@@ -2,7 +2,7 @@
 
 namespace app\components\ExpressionBuilder;
 
-use Closure;
+use InvalidArgumentException;
 use yii\db\Expression;
 
 /**
@@ -23,32 +23,20 @@ use yii\db\Expression;
  *
  * @package app\components\ExpressionBuilder
  */
-class IfExpressionBuilder
+class IfExpressionBuilder extends ExpressionBuilder
 {
-	private           $condition;
-	private           $trueExpression;
-	private           $falseExpression;
-	private ?string   $alias = null;
-	protected Closure $transformFn;
+	private         $condition;
+	private         $trueExpression;
+	private         $falseExpression;
+	private ?string $alias = null;
 
 	public function __construct($condition = null, $trueExpression = 1, $falseExpression = 0)
 	{
 		$this->condition       = $condition;
 		$this->trueExpression  = $trueExpression;
 		$this->falseExpression = $falseExpression;
-		$this->transformFn     = fn($expression) => $expression;
-	}
 
-	/**
-	 * Создает новый объект `IfExpressionBuilder`
-	 *
-	 * @param mixed ...$argv
-	 *
-	 * @return static
-	 */
-	public static function create(...$argv): self
-	{
-		return new static(...$argv);
+		parent::__construct();
 	}
 
 	/**
@@ -108,17 +96,15 @@ class IfExpressionBuilder
 	}
 
 	/**
-	 * Устанавливает функцию для обработки выражения перед созданием объекта `Expression`
+	 * Валидирует выражение и выбрасывает исключение, если не все поля установлены
 	 *
-	 * @param callable $transformFn
-	 *
-	 * @return $this
+	 * @return void
 	 */
-	public function beforeBuild(callable $transformFn): self
+	private function validateOrThrow(): void
 	{
-		$this->transformFn = $transformFn;
-
-		return $this;
+		if (is_null($this->condition)) {
+			throw new InvalidArgumentException('Condition must be set');
+		}
 	}
 
 	/**
@@ -146,15 +132,5 @@ class IfExpressionBuilder
 		}
 
 		return $string;
-	}
-
-	/**
-	 * Возвращает созданное выражение
-	 *
-	 * @return Expression
-	 */
-	public function build(): Expression
-	{
-		return new Expression($this->toString());
 	}
 }
