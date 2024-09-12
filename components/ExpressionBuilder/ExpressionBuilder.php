@@ -3,6 +3,7 @@
 namespace app\components\ExpressionBuilder;
 
 use Closure;
+use Stringable;
 use yii\db\Expression;
 
 /**
@@ -10,7 +11,7 @@ use yii\db\Expression;
  *
  * @package app\components\ExpressionBuilder
  */
-class ExpressionBuilder
+class ExpressionBuilder implements Stringable
 {
 	protected Closure $transformFn;
 
@@ -44,6 +45,11 @@ class ExpressionBuilder
 
 		return $this;
 	}
+	
+	public function __toString(): string
+	{
+		return ($this->transformFn)();
+	}
 
 	/**
 	 * Возвращает строковое представление выражения
@@ -52,7 +58,7 @@ class ExpressionBuilder
 	 */
 	public function toString(): string
 	{
-		return ($this->transformFn)();
+		return (string)$this;
 	}
 
 	/**
@@ -62,6 +68,6 @@ class ExpressionBuilder
 	 */
 	public function build(): Expression
 	{
-		return new Expression($this->toString());
+		return new Expression($this);
 	}
 }

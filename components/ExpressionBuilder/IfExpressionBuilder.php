@@ -25,12 +25,12 @@ use yii\db\Expression;
  */
 class IfExpressionBuilder extends ExpressionBuilder
 {
-	private         $condition;
-	private         $trueExpression;
-	private         $falseExpression;
+	private ?string $condition;
+	private ?string $trueExpression;
+	private ?string $falseExpression;
 	private ?string $alias = null;
 
-	public function __construct($condition = null, $trueExpression = 1, $falseExpression = 0)
+	public function __construct(?string $condition = null, ?string $trueExpression = "1", ?string $falseExpression = "0")
 	{
 		$this->condition       = $condition;
 		$this->trueExpression  = $trueExpression;
@@ -42,11 +42,11 @@ class IfExpressionBuilder extends ExpressionBuilder
 	/**
 	 * Устанавливает условие для оператора `IF`
 	 *
-	 * @param $condition
+	 * @param string $condition
 	 *
 	 * @return $this
 	 */
-	public function condition($condition): self
+	public function condition(string $condition): self
 	{
 		$this->condition = $condition;
 
@@ -56,11 +56,11 @@ class IfExpressionBuilder extends ExpressionBuilder
 	/**
 	 * Устанавливает выражение для ветки `THEN`
 	 *
-	 * @param $trueExpression
+	 * @param ?string $trueExpression
 	 *
 	 * @return $this
 	 */
-	public function left($trueExpression): self
+	public function left(?string $trueExpression): self
 	{
 		$this->trueExpression = $trueExpression;
 
@@ -70,11 +70,11 @@ class IfExpressionBuilder extends ExpressionBuilder
 	/**
 	 * Устанавливает выражение для ветки `ELSE`
 	 *
-	 * @param $falseExpression
+	 * @param ?string $falseExpression
 	 *
 	 * @return $this
 	 */
-	public function right($falseExpression): self
+	public function right(?string $falseExpression): self
 	{
 		$this->falseExpression = $falseExpression;
 
@@ -117,12 +117,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 		return new Expression("IF($this->condition, $this->trueExpression, $this->falseExpression)");
 	}
 
-	/**
-	 * Возвращает строковое представление выражения
-	 *
-	 * @return string
-	 */
-	public function toString(): string
+	public function __toString(): string
 	{
 		$expression = "IF($this->condition, $this->trueExpression, $this->falseExpression)";
 		$string     = ($this->transformFn)($expression);
