@@ -2,7 +2,9 @@
 
 namespace app\components\ExpressionBuilder;
 
+use app\helpers\StringHelper;
 use InvalidArgumentException;
+use yii\base\InvalidValueException;
 use yii\db\Expression;
 
 /**
@@ -13,12 +15,12 @@ use yii\db\Expression;
  * ```php
  * $expression = IfExpressionBuilder::create()
  *         ->condition('object.count > 10')
- *         ->left(1)
- *         ->right(0)
+ *         ->left('true')
+ *         ->right('false')
  *         ->as('is_big')
  *         ->build();
  *  // equals to:
- *  // $expression = new Expression("IF(object.count > 10, 1, 0) AS is_big");
+ *  // $expression = new Expression("IF(object.count > 10, true, false) AS is_big");
  * ```
  *
  * @package app\components\ExpressionBuilder
@@ -26,11 +28,11 @@ use yii\db\Expression;
 class IfExpressionBuilder extends ExpressionBuilder
 {
 	private ?string $condition;
-	private string  $trueExpression;
-	private string  $falseExpression;
+	private ?string $trueExpression;
+	private ?string $falseExpression;
 	private ?string $alias = null;
 
-	public function __construct(?string $condition = null, string $trueExpression = "1", string $falseExpression = "0")
+	public function __construct(?string $condition = null, ?string $trueExpression = null, ?string $falseExpression = null)
 	{
 		$this->condition       = $condition;
 		$this->trueExpression  = $trueExpression;
@@ -48,6 +50,10 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function condition(string $condition): self
 	{
+		if (StringHelper::empty($condition)) {
+			throw new InvalidValueException('Condition expression cannot be empty string');
+		}
+
 		$this->condition = $condition;
 
 		return $this;
@@ -62,6 +68,10 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function left(string $trueExpression): self
 	{
+		if (StringHelper::empty($trueExpression)) {
+			throw new InvalidValueException('True (left) expression cannot be empty string');
+		}
+
 		$this->trueExpression = $trueExpression;
 
 		return $this;
@@ -76,6 +86,10 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function right(string $falseExpression): self
 	{
+		if (StringHelper::empty($falseExpression)) {
+			throw new InvalidValueException('False (right) expression cannot be empty string');
+		}
+
 		$this->falseExpression = $falseExpression;
 
 		return $this;
@@ -90,6 +104,10 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function as(string $alias): self
 	{
+		if (StringHelper::empty($alias)) {
+			throw new InvalidValueException('Alias for final expression cannot be empty string');
+		}
+
 		$this->alias = $alias;
 
 		return $this;
@@ -104,6 +122,14 @@ class IfExpressionBuilder extends ExpressionBuilder
 	{
 		if (is_null($this->condition)) {
 			throw new InvalidArgumentException('Condition must be set');
+		}
+
+		if (is_null($this->trueExpression)) {
+			throw new InvalidArgumentException('True (left) expression must be set');
+		}
+
+		if (is_null($this->falseExpression)) {
+			throw new InvalidArgumentException('False (right) expression must be set');
 		}
 	}
 
