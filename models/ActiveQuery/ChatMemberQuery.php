@@ -2,7 +2,6 @@
 
 namespace app\models\ActiveQuery;
 
-use app\components\ExpressionBuilder\CompareExpressionBuilder;
 use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
@@ -13,6 +12,7 @@ use app\models\Request;
 use app\models\views\ChatMemberSearchView;
 use yii\base\ErrorException;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * @see ChatMember
@@ -79,32 +79,20 @@ class ChatMemberQuery extends AQ
 	 */
 	public function needCalling(): self
 	{
-		$interval = 'DATE_SUB(NOW(), INTERVAL 1 YEAR)';
+		$interval = new Expression(SQLHelper::dateSub('NOW()', '1 YEAR'));
 
 		return $this->andWhere([
 				'or',
-				CompareExpressionBuilder::create()
-				                        ->left('last_call_rel.created_at')
-				                        ->lower()
-				                        ->right($interval)
-				                        ->build(),
+				['<', 'last_call_rel.created_at', $interval],
 				[
 					'and',
 					['last_call_rel.created_at' => null],
-					CompareExpressionBuilder::create()
-					                        ->left(SQLHelper::fromUnixTime(Objects::field('last_update')))
-					                        ->lower()
-					                        ->right($interval)
-					                        ->build()
+					['<', SQLHelper::fromUnixTime(Objects::field('last_update')), $interval]
 				],
 				[
 					'and',
 					['last_call_rel.created_at' => null],
-					CompareExpressionBuilder::create()
-					                        ->left(Request::field('updated_at'))
-					                        ->lower()
-					                        ->right($interval)
-					                        ->build()
+					['<', Request::field('updated_at'), $interval]
 				]
 			]
 		);
