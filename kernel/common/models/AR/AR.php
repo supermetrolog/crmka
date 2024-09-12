@@ -13,6 +13,7 @@ use Throwable;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\db\StaleObjectException;
 
 class AR extends ActiveRecord
@@ -305,6 +306,19 @@ class AR extends ActiveRecord
 	public static function field(string $name): string
 	{
 		return static::getColumn($name);
+	}
+
+	/**
+	 * Returns the expression object representing the SQL of the field.
+	 *
+	 * @param string $name
+	 *
+	 * @return Expression
+	 * @throws ErrorException
+	 */
+	public static function xfield(string $name): Expression
+	{
+		return new Expression(static::field($name));
 	}
 
 	public static function getMorphClass(): string

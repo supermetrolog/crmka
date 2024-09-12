@@ -60,4 +60,9 @@ class ArrayHelper
 	{
 		return array_intersect(...$array);
 	}
+
+	public static function toArray($array): array
+	{
+		return self::isArray($array) ? $array : [$array];
+	}
 }

@@ -4,6 +4,7 @@ namespace app\models\views;
 
 use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\RelationQuery;
+use app\models\ActiveQuery\TaskQuery;
 use app\models\Call;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
@@ -14,7 +15,9 @@ use app\models\OfferMix;
 use app\models\Relation;
 use app\models\Request;
 use app\models\User;
+use sapp\kernel\common\models\AR\AR;
 use yii\base\ErrorException;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "chat_member".
@@ -39,43 +42,37 @@ use yii\base\ErrorException;
  * @property ChatMemberMessage     $pinnedChatMemberMessage
  * @property Relation[]            $relationFirst
  * @property Call[]                $calls
- * @property-read RelationQuery    $lastCallRelationFirst
  * @property Call                  $lastCall
  */
-class ChatMemberSearchView extends ChatMember
+class ChatMemberStatisticView extends ChatMember
 {
-	public ?int  $last_call_rel_id          = null;
-	public ?bool $is_linked                 = null;
-	public ?int  $unread_task_count         = null;
-	public ?int  $unread_notification_count = null;
-	public ?int  $unread_message_count      = null;
+	public int  $chat_member_id;
+	public ?int $last_call_rel_id          = null;
+	public ?int $unread_task_count         = null;
+	public ?int $unread_notification_count = null;
+	public ?int $unread_message_count      = null;
+	public ?int $outdated_call_count       = null;
 
 	/**
-	 * @return RelationQuery
+	 * @return RelationQuery|ActiveQuery
 	 * @throws ErrorException
 	 */
 	public function getLastCallRelationFirst(): RelationQuery
 	{
-		/** @var RelationQuery $query */
-		$query = $this->hasOne(Relation::class, [
+		return $this->hasOne(Relation::class, [
 			'first_id'   => 'id',
 			'first_type' => 'morph',
 			'id'         => 'last_call_rel_id'
 		])->from([Relation::tableName() => Relation::getTable()]);
-
-		return $query;
 	}
 
 	/**
-	 * @return CallQuery
+	 * @return ActiveQuery|TaskQuery
 	 * @throws ErrorException
 	 */
 	public function getLastCall(): CallQuery
 	{
-		/** @var CallQuery $query */
-		$query = $this->morphHasOneVia(Call::class, 'id', 'second')
-		              ->via('lastCallRelationFirst');
-
-		return $query;
+		return $this->morphHasOneVia(Call::class, 'id', 'second')
+		            ->via('lastCallRelationFirst');
 	}
 }
