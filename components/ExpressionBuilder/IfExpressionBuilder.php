@@ -26,11 +26,11 @@ use yii\db\Expression;
 class IfExpressionBuilder extends ExpressionBuilder
 {
 	private ?string $condition;
-	private ?string $trueExpression;
-	private ?string $falseExpression;
+	private string  $trueExpression;
+	private string  $falseExpression;
 	private ?string $alias = null;
 
-	public function __construct(?string $condition = null, ?string $trueExpression = "1", ?string $falseExpression = "0")
+	public function __construct(?string $condition = null, string $trueExpression = "1", string $falseExpression = "0")
 	{
 		$this->condition       = $condition;
 		$this->trueExpression  = $trueExpression;
@@ -60,7 +60,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 *
 	 * @return $this
 	 */
-	public function left(?string $trueExpression): self
+	public function left(string $trueExpression): self
 	{
 		$this->trueExpression = $trueExpression;
 
@@ -74,7 +74,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 *
 	 * @return $this
 	 */
-	public function right(?string $falseExpression): self
+	public function right(string $falseExpression): self
 	{
 		$this->falseExpression = $falseExpression;
 
@@ -114,11 +114,15 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function getCleanExpression(): Expression
 	{
+		$this->validateOrThrow();
+
 		return new Expression("IF($this->condition, $this->trueExpression, $this->falseExpression)");
 	}
 
 	public function __toString(): string
 	{
+		$this->validateOrThrow();
+
 		$expression = "IF($this->condition, $this->trueExpression, $this->falseExpression)";
 		$string     = ($this->transformFn)($expression);
 
