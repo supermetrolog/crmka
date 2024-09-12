@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace app\repositories;
 
-use app\helpers\ArrayHelper;
-use app\kernel\common\models\AQ\AQ;
+use app\models\ActiveQuery\ChatMemberMessageQuery;
+use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\UserNotificationQuery;
 use app\models\ChatMember;
 use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
@@ -21,13 +23,14 @@ use yii\db\Expression;
 class ChatMemberRepository
 {
 	/**
+	 * @param int[]    $chat_member_ids
+	 * @param string[] $model_types array of model types like ['request', 'object', 'user] etc. (use getMorphClass() method in models)
+	 *
+	 * @return ChatMemberStatisticView[]
 	 * @throws ErrorException
 	 */
-	public function getStatisticByIdsAndModelTypes($chat_member_ids, $model_types): array
+	public function getStatisticByIdsAndModelTypes(array $chat_member_ids, array $model_types): array
 	{
-		$model_types     = ArrayHelper::isArray($model_types) ? $model_types : [$model_types];
-		$chat_member_ids = ArrayHelper::isArray($chat_member_ids) ? $chat_member_ids : [(int)$chat_member_ids];
-
 		$lastEventQuery = ChatMemberLastEvent::find()
 		                                     ->select([
 			                                     ChatMemberLastEvent::field('event_chat_member_id')
@@ -69,9 +72,12 @@ class ChatMemberRepository
 	}
 
 	/**
+	 * @param string[] $model_types
+	 *
+	 * @return TaskQuery
 	 * @throws ErrorException
 	 */
-	private function makeTaskQuery($model_types): AQ
+	private function makeTaskQuery(array $model_types): TaskQuery
 	{
 		return Task::find()
 		           ->select([
@@ -104,9 +110,12 @@ class ChatMemberRepository
 	}
 
 	/**
+	 * @param string[] $model_types
+	 *
+	 * @return UserNotificationQuery
 	 * @throws ErrorException
 	 */
-	private function makeNotificationQuery($model_types): AQ
+	private function makeNotificationQuery(array $model_types): UserNotificationQuery
 	{
 		return UserNotification::find()
 		                       ->select([
@@ -132,9 +141,12 @@ class ChatMemberRepository
 	}
 
 	/**
+	 * @param string[] $model_types
+	 *
+	 * @return ChatMemberQuery
 	 * @throws ErrorException
 	 */
-	private function makeNeedingCallCountQuery($model_types): AQ
+	private function makeNeedingCallCountQuery(array $model_types): ChatMemberQuery
 	{
 		return ChatMember::find()
 		                 ->select([
@@ -147,9 +159,12 @@ class ChatMemberRepository
 	}
 
 	/**
+	 * @param string[] $model_types
+	 *
+	 * @return ChatMemberMessageQuery
 	 * @throws ErrorException
 	 */
-	private function makeMessagesQuery($model_types): AQ
+	private function makeMessagesQuery(array $model_types): ChatMemberMessageQuery
 	{
 		return ChatMemberMessage::find()
 		                        ->select([
