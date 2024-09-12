@@ -3,9 +3,12 @@
 namespace app\models\search;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
-use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\ActiveQuery\ChatMemberMessageQuery;
+use app\models\ActiveQuery\ReminderQuery;
+use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\UserNotificationQuery;
 use app\models\ChatMember;
 use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
@@ -60,8 +63,11 @@ class ChatMemberSearch extends Form
 	}
 
 	/**
-	 * @throws ValidateException
+	 * @param array $params
+	 *
+	 * @return ActiveDataProvider
 	 * @throws ErrorException
+	 * @throws ValidateException
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
@@ -133,8 +139,24 @@ class ChatMemberSearch extends Form
 						'desc' => ['un.id' => SORT_DESC]
 					],
 					'message'      => [
-						'asc'  => ['cmm.chat_member_message_id' => SORT_ASC],
-						'desc' => ['cmm.chat_member_message_id' => SORT_DESC]
+						'asc'  => [
+							'is_linked' => SORT_DESC,
+							IfExpressionBuilder::create()
+							                   ->condition('unread_message_count > 0')
+							                   ->left('cmm.chat_member_message_id')
+							                   ->right('NULL')
+							                   ->beforeBuild(fn($expression) => "$expression ASC")
+							                   ->build()
+						],
+						'desc' => [
+							'is_linked' => SORT_DESC,
+							IfExpressionBuilder::create()
+							                   ->condition('unread_message_count > 0')
+							                   ->left('cmm.chat_member_message_id')
+							                   ->right('NULL')
+							                   ->beforeBuild(fn($expression) => "$expression DESC")
+							                   ->build()
+						]
 					],
 					'call'         => [
 						'asc'  => [
@@ -226,9 +248,10 @@ class ChatMemberSearch extends Form
 	}
 
 	/**
+	 * @return TaskQuery
 	 * @throws ErrorException
 	 */
-	private function makeTaskQuery(): AQ
+	private function makeTaskQuery(): TaskQuery
 	{
 		return Task::find()
 		           ->select([
@@ -258,9 +281,10 @@ class ChatMemberSearch extends Form
 	}
 
 	/**
+	 * @return ReminderQuery
 	 * @throws ErrorException
 	 */
-	private function makeReminderQuery(): AQ
+	private function makeReminderQuery(): ReminderQuery
 	{
 		return Reminder::find()
 		               ->select([
@@ -281,9 +305,10 @@ class ChatMemberSearch extends Form
 	}
 
 	/**
+	 * @return UserNotificationQuery
 	 * @throws ErrorException
 	 */
-	private function makeNotificationQuery(): AQ
+	private function makeNotificationQuery(): UserNotificationQuery
 	{
 		return UserNotification::find()
 		                       ->select([
@@ -303,9 +328,10 @@ class ChatMemberSearch extends Form
 	}
 
 	/**
+	 * @return ChatMemberMessageQuery
 	 * @throws ErrorException
 	 */
-	private function makeMessageQuery(): AQ
+	private function makeMessageQuery(): ChatMemberMessageQuery
 	{
 		$subQuery = ChatMemberMessageView::find()
 		                                 ->andWhere([ChatMemberMessageView::field('chat_member_id') => $this->current_chat_member_id]);
