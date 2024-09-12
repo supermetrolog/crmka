@@ -6,7 +6,6 @@ use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
-use app\models\ActiveQuery\ReminderQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\UserNotificationQuery;
 use app\models\ChatMember;
@@ -18,7 +17,6 @@ use app\models\Notification\UserNotification;
 use app\models\ObjectChatMember;
 use app\models\Objects;
 use app\models\Relation;
-use app\models\Reminder;
 use app\models\Request;
 use app\models\Task;
 use app\models\TaskObserver;
@@ -85,16 +83,12 @@ class ChatMemberSearch extends Form
 			                             'last_call_rel_id'          => 'last_call_rel.id',
 			                             'is_linked'                 => '(cmle.id is not null)',
 			                             'unread_task_count'         => 'COUNT(DISTINCT t.id)',
-			                             'unread_reminder_count'     => 'COUNT(DISTINCT r.id)',
 			                             'unread_notification_count' => 'COUNT(DISTINCT un.id)',
 			                             'unread_message_count'      => 'COUNT(DISTINCT m.id)',
 		                             ])
 		                             ->leftJoinLastCallRelation()
 		                             ->leftJoin(['t' => $this->makeTaskQuery()], [
 			                             't.to_chat_member_id' => ChatMember::xfield('id')
-		                             ])
-		                             ->leftJoin(['r' => $this->makeReminderQuery()], [
-			                             'r.to_chat_member_id' => ChatMember::xfield('id')
 		                             ])
 		                             ->leftJoin(['un' => $this->makeNotificationQuery()], [
 			                             'un.to_chat_member_id' => ChatMember::xfield('id')
@@ -272,36 +266,9 @@ class ChatMemberSearch extends Form
 			           'observer.viewed_at' => null
 		           ])
 		           ->andWhere([
-			           Task::field('user_id') => $this->current_user_id,
-			           'observer.user_id'     => $this->current_user_id
+			           'observer.user_id' => $this->current_user_id
 		           ])
-		           ->notCompleted()
-		           ->notImpossible()
 		           ->notDeleted();
-	}
-
-	/**
-	 * @return ReminderQuery
-	 * @throws ErrorException
-	 */
-	private function makeReminderQuery(): ReminderQuery
-	{
-		return Reminder::find()
-		               ->select([
-			               'id'                => Reminder::field('id'),
-			               'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
-		               ])
-		               ->leftJoin(Relation::getTable(), [
-			               Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
-			               Relation::field('second_type') => Reminder::getMorphClass(),
-			               Relation::field('second_id')   => Reminder::xfield('id'),
-		               ])
-		               ->leftJoin(ChatMemberMessage::getTable(), [
-			               ChatMemberMessage::field('id') => Relation::xfield('first_id'),
-		               ])
-		               ->andWhere([Reminder::field('user_id') => $this->current_user_id])
-		               ->notNotified()
-		               ->notDeleted();
 	}
 
 	/**
