@@ -24,7 +24,6 @@ use app\models\UserProfile;
 use app\models\views\ChatMemberSearchView;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
-use yii\db\Expression;
 
 class ChatMemberSearch extends Form
 {
@@ -86,16 +85,16 @@ class ChatMemberSearch extends Form
 		                             ])
 		                             ->leftJoinLastCallRelation()
 		                             ->leftJoin(['t' => $this->makeTaskQuery()], [
-			                             't.to_chat_member_id' => new Expression(ChatMember::field('id'))
+			                             't.to_chat_member_id' => ChatMember::xfield('id')
 		                             ])
 		                             ->leftJoin(['r' => $this->makeReminderQuery()], [
-			                             'r.to_chat_member_id' => new Expression(ChatMember::field('id'))
+			                             'r.to_chat_member_id' => ChatMember::xfield('id')
 		                             ])
 		                             ->leftJoin(['un' => $this->makeNotificationQuery()], [
-			                             'un.to_chat_member_id' => new Expression(ChatMember::field('id'))
+			                             'un.to_chat_member_id' => ChatMember::xfield('id')
 		                             ])
 		                             ->leftJoin(['m' => $this->makeMessageQuery()], [
-			                             'm.to_chat_member_id' => new Expression(ChatMember::field('id'))
+			                             'm.to_chat_member_id' => ChatMember::xfield('id')
 		                             ])
 		                             ->leftJoin(['cmm' => $messageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
 		                             ->leftJoin(['cmle' => $eventQuery], ChatMember::getColumn('id') . '=' . 'cmle.event_chat_member_id')
@@ -180,9 +179,9 @@ class ChatMemberSearch extends Form
 		$this->validateOrThrow();
 
 		if (!empty($this->search)) {
-			$query->leftJoin(['request_company' => Company::tableName()], ['request_company.id' => new Expression(Request::field('company_id'))]);
-			$query->leftJoin(['object_company' => Company::tableName()], ['object_company.id' => new Expression(Objects::field('company_id'))]);
-			$query->leftJoin(['user_profile' => UserProfile::tableName()], ['user_profile.user_id' => new Expression(User::field('id'))]);
+			$query->leftJoin(['request_company' => Company::tableName()], ['request_company.id' => Request::xfield('company_id')]);
+			$query->leftJoin(['object_company' => Company::tableName()], ['object_company.id' => Objects::xfield('company_id')]);
+			$query->leftJoin(['user_profile' => UserProfile::tableName()], ['user_profile.user_id' => User::xfield('id')]);
 
 			$query->andFilterWhere([
 				'or',
@@ -239,13 +238,13 @@ class ChatMemberSearch extends Form
 		           ->leftJoin(Relation::getTable(), [
 			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
 			           Relation::field('second_type') => Task::getMorphClass(),
-			           Relation::field('second_id')   => new Expression(Task::field('id')),
+			           Relation::field('second_id')   => Task::xfield('id'),
 		           ])
 		           ->leftJoin(ChatMemberMessage::getTable(), [
-			           ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+			           ChatMemberMessage::field('id') => Relation::xfield('first_id'),
 		           ])
 		           ->leftJoin(['observer' => TaskObserver::getTable()], [
-			           'observer.task_id'   => new Expression(Task::field('id')),
+			           'observer.task_id'   => Task::xfield('id'),
 			           'observer.user_id'   => $this->current_user_id,
 			           'observer.viewed_at' => null
 		           ])
@@ -271,10 +270,10 @@ class ChatMemberSearch extends Form
 		               ->leftJoin(Relation::getTable(), [
 			               Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
 			               Relation::field('second_type') => Reminder::getMorphClass(),
-			               Relation::field('second_id')   => new Expression(Reminder::field('id')),
+			               Relation::field('second_id')   => Reminder::xfield('id'),
 		               ])
 		               ->leftJoin(ChatMemberMessage::getTable(), [
-			               ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+			               ChatMemberMessage::field('id') => Relation::xfield('first_id'),
 		               ])
 		               ->andWhere([Reminder::field('user_id') => $this->current_user_id])
 		               ->notNotified()
@@ -294,10 +293,10 @@ class ChatMemberSearch extends Form
 		                       ->leftJoin(Relation::getTable(), [
 			                       Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
 			                       Relation::field('second_type') => UserNotification::getMorphClass(),
-			                       Relation::field('second_id')   => new Expression(UserNotification::field('id')),
+			                       Relation::field('second_id')   => UserNotification::xfield('id'),
 		                       ])
 		                       ->leftJoin(ChatMemberMessage::getTable(), [
-			                       ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+			                       ChatMemberMessage::field('id') => Relation::xfield('first_id'),
 		                       ])
 		                       ->andWhere([UserNotification::field('user_id') => $this->current_user_id])
 		                       ->andWhereNull(UserNotification::field('viewed_at'));
@@ -317,7 +316,7 @@ class ChatMemberSearch extends Form
 			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
 		                        ])
 		                        ->leftJoin(['views' => $subQuery], [
-			                        'views.chat_member_message_id' => new Expression(ChatMemberMessage::field('id')),
+			                        'views.chat_member_message_id' => ChatMemberMessage::xfield('id'),
 		                        ])
 		                        ->andWhere(['views.chat_member_id' => null])
 		                        ->notDeleted();

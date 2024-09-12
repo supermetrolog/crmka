@@ -36,7 +36,7 @@ class ChatMemberRepository
 			                                     ChatMemberLastEvent::field('event_chat_member_id')
 		                                     ])
 		                                     ->andWhere([
-			                                     ChatMemberLastEvent::field('chat_member_id') => new Expression(ChatMemberStatisticView::field('id'))
+			                                     ChatMemberLastEvent::field('chat_member_id') => ChatMemberStatisticView::xfield('id')
 		                                     ]);
 
 		$chatMemberQuery = ChatMemberStatisticView::find()
@@ -48,10 +48,10 @@ class ChatMemberRepository
 			                                          'outdated_call_count'       => $this->makeNeedingCallCountQuery($model_types)
 		                                          ])
 		                                          ->leftJoin(['tasks' => $this->makeTaskQuery($model_types)], [
-			                                          'tasks.observer_id' => new Expression(ChatMemberStatisticView::field('model_id'))
+			                                          'tasks.observer_id' => ChatMemberStatisticView::xfield('model_id')
 		                                          ])
 		                                          ->leftJoin(['notifications' => $this->makeNotificationQuery($model_types)], [
-			                                          'notifications.user_id' => new Expression(ChatMemberStatisticView::field('model_id'))
+			                                          'notifications.user_id' => ChatMemberStatisticView::xfield('model_id')
 		                                          ])
 		                                          ->leftJoin(['messages' => $this->makeMessagesQuery($model_types)], [
 			                                          'messages.to_chat_member_id' => $lastEventQuery,
@@ -61,7 +61,7 @@ class ChatMemberRepository
 			                                          ['message_views.chat_member_message_id' => new Expression('messages.id')],
 			                                          [
 				                                          'or',
-				                                          ['message_views.chat_member_id' => new Expression(ChatMemberStatisticView::field('id'))],
+				                                          ['message_views.chat_member_id' => ChatMemberStatisticView::xfield('id')],
 				                                          ['message_views.chat_member_id' => null],
 			                                          ]
 		                                          ])
@@ -89,21 +89,21 @@ class ChatMemberRepository
 		           ->leftJoin(Relation::getTable(), [
 			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
 			           Relation::field('second_type') => Task::getMorphClass(),
-			           Relation::field('second_id')   => new Expression(Task::field('id')),
+			           Relation::field('second_id')   => Task::xfield('id'),
 		           ])
 		           ->leftJoin(ChatMemberMessage::getTable(), [
-			           ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+			           ChatMemberMessage::field('id') => Relation::xfield('first_id'),
 		           ])
 		           ->leftJoin(['to' => TaskObserver::getTable()], [
-			           'to.task_id' => new Expression(Task::field('id'))
+			           'to.task_id' => Task::xfield('id')
 		           ])
 		           ->leftJoin(['chat_member' => ChatMember::getTable()], [
-			           'chat_member.id' => new Expression(ChatMemberMessage::field('to_chat_member_id'))
+			           'chat_member.id' => ChatMemberMessage::xfield('to_chat_member_id')
 		           ])
 		           ->andWhereNotNull(ChatMemberMessage::field('id'))
 		           ->andWhere([
 			           'to.viewed_at'           => null,
-			           'to.task_id'             => new Expression(Task::field('id')),
+			           'to.task_id'             => Task::xfield('id'),
 			           'chat_member.model_type' => $model_types
 		           ])
 		           ->notDeleted();
@@ -125,13 +125,13 @@ class ChatMemberRepository
 		                       ->leftJoin(Relation::getTable(), [
 			                       Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
 			                       Relation::field('second_type') => UserNotification::getMorphClass(),
-			                       Relation::field('second_id')   => new Expression(UserNotification::field('id')),
+			                       Relation::field('second_id')   => UserNotification::xfield('id'),
 		                       ])
 		                       ->leftJoin(ChatMemberMessage::getTable(), [
-			                       ChatMemberMessage::field('id') => new Expression(Relation::field('first_id')),
+			                       ChatMemberMessage::field('id') => Relation::xfield('first_id'),
 		                       ])
 		                       ->leftJoin(['chat_member' => ChatMember::getTable()], [
-			                       'chat_member.id' => new Expression(ChatMemberMessage::field('to_chat_member_id'))
+			                       'chat_member.id' => ChatMemberMessage::xfield('to_chat_member_id')
 		                       ])
 		                       ->andWhereNull(UserNotification::field('viewed_at'))
 		                       ->andWhereNotNull(ChatMemberMessage::field('id'))
@@ -172,7 +172,7 @@ class ChatMemberRepository
 			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id')
 		                        ])
 		                        ->leftJoin(['chat_member_rel' => ChatMember::getTable()], [
-			                        'chat_member_rel.id' => new Expression(ChatMemberMessage::field('to_chat_member_id'))
+			                        'chat_member_rel.id' => ChatMemberMessage::xfield('to_chat_member_id')
 		                        ])
 		                        ->andWhere(['chat_member_rel.model_type' => $model_types])
 		                        ->notDeleted();
