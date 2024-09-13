@@ -136,7 +136,7 @@ class ChatMemberSearch extends Form
 						'asc'  => [
 							'is_linked' => SORT_DESC,
 							IfExpressionBuilder::create()
-							                   ->condition('unread_message_count > 0')
+							                   ->condition('COUNT(DISTINCT m.id) > 0')
 							                   ->left('cmm.chat_member_message_id')
 							                   ->right('NULL')
 							                   ->beforeBuild(fn($expression) => "$expression ASC")
@@ -145,7 +145,7 @@ class ChatMemberSearch extends Form
 						'desc' => [
 							'is_linked' => SORT_DESC,
 							IfExpressionBuilder::create()
-							                   ->condition('unread_message_count > 0')
+							                   ->condition('COUNT(DISTINCT m.id) > 0')
 							                   ->left('cmm.chat_member_message_id')
 							                   ->right('NULL')
 							                   ->beforeBuild(fn($expression) => "$expression DESC")
