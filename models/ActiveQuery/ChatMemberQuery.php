@@ -2,19 +2,17 @@
 
 namespace app\models\ActiveQuery;
 
+use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
 use app\models\ChatMember;
-use app\models\ChatMemberMessage;
-use app\models\ChatMemberMessageView;
-use app\models\Notification\UserNotification;
+use app\models\Objects;
 use app\models\Relation;
-use app\models\Reminder;
-use app\models\Task;
+use app\models\Request;
 use app\models\views\ChatMemberSearchView;
+use yii\base\ErrorException;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
-use yii\db\Query;
 
 /**
  * @see ChatMember
@@ -48,6 +46,11 @@ class ChatMemberQuery extends AQ
 		return $this->andWhere([$this->field('model_type') => $type]);
 	}
 
+	public function byModelTypes(array $types): self
+	{
+		return $this->andWhere([$this->field('model_type') => $types]);
+	}
+
 	public function byMorph(int $id, string $type): self
 	{
 		return $this->byModelType($type)->byModelId($id);
@@ -69,5 +72,29 @@ class ChatMemberQuery extends AQ
 		$this->leftJoin(['last_call_rel' => $subQuery], $this->field('id') . '=' . 'last_call_rel.first_id');
 
 		return $this;
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function needCalling(): self
+	{
+		$interval = new Expression(SQLHelper::dateSub('NOW()', '1 YEAR'));
+
+		return $this->andWhere([
+				'or',
+				['<', 'last_call_rel.created_at', $interval],
+				[
+					'and',
+					['last_call_rel.created_at' => null],
+					['<', SQLHelper::fromUnixTime(Objects::field('last_update')), $interval]
+				],
+				[
+					'and',
+					['last_call_rel.created_at' => null],
+					['<', Request::field('updated_at'), $interval]
+				]
+			]
+		);
 	}
 }

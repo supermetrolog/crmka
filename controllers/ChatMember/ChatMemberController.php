@@ -2,6 +2,7 @@
 
 namespace app\controllers\ChatMember;
 
+use app\helpers\ArrayHelper;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -21,6 +22,7 @@ use app\resources\CallResource;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
+use app\resources\ChatMember\ChatMemberStatisticResource;
 use app\resources\MediaResource;
 use app\usecases\ChatMember\ChatMemberService;
 use Throwable;
@@ -60,17 +62,27 @@ class ChatMemberController extends AppController
 
 	/**
 	 * @throws NotFoundHttpException
+	 * @throws ErrorException
 	 */
 	public function actionView(int $id): JsonResource
 	{
 		return ChatMemberFullResource::make($this->findModel($id));
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function actionStatistic(): array
 	{
-		return $this->repository->getStatisticByIds(
-			$this->request->get('chat_member_ids')
+		$model_types     = ArrayHelper::toArray($this->request->get('model_types'));
+		$chat_member_ids = ArrayHelper::map(
+			ArrayHelper::toArray($this->request->get('chat_member_ids')),
+			fn($element) => (int)$element
 		);
+
+		$resource = $this->repository->getStatisticByIdsAndModelTypes($chat_member_ids, $model_types);
+
+		return ChatMemberStatisticResource::collection($resource);
 	}
 
 	/**
@@ -78,6 +90,7 @@ class ChatMemberController extends AppController
 	 */
 	public function actionPinnedMessage(int $id): ?JsonResource
 	{
+		/** @var ChatMember $model */
 		$model = ChatMember::find()
 		                   ->byId($id)
 		                   ->oneOrThrow();

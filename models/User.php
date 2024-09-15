@@ -180,7 +180,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	{
 		return self::find()->distinct()->with(['userProfile' => function ($query) {
 			$query->with(['phones', 'emails']);
-		}])->where(['status' => self::STATUS_ACTIVE, 'id' => $id])->one();
+		}])->where(['id' => $id])->one();
 	}
 
 	/**
