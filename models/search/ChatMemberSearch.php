@@ -252,7 +252,7 @@ class ChatMemberSearch extends Form
 			           'id'                => Task::field('id'),
 			           'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
 		           ])
-		           ->leftJoin(Relation::getTable(), [
+		           ->leftJoin('relation FORCE INDEX (`idx-relation-second_id-second_type`)', [
 			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
 			           Relation::field('second_type') => Task::getMorphClass(),
 			           Relation::field('second_id')   => Task::xfield('id'),
