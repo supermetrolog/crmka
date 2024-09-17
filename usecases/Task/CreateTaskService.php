@@ -49,11 +49,15 @@ class CreateTaskService
 			$task->saveOrThrow();
 			$task->linkManyToManyRelations('tags', $dto->tagIds);
 
-			$this->taskObserverService->create(new CreateTaskObserverDto([
+			$observer = $this->taskObserverService->create(new CreateTaskObserverDto([
 				'task_id'       => $task->id,
 				'user_id'       => $dto->user->id,
 				'created_by_id' => $dto->created_by_id,
 			]));
+
+			if ($dto->user->id === $dto->created_by_id) {
+				$this->taskObserverService->observe($observer);
+			}
 
 			foreach ($dto->observerIds as $observerId) {
 				$this->taskObserverService->create(new CreateTaskObserverDto([
