@@ -472,4 +472,9 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	{
 		return $this->id;
 	}
+
+	public static function isAdmin($user): bool
+	{
+		return $user->role === static::ROLE_ADMIN;
+	}
 }
