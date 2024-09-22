@@ -76,24 +76,20 @@ class TaskObserver extends AR
 	/**
 	 * Return true if the observer viewed the task, otherwise false
 	 *
-	 * @param TaskObserver $observer
-	 *
 	 * @return bool
 	 */
-	public static function isViewed(TaskObserver $observer): bool
+	public function isViewed(): bool
 	{
-		return $observer->viewed_at === null;
+		return $this->viewed_at === null;
 	}
 
 	/**
 	 * Return true if the observer not viewed the task, otherwise false
 	 *
-	 * @param TaskObserver $observer
-	 *
 	 * @return bool
 	 */
-	public static function isNotViewed(TaskObserver $observer): bool
+	public function isNotViewed(): bool
 	{
-		return !static::isViewed($observer);
+		return !$this->isViewed();
 	}
 }

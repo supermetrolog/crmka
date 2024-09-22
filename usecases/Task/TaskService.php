@@ -131,7 +131,7 @@ class TaskService
 				$this->done($task);
 
 				$observer = $task->targetUserObserver;
-				if ($observer instanceof TaskObserver && TaskObserver::isNotViewed($observer)) {
+				if ($observer instanceof TaskObserver && $observer->isNotViewed()) {
 					$this->taskObserverService->observe($observer);
 				}
 
