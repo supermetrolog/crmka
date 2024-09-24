@@ -7,6 +7,7 @@ namespace app\models\forms\ChatMember;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
 use app\kernel\common\models\Form\Form;
+use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
@@ -32,7 +33,13 @@ class ChatMemberMessageForm extends Form
 			[['message'], 'string', 'max' => 2048],
 			[['from_chat_member_id'], 'exist', 'targetClass' => ChatMember::class, 'targetAttribute' => ['from_chat_member_id' => 'id']],
 			[['to_chat_member_id'], 'exist', 'targetClass' => ChatMember::class, 'targetAttribute' => ['to_chat_member_id' => 'id']],
-			[['reply_to_id'], 'exist', 'targetClass' => ChatMemberMessage::class, 'targetAttribute' => ['reply_to_id' => 'id']],
+			[['reply_to_id'],
+			 'exist',
+			 'targetClass'     => ChatMemberMessage::class,
+			 'targetAttribute' => ['reply_to_id' => 'id'],
+			 'filter'          => function (ChatMemberMessageQuery $query) {
+				 $query->andWhere(['to_chat_member_id' => $this->to_chat_member_id]);
+			 }],
 			['contact_ids', 'each', 'rule' => [
 				'exist',
 				'targetClass'     => Contact::class,
@@ -83,7 +90,12 @@ class ChatMemberMessageForm extends Form
 		]);
 	}
 
-	private function getReplyTo()
+	/**
+	 * Get reply to message if exists
+	 *
+	 * @return ChatMemberMessage|null
+	 */
+	private function getReplyTo(): ?ChatMemberMessage
 	{
 		if ($this->reply_to_id !== null) {
 			return ChatMemberMessage::find()->byId((int)$this->reply_to_id)->one();

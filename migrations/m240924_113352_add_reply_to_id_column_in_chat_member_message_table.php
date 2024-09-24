@@ -24,7 +24,7 @@ class m240924_113352_add_reply_to_id_column_in_chat_member_message_table extends
 		$this->foreignKey(
 			$table,
 			['reply_to_id'],
-			'chat_member_message',
+			$table,
 			['id']
 		);
 	}
