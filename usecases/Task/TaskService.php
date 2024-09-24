@@ -73,6 +73,8 @@ class TaskService
 				]);
 			}
 
+			$tx->commit();
+
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;
