@@ -3,13 +3,11 @@
 namespace app\models\search;
 
 use app\kernel\common\models\AQ\AQ;
-use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use yii\data\ActiveDataProvider;
-use yii\data\Pagination;
 use yii\db\Expression;
 
 class ChatMemberMessageSearch extends Form
@@ -59,6 +57,7 @@ class ChatMemberMessageSearch extends Form
 		                          ->with(['alerts.createdByUser.userProfile'])
 		                          ->with(['reminders.createdByUser.userProfile'])
 		                          ->with(['contacts', 'tags', 'notifications', 'files'])
+		                          ->with(['replyTo.fromChatMember.user.userProfile'])
 		                          ->notDeleted()
 		                          ->orderBy([ChatMemberMessage::field('id') => SORT_DESC])
 		                          ->limit(30);
