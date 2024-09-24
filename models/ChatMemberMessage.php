@@ -25,6 +25,7 @@ use yii\db\ActiveQuery;
  * @property string|null             $message
  * @property string                  $created_at
  * @property string                  $updated_at
+ * @property string                  $deleted_at
  *
  * @property ChatMember              $fromChatMember
  * @property ChatMember              $toChatMember
