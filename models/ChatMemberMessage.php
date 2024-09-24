@@ -22,6 +22,7 @@ use yii\db\ActiveQuery;
  * @property int                     $id
  * @property int                     $to_chat_member_id
  * @property int|null                $from_chat_member_id
+ * @property int|null                $reply_to_id
  * @property string|null             $message
  * @property string                  $created_at
  * @property string                  $updated_at
@@ -37,6 +38,7 @@ use yii\db\ActiveQuery;
  * @property ChatMemberMessageTag[]  $tags
  * @property Media[]                 $files
  * @property ChatMemberMessageView[] $views
+ * @property ChatMemberMessage       $replyTo
  */
 class ChatMemberMessage extends AR
 {
@@ -187,8 +189,16 @@ class ChatMemberMessage extends AR
 	{
 		return $this->hasMany(ChatMemberMessageView::class, [
 			'chat_member_message_id' => 'id',
-			'chat_member_id' => 'from_chat_member_id',
+			'chat_member_id'         => 'from_chat_member_id',
 		]);
+	}
+
+	public function getReplyTo(): ChatMemberMessageQuery
+	{
+		/** @var ChatMemberMessageQuery $query */
+		$query = $this->hasOne(ChatMemberMessage::class, ['id' => 'reply_to_id']);
+
+		return $query;
 	}
 
 

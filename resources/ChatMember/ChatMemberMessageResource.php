@@ -28,6 +28,7 @@ class ChatMemberMessageResource extends JsonResource
 			'id'                  => $this->resource->id,
 			'from_chat_member_id' => $this->resource->from_chat_member_id,
 			'to_chat_member_id'   => $this->resource->to_chat_member_id,
+			'reply_to_id'         => $this->resource->reply_to_id,
 			'message'             => $this->resource->message,
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
@@ -41,6 +42,7 @@ class ChatMemberMessageResource extends JsonResource
 			'notifications'       => UserNotificationResource::collection($this->resource->notifications),
 			'tags'                => ChatMemberMessageTagResource::collection($this->resource->tags),
 			'files'               => MediaResource::collection($this->resource->files),
+			'reply_to'            => ChatMemberMessageShortResource::tryMakeArray($this->resource->replyTo)
 		];
 	}
 }
