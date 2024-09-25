@@ -30,6 +30,7 @@ class ObjectShortResource extends JsonResource
 			'updated_at'   => $this->getUpdatedAt(),
 			'created_at'   => $this->resource->publ_time,
 			'company'      => CompanyShortResource::tryMakeArray($this->resource->company),
+			'agent_id'     => $this->resource->agent_id
 		];
 	}
 
