@@ -11,6 +11,7 @@ use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
+use app\models\TaskObserver;
 use app\usecases\TaskObserver\TaskObserverService;
 use DateTimeInterface;
 use Exception;
@@ -72,6 +73,8 @@ class TaskService
 				]);
 			}
 
+			$tx->commit();
+
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;
@@ -128,6 +131,12 @@ class TaskService
 		switch ($dto->status) {
 			case Task::STATUS_DONE:
 				$this->done($task);
+
+				$observer = $task->targetUserObserver;
+				if ($observer instanceof TaskObserver && $observer->isNotViewed()) {
+					$this->taskObserverService->observe($observer);
+				}
+
 				break;
 			case Task::STATUS_ACCEPTED:
 				$this->accept($task);

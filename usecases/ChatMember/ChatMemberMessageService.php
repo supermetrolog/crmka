@@ -93,8 +93,12 @@ class ChatMemberMessageService
 
 			$message->from_chat_member_id = $dto->from->id;
 			$message->to_chat_member_id   = $dto->to->id;
+			$message->message             = $dto->message;
 
-			$message->message = $dto->message;
+			if ($dto->replyTo !== null) {
+				$message->reply_to_id = $dto->replyTo->id;
+				$this->markChatAsLatestForMember($message->to_chat_member_id, $dto->replyTo->from_chat_member_id);
+			}
 
 			$message->saveOrThrow();
 

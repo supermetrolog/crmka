@@ -43,7 +43,10 @@ class TaskSearch extends Form
 		$query = Task::find()->with(['user.userProfile', 'createdByUser.userProfile', 'tags', 'observers.user.userProfile'])->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
+			'query'      => $query,
+			'pagination' => [
+				'pageSize' => 100
+			],
 		]);
 
 		$this->load($params);
