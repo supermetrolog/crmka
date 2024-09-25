@@ -13,9 +13,12 @@ use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\models\Notification\UserNotification;
+use app\models\Objects;
 use app\models\Relation;
+use app\models\Request;
 use app\models\Task;
 use app\models\TaskObserver;
+use app\models\User;
 use app\models\views\ChatMemberStatisticView;
 use yii\base\ErrorException;
 use yii\db\Expression;
@@ -31,6 +34,8 @@ class ChatMemberRepository
 	 */
 	public function getStatisticByIdsAndModelTypes(array $chat_member_ids, array $model_types): array
 	{
+		$outdated_call_count = $this->makeNeedingCallCountQuery($model_types, $chat_member_ids);
+
 		$lastEventQuery = ChatMemberLastEvent::find()
 		                                     ->select([
 			                                     ChatMemberLastEvent::field('event_chat_member_id')
@@ -45,7 +50,7 @@ class ChatMemberRepository
 			                                          'unread_task_count'         => 'COUNT(DISTINCT tasks.id)',
 			                                          'unread_notification_count' => 'COUNT(DISTINCT notifications.id)',
 			                                          'unread_message_count'      => 'COUNT(DISTINCT messages.id) - COUNT(DISTINCT message_views.id)',
-			                                          'outdated_call_count'       => $this->makeNeedingCallCountQuery($model_types)
+			                                          'outdated_call_count'       => $outdated_call_count
 		                                          ])
 		                                          ->leftJoin(['tasks' => $this->makeTaskQuery($model_types)], [
 			                                          'tasks.observer_id' => ChatMemberStatisticView::xfield('model_id')
@@ -142,12 +147,28 @@ class ChatMemberRepository
 
 	/**
 	 * @param string[] $model_types
+	 * @param int[]    $chat_member_ids
 	 *
 	 * @return ChatMemberQuery
 	 * @throws ErrorException
 	 */
-	private function makeNeedingCallCountQuery(array $model_types): ChatMemberQuery
+	private function makeNeedingCallCountQuery(array $model_types, array $chat_member_ids): ChatMemberQuery
 	{
+		$chat_member_models_ids = ChatMember::find()
+		                                    ->select([
+			                                    'id' => ChatMember::field('model_id')
+		                                    ])
+		                                    ->andWhere([ChatMember::field('id') => $chat_member_ids])
+		                                    ->column();
+
+		$old_users_ids = User::find()
+		                     ->select([
+			                     'id' => User::field('user_id_old')
+		                     ])
+		                     ->andWhere([User::field('id') => $chat_member_models_ids])
+		                     ->column();
+
+
 		return ChatMember::find()
 		                 ->select([
 			                 'count' => 'COUNT(*)'
@@ -155,7 +176,10 @@ class ChatMemberRepository
 		                 ->leftJoinLastCallRelation()
 		                 ->byModelTypes($model_types)
 		                 ->joinWith(['objectChatMember.object', 'request'])
-		                 ->needCalling();
+		                 ->needCalling()
+		                 ->andWhere(['or',
+		                             [Request::field('consultant_id') => $chat_member_models_ids],
+		                             [Objects::field('agent_id') => $old_users_ids]]);
 	}
 
 	/**
