@@ -80,7 +80,7 @@ class ChatMemberMessageForm extends Form
 
 		return [
 			self::SCENARIO_CREATE => [...$common, 'from_chat_member_id', 'to_chat_member_id', 'reply_to_id'],
-			self::SCENARIO_UPDATE => [...$common],
+			self::SCENARIO_UPDATE => [...$common, 'current_files'],
 		];
 	}
 
@@ -101,9 +101,10 @@ class ChatMemberMessageForm extends Form
 		}
 
 		return new UpdateChatMemberMessageDto([
-			'message'    => $this->message,
-			'contactIds' => $this->contact_ids,
-			'tagIds'     => $this->tag_ids,
+			'message'      => $this->message,
+			'contactIds'   => $this->contact_ids,
+			'tagIds'       => $this->tag_ids,
+			'currentFiles' => $this->current_files
 		]);
 	}
 

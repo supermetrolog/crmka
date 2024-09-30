@@ -33,6 +33,7 @@ use app\models\User;
 use app\repositories\ChatMemberMessageRepository;
 use app\usecases\Alert\CreateAlertService;
 use app\usecases\Media\CreateMediaService;
+use app\usecases\Media\MediaService;
 use app\usecases\Relation\RelationService;
 use app\usecases\Reminder\CreateReminderService;
 use app\usecases\Task\CreateTaskService;
@@ -52,6 +53,7 @@ class ChatMemberMessageService
 	protected NotifierFactory              $notifierFactory;
 	protected ChatMemberMessageRepository  $chatMemberMessageRepository;
 	protected ChatMemberLastEventService   $chatMemberLastEventService;
+	protected MediaService                 $mediaService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -63,7 +65,8 @@ class ChatMemberMessageService
 		ChatMemberMessageViewService $chatMemberMessageViewService,
 		NotifierFactory $notifierFactory,
 		ChatMemberMessageRepository $chatMemberMessageRepository,
-		ChatMemberLastEventService $chatMemberLastEventService
+		ChatMemberLastEventService $chatMemberLastEventService,
+		MediaService $mediaService
 	)
 	{
 		$this->transactionBeginner          = $transactionBeginner;
@@ -76,6 +79,7 @@ class ChatMemberMessageService
 		$this->notifierFactory              = $notifierFactory;
 		$this->chatMemberMessageRepository  = $chatMemberMessageRepository;
 		$this->chatMemberLastEventService   = $chatMemberLastEventService;
+		$this->mediaService                 = $mediaService;
 	}
 
 	/**
@@ -148,10 +152,15 @@ class ChatMemberMessageService
 
 
 	/**
+	 * @param ChatMemberMessage          $message
+	 * @param UpdateChatMemberMessageDto $dto
+	 * @param CreateMediaDto[]           $mediaDtos
+	 *
+	 * @return ChatMemberMessage
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function update(ChatMemberMessage $message, UpdateChatMemberMessageDto $dto): ChatMemberMessage
+	public function update(ChatMemberMessage $message, UpdateChatMemberMessageDto $dto, array $mediaDtos = []): ChatMemberMessage
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -192,7 +201,26 @@ class ChatMemberMessageService
 				]));
 			}
 
+			$deletedMedias = $message->getFiles()->andWhere(['not in', 'id', $dto->currentFiles])->all();
+
+			foreach ($deletedMedias as $media) {
+				$this->mediaService->delete($media);
+			}
+
+			foreach ($mediaDtos as $mediaDto) {
+				$media = $this->createMediaService->create($mediaDto);
+
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $message::getMorphClass(),
+					'first_id'    => $message->id,
+					'second_type' => $media::getMorphClass(),
+					'second_id'   => $media->id,
+				]));
+			}
+
 			$tx->commit();
+
+			$message->refresh();
 
 			return $message;
 		} catch (Throwable $th) {

@@ -12,7 +12,7 @@ use yii\db\StaleObjectException;
 
 class MediaService
 {
-	private MediaComponent $media;
+	private MediaComponent               $media;
 	private TransactionBeginnerInterface $transactionBeginner;
 
 	public function __construct(
@@ -20,7 +20,7 @@ class MediaService
 		TransactionBeginnerInterface $transactionBeginner
 	)
 	{
-		$this->media = $media;
+		$this->media               = $media;
 		$this->transactionBeginner = $transactionBeginner;
 	}
 
@@ -43,6 +43,9 @@ class MediaService
 //	}
 
 	/**
+	 * @param Media $media
+	 *
+	 * @return void
 	 * @throws StaleObjectException
 	 * @throws Throwable
 	 */
@@ -56,7 +59,7 @@ class MediaService
 			$this->media->delete($media->path);
 
 			$tx->commit();
-		} catch (\Throwable $th) {
+		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;
 		}

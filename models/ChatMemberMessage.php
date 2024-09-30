@@ -8,6 +8,7 @@ use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTagQuery;
 use app\models\ActiveQuery\ChatMemberMessageViewQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\ReminderQuery;
 use app\models\ActiveQuery\TaskQuery;
@@ -165,13 +166,16 @@ class ChatMemberMessage extends AR
 	}
 
 	/**
-	 * @return ActiveQuery
+	 * @return MediaQuery
 	 * @throws ErrorException
 	 */
-	public function getFiles(): ActiveQuery
+	public function getFiles(): MediaQuery
 	{
-		return $this->morphHasManyVia(Media::class, 'id', 'second')
-		            ->via('relationFirst');
+		/** @var MediaQuery $query */
+		$query = $this->morphHasManyVia(Media::class, 'id', 'second')
+		              ->via('relationFirst');
+
+		return $query->notDeleted();
 	}
 
 	/**
