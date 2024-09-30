@@ -13,7 +13,7 @@ class CreateChatMemberMessageDto extends BaseObject
 	public ChatMember         $from;
 	public ChatMember         $to;
 	public ?ChatMemberMessage $replyTo;
-	public string             $message;
+	public ?string            $message;
 	public array              $contactIds;
 	public array              $tagIds;
 }

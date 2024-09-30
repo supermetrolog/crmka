@@ -6,12 +6,14 @@ namespace app\models\forms\ChatMember;
 
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
+use app\helpers\validators\AnyValidator;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
 use app\models\Contact;
+use app\models\Media;
 
 class ChatMemberMessageForm extends Form
 {
@@ -20,19 +22,28 @@ class ChatMemberMessageForm extends Form
 
 	public $from_chat_member_id;
 	public $to_chat_member_id;
-	public $message;
-	public $contact_ids = [];
-	public $tag_ids     = [];
-	public $reply_to_id = null;
+	public $message       = null;
+	public $contact_ids   = [];
+	public $tag_ids       = [];
+	public $reply_to_id   = null;
+	public $current_files = [];
+
+	public $files = [];
 
 	public function rules(): array
 	{
 		return [
-			[['message', 'from_chat_member_id', 'to_chat_member_id'], 'required'],
+			[['from_chat_member_id', 'to_chat_member_id'], 'required'],
 			[['from_chat_member_id', 'to_chat_member_id', 'reply_to_id'], 'integer'],
 			[['message'], 'string', 'max' => 2048],
 			[['from_chat_member_id'], 'exist', 'targetClass' => ChatMember::class, 'targetAttribute' => ['from_chat_member_id' => 'id']],
 			[['to_chat_member_id'], 'exist', 'targetClass' => ChatMember::class, 'targetAttribute' => ['to_chat_member_id' => 'id']],
+			[
+				['files', 'current_files', 'message'],
+				AnyValidator::class,
+				'message' => 'Сообщение или список файлов должны быть заполнены',
+				'rule'    => 'required'
+			],
 			[['reply_to_id'],
 			 'exist',
 			 'targetClass'     => ChatMemberMessage::class,
@@ -49,6 +60,11 @@ class ChatMemberMessageForm extends Form
 				'exist',
 				'targetClass'     => ChatMemberMessageTag::class,
 				'targetAttribute' => ['tag_ids' => 'id'],
+			]],
+			['current_files', 'each', 'rule' => [
+				'exist',
+				'targetClass'     => Media::class,
+				'targetAttribute' => ['current_files' => 'id'],
 			]]
 		];
 	}
@@ -58,12 +74,13 @@ class ChatMemberMessageForm extends Form
 		$common = [
 			'message',
 			'contact_ids',
-			'tag_ids'
+			'tag_ids',
+			'files'
 		];
 
 		return [
 			self::SCENARIO_CREATE => [...$common, 'from_chat_member_id', 'to_chat_member_id', 'reply_to_id'],
-			self::SCENARIO_UPDATE => [...$common],
+			self::SCENARIO_UPDATE => [...$common, 'current_files'],
 		];
 	}
 
@@ -84,9 +101,10 @@ class ChatMemberMessageForm extends Form
 		}
 
 		return new UpdateChatMemberMessageDto([
-			'message'    => $this->message,
-			'contactIds' => $this->contact_ids,
-			'tagIds'     => $this->tag_ids,
+			'message'      => $this->message,
+			'contactIds'   => $this->contact_ids,
+			'tagIds'       => $this->tag_ids,
+			'currentFiles' => $this->current_files
 		]);
 	}
 
