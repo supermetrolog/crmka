@@ -6,6 +6,7 @@ namespace app\models\ActiveQuery;
 
 use app\kernel\common\models\AQ\AQ;
 use app\models\User;
+use app\models\UserAccessToken;
 use yii\db\ActiveRecord;
 
 class UserQuery extends AQ
@@ -28,5 +29,12 @@ class UserQuery extends AQ
 	public function all($db = null): array
 	{
 		return parent::all($db);
+	}
+
+	public function byAccessToken(string $token): self
+	{
+		$userAccessToken = UserAccessToken::findValid()->byToken($token);
+
+		return $this->leftJoin(['uat' => $userAccessToken], ['uat.user_id' => $this->field('id')]);
 	}
 }
