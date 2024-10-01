@@ -20,26 +20,28 @@ use yii\web\IdentityInterface;
 /**
  * This is the model class for table "user".
  *
- * @property int         $id
- * @property string      $username
- * @property string      $auth_key
- * @property string      $password_hash
- * @property string|null $password_reset_token
- * @property string      $email
- * @property string      $email_username
- * @property string      $email_password
- * @property string|null $access_token
- * @property int         $status
- * @property int         $created_at
- * @property int         $updated_at
- * @property int         $role
- * @property int         $user_id_old
+ * @property int                  $id
+ * @property string               $username
+ * @property string               $auth_key
+ * @property string               $password_hash
+ * @property string|null          $password_reset_token
+ * @property string               $email
+ * @property string               $email_username
+ * @property string               $email_password
+ * @property int                  $status
+ * @property int                  $created_at
+ * @property int                  $updated_at
+ * @property int                  $role
+ * @property int                  $user_id_old
  *
- * @property UserProfile $userProfile
- * @property ChatMember  $chatMember
+ * @property UserProfile          $userProfile
+ * @property ChatMember           $chatMember
+ * @property-read UserAccessToken $accessToken
  */
 class User extends AR implements IdentityInterface, NotifiableInterface
 {
+	const DEFAULT_MEDIA_CATEGORY = 'user';
+
 	const STATUS_DELETED  = 0;
 	const STATUS_INACTIVE = 9;
 	const STATUS_ACTIVE   = 10;
@@ -301,7 +303,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	 */
 	public static function findIdentityByAccessToken($token, $type = null)
 	{
-		return static::findOne(['access_token' => $token]);
+		return self::find()->byAccessToken($token)->one();
 	}
 
 	/**
@@ -400,7 +402,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	 *
 	 * @return bool if password provided is valid for current user
 	 */
-	public function validatePassword($password)
+	public function validatePassword(string $password): bool
 	{
 		return Yii::$app->security->validatePassword($password, $this->password_hash);
 	}
@@ -463,6 +465,9 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 		return $this->morphHasOne(ChatMember::class);
 	}
 
+	/**
+	 * @return UserQuery
+	 */
 	public static function find(): UserQuery
 	{
 		return new UserQuery(get_called_class());
@@ -471,5 +476,13 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	public function getUserId(): int
 	{
 		return $this->id;
+	}
+
+	/**
+	 * @return bool Whether the user is an administrator.
+	 */
+	public function isAdministrator(): bool
+	{
+		return $this->role === self::ROLE_ADMIN;
 	}
 }
