@@ -24,8 +24,7 @@ class m240930_162744_create_user_access_token_table extends Migration
 
 		$this->foreignKey($tableName, ['user_id'], 'user', ['id']);
 		$this->index($tableName, ['user_id']);
-		$this->index($tableName, ['user_id', 'access_token']);
-		$this->index($tableName, ['user_id', 'expires_at']);
+		$this->index($tableName, ['access_token', 'expires_at']);
 	}
 
 	/**
