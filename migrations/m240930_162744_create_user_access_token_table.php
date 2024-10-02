@@ -18,12 +18,14 @@ class m240930_162744_create_user_access_token_table extends Migration
 			'user_id'      => $this->integer()->notNull(),
 			'access_token' => $this->string()->notNull(),
 			'expires_at'   => $this->timestamp()->notNull(),
-			'ip'           => $this->string(19),
-			'user_agent'   => $this->string(),
+			'ip'           => $this->string(15),
+			'user_agent'   => $this->string(1024),
 		], $this->timestamps(), $this->softDelete());
 
 		$this->foreignKey($tableName, ['user_id'], 'user', ['id']);
-
+		$this->index($tableName, ['user_id']);
+		$this->index($tableName, ['user_id', 'access_token']);
+		$this->index($tableName, ['user_id', 'expires_at']);
 	}
 
 	/**
