@@ -2,12 +2,12 @@
 
 namespace app\models\ActiveQuery;
 
+use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\UserAccessToken;
 use yii\db\ActiveRecord;
-use yii\db\Expression;
 
 class UserAccessTokenQuery extends AQ
 {
@@ -44,8 +44,16 @@ class UserAccessTokenQuery extends AQ
 	public function notExpired(): self
 	{
 		return $this->andWhere(
-			['>', $this->field('expires_at'), new Expression('NOW()')]
+			SQLHelper::afterNow($this->field('expires_at'))
 		);
+	}
+
+	/**
+	 * @return UserAccessTokenQuery
+	 */
+	public function onlyValid(): self
+	{
+		return $this->notExpired()->notDeleted();
 	}
 
 	/**
