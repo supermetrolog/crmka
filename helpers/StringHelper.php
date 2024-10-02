@@ -33,4 +33,20 @@ class StringHelper
 	{
 		return !self::empty($string);
 	}
+
+	/** Truncates a string to a given maximum length.
+	 *
+	 * @param string $string
+	 * @param int    $maxLength
+	 *
+	 * @return string The truncated string or the original string if it is shorter than the maximum length.
+	 */
+	public static function truncate(string $string, int $maxLength): string
+	{
+		if (strlen($string) <= $maxLength) {
+			return $string;
+		}
+
+		return substr($string, 0, $maxLength);
+	}
 }
