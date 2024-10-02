@@ -26,6 +26,7 @@ class UserProfileService
 	}
 
 	/**
+	 * @param int                  $userId
 	 * @param CreateUserProfileDto $userProfileDto
 	 * @param UploadFile           $uploadMedia
 	 *
@@ -34,13 +35,13 @@ class UserProfileService
 	 * @throws Throwable
 	 * @throws ValidationErrorHttpException
 	 */
-	public function create(CreateUserProfileDto $userProfileDto, UploadFile $uploadMedia): UserProfile
+	public function create(int $userId, CreateUserProfileDto $userProfileDto, UploadFile $uploadMedia): UserProfile
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
 			$model = new UserProfile([
-				'user_id'     => $userProfileDto->user_id,
+				'user_id'     => $userId,
 				'first_name'  => $userProfileDto->first_name,
 				'middle_name' => $userProfileDto->middle_name,
 				'last_name'   => $userProfileDto->last_name,

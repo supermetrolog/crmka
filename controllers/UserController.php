@@ -2,44 +2,45 @@
 
 namespace app\controllers;
 
-use app\behaviors\BaseControllerBehaviors;
+use app\dto\Auth\AuthUserAgentDto;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\TokenHelper;
+use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\LoginForm;
 use app\models\forms\User\UserForm;
 use app\models\forms\User\UserProfileForm;
+use app\models\search\UserSearch;
 use app\models\UploadFile;
 use app\models\User;
-use app\resources\Authentication\AuthenticationLoginResource;
+use app\resources\Auth\AuthLoginResource;
 use app\resources\User\UserResource;
-use app\usecases\Authentication\AuthenticationService;
+use app\resources\User\UserWithContactsResource;
+use app\usecases\Auth\AuthService;
 use app\usecases\User\UserService;
 use Exception;
 use Throwable;
-use Yii;
 use yii\base\ErrorException;
+use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper;
-use yii\rest\ActiveController;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
-class UserController extends ActiveController
+class UserController extends AppController
 {
-	public $modelClass = 'app\models\User';
-
-	private AuthenticationService $authService;
-	private UserService           $userService;
+	private AuthService $authService;
+	private UserService $userService;
+	protected array     $exceptAuthActions = ['login'];
 
 
 	public function __construct(
 		$id,
 		$module,
-		AuthenticationService $authService,
+		AuthService $authService,
 		UserService $userService,
 		array $config = []
 	)
@@ -50,33 +51,29 @@ class UserController extends ActiveController
 		parent::__construct($id, $module, $config);
 	}
 
-	public function behaviors(): array
+	/**
+	 * @return ActiveDataProvider
+	 * @throws ErrorException
+	 * @throws ValidateException
+	 */
+	public function actionIndex(): ActiveDataProvider
 	{
-		$behaviors = parent::behaviors();
+		$searchModel = new UserSearch();
 
-		return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['login', 'index']);
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return UserWithContactsResource::fromDataProvider($dataProvider);
 	}
 
-	public function actions(): array
+	/**
+	 * @param $id
+	 *
+	 * @return array|null
+	 * @throws NotFoundHttpException
+	 */
+	public function actionView($id): array
 	{
-		$actions = parent::actions();
-		unset($actions['create']);
-		unset($actions['index']);
-		unset($actions['update']);
-		unset($actions['delete']);
-		unset($actions['view']);
-
-		return $actions;
-	}
-
-	public function actionIndex()
-	{
-		return User::getUsers();
-	}
-
-	public function actionView($id)
-	{
-		return User::getUser($id);
+		return UserWithContactsResource::make($this->findModel($id))->toArray();
 	}
 
 	/** Creates a new user.
@@ -121,7 +118,7 @@ class UserController extends ActiveController
 	 * @throws ValidationErrorHttpException If the user form cannot be validated.
 	 * @throws NotFoundHttpException If the user cannot be found.
 	 */
-	public function actionUpdate($id): UserResource
+	public function actionUpdate($id): array
 	{
 		$model = $this->findModel($id);
 
@@ -138,6 +135,12 @@ class UserController extends ActiveController
 		$userProfileForm->emails = ArrayHelper::getValue($userProfileData, 'emails', []);
 		$userProfileForm->phones = ArrayHelper::getValue($userProfileData, 'phones', []);
 
+		$isAdministrator = $this->user->identity->isAdministrator();
+
+		if (isset($form->password) && !$isAdministrator) {
+			throw new ForbiddenHttpException('У вас нет прав на изменение пароля сотрудника');
+		}
+
 		$form->validateOrThrow();
 		$userProfileForm->validateOrThrow();
 
@@ -146,7 +149,7 @@ class UserController extends ActiveController
 
 		$user = $this->userService->update($model, $form->getDto(), $userProfileForm->getDto(), $uploadFileModel);
 
-		return new UserResource($user);
+		return UserResource::make($user)->toArray();
 	}
 
 
@@ -161,7 +164,7 @@ class UserController extends ActiveController
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$user = Yii::$app->user->identity;
+		$user = $this->user->identity;
 
 		if ($user === null || !$user->isAdministrator()) {
 			throw new ForbiddenHttpException('У вас нет прав на удаление пользователя');
@@ -184,16 +187,17 @@ class UserController extends ActiveController
 	 */
 	public function actionLogin(): array
 	{
-		$form = new LoginForm();
+		$form = new LoginForm($this->authService);
 		$form->load($this->request->post());
 
-		if ($form->validate()) {
-			$authenticated = $this->authService->authenticate($form->username, $form->password);
+		$form->validateOrThrow();
 
-			return AuthenticationLoginResource::make($authenticated)->toArray();
-		}
+		$authDto = $this->authService->login($form->getDto(), new AuthUserAgentDto([
+			'agent' => $this->request->getUserAgent(),
+			'IP'    => $this->request->getUserIP(),
+		]));
 
-		throw new ValidationErrorHttpException($form->getErrorSummary(false));
+		return AuthLoginResource::make($authDto)->toArray();
 	}
 
 	/**
@@ -205,7 +209,7 @@ class UserController extends ActiveController
 	 */
 	public function actionLogout(): SuccessResponse
 	{
-		$token = TokenHelper::parseBearerToken(Yii::$app->request->headers->get('Authorization'));
+		$token = TokenHelper::parseBearerToken($this->request->headers->get('Authorization'));
 		$this->authService->logout($token);
 
 		return new SuccessResponse('Вы вышли из аккаунт');
@@ -222,7 +226,9 @@ class UserController extends ActiveController
 	 */
 	protected function findModel(int $id): User
 	{
-		$user = User::findOne($id);
+		$user = User::find()->with(['userProfile' => function ($query) {
+			$query->with(['phones', 'emails']);
+		}])->byId($id)->one();
 
 		if ($user instanceof User) {
 			return $user;

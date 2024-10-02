@@ -10,22 +10,25 @@ use app\dto\User\UpdateUserDto;
 use app\exceptions\ValidationErrorHttpException;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\SignUp;
 use app\models\UploadFile;
 use app\models\User;
 use Throwable;
+use yii\base\Security;
 use yii\db\ActiveRecord;
 
 class UserService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
 	private UserProfileService           $userProfileService;
+	private Security                     $security;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
-		UserProfileService $userProfileService
+		UserProfileService $userProfileService,
+		Security $security
 	)
 	{
+		$this->security            = $security;
 		$this->transactionBeginner = $transactionBeginner;
 		$this->userProfileService  = $userProfileService;
 	}
@@ -45,24 +48,22 @@ class UserService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$model = new SignUp([
+			$model = new User([
 				'username'       => $createUserDto->username,
 				'email'          => $createUserDto->email,
 				'email_username' => $createUserDto->email_username,
 				'email_password' => $createUserDto->email_password,
 				'role'           => $createUserDto->role,
-				'password'       => $createUserDto->password,
+				'password_hash'  => $this->security->generatePasswordHash($createUserDto->password)
 			]);
 
-			$userId = $model->signUp();
+			$model->saveOrThrow();
 
-			$userProfileDto->user_id = $userId;
-
-			$this->userProfileService->create($userProfileDto, $uploadMedia);
+			$this->userProfileService->create($model->id, $userProfileDto, $uploadMedia);
 
 			$tx->commit();
 
-			return User::find()->with('userProfile')->where(['id' => $userId])->one();
+			return User::find()->with('userProfile')->where(['id' => $model->id])->one();
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
@@ -95,6 +96,10 @@ class UserService
 
 			if ($dto->email_password !== null) {
 				$model->email_password = $dto->email_password;
+			}
+
+			if ($dto->password !== null) {
+				$model->password_hash = $this->security->generatePasswordHash($dto->password);
 			}
 
 			$model->saveOrThrow();

@@ -7,8 +7,13 @@ return
 			'controller'    => 'user',
 			'except'        => [],
 			'extraPatterns' => [
+				'GET,OPTIONS'         => 'index',
+				'GET,OPTIONS <id>'    => 'view',
+				'POST,OPTIONS'        => 'create',
+				'PUT,OPTIONS <id>'    => 'update',
+				'DELETE,OPTIONS <id>' => 'delete',
 				'POST,OPTIONS login'  => 'login',
-				'POST,OPTIONS logout' => 'logout',
+				'POST,OPTIONS logout' => 'logout'
 			],
 		],
 		[

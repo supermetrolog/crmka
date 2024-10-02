@@ -56,11 +56,13 @@ class UserForm extends Form
 		$common = [
 			'email',
 			'email_username',
-			'role'
+			'role',
+			'password',
+			'email_password'
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common, 'username', 'password', 'email_password',],
+			self::SCENARIO_CREATE => [...$common, 'username'],
 			self::SCENARIO_UPDATE => [...$common],
 		];
 	}
@@ -86,7 +88,8 @@ class UserForm extends Form
 			'email'          => $this->email,
 			'email_username' => $this->email_username,
 			'email_password' => $this->email_password,
-			'role'           => $this->role
+			'role'           => $this->role,
+			'password'       => $this->password
 		]);
 	}
 }

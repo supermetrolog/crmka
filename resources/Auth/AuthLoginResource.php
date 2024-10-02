@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace app\resources\Authentication;
+namespace app\resources\Auth;
 
-use app\dto\Authentication\AuthenticationResponseDto;
+use app\dto\Auth\AuthResponseDto;
 use app\kernel\web\http\resources\JsonResource;
 use app\resources\User\UserResource;
 
-class AuthenticationLoginResource extends JsonResource
+class AuthLoginResource extends JsonResource
 {
-	private AuthenticationResponseDto $resource;
+	private AuthResponseDto $resource;
 
-	public function __construct(AuthenticationResponseDto $resource)
+	public function __construct(AuthResponseDto $resource)
 	{
 		$this->resource = $resource;
 	}

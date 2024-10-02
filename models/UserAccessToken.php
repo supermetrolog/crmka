@@ -92,14 +92,4 @@ class UserAccessToken extends AR
 	{
 		return new UserAccessTokenQuery(get_called_class());
 	}
-
-	/**
-	 * Finds the user access token with the valid access token (not expired and not deleted).
-	 *
-	 * @return UserAccessTokenQuery the active query used by this AR class.
-	 */
-	public static function findValid(): UserAccessTokenQuery
-	{
-		return self::find()->notDeleted()->notExpired();
-	}
 }

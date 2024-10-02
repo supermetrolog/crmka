@@ -1,41 +1,54 @@
 <?php
 
-namespace app\usecases\Authentication;
+namespace app\usecases\Auth;
 
-use app\dto\Authentication\AuthenticationResponseDto;
+use app\dto\Auth\AuthLoginDto;
+use app\dto\Auth\AuthResponseDto;
+use app\dto\Auth\AuthUserAgentDto;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
+use app\helpers\StringHelper;
+use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\User;
 use app\models\UserAccessToken;
 use Throwable;
-use Yii;
 use yii\base\ErrorException;
 use yii\base\Exception;
+use yii\base\Security;
 use yii\db\StaleObjectException;
 
-class AuthenticationService
+class AuthService
 {
+
+	private Security $security;
+
+
+	public function __construct(
+		Security $security
+	)
+	{
+		$this->security = $security;
+	}
+
 	/**
 	 * Authenticates a user by username and password.
 	 *
-	 * @param string $username The user's username.
-	 * @param string $password The user's password.
-	 *
-	 * @return AuthenticationResponseDto The user and the access token.
+	 * @return AuthResponseDto The user and the access token.
 	 * @throws ErrorException If the access token cannot be generated.
 	 * @throws Exception If the username or password is invalid.
+	 * @throws SaveModelException
 	 */
-	public function authenticate(string $username, string $password): AuthenticationResponseDto
+	public function login(AuthLoginDto $dto, AuthUserAgentDto $userAgentDto): AuthResponseDto
 	{
-		$user = User::findByUsername($username);
+		$user = User::find()->byUsername($dto->username)->one();
 
-		if (!$user || !$user->validatePassword($password)) {
+		if (!$user || !$this->validatePassword($user, $dto->password)) {
 			throw new Exception('Неверное имя пользователя или пароль.');
 		}
 
-		$accessToken = $this->generateAccessToken($user);
+		$accessToken = $this->generateAccessToken($user, $userAgentDto);
 
-		return new AuthenticationResponseDto([
+		return new AuthResponseDto([
 			'user'        => $user,
 			'accessToken' => $accessToken,
 		]);
@@ -49,13 +62,11 @@ class AuthenticationService
 	 * @return string The generated access token.
 	 * @throws Exception If the access token cannot be saved.
 	 * @throws ErrorException If the access token cannot be generated.
+	 * @throws SaveModelException
 	 */
-	private function generateAccessToken(User $user): string
+	private function generateAccessToken(User $user, AuthUserAgentDto $userAgentDto): string
 	{
-		$token     = Yii::$app->security->generateRandomString() . '_' . time();
-		$userIP    = Yii::$app->request->getUserIP();
-		$userAgent = Yii::$app->request->getUserAgent();
-
+		$token    = $this->security->generateRandomString() . '_' . time();
 		$dateTime = DateTimeHelper::now();
 		$dateTime->add(DateIntervalHelper::days(UserAccessToken::EXPIRES_IN_DAYS));
 		$expiresAt = $dateTime->format('Y-m-d H:i:s');
@@ -64,13 +75,11 @@ class AuthenticationService
 			'user_id'      => $user->id,
 			'access_token' => $token,
 			'expires_at'   => $expiresAt,
-			'ip'           => $userIP,
-			'user_agent'   => $userAgent
+			'ip'           => $userAgentDto->IP,
+			'user_agent'   => StringHelper::truncate($userAgentDto->agent, 1024)
 		]);
 
-		if (!$userAccessToken->save()) {
-			throw new Exception('Ошибка при генерации токена авторизации.');
-		}
+		$userAccessToken->saveOrThrow();
 
 		return $token;
 	}
@@ -84,7 +93,7 @@ class AuthenticationService
 	 */
 	public function validateAccessToken(string $token): bool
 	{
-		$userAccessToken = UserAccessToken::findValid()->byToken($token)->one();
+		$userAccessToken = UserAccessToken::find()->notDeleted()->byToken($token)->one();
 
 		if (!$userAccessToken || !$userAccessToken->isValid()) {
 			return false;
@@ -108,10 +117,21 @@ class AuthenticationService
 		$tokenIsValid = $this->validateAccessToken($token);
 
 		if ($tokenIsValid) {
-			$userAccessToken = UserAccessToken::findValid()->byToken($token)->one();
+			$userAccessToken = UserAccessToken::find()->onlyValid()->byToken($token)->one();
 			$userAccessToken->delete();
 		} else {
 			throw new Exception('Токен авторизации уже не является актуальным.');
 		}
+	}
+
+	/**
+	 * @param User   $user
+	 * @param string $password
+	 *
+	 * @return bool Whether the password is valid.
+	 */
+	public function validatePassword(User $user, string $password): bool
+	{
+		return $this->security->validatePassword($password, $user->password_hash);
 	}
 }
