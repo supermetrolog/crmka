@@ -39,8 +39,8 @@ class UserSearch extends Form
 
 	public function load($data, $formName = null): bool
 	{
-		if (isset($data->role)) {
-			$data->role = ArrayHelper::toArray($data->role);
+		if (isset($data['role'])) {
+			$data['role'] = ArrayHelper::toArray($data['role']);
 		}
 
 		return parent::load($data, $formName);

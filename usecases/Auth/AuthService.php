@@ -114,13 +114,7 @@ class AuthService
 	 */
 	public function logout(string $token)
 	{
-		$tokenIsValid = $this->validateAccessToken($token);
-
-		if (!$tokenIsValid) {
-			throw new InvalidBearerTokenException();
-		}
-
-		$userAccessToken = UserAccessToken::find()->valid()->byToken($token)->oneOrThrow();
+		$userAccessToken = UserAccessToken::find()->byToken($token)->oneOrThrow();
 		$userAccessToken->delete();
 	}
 

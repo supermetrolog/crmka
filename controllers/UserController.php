@@ -168,7 +168,7 @@ class UserController extends AppController
 	{
 		$user = $this->user->identity;
 
-		if ($user === null || !$user->isAdministrator()) {
+		if (!$user->isAdministrator()) {
 			throw new ForbiddenHttpException('У вас нет прав на удаление пользователя');
 		}
 
@@ -183,6 +183,7 @@ class UserController extends AppController
 	 * @return array
 	 * @throws ForbiddenHttpException
 	 * @throws NotFoundHttpException
+	 * @throws ValidateException
 	 */
 	public function actionLogin(): array
 	{
@@ -200,8 +201,6 @@ class UserController extends AppController
 			return AuthLoginResource::make($authDto)->toArray();
 		} catch (ModelNotFoundException|InvalidPasswordException $e) {
 			throw new NotFoundHttpException('Неправильный логин или пароль.');
-		} catch (Exception $e) {
-			throw new ForbiddenHttpException($e->getMessage());
 		}
 	}
 
@@ -216,14 +215,10 @@ class UserController extends AppController
 	 */
 	public function actionLogout(): SuccessResponse
 	{
-		try {
-			$token = TokenHelper::parseBearerToken($this->request->headers->get('Authorization'));
-			$this->authService->logout($token);
+		$token = TokenHelper::parseBearerToken($this->request->headers->get('Authorization'));
+		$this->authService->logout($token);
 
-			return new SuccessResponse('Вы вышли из аккаунта');
-		} catch (ModelNotFoundException $e) {
-			throw new NotFoundHttpException('Токен авторизации уже устарел или не найден');
-		}
+		return new SuccessResponse('Вы вышли из аккаунта');
 	}
 
 	/**
