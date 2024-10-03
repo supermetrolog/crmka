@@ -63,7 +63,7 @@ class UserService
 
 			$tx->commit();
 
-			return User::find()->with('userProfile')->where(['id' => $model->id])->one();
+			return $model;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
@@ -110,7 +110,7 @@ class UserService
 
 			$tx->commit();
 
-			return User::find()->with('userProfile')->where(['id' => $model->id])->one();
+			return $model;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;

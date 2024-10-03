@@ -3,9 +3,12 @@
 namespace app\controllers;
 
 use app\dto\Auth\AuthUserAgentDto;
+use app\exceptions\InvalidBearerTokenException;
+use app\exceptions\InvalidPasswordException;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\TokenHelper;
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
@@ -153,14 +156,13 @@ class UserController extends AppController
 	}
 
 
-	/** Deletes an existing user.
+	/**
+	 * @param int $id
 	 *
-	 * @param int $id The user ID.
-	 *
-	 * @return SuccessResponse The response message.
-	 * @throws ForbiddenHttpException If the user is not an administrator.
-	 * @throws NotFoundHttpException If the user cannot be found.
-	 * @throws SaveModelException If the user cannot be saved.
+	 * @return SuccessResponse
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
@@ -178,41 +180,50 @@ class UserController extends AppController
 
 
 	/**
-	 * Logs in a user.
-	 *
-	 * @return array The authenticated user with the access token.
-	 * @throws ValidationErrorHttpException If the login form cannot be validated.
-	 * @throws ErrorException If the access token cannot be generated.
-	 * @throws Exception If the access token cannot be saved.
+	 * @return array
+	 * @throws ForbiddenHttpException
+	 * @throws NotFoundHttpException
 	 */
 	public function actionLogin(): array
 	{
 		$form = new LoginForm($this->authService);
 		$form->load($this->request->post());
 
-		$form->validateOrThrow();
+		try {
+			$form->validateOrThrow();
 
-		$authDto = $this->authService->login($form->getDto(), new AuthUserAgentDto([
-			'agent' => $this->request->getUserAgent(),
-			'ip'    => $this->request->getUserIP(),
-		]));
+			$authDto = $this->authService->login($form->getDto(), new AuthUserAgentDto([
+				'agent' => $this->request->getUserAgent(),
+				'ip'    => $this->request->getUserIP(),
+			]));
 
-		return AuthLoginResource::make($authDto)->toArray();
+			return AuthLoginResource::make($authDto)->toArray();
+		} catch (ModelNotFoundException|InvalidPasswordException $e) {
+			throw new NotFoundHttpException('Неправильный логин или пароль.');
+		} catch (Exception $e) {
+			throw new ForbiddenHttpException($e->getMessage());
+		}
 	}
 
 	/**
 	 * Logs out the current user.
 	 *
 	 * @return SuccessResponse The response message.
-	 * @throws StaleObjectException If the user cannot be logged out.
+	 * @throws StaleObjectException If the user cannot be logged out
+	 * @throws InvalidBearerTokenException
+	 * @throws NotFoundHttpException
 	 * @throws Throwable If the user cannot be logged out.
 	 */
 	public function actionLogout(): SuccessResponse
 	{
-		$token = TokenHelper::parseBearerToken($this->request->headers->get('Authorization'));
-		$this->authService->logout($token);
+		try {
+			$token = TokenHelper::parseBearerToken($this->request->headers->get('Authorization'));
+			$this->authService->logout($token);
 
-		return new SuccessResponse('Вы вышли из аккаунт');
+			return new SuccessResponse('Вы вышли из аккаунта');
+		} catch (ModelNotFoundException $e) {
+			throw new NotFoundHttpException('Токен авторизации уже устарел или не найден');
+		}
 	}
 
 	/**
@@ -222,18 +233,15 @@ class UserController extends AppController
 	 * @param int $id The user ID.
 	 *
 	 * @return User The loaded model.
-	 * @throws NotFoundHttpException If the model cannot be found.
+	 * @throws ModelNotFoundException
 	 */
 	protected function findModel(int $id): User
 	{
+		/** @var User $user */
 		$user = User::find()->with(['userProfile' => function ($query) {
 			$query->with(['phones', 'emails']);
-		}])->byId($id)->one();
+		}])->byId($id)->oneOrThrow();
 
-		if ($user instanceof User) {
-			return $user;
-		}
-
-		throw new NotFoundHttpException('The requested page does not exist.');
+		return $user;
 	}
 }

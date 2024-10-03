@@ -7,7 +7,7 @@ namespace app\dto\Auth;
 use app\models\User;
 use yii\base\BaseObject;
 
-class AuthResponseDto extends BaseObject
+class AuthResultDto extends BaseObject
 {
 	public User   $user;
 	public string $accessToken;

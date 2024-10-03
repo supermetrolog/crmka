@@ -3,11 +3,14 @@
 namespace app\usecases\Auth;
 
 use app\dto\Auth\AuthLoginDto;
-use app\dto\Auth\AuthResponseDto;
+use app\dto\Auth\AuthResultDto;
 use app\dto\Auth\AuthUserAgentDto;
+use app\exceptions\InvalidBearerTokenException;
+use app\exceptions\InvalidPasswordException;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
 use app\helpers\StringHelper;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\User;
 use app\models\UserAccessToken;
@@ -33,22 +36,24 @@ class AuthService
 	/**
 	 * Authenticates a user by username and password.
 	 *
-	 * @return AuthResponseDto The user and the access token.
+	 * @return AuthResultDto The user and the access token.
 	 * @throws ErrorException If the access token cannot be generated.
 	 * @throws Exception If the username or password is invalid.
 	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 * @throws InvalidPasswordException
 	 */
-	public function login(AuthLoginDto $dto, AuthUserAgentDto $userAgentDto): AuthResponseDto
+	public function login(AuthLoginDto $dto, AuthUserAgentDto $userAgentDto): AuthResultDto
 	{
-		$user = User::find()->byUsername($dto->username)->one();
+		$user = User::find()->byUsername($dto->username)->oneOrThrow();
 
-		if (!$user || !$this->validatePassword($user, $dto->password)) {
-			throw new Exception('Неверное имя пользователя или пароль.');
+		if (!$this->validatePassword($user, $dto->password)) {
+			throw new InvalidPasswordException();
 		}
 
 		$accessToken = $this->generateAccessToken($user, $userAgentDto);
 
-		return new AuthResponseDto([
+		return new AuthResultDto([
 			'user'        => $user,
 			'accessToken' => $accessToken,
 		]);
@@ -93,13 +98,7 @@ class AuthService
 	 */
 	public function validateAccessToken(string $token): bool
 	{
-		$userAccessToken = UserAccessToken::find()->notDeleted()->byToken($token)->one();
-
-		if (!$userAccessToken || !$userAccessToken->isValid()) {
-			return false;
-		}
-
-		return true;
+		return UserAccessToken::find()->valid()->byToken($token)->exists();
 	}
 
 	/**
@@ -108,20 +107,21 @@ class AuthService
 	 * @param string $token The access token.
 	 *
 	 * @return void
-	 * @throws Exception If the access token is invalid.
+	 * @throws InvalidBearerTokenException
 	 * @throws StaleObjectException If the access token cannot be deleted.
 	 * @throws Throwable If the access token cannot be deleted.
+	 * @throws ModelNotFoundException
 	 */
 	public function logout(string $token)
 	{
 		$tokenIsValid = $this->validateAccessToken($token);
 
-		if ($tokenIsValid) {
-			$userAccessToken = UserAccessToken::find()->valid()->byToken($token)->one();
-			$userAccessToken->delete();
-		} else {
-			throw new Exception('Токен авторизации уже не является актуальным.');
+		if (!$tokenIsValid) {
+			throw new InvalidBearerTokenException();
 		}
+
+		$userAccessToken = UserAccessToken::find()->valid()->byToken($token)->oneOrThrow();
+		$userAccessToken->delete();
 	}
 
 	/**
