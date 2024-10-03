@@ -2,8 +2,8 @@
 
 namespace app\models\search;
 
+use app\helpers\ArrayHelper;
 use app\helpers\SQLHelper;
-use app\helpers\ValidatorHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\User;
@@ -32,11 +32,18 @@ class UserSearch extends Form
 			[
 				'role',
 				'each',
-				'rule' => ['in', 'range' => User::getRoles()],
-				'when' => ValidatorHelper::whenIsArray('role')
-			],
-			[['role'], 'in', 'range' => User::getRoles(), 'when' => ValidatorHelper::whenIsNotArray('role')]
+				'rule' => ['in', 'range' => User::getRoles()]
+			]
 		];
+	}
+
+	public function load($data, $formName = null): bool
+	{
+		if (isset($data->role)) {
+			$data->role = ArrayHelper::toArray($data->role);
+		}
+
+		return parent::load($data, $formName);
 	}
 
 	/**
