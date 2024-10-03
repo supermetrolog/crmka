@@ -17,18 +17,15 @@ class TokenHelper
 	 *
 	 * @param string $header Authorization header value
 	 *
-	 * @return string|null Bearer token or null if not found
+	 * @return string Bearer token or null if not found
 	 * @throws InvalidBearerTokenException
 	 */
-	public static function parseBearerToken(string $header): ?string
+	public static function parseBearerToken(string $header): string
 	{
-		$matches = [];
-		preg_match('/Bearer\s(\S+)/', $header, $matches);
-
-		if (empty($matches)) {
+		if (!StringHelper::startWith($header, 'Bearer ')) {
 			throw new InvalidBearerTokenException();
 		}
 
-		return $matches[1];
+		return StringHelper::after($header, 'Bearer ');
 	}
 }

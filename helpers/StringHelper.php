@@ -49,4 +49,28 @@ class StringHelper
 
 		return substr($string, 0, $maxLength);
 	}
+
+	public static function startWith(string $string, string $prefix): bool
+	{
+		return strncmp($string, $prefix, strlen($prefix)) === 0;
+	}
+
+	/**
+	 * Returns the portion of string specified by the after parameter.
+	 *
+	 * @param string $string
+	 * @param string $after The portion of string.
+	 *
+	 * @return string|null The portion of string, or null if the after parameter was not found.
+	 */
+	public static function after(string $string, string $after): ?string
+	{
+		$pos = strpos($string, $after);
+
+		if ($pos === false) {
+			return null;
+		}
+
+		return substr($string, $pos + strlen($after));
+	}
 }
