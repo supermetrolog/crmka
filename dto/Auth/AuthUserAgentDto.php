@@ -8,6 +8,6 @@ use yii\base\BaseObject;
 
 class AuthUserAgentDto extends BaseObject
 {
-	public string $IP;
+	public string $ip;
 	public string $agent;
 }

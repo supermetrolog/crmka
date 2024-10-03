@@ -75,7 +75,7 @@ class AuthService
 			'user_id'      => $user->id,
 			'access_token' => $token,
 			'expires_at'   => $expiresAt,
-			'ip'           => $userAgentDto->IP,
+			'ip'           => $userAgentDto->ip,
 			'user_agent'   => StringHelper::truncate($userAgentDto->agent, 1024)
 		]);
 
@@ -117,7 +117,7 @@ class AuthService
 		$tokenIsValid = $this->validateAccessToken($token);
 
 		if ($tokenIsValid) {
-			$userAccessToken = UserAccessToken::find()->onlyValid()->byToken($token)->one();
+			$userAccessToken = UserAccessToken::find()->valid()->byToken($token)->one();
 			$userAccessToken->delete();
 		} else {
 			throw new Exception('Токен авторизации уже не является актуальным.');

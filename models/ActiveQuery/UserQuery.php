@@ -33,7 +33,7 @@ class UserQuery extends AQ
 	public function byAccessToken(string $token): self
 	{
 		$this->innerJoinWith(['userAccessTokens' => function (UserAccessTokenQuery $query) use ($token) {
-			$query->onlyValid()->byToken($token);
+			$query->valid()->byToken($token);
 		}]);
 
 		return $this;

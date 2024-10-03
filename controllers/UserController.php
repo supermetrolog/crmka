@@ -194,7 +194,7 @@ class UserController extends AppController
 
 		$authDto = $this->authService->login($form->getDto(), new AuthUserAgentDto([
 			'agent' => $this->request->getUserAgent(),
-			'IP'    => $this->request->getUserIP(),
+			'ip'    => $this->request->getUserIP(),
 		]));
 
 		return AuthLoginResource::make($authDto)->toArray();

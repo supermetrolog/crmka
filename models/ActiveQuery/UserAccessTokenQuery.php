@@ -51,7 +51,7 @@ class UserAccessTokenQuery extends AQ
 	/**
 	 * @return UserAccessTokenQuery
 	 */
-	public function onlyValid(): self
+	public function valid(): self
 	{
 		return $this->notExpired()->notDeleted();
 	}
