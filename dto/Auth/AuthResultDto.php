@@ -11,4 +11,5 @@ class AuthResultDto extends BaseObject
 {
 	public User   $user;
 	public string $accessToken;
+	public int    $accessTokenId;
 }

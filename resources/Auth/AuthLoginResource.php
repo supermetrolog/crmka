@@ -22,8 +22,9 @@ class AuthLoginResource extends JsonResource
 		return [
 			'message' => 'Авторизация прошла успешно. Добро пожаловать!',
 			'data'    => [
-				'user'         => UserResource::tryMakeArray($this->resource->user),
-				'access_token' => $this->resource->accessToken,
+				'user'            => UserResource::tryMakeArray($this->resource->user),
+				'access_token'    => $this->resource->accessToken,
+				'access_token_id' => $this->resource->accessTokenId
 			]
 		];
 	}

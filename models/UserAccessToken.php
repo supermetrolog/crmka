@@ -16,6 +16,8 @@ use app\models\ActiveQuery\UserQuery;
  * @property string    $created_at
  * @property string    $updated_at
  * @property string    $deleted_at
+ * @property string    $user_agent
+ * @property string    $ip
  *
  * @property-read User $user
  */
@@ -43,8 +45,11 @@ class UserAccessToken extends AR
 			[['user_id', 'access_token'], 'required'],
 			[['user_id'], 'integer'],
 			[['access_token'], 'string', 'max' => 255],
+			[['user_agent'], 'string', 'max' => 1024],
+			[['ip'], 'string', 'max' => 15],
 			[['created_at', 'updated_at', 'expires_at'], 'safe'],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']]
+			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+
 		];
 	}
 
