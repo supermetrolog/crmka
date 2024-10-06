@@ -26,7 +26,7 @@ class UserAccessToken extends AR
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
 
-	const EXPIRES_IN_DAYS = 14;
+	const EXPIRES_IN_DAYS = 30;
 
 	/**
 	 * {@inheritdoc}
