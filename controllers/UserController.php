@@ -18,7 +18,6 @@ use app\models\forms\User\UserProfileForm;
 use app\models\search\UserSearch;
 use app\models\UploadFile;
 use app\models\User;
-use app\models\UserAccessToken;
 use app\repositories\UserAccessTokenRepository;
 use app\resources\Auth\AuthLoginResource;
 use app\resources\User\UserAccessTokenResource;
@@ -246,7 +245,7 @@ class UserController extends AppController
 		$user  = $this->user->identity;
 
 		// TODO: Заменить на RBAC
-		if ($user->id !== $model->id && !$user->isAdministrator()) {
+		if ($user->id !== $model->id && !$user->isAdministrator() && !$user->isDirector()) {
 			throw new ForbiddenHttpException('У вас нет прав на просмотр активных сессий данного пользователя');
 		}
 
@@ -267,21 +266,19 @@ class UserController extends AppController
 	 */
 	public function actionDeleteSessions($id): SuccessResponse
 	{
-		$model = $this->findModel($id);
-		$user  = $this->user->identity;
+		$user     = $this->findModel($id);
+		$identity = $this->user->identity;
 
 		// TODO: Заменить на RBAC
-		if ($user->id !== $model->id && $user->isAdministrator()) {
+		if ($identity->id !== $user->id && !$identity->isAdministrator() && !$identity->isDirector()) {
 			throw new ForbiddenHttpException('У вас нет прав на управление сессиями данного пользователя');
 		}
 
-		if ($user->id === $model->id) {
-			$token           = TokenHelper::parseBearerToken($this->request->headers->get('Authorization'));
-			$userAccessToken = UserAccessToken::find()->byToken($token)->oneOrThrow();
-
-			$this->accessTokenService->deleteAllByUserId($model->id, [$userAccessToken->id]);
+		if ($identity->id === $user->id) {
+			$token = TokenHelper::parseBearerToken($this->request->headers->get('Authorization'));
+			$this->accessTokenService->deleteByUserIdExcludingToken($user->id, $token);
 		} else {
-			$this->accessTokenService->deleteAllByUserId($model->id);
+			$this->accessTokenService->deleteAllByUserId($user->id);
 		}
 
 		return new SuccessResponse('Сессии успешно удалены');

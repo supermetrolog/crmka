@@ -59,12 +59,37 @@ class UserAccessTokenService
 	 * @throws Throwable
 	 * @throws StaleObjectException
 	 */
-	public function deleteAllByUserId(int $userId, array $excludeIds = [])
+	public function deleteAllByUserId(int $userId)
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$models = UserAccessToken::find()->valid()->byUserId($userId)->andWhere(['not in', 'id', $excludeIds])->all();
+			$models = UserAccessToken::find()
+			                         ->valid()
+			                         ->byUserId($userId)
+			                         ->all();
+
+			foreach ($models as $model) {
+				$this->delete($model);
+			}
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	public function deleteByUserIdExcludingToken(int $userId, string $excludeToken)
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$models = UserAccessToken::find()
+			                         ->valid()
+			                         ->byUserId($userId)
+			                         ->excludeToken($excludeToken)
+			                         ->all();
 
 			foreach ($models as $model) {
 				$this->delete($model);

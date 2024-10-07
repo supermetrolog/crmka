@@ -10,8 +10,8 @@ use yii\data\ActiveDataProvider;
 
 class UserAccessTokenSearch extends Form
 {
-	public ?int   $id;
-	public ?array $user_ids;
+	public $id;
+	public $user_ids;
 
 	public function rules(): array
 	{

@@ -75,4 +75,14 @@ class UserAccessTokenQuery extends AQ
 	{
 		return $this->andWhere(['user_id' => $userId]);
 	}
+
+	/**
+	 * @param string $token
+	 *
+	 * @return UserAccessTokenQuery
+	 */
+	public function excludeToken(string $token): self
+	{
+		return $this->andWhere(['!=', 'access_token', $token]);
+	}
 }

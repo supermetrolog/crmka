@@ -35,9 +35,15 @@ class SessionController extends AppController
 	/**
 	 * @return ActiveDataProvider
 	 * @throws ValidateException
+	 * @throws ForbiddenHttpException
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
+		$identity = $this->user->identity;
+		if (!$identity->isAdministrator() && !$identity->isDirector()) {
+			throw new ForbiddenHttpException('У вас нет прав на просмотр сессий пользователей.');
+		}
+
 		$searchModel = new UserAccessTokenSearch();
 
 		$dataProvider = $searchModel->search($this->request->get());
@@ -59,7 +65,7 @@ class SessionController extends AppController
 		$user  = $this->user->identity;
 		$model = $this->findModel($id);
 
-		if ($model->user_id !== $user->id && !$user->isAdministrator()) {
+		if ($model->user_id !== $user->id && !$user->isAdministrator() && !$user->isDirector()) {
 			throw new ForbiddenHttpException('У вас нет прав на удаление сессии данного пользователя');
 		}
 
