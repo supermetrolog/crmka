@@ -73,4 +73,37 @@ class StringHelper
 
 		return substr($string, $pos + strlen($after));
 	}
+
+	/**
+	 * Returns first symbol in string
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	public static function first(string $string): string
+	{
+		return mb_substr($string, 0, 1);
+	}
+
+	/**
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	public static function toUpperCase(string $string): string
+	{
+		return ucfirst($string);
+	}
+
+	/**
+	 * @param string $string
+	 * @param string $characters
+	 *
+	 * @return string
+	 */
+	public static function trim(string $string, string $characters = " \t\n\r\0\x0B"): string
+	{
+		return trim($string, $characters);
+	}
 }
