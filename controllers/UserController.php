@@ -18,10 +18,13 @@ use app\models\forms\User\UserProfileForm;
 use app\models\search\UserSearch;
 use app\models\UploadFile;
 use app\models\User;
+use app\repositories\UserAccessTokenRepository;
 use app\resources\Auth\AuthLoginResource;
+use app\resources\User\UserAccessTokenResource;
 use app\resources\User\UserResource;
 use app\resources\User\UserWithContactsResource;
 use app\usecases\Auth\AuthService;
+use app\usecases\User\UserAccessTokenService;
 use app\usecases\User\UserService;
 use Exception;
 use Throwable;
@@ -35,9 +38,11 @@ use yii\web\UploadedFile;
 
 class UserController extends AppController
 {
-	private AuthService $authService;
-	private UserService $userService;
-	protected array     $exceptAuthActions = ['login'];
+	private AuthService               $authService;
+	private UserService               $userService;
+	private UserAccessTokenRepository $accessTokenRepository;
+	private UserAccessTokenService    $accessTokenService;
+	protected array                   $exceptAuthActions = ['login'];
 
 
 	public function __construct(
@@ -45,11 +50,15 @@ class UserController extends AppController
 		$module,
 		AuthService $authService,
 		UserService $userService,
+		UserAccessTokenRepository $accessTokenRepository,
+		UserAccessTokenService $accessTokenService,
 		array $config = []
 	)
 	{
-		$this->authService = $authService;
-		$this->userService = $userService;
+		$this->authService           = $authService;
+		$this->userService           = $userService;
+		$this->accessTokenRepository = $accessTokenRepository;
+		$this->accessTokenService    = $accessTokenService;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -166,14 +175,14 @@ class UserController extends AppController
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$user = $this->user->identity;
+		$identity = $this->user->identity;
 
-		if (!$user->isAdministrator()) {
+		if (!$identity->isAdministrator() && !$identity->isOwner()) {
 			throw new ForbiddenHttpException('У вас нет прав на удаление пользователя');
 		}
 
-		$model = $this->findModel($id);
-		$this->userService->delete($model);
+		$user = $this->findModel($id);
+		$this->userService->delete($user);
 
 		return new SuccessResponse('Пользователь успешно удален');
 	}
@@ -181,9 +190,11 @@ class UserController extends AppController
 
 	/**
 	 * @return array
-	 * @throws ForbiddenHttpException
+	 * @throws ErrorException
 	 * @throws NotFoundHttpException
+	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws Exception
 	 */
 	public function actionLogin(): array
 	{
@@ -219,6 +230,58 @@ class UserController extends AppController
 		$this->authService->logout($token);
 
 		return new SuccessResponse('Вы вышли из аккаунта');
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return array
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 */
+	public function actionSessions($id): array
+	{
+		$user     = $this->findModel($id);
+		$identity = $this->user->identity;
+
+		// TODO: Заменить на RBAC
+		if ($identity->id !== $user->id && !$identity->isAdministrator() && !$identity->isOwner()) {
+			throw new ForbiddenHttpException('У вас нет прав на просмотр активных сессий данного пользователя');
+		}
+
+		$sessions = $this->accessTokenRepository->findAllValidByUserId($user->id);
+
+		return UserAccessTokenResource::collection($sessions);
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return SuccessResponse
+	 * @throws ForbiddenHttpException
+	 * @throws InvalidBearerTokenException
+	 * @throws ModelNotFoundException
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 */
+	public function actionDeleteSessions($id): SuccessResponse
+	{
+		$user     = $this->findModel($id);
+		$identity = $this->user->identity;
+
+		// TODO: Заменить на RBAC
+		if ($identity->id !== $user->id && !$identity->isAdministrator() && !$identity->isOwner()) {
+			throw new ForbiddenHttpException('У вас нет прав на управление сессиями данного пользователя');
+		}
+
+		if ($identity->id === $user->id) {
+			$token = TokenHelper::parseBearerToken($this->request->headers->get('Authorization'));
+			$this->accessTokenService->deleteByUserIdExcludingToken($user->id, $token);
+		} else {
+			$this->accessTokenService->deleteAllByUserId($user->id);
+		}
+
+		return new SuccessResponse('Сессии успешно удалены');
 	}
 
 	/**

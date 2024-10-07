@@ -6,6 +6,8 @@ namespace app\helpers;
 
 class StringHelper
 {
+	public const SYMBOL_SPACE = ' ';
+
 	/**
 	 * Checks if a string is empty.
 	 *
@@ -72,5 +74,45 @@ class StringHelper
 		}
 
 		return substr($string, $pos + strlen($after));
+	}
+
+	/**
+	 * Returns first symbol in string
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	public static function first(string $string): string
+	{
+		return mb_substr($string, 0, 1);
+	}
+
+	/**
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	public static function ucFirst(string $string): string
+	{
+		return ucfirst($string);
+	}
+
+	/**
+	 * @param string $string
+	 * @param string $characters
+	 *
+	 * @return string
+	 */
+	public static function trim(string $string, string $characters = " \t\n\r\0\x0B"): string
+	{
+		return trim($string, $characters);
+	}
+
+	public static function join(string $separator = ' ', string ...$strings): string
+	{
+		$notEmptyStrings = ArrayHelper::filter($strings, fn($str) => self::notEmpty($str));
+
+		return join($separator, $notEmptyStrings);
 	}
 }

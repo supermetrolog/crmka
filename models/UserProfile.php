@@ -4,11 +4,11 @@ namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\exceptions\ValidationErrorHttpException;
+use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\miniModels\UserProfileEmail;
 use app\models\miniModels\UserProfilePhone;
-use Yii;
-use yii\helpers\ArrayHelper;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "user_profile".
@@ -36,7 +36,7 @@ class UserProfile extends AR
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName()
+	public static function tableName(): string
 	{
 		return 'user_profile';
 	}
@@ -44,18 +44,18 @@ class UserProfile extends AR
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules()
+	public function rules(): array
 	{
 		return [
 			[['user_id'], 'required'],
 			[['user_id'], 'integer'],
 			[['first_name', 'middle_name', 'last_name', 'caller_id', 'avatar'], 'string', 'max' => 255],
 			[['caller_id'], 'unique'],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
 
-	public function behaviors()
+	public function behaviors(): array
 	{
 		return [
 			CreateManyMiniModelsBehaviors::class
@@ -65,7 +65,7 @@ class UserProfile extends AR
 	/**
 	 * {@inheritdoc}
 	 */
-	public function attributeLabels()
+	public function attributeLabels(): array
 	{
 		return [
 			'id'          => 'ID',
@@ -78,6 +78,7 @@ class UserProfile extends AR
 		];
 	}
 
+	// TODO: Вынести в сервис и заменить на Media
 	public function uploadFiles($uploadFileModel, UserProfile $model)
 	{
 		foreach ($uploadFileModel->files as $file) {
@@ -90,82 +91,33 @@ class UserProfile extends AR
 		return $model;
 	}
 
-	public static function createUserProfile($post_data, $uploadFileModel)
-	{
-		$model       = new self();
-		$transaction = Yii::$app->db->beginTransaction();
-		try {
-			if ($model->load($post_data, '')) {
-				$model = $model->uploadFiles($uploadFileModel, $model);
-				if ($model->save()) {
-					$model->createManyMiniModels([
-						UserProfileEmail::class => ArrayHelper::getValue($post_data, 'emails'),
-						UserProfilePhone::class => ArrayHelper::getValue($post_data, 'phones'),
-					]);
-					$transaction->commit();
-
-					return true;
-				}
-			}
-			throw new ValidationErrorHttpException($model->getErrorSummary(false));
-		} catch (\Throwable $th) {
-			$transaction->rollBack();
-			throw $th;
-		}
-	}
-
-	public static function updateUserProfile($post_data, $uploadFileModel)
-	{
-		$model       = self::findOne($post_data['id']);
-		$transaction = Yii::$app->db->beginTransaction();
-		try {
-			if ($model->load($post_data, '')) {
-				$model = $model->uploadFiles($uploadFileModel, $model);
-				if ($model->save()) {
-					$model->updateManyMiniModels([
-						UserProfileEmail::class => ArrayHelper::getValue($post_data, 'emails'),
-						UserProfilePhone::class => ArrayHelper::getValue($post_data, 'phones'),
-					]);
-					$transaction->commit();
-
-					return true;
-				}
-			}
-			throw new ValidationErrorHttpException($model->getErrorSummary(false));
-		} catch (\Throwable $th) {
-			$transaction->rollBack();
-			throw $th;
-		}
-	}
-
 	public function getFullName(): string
 	{
-		$fullName = $this->middle_name . " " . $this->first_name;
-		if ($this->last_name) {
-			$fullName .= " " . $this->last_name;
-		}
-
-		return $fullName;
+		return StringHelper::join(
+			StringHelper::SYMBOL_SPACE,
+			$this->middle_name ?? "",
+			$this->first_name,
+			$this->last_name ?? ""
+		);
 	}
 
 	public function getShortName(): string
 	{
-		$first_name = ucfirst(mb_substr($this->first_name, 0, 1)) . ".";
+		$firstNameCharacter = StringHelper::ucFirst(StringHelper::first($this->first_name));
+		$lastNameCharacter  = StringHelper::ucFirst(StringHelper::first($this->last_name ?? ""));
 
-		$last_name = "";
+		$characters = StringHelper::join(". ", $firstNameCharacter, $lastNameCharacter);
 
-		if ($this->last_name) {
-			$last_name = ucfirst(mb_substr($this->last_name, 0, 1)) . ".";
-		}
-
-		$short_name = "{$this->middle_name} $first_name $last_name";
-
-		return trim($short_name);
+		return StringHelper::join(StringHelper::SYMBOL_SPACE, $this->middle_name ?? "", $characters) . ".";
 	}
 
 	public function getMediumName(): string
 	{
-		return trim($this->first_name . " " . $this->middle_name);
+		return StringHelper::join(
+			StringHelper::SYMBOL_SPACE,
+			$this->first_name,
+			$this->middle_name ?? ""
+		);
 	}
 
 	public function fields(): array
@@ -187,40 +139,40 @@ class UserProfile extends AR
 	/**
 	 * Gets query for [[CallLists]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
-	public function getCallLists()
+	public function getCallLists(): ActiveQuery
 	{
-		return $this->hasMany(CallList::className(), ['caller_id' => 'caller_id']);
+		return $this->hasMany(CallList::class, ['caller_id' => 'caller_id']);
 	}
 
 	/**
 	 * Gets query for [[Phones]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
-	public function getEmails()
+	public function getEmails(): ActiveQuery
 	{
-		return $this->hasMany(UserProfileEmail::className(), ['user_profile_id' => 'id']);
+		return $this->hasMany(UserProfileEmail::class, ['user_profile_id' => 'id']);
 	}
 
 	/**
 	 * Gets query for [[Phones]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
-	public function getPhones()
+	public function getPhones(): ActiveQuery
 	{
-		return $this->hasMany(UserProfilePhone::className(), ['user_profile_id' => 'id']);
+		return $this->hasMany(UserProfilePhone::class, ['user_profile_id' => 'id']);
 	}
 
 	/**
 	 * Gets query for [[User]].
 	 *
-	 * @return \yii\db\ActiveQuery
+	 * @return ActiveQuery
 	 */
-	public function getUser()
+	public function getUser(): ActiveQuery
 	{
-		return $this->hasOne(User::className(), ['id' => 'user_id']);
+		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 }

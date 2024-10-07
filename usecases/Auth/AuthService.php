@@ -5,7 +5,7 @@ namespace app\usecases\Auth;
 use app\dto\Auth\AuthLoginDto;
 use app\dto\Auth\AuthResultDto;
 use app\dto\Auth\AuthUserAgentDto;
-use app\exceptions\InvalidBearerTokenException;
+use app\dto\User\UserAccessTokenDto;
 use app\exceptions\InvalidPasswordException;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
@@ -14,8 +14,8 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\User;
 use app\models\UserAccessToken;
+use app\usecases\User\UserAccessTokenService;
 use Throwable;
-use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\base\Security;
 use yii\db\StaleObjectException;
@@ -23,25 +23,27 @@ use yii\db\StaleObjectException;
 class AuthService
 {
 
-	private Security $security;
-
+	private Security               $security;
+	private UserAccessTokenService $userAccessTokenService;
 
 	public function __construct(
-		Security $security
+		Security $security,
+		UserAccessTokenService $userAccessTokenService
 	)
 	{
-		$this->security = $security;
+		$this->security               = $security;
+		$this->userAccessTokenService = $userAccessTokenService;
 	}
 
 	/**
-	 * Authenticates a user by username and password.
+	 * @param AuthLoginDto     $dto
+	 * @param AuthUserAgentDto $userAgentDto
 	 *
-	 * @return AuthResultDto The user and the access token.
-	 * @throws ErrorException If the access token cannot be generated.
-	 * @throws Exception If the username or password is invalid.
-	 * @throws SaveModelException
-	 * @throws ModelNotFoundException
+	 * @return AuthResultDto
+	 * @throws Exception
 	 * @throws InvalidPasswordException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
 	 */
 	public function login(AuthLoginDto $dto, AuthUserAgentDto $userAgentDto): AuthResultDto
 	{
@@ -51,42 +53,39 @@ class AuthService
 			throw new InvalidPasswordException();
 		}
 
-		$accessToken = $this->generateAccessToken($user, $userAgentDto);
+		$userAccessToken = $this->generateAccessToken($user, $userAgentDto);
 
 		return new AuthResultDto([
-			'user'        => $user,
-			'accessToken' => $accessToken,
+			'user'          => $user,
+			'accessToken'   => $userAccessToken->access_token,
+			'accessTokenId' => $userAccessToken->id
 		]);
 	}
 
 	/**
-	 * Generates an access token for the authenticated user.
+	 * @param User             $user
+	 * @param AuthUserAgentDto $userAgentDto
 	 *
-	 * @param User $user The authenticated user.
-	 *
-	 * @return string The generated access token.
-	 * @throws Exception If the access token cannot be saved.
-	 * @throws ErrorException If the access token cannot be generated.
+	 * @return UserAccessToken
+	 * @throws Exception
 	 * @throws SaveModelException
 	 */
-	private function generateAccessToken(User $user, AuthUserAgentDto $userAgentDto): string
+	private function generateAccessToken(User $user, AuthUserAgentDto $userAgentDto): UserAccessToken
 	{
 		$token    = $this->security->generateRandomString() . '_' . time();
 		$dateTime = DateTimeHelper::now();
 		$dateTime->add(DateIntervalHelper::days(UserAccessToken::EXPIRES_IN_DAYS));
 		$expiresAt = $dateTime->format('Y-m-d H:i:s');
 
-		$userAccessToken = new UserAccessToken([
+		$userAccessToken = $this->userAccessTokenService->create(new UserAccessTokenDto([
 			'user_id'      => $user->id,
 			'access_token' => $token,
 			'expires_at'   => $expiresAt,
 			'ip'           => $userAgentDto->ip,
 			'user_agent'   => StringHelper::truncate($userAgentDto->agent, 1024)
-		]);
+		]));
 
-		$userAccessToken->saveOrThrow();
-
-		return $token;
+		return $userAccessToken;
 	}
 
 	/**
@@ -107,15 +106,14 @@ class AuthService
 	 * @param string $token The access token.
 	 *
 	 * @return void
-	 * @throws InvalidBearerTokenException
-	 * @throws StaleObjectException If the access token cannot be deleted.
-	 * @throws Throwable If the access token cannot be deleted.
 	 * @throws ModelNotFoundException
+	 * @throws StaleObjectException
+	 * @throws Throwable
 	 */
 	public function logout(string $token)
 	{
 		$userAccessToken = UserAccessToken::find()->byToken($token)->oneOrThrow();
-		$userAccessToken->delete();
+		$this->userAccessTokenService->delete($userAccessToken);
 	}
 
 	/**
