@@ -40,7 +40,7 @@ class SessionController extends AppController
 	public function actionIndex(): ActiveDataProvider
 	{
 		$identity = $this->user->identity;
-		if (!$identity->isAdministrator() && !$identity->isDirector()) {
+		if (!$identity->isAdministrator() && !$identity->isOwner()) {
 			throw new ForbiddenHttpException('У вас нет прав на просмотр сессий пользователей.');
 		}
 
@@ -62,14 +62,14 @@ class SessionController extends AppController
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$user  = $this->user->identity;
-		$model = $this->findModel($id);
+		$identity = $this->user->identity;
+		$session  = $this->findModel($id);
 
-		if ($model->user_id !== $user->id && !$user->isAdministrator() && !$user->isDirector()) {
+		if ($session->user_id !== $identity->id && !$identity->isAdministrator() && !$identity->isOwner()) {
 			throw new ForbiddenHttpException('У вас нет прав на удаление сессии данного пользователя');
 		}
 
-		$this->accessTokenService->delete($model);
+		$this->accessTokenService->delete($session);
 
 		return new SuccessResponse('Сессия пользователя успешно удалена');
 	}

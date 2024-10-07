@@ -175,14 +175,14 @@ class UserController extends AppController
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$user = $this->user->identity;
+		$identity = $this->user->identity;
 
-		if (!$user->isAdministrator()) {
+		if (!$identity->isAdministrator() && !$identity->isOwner()) {
 			throw new ForbiddenHttpException('У вас нет прав на удаление пользователя');
 		}
 
-		$model = $this->findModel($id);
-		$this->userService->delete($model);
+		$user = $this->findModel($id);
+		$this->userService->delete($user);
 
 		return new SuccessResponse('Пользователь успешно удален');
 	}
@@ -241,15 +241,15 @@ class UserController extends AppController
 	 */
 	public function actionSessions($id): array
 	{
-		$model = $this->findModel($id);
-		$user  = $this->user->identity;
+		$user     = $this->findModel($id);
+		$identity = $this->user->identity;
 
 		// TODO: Заменить на RBAC
-		if ($user->id !== $model->id && !$user->isAdministrator() && !$user->isDirector()) {
+		if ($identity->id !== $user->id && !$identity->isAdministrator() && !$identity->isOwner()) {
 			throw new ForbiddenHttpException('У вас нет прав на просмотр активных сессий данного пользователя');
 		}
 
-		$sessions = $this->accessTokenRepository->findAllValidByUserId($model->id);
+		$sessions = $this->accessTokenRepository->findAllValidByUserId($user->id);
 
 		return UserAccessTokenResource::collection($sessions);
 	}
@@ -270,7 +270,7 @@ class UserController extends AppController
 		$identity = $this->user->identity;
 
 		// TODO: Заменить на RBAC
-		if ($identity->id !== $user->id && !$identity->isAdministrator() && !$identity->isDirector()) {
+		if ($identity->id !== $user->id && !$identity->isAdministrator() && !$identity->isOwner()) {
 			throw new ForbiddenHttpException('У вас нет прав на управление сессиями данного пользователя');
 		}
 

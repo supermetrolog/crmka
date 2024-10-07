@@ -35,30 +35,30 @@ class UserProfileResource extends JsonResource
 
 	public function getFullName(): string
 	{
-		$fullName = "{$this->resource->middle_name} {$this->resource->first_name}";
-		if ($this->resource->last_name) {
-			$fullName .= " {$this->resource->last_name}";
-		}
-
-		return $fullName;
+		return StringHelper::join(
+			StringHelper::SYMBOL_SPACE,
+			$this->resource->middle_name ?? "",
+			$this->resource->first_name,
+			$this->resource->last_name ?? ""
+		);
 	}
 
 	public function getShortName(): string
 	{
-		$firstName = StringHelper::toUpperCase(StringHelper::first($this->resource->first_name)) . '.';
-		$lastName  = "";
+		$firstNameCharacter = StringHelper::ucFirst(StringHelper::first($this->resource->first_name));
+		$lastNameCharacter  = StringHelper::ucFirst(StringHelper::first($this->resource->last_name ?? ""));
 
-		if ($this->resource->last_name) {
-			$lastName = StringHelper::toUpperCase(StringHelper::first($this->resource->last_name)) . '.';
-		}
+		$characters = StringHelper::join(". ", $firstNameCharacter, $lastNameCharacter);
 
-		$shortName = $this->resource->middle_name . " $firstName $lastName";
-
-		return StringHelper::trim($shortName);
+		return StringHelper::join(StringHelper::SYMBOL_SPACE, $this->resource->middle_name ?? "", $characters) . ".";
 	}
 
 	public function getMediumName(): string
 	{
-		return StringHelper::trim($this->resource->first_name . " " . $this->resource->middle_name);
+		return StringHelper::join(
+			StringHelper::SYMBOL_SPACE,
+			$this->resource->first_name,
+			$this->resource->middle_name ?? ""
+		);
 	}
 }

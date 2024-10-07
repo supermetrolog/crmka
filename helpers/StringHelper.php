@@ -6,6 +6,8 @@ namespace app\helpers;
 
 class StringHelper
 {
+	public const SYMBOL_SPACE = ' ';
+
 	/**
 	 * Checks if a string is empty.
 	 *
@@ -91,7 +93,7 @@ class StringHelper
 	 *
 	 * @return string
 	 */
-	public static function toUpperCase(string $string): string
+	public static function ucFirst(string $string): string
 	{
 		return ucfirst($string);
 	}
@@ -105,5 +107,12 @@ class StringHelper
 	public static function trim(string $string, string $characters = " \t\n\r\0\x0B"): string
 	{
 		return trim($string, $characters);
+	}
+
+	public static function join(string $separator = ' ', string ...$strings): string
+	{
+		$notEmptyStrings = ArrayHelper::filter(ArrayHelper::toArray($strings), fn($str) => self::notEmpty($str));
+
+		return join($separator, $notEmptyStrings);
 	}
 }

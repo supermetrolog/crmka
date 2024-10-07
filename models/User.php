@@ -260,7 +260,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	/**
 	 * @return bool
 	 */
-	public function isDirector(): bool
+	public function isOwner(): bool
 	{
 		return $this->role === self::ROLE_OWNER;
 	}

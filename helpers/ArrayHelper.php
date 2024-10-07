@@ -65,4 +65,10 @@ class ArrayHelper
 	{
 		return self::isArray($array) ? $array : [$array];
 	}
+
+
+	public static function filter($array, callable $fn): array
+	{
+		return array_filter($array, $fn);
+	}
 }
