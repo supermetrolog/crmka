@@ -111,7 +111,7 @@ class StringHelper
 
 	public static function join(string $separator = ' ', string ...$strings): string
 	{
-		$notEmptyStrings = ArrayHelper::filter(ArrayHelper::toArray($strings), fn($str) => self::notEmpty($str));
+		$notEmptyStrings = ArrayHelper::filter($strings, fn($str) => self::notEmpty($str));
 
 		return join($separator, $notEmptyStrings);
 	}
