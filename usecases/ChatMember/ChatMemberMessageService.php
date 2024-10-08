@@ -270,7 +270,9 @@ class ChatMemberMessageService
 				'second_id'   => $task->id,
 			]));
 
-			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $task->user_id);
+			if ($task->user_id !== $task->created_by_id) {
+				$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $task->user_id);
+			}
 
 			$this->markChatAsLatestForModel($message->to_chat_member_id, User::getMorphClass(), $task->user_id);
 

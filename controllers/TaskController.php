@@ -183,7 +183,13 @@ class TaskController extends AppController
 	 */
 	public function actionUpdate(int $id): TaskResource
 	{
-		$model = $this->findModelByIdAndCreatedByOrUserId($id);
+		$identity = $this->user->identity;
+
+		if ($identity->isAdministrator()) {
+			$model = $this->findModelById($id);
+		} else {
+			$model = $this->findModelByIdAndCreatedByOrUserId($id);
+		}
 
 		$form = new TaskForm();
 
@@ -231,7 +237,13 @@ class TaskController extends AppController
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$this->service->delete($this->findModelByIdAndCreatedBy($id));
+		$identity = $this->user->identity;
+
+		if ($identity->isAdministrator()) {
+			$this->service->delete($this->findModelById($id));
+		} else {
+			$this->service->delete($this->findModelByIdAndCreatedBy($id));
+		}
 
 		return new SuccessResponse();
 	}
