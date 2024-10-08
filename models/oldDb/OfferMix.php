@@ -346,7 +346,8 @@ class OfferMix extends AR
 		'334' => 68,
 		'335' => 69,
 		'338' => 72,
-		'340' => 73
+		'340' => 73,
+		'341' => 74,
 	];
 
 	public ?int $last_call_rel_id = null;
@@ -851,7 +852,7 @@ class OfferMix extends AR
 
 			return $this->calcPriceGeneralForRent($fields);
 		};
-		$fields['last_call'] = function ($fields) {
+		$fields['last_call']              = function ($fields) {
 			return empty($fields->lastCall) ? null : CallResource::tryMake($fields->lastCall)->toArray();
 		};
 

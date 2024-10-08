@@ -12,6 +12,7 @@ use app\models\forms\Task\TaskCommentForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\TaskSearch;
 use app\models\Task;
+use app\models\User;
 use app\repositories\TaskCommentRepository;
 use app\repositories\TaskObserverRepository;
 use app\repositories\TaskRepository;
@@ -183,7 +184,11 @@ class TaskController extends AppController
 	 */
 	public function actionUpdate(int $id): TaskResource
 	{
-		$model = $this->findModelByIdAndCreatedByOrUserId($id);
+		if (User::isAdmin($this->user->identity)) {
+			$model = $this->findModelById($id);
+		} else {
+			$model = $this->findModelByIdAndCreatedByOrUserId($id);
+		}
 
 		$form = new TaskForm();
 
@@ -231,7 +236,11 @@ class TaskController extends AppController
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$this->service->delete($this->findModelByIdAndCreatedBy($id));
+		if (User::isAdmin($this->user->identity)) {
+			$this->service->delete($this->findModelById($id));
+		} else {
+			$this->service->delete($this->findModelByIdAndCreatedBy($id));
+		}
 
 		return new SuccessResponse();
 	}

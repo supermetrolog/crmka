@@ -25,8 +25,8 @@ class TaskRelationResource extends JsonResource
 		return [
 			'chat_member_message_id' => $this->getChatMemberMessageId(),
 			'chat_member_id'         => $this->getChatMemberId(),
-			'chat_member'            => ChatMemberShortResource::make($this->resource->chatMember)->toArray(),
-			'chat_member_message'    => ChatMemberMessageShortResource::make($this->resource->chatMemberMessage)->toArray(),
+			'chat_member'            => ChatMemberShortResource::tryMakeArray($this->resource->chatMember),
+			'chat_member_message'    => ChatMemberMessageShortResource::tryMakeArray($this->resource->chatMemberMessage)
 		];
 	}
 

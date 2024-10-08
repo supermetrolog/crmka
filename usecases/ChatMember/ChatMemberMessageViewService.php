@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace app\usecases\ChatMember;
 
-use app\components\Notification\Factories\NotifierFactory;
 use app\dto\ChatMember\CreateChatMemberMessageViewDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\usecases\Notification\UserNotificationService;
-use app\usecases\Reminder\ReminderService;
-use mysql_xdevapi\DocResult;
 use Throwable;
 
 class ChatMemberMessageViewService
@@ -45,7 +41,9 @@ class ChatMemberMessageViewService
 			$model->saveOrThrow();
 
 			foreach ($dto->message->notifications as $notification) {
-				$this->notificationService->viewed($notification);
+				if ($notification->user_id === $dto->from_chat_member_id) {
+					$this->notificationService->viewed($notification);
+				}
 			}
 
 			$tx->commit();
