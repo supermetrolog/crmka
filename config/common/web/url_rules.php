@@ -7,8 +7,15 @@ return
 			'controller'    => 'user',
 			'except'        => [],
 			'extraPatterns' => [
-				'POST,OPTIONS login'  => 'login',
-				'POST,OPTIONS logout' => 'logout',
+				'GET,OPTIONS'                  => 'index',
+				'GET,OPTIONS <id>'             => 'view',
+				'POST,OPTIONS'                 => 'create',
+				'PUT,OPTIONS <id>'             => 'update',
+				'DELETE,OPTIONS <id>'          => 'delete',
+				'POST,OPTIONS login'           => 'login',
+				'POST,OPTIONS logout'          => 'logout',
+				'GET,OPTIONS <id>/sessions'    => 'sessions',
+				'DELETE,OPTIONS <id>/sessions' => 'delete-sessions',
 			],
 		],
 		[
@@ -380,6 +387,15 @@ return
 				'GET,OPTIONS'         => 'index',
 				'GET,OPTIONS <id>'    => 'view',
 				'PUT,OPTIONS <id>'    => 'update',
+				'DELETE,OPTIONS <id>' => 'delete',
+			],
+		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'session',
+			'except'        => [],
+			'extraPatterns' => [
+				'GET,OPTIONS'         => 'index',
 				'DELETE,OPTIONS <id>' => 'delete',
 			],
 		],

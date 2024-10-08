@@ -73,8 +73,6 @@ class ChatMemberMessageController extends AppController
 
 		$form->from_chat_member_id = $this->user->identity->chatMember->id;
 
-		$form->validateOrThrow();
-
 		$mediaForm = new MediaForm();
 
 		$mediaForm->category   = ChatMemberMessage::DEFAULT_MEDIA_CATEGORY;
@@ -84,6 +82,9 @@ class ChatMemberMessageController extends AppController
 		$mediaForm->files = UploadedFile::getInstancesByName('files');
 
 		$mediaForm->validateOrThrow();
+
+		$form->files = $mediaForm->files;
+		$form->validateOrThrow();
 
 		$model = $this->service->create($form->getDto(), $mediaForm->getDtos());
 
@@ -108,9 +109,21 @@ class ChatMemberMessageController extends AppController
 		$form->setScenario(ChatMemberMessageForm::SCENARIO_UPDATE);
 
 		$form->load($this->request->post());
+
+		$mediaForm = new MediaForm();
+
+		$mediaForm->category   = ChatMemberMessage::DEFAULT_MEDIA_CATEGORY;
+		$mediaForm->model_id   = $this->user->id;
+		$mediaForm->model_type = $this->user->identity::getMorphClass();
+
+		$mediaForm->files = UploadedFile::getInstancesByName('files');
+
+		$mediaForm->validateOrThrow();
+
+		$form->files = $mediaForm->files;
 		$form->validateOrThrow();
 
-		$this->service->update($model, $form->getDto());
+		$this->service->update($model, $form->getDto(), $mediaForm->getDtos());
 
 		return new ChatMemberMessageResource($model);
 	}
