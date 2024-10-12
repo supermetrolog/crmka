@@ -9,7 +9,7 @@ use app\models\ChatMember;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
-use app\resources\CallResource;
+use app\resources\Call\CallResource;
 use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
 use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;

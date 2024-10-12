@@ -15,11 +15,8 @@ use app\models\oldDb\User as OldDbUser;
 use app\models\Relation;
 use app\models\Request;
 use app\models\User;
-use app\resources\CallResource;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Yii;
 use yii\base\ErrorException;
-use yii\data\Pagination;
 use yii\db\ActiveQuery;
 
 /**
@@ -853,7 +850,7 @@ class OfferMix extends AR
 			return $this->calcPriceGeneralForRent($fields);
 		};
 		$fields['last_call']              = function ($fields) {
-			return empty($fields->lastCall) ? null : CallResource::tryMake($fields->lastCall)->toArray();
+			return empty($fields->lastCall) ? null : $fields->lastCall->created_at;
 		};
 
 		return $fields;

@@ -18,7 +18,7 @@ use app\models\search\ChatMemberSearch;
 use app\models\User;
 use app\models\views\ChatMemberSearchView;
 use app\repositories\ChatMemberRepository;
-use app\resources\CallResource;
+use app\resources\Call\CallResource;
 use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
