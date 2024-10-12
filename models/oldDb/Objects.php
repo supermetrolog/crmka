@@ -3,9 +3,15 @@
 namespace app\models\oldDb;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\OfferMixQuery;
 use app\models\Company;
 use app\models\Deal;
+use app\models\OfferMix;
+use app\models\oldDb\OfferMix as OfferMixOld;
+use app\resources\Offer\ShortMixedOfferInObjectResource;
 use Yii;
+use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\HtmlPurifier;
 
@@ -243,19 +249,21 @@ use yii\helpers\HtmlPurifier;
  * @property string|null $cadastral_number_land
  * @property int|null    $documents_old
  * @property int|null    $test_only
+ * @property Offers[]    $offers
  */
 class Objects extends AR
 {
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName()
+	public static function tableName(): string
 	{
 		return 'c_industry';
 	}
 
 	/**
-	 * @return \yii\db\Connection the database connection used by this AR class.
+	 * {@inheritdoc}
+	 * @throws InvalidConfigException
 	 */
 	public static function getDb()
 	{
@@ -265,7 +273,7 @@ class Objects extends AR
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules()
+	public function rules(): array
 	{
 		return [
 			[['title', 'last_update', 'purposes', 'floor_type', 'highway_secondary', 'telecommunications', 'parking', 'parking_car_value', 'parking_lorry', 'parking_lorry_value', 'parking_truck_value', 'steam_value', 'water_value', 'from_station', 'from_station_value', 'from_busstop', 'from_busstop_value', 'entrance_type', 'photo', 'videos', 'publ_time', 'order_row'], 'required'],
@@ -286,7 +294,7 @@ class Objects extends AR
 	/**
 	 * {@inheritdoc}
 	 */
-	public function attributeLabels()
+	public function attributeLabels(): array
 	{
 		return [
 			'id'                                 => 'ID',
@@ -585,6 +593,14 @@ class Objects extends AR
 			return $fuck;
 		};
 
+		$fields['offers'] = function ($fields) {
+			if (empty($fields->offers)) {
+				return null;
+			}
+
+			return ShortMixedOfferInObjectResource::collection($fields['offers']);
+		};
+
 		return $fields;
 	}
 
@@ -660,5 +676,17 @@ class Objects extends AR
 	public function getArendators()
 	{
 		return $this->hasMany(Company::class, ['id' => 'company_id'])->via('deals');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getOffers(): OfferMixQuery
+	{
+		/** @var OfferMixQuery $query */
+		$query = $this->hasMany(OfferMix::class, ['object_id' => 'id']);
+		$query->notDeleted()->andWhere([OfferMix::field('type_id') => OfferMixOld::GENERAL_TYPE_ID]);
+
+		return $query;
 	}
 }
