@@ -9,7 +9,6 @@ use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
 use app\models\ChatMember;
 use app\models\Company;
-use app\models\ObjectChatMember;
 use app\models\oldDb\OfferMix;
 use app\models\Relation;
 use yii\base\ErrorException;
@@ -64,15 +63,12 @@ class OfferMixQuery extends AQ
 		                          ->groupBy(['first_id', 'first_type']);
 
 		$subQuery = Relation::find()
-		                    ->select([Relation::field('*'), 'object_id' => 'ocm.object_id'])
 		                    ->from(Relation::getTable())
-		                    ->leftJoin([ChatMember::getTable()], ChatMember::xfield('id') . '=' . Relation::xfield('first_id'))
-		                    ->leftJoin(['ocm' => ObjectChatMember::getTable()], 'ocm.id =' . ChatMember::xfield('model_id'))
 		                    ->byFirstType(ChatMember::getMorphClass())
 		                    ->bySecondType(Call::getMorphClass())
 		                    ->andWhere([Relation::field('id') => $maxIdsSubQuery]);
 
-		$this->leftJoin(['last_call_rel' => $subQuery], $this->field('object_id') . '=' . 'last_call_rel.object_id');
+		$this->leftJoin(['last_call_rel' => $subQuery], 'cm.id' . '=' . 'last_call_rel.first_id');
 
 		return $this;
 	}
