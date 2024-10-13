@@ -14,6 +14,7 @@ use yii\filters\Cors;
 use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
 use yii\rest\Controller;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\User;
@@ -94,5 +95,20 @@ class AppController extends Controller
 		} catch (ModelNotFoundException $e) {
 			throw new NotFoundHttpException($e->getMessage(), $e->getCode(), $e);
 		}
+	}
+
+	/**
+	 * @param $action
+	 *
+	 * @return bool
+	 * @throws BadRequestHttpException
+	 */
+	public function beforeAction($action): bool
+	{
+		$this->response->on(Response::EVENT_BEFORE_SEND, function () {
+			$this->response->headers->remove('link');
+		});
+
+		return parent::beforeAction($action);
 	}
 }

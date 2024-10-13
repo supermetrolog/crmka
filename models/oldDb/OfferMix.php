@@ -15,11 +15,8 @@ use app\models\oldDb\User as OldDbUser;
 use app\models\Relation;
 use app\models\Request;
 use app\models\User;
-use app\resources\CallResource;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Yii;
 use yii\base\ErrorException;
-use yii\data\Pagination;
 use yii\db\ActiveQuery;
 
 /**
@@ -853,7 +850,7 @@ class OfferMix extends AR
 			return $this->calcPriceGeneralForRent($fields);
 		};
 		$fields['last_call']              = function ($fields) {
-			return empty($fields->lastCall) ? null : CallResource::tryMake($fields->lastCall)->toArray();
+			return empty($fields->lastCall) ? null : $fields->lastCall->created_at;
 		};
 
 		return $fields;
@@ -918,8 +915,10 @@ class OfferMix extends AR
 		if ($dealType === null) {
 			return;
 		}
+
+//			Request::DEAL_TYPE_RENT             => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE, OfferMix::DEAL_TYPE_RESPONSE_STORAGE],
 		$dealTypes = [
-			Request::DEAL_TYPE_RENT             => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE, OfferMix::DEAL_TYPE_RESPONSE_STORAGE],
+			Request::DEAL_TYPE_RENT             => OfferMix::DEAL_TYPE_RENT,
 			Request::DEAL_TYPE_SALE             => OfferMix::DEAL_TYPE_SALE,
 			Request::DEAL_TYPE_RESPONSE_STORAGE => OfferMix::DEAL_TYPE_RESPONSE_STORAGE,
 			Request::DEAL_TYPE_SUBLEASE         => OfferMix::DEAL_TYPE_SUBLEASE,
@@ -1169,9 +1168,7 @@ class OfferMix extends AR
 	public function getLastCallRelationFirst(): RelationQuery
 	{
 		return $this->hasOne(Relation::class, [
-			'first_id'   => 'id',
-			'first_type' => 'morph',
-			'id'         => 'last_call_rel_id'
+			'id' => 'last_call_rel_id'
 		])->from([Relation::tableName() => Relation::getTable()]);
 	}
 

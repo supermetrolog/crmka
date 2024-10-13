@@ -154,6 +154,12 @@ class ChatMemberSearch extends Form
 					],
 					'call'         => [
 						'asc'  => [
+							IfExpressionBuilder::create()
+							                   ->condition(Request::field('consultant_id') . ' = ' . $this->current_user_id)
+							                   ->left('1')
+							                   ->right('0')
+							                   ->beforeBuild(fn($expression) => "$expression DESC")
+							                   ->build(),
 							'last_call_rel.created_at'                                        => SORT_ASC,
 							'IF (request.updated_at, request.updated_at, request.created_at)' => SORT_ASC,
 							IfExpressionBuilder::create()
@@ -164,6 +170,12 @@ class ChatMemberSearch extends Form
 							                   ->build()
 						],
 						'desc' => [
+							IfExpressionBuilder::create()
+							                   ->condition(Request::field('consultant_id') . ' = ' . $this->current_user_id)
+							                   ->left('1')
+							                   ->right('0')
+							                   ->beforeBuild(fn($expression) => "$expression DESC")
+							                   ->build(),
 							'last_call_rel.created_at'                                        => SORT_DESC,
 							'IF (request.updated_at, request.updated_at, request.created_at)' => SORT_DESC,
 							IfExpressionBuilder::create()

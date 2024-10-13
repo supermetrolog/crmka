@@ -7,6 +7,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 
@@ -36,6 +37,7 @@ class ChatMemberMessageSearch extends Form
 
 	/**
 	 * @throws ValidateException
+	 * @throws ErrorException
 	 */
 	public function search(array $params): ActiveDataProvider
 	{

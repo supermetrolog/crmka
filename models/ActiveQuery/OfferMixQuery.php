@@ -6,115 +6,99 @@ namespace app\models\ActiveQuery;
 
 use app\models\OfferMix;
 use app\models\oldDb\ObjectsBlock;
-use yii\db\ActiveRecord;
+use app\models\oldDb\OfferMix as OfferMixOld;
 
 class OfferMixQuery extends oldDb\OfferMixQuery
 {
-    /**
-     * @param  mixed $db
-     * @return OfferMix[]
-     */
-    public function all($db = null): array
-    {
-        return parent::all($db);
-    }
-    /**
-     * @param  mixed $db
-     * @return OfferMix|null|ActiveRecord
-     */
-    public function one($db = null): ?OfferMix
-    {
-        $this->limit(1);
-        return parent::one($db);
-    }
+	/**
+	 * @param int $originalId
+	 *
+	 * @return self
+	 */
+	public function byOriginalId(int $originalId): self
+	{
+		return $this->andWhere(['original_id' => $originalId]);
+	}
 
-    /**
-     * @param int $originalId
-     * @return self
-     */
-    public function byOriginalId(int $originalId): self
-    {
-        return $this->andWhere(['original_id' => $originalId]);
-    }
+	/**
+	 * @return self
+	 */
+	public function notDelete(): self
+	{
+		return $this->andWhere(['!=', OfferMix::tableName() . '.deleted', 1]);
+	}
 
-    /**
-     * @return self
-     */
-    public function notDelete(): self
-    {
-        return $this->andWhere(['!=', OfferMix::tableName() . '.deleted', 1]);
-    }
+	/**
+	 * @return self
+	 */
+	public function active(): self
+	{
+		return $this->andWhere([OfferMix::tableName() . '.status' => 1]);
+	}
 
-    /**
-     * @return self
-     */
-    public function active(): self
-    {
-        return $this->andWhere([OfferMix::tableName() . '.status' => 1]);
-    }
+	/**
+	 * @return self
+	 */
+	public function blockType(): self
+	{
+		return $this->andWhere(['type_id' => OfferMixOld::MINI_TYPE_ID]);
+	}
 
-    /**
-     * @return self
-     */
-    public function blockType(): self
-    {
-        return $this->andWhere(['type_id' => OfferMix::MINI_TYPE_ID]);
-    }
+	/**
+	 * @return self
+	 */
+	public function generalType(): self
+	{
+		return $this->andWhere(['type_id' => OfferMixOld::GENERAL_TYPE_ID]);
+	}
 
-    /**
-     * @return self
-     */
-    public function generalType(): self
-    {
-        return $this->andWhere(['type_id' => OfferMix::GENERAL_TYPE_ID]);
-    }
+	/**
+	 * @return self
+	 */
+	public function offersType(): self
+	{
+		return $this->andWhere(['type_id' => [1, 2]]);
+	}
 
-    /**
-     * @return self
-     */
-    public function offersType(): self
-    {
-        return $this->andWhere(['type_id' => [1, 2]]);
-    }
+	/**
+	 * @return self
+	 */
+	public function saleDealType(): self
+	{
+		return $this->andWhere(['deal_type' => OfferMixOld::DEAL_TYPE_SALE]);
+	}
 
-    /**
-     * @return self
-     */
-    public function saleDealType(): self
-    {
-        return $this->andWhere(['deal_type' => OfferMix::DEAL_TYPE_SALE]);
-    }
+	/**
+	 * @return self
+	 */
+	public function rentDealType(): self
+	{
+		return $this->andWhere(['deal_type' => OfferMixOld::DEAL_TYPE_RENT]);
+	}
 
-    /**
-     * @return self
-     */
-    public function rentDealType(): self
-    {
-        return $this->andWhere(['deal_type' => OfferMix::DEAL_TYPE_RENT]);
-    }
+	/**
+	 * @return self
+	 */
+	public function rentAllDealType(): self
+	{
+		return $this->andWhere(['deal_type' => [OfferMixOld::DEAL_TYPE_RENT, OfferMixOld::DEAL_TYPE_SUBLEASE]]);
+	}
 
-    /**
-     * @return self
-     */
-    public function rentAllDealType(): self
-    {
-        return $this->andWhere(['deal_type' => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE]]);
-    }
+	/**
+	 * @return self
+	 */
+	public function notResponseStorageDealType(): self
+	{
+		return $this->andWhere(['!=', OfferMix::tableName() . '.deal_type', OfferMixOld::DEAL_TYPE_RESPONSE_STORAGE]);
+	}
 
-    /**
-     * @return self
-     */
-    public function notResponseStorageDealType(): self
-    {
-        return $this->andWhere(['!=', OfferMix::tableName() . '.deal_type', OfferMix::DEAL_TYPE_RESPONSE_STORAGE]);
-    }
+	/**
+	 * @return self
+	 */
+	public function adAvito(): self
+	{
+		$this->joinWith(['block']);
 
-    /**
-     * @return self
-     */
-    public function adAvito(): self
-    {
-        $this->joinWith(['block']);
-        return $this->andWhere([ObjectsBlock::tableName() . '.ad_avito' => 1]);
-    }
+		return $this->andWhere([ObjectsBlock::tableName() . '.ad_avito' => 1]);
+	}
 }
