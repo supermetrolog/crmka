@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace app\models\ActiveQuery\oldDb;
 
 use app\helpers\DbHelper;
+use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
+use app\models\ChatMember;
 use app\models\Company;
+use app\models\ObjectChatMember;
+use app\models\oldDb\OfferMix;
 use app\models\Relation;
 use yii\base\ErrorException;
-use yii\db\ActiveQuery;
-use app\models\oldDb\OfferMix;
 use yii\db\ActiveRecord;
 
-class OfferMixQuery extends ActiveQuery
+class OfferMixQuery extends AQ
 {
 	/**
 	 * @param mixed $db
@@ -30,7 +32,7 @@ class OfferMixQuery extends ActiveQuery
 	 *
 	 * @return OfferMix|null|ActiveRecord
 	 */
-	public function one($db = null)
+	public function one($db = null): ?OfferMix
 	{
 		$this->limit(1);
 
@@ -48,33 +50,33 @@ class OfferMixQuery extends ActiveQuery
 		            ->joinForSearch();
 	}
 
-	protected function field(string $column): string
-	{
-		return $this->getPrimaryTableName() . '.' . $column;
-	}
-
 	/**
 	 * @throws ErrorException
 	 */
+
 	public function leftJoinLastCallRelation(): self
 	{
 		$maxIdsSubQuery = Relation::find()
 		                          ->from(Relation::getTable())
 		                          ->select(['MAX(id)'])
-		                          ->byFirstType(OfferMix::getMorphClass())
+		                          ->byFirstType(ChatMember::getMorphClass())
 		                          ->bySecondType(Call::getMorphClass())
 		                          ->groupBy(['first_id', 'first_type']);
 
 		$subQuery = Relation::find()
+		                    ->select([Relation::field('*'), 'object_id' => 'ocm.object_id'])
 		                    ->from(Relation::getTable())
-		                    ->byFirstType(OfferMix::getMorphClass())
+		                    ->leftJoin([ChatMember::getTable()], ChatMember::xfield('id') . '=' . Relation::xfield('first_id'))
+		                    ->leftJoin(['ocm' => ObjectChatMember::getTable()], 'ocm.id =' . ChatMember::xfield('model_id'))
+		                    ->byFirstType(ChatMember::getMorphClass())
 		                    ->bySecondType(Call::getMorphClass())
-		                    ->andWhere(['id' => $maxIdsSubQuery]);
+		                    ->andWhere([Relation::field('id') => $maxIdsSubQuery]);
 
-		$this->leftJoin(['last_call_rel' => $subQuery], $this->field('id') . '=' . 'last_call_rel.first_id');
+		$this->leftJoin(['last_call_rel' => $subQuery], $this->field('object_id') . '=' . 'last_call_rel.object_id');
 
 		return $this;
 	}
+
 
 	/**
 	 * @param bool $eagerLoading
@@ -98,5 +100,13 @@ class OfferMixQuery extends ActiveQuery
 
 		return $this->joinWith(['company' => $companyJoin], $eagerLoading)
 		            ->joinWith(['block'], $eagerLoading);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function notDeleted(): self
+	{
+		return $this->andWhere([OfferMix::field('deleted') => 0]);
 	}
 }

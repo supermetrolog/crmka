@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\resources;
+namespace app\resources\Call;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Call;

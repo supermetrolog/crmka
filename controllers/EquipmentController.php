@@ -2,17 +2,16 @@
 
 namespace app\controllers;
 
+use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
-use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
-use app\models\ChatMemberMessage;
 use app\models\Equipment;
 use app\models\forms\Call\CallForm;
 use app\models\forms\Equipment\EquipmentForm;
 use app\models\forms\Media\MediaForm;
 use app\models\search\EquipmentSearch;
-use app\resources\CallResource;
+use app\resources\Call\CallResource;
 use app\resources\EquipmentResource;
 use app\usecases\Equipment\EquipmentService;
 use Exception;
@@ -73,7 +72,7 @@ class EquipmentController extends AppController
 
 		$form->validateOrThrow();
 
-		$filesForm = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_FILE, 'files');
+		$filesForm  = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_FILE, 'files');
 		$photosForm = $this->makeMediaForm(Equipment::MEDIA_CATEGORY_PHOTO, 'photos');
 
 		$model = $this->service->create($form->getDto(), $filesForm->getDtos(), $photosForm->getDtos());

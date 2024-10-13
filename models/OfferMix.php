@@ -3,13 +3,12 @@
 namespace app\models;
 
 use app\components\interfaces\OfferInterface;
-use app\helpers\DbHelper;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\ObjectChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
-use yii\db\ActiveQuery;
 use yii\helpers\Json;
 
 /**
@@ -456,13 +455,29 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	}
 
 	/**
-	 * @return ChatMemberQuery|ActiveQuery
+	 * @return ObjectChatMemberQuery
+	 * @throws ErrorException
+	 */
+	public function getObjectChatMember(): ObjectChatMemberQuery
+	{
+		/** @var ObjectChatMemberQuery $query */
+		$query = $this->hasOne(ObjectChatMember::class, ['object_id' => 'object_id'])->from(ObjectChatMember::getTable());
+
+		return $query;
+	}
+
+	/**
+	 * @return ChatMemberQuery
 	 * @throws ErrorException
 	 */
 	public function getChatMember(): ChatMemberQuery
 	{
-		return $this->morphHasOne(ChatMember::class, 'original_id');
-//		return $this->hasOne(ChatMember::class, ['model_id' => 'id'])
-//		            ->andOnCondition([DbHelper::getDsnAttribute('dbname', ChatMember::getDb()->dsn) . '.' . ChatMember::tableName() . '.model_type' => self::tableName()]);
+		/** @var ChatMemberQuery $query */
+		$query = $this->hasOne(ChatMember::class, ['model_id' => 'id'])
+		              ->andOnCondition(['model_type' => ObjectChatMember::getMorphClass()])
+		              ->via('objectChatMember')
+		              ->from(ChatMember::getTable());
+
+		return $query;
 	}
 }

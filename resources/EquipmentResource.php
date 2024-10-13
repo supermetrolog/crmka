@@ -6,13 +6,10 @@ namespace app\resources;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Equipment;
-use app\models\User;
+use app\resources\Call\CallResource;
 use app\resources\ChatMember\ChatMemberModel\CompanyResource;
-use app\resources\ChatMember\ChatMemberModel\CompanyShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Contact\ContactResource;
-use app\resources\Contact\ContactShortResource;
-use app\resources\User\UserResource;
 
 class EquipmentResource extends JsonResource
 {
