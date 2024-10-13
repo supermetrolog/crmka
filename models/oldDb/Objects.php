@@ -594,7 +594,7 @@ class Objects extends AR
 		};
 
 		$fields['offers'] = function ($fields) {
-			if (empty($fields->offers)) {
+			if (!$fields['offers']) {
 				return null;
 			}
 
