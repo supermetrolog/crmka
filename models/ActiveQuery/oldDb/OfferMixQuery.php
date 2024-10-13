@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models\ActiveQuery\oldDb;
 
 use app\helpers\DbHelper;
+use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
 use app\models\ChatMember;
 use app\models\Company;
@@ -12,10 +13,9 @@ use app\models\ObjectChatMember;
 use app\models\oldDb\OfferMix;
 use app\models\Relation;
 use yii\base\ErrorException;
-use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
-class OfferMixQuery extends ActiveQuery
+class OfferMixQuery extends AQ
 {
 	/**
 	 * @param mixed $db
@@ -32,7 +32,7 @@ class OfferMixQuery extends ActiveQuery
 	 *
 	 * @return OfferMix|null|ActiveRecord
 	 */
-	public function one($db = null)
+	public function one($db = null): ?OfferMix
 	{
 		$this->limit(1);
 
@@ -48,11 +48,6 @@ class OfferMixQuery extends ActiveQuery
 		return $this->groupBy(DbHelper::getField(OfferMix::tableName(), 'id'))
 		            ->with(['object'])
 		            ->joinForSearch();
-	}
-
-	protected function field(string $column): string
-	{
-		return $this->getPrimaryTableName() . '.' . $column;
 	}
 
 	/**

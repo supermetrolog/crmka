@@ -473,7 +473,10 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	public function getChatMember(): ChatMemberQuery
 	{
 		/** @var ChatMemberQuery $query */
-		$query = $this->hasOne(ChatMember::class, ['model_id' => 'id'])->andOnCondition(['model_type' => ObjectChatMember::getMorphClass()])->via('objectChatMember')->from(ChatMember::getTable());
+		$query = $this->hasOne(ChatMember::class, ['model_id' => 'id'])
+		              ->andOnCondition(['model_type' => ObjectChatMember::getMorphClass()])
+		              ->via('objectChatMember')
+		              ->from(ChatMember::getTable());
 
 		return $query;
 	}

@@ -4,50 +4,12 @@ declare(strict_types=1);
 
 namespace app\models\ActiveQuery;
 
-use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\OfferMix;
 use app\models\oldDb\ObjectsBlock;
-use yii\db\ActiveRecord;
+use app\models\oldDb\OfferMix as OfferMixOld;
 
 class OfferMixQuery extends oldDb\OfferMixQuery
 {
-	/**
-	 * @param mixed $db
-	 *
-	 * @return OfferMix[]
-	 */
-	public function all($db = null): array
-	{
-		return parent::all($db);
-	}
-
-	/**
-	 * @param mixed $db
-	 *
-	 * @return OfferMix|null|ActiveRecord
-	 */
-	public function one($db = null): ?OfferMix
-	{
-		$this->limit(1);
-
-		return parent::one($db);
-	}
-
-	/**
-	 * @return OfferMix|array|ActiveRecord
-	 * @throws ModelNotFoundException
-	 */
-	public function oneOrThrow($db = null): OfferMix
-	{
-		$model = $this->one($db);
-
-		if ($model) {
-			return $model;
-		}
-
-		throw new ModelNotFoundException();
-	}
-
 	/**
 	 * @param int $originalId
 	 *
@@ -79,7 +41,7 @@ class OfferMixQuery extends oldDb\OfferMixQuery
 	 */
 	public function blockType(): self
 	{
-		return $this->andWhere(['type_id' => OfferMix::MINI_TYPE_ID]);
+		return $this->andWhere(['type_id' => OfferMixOld::MINI_TYPE_ID]);
 	}
 
 	/**
@@ -87,7 +49,7 @@ class OfferMixQuery extends oldDb\OfferMixQuery
 	 */
 	public function generalType(): self
 	{
-		return $this->andWhere(['type_id' => OfferMix::GENERAL_TYPE_ID]);
+		return $this->andWhere(['type_id' => OfferMixOld::GENERAL_TYPE_ID]);
 	}
 
 	/**
@@ -103,7 +65,7 @@ class OfferMixQuery extends oldDb\OfferMixQuery
 	 */
 	public function saleDealType(): self
 	{
-		return $this->andWhere(['deal_type' => OfferMix::DEAL_TYPE_SALE]);
+		return $this->andWhere(['deal_type' => OfferMixOld::DEAL_TYPE_SALE]);
 	}
 
 	/**
@@ -111,7 +73,7 @@ class OfferMixQuery extends oldDb\OfferMixQuery
 	 */
 	public function rentDealType(): self
 	{
-		return $this->andWhere(['deal_type' => OfferMix::DEAL_TYPE_RENT]);
+		return $this->andWhere(['deal_type' => OfferMixOld::DEAL_TYPE_RENT]);
 	}
 
 	/**
@@ -119,7 +81,7 @@ class OfferMixQuery extends oldDb\OfferMixQuery
 	 */
 	public function rentAllDealType(): self
 	{
-		return $this->andWhere(['deal_type' => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE]]);
+		return $this->andWhere(['deal_type' => [OfferMixOld::DEAL_TYPE_RENT, OfferMixOld::DEAL_TYPE_SUBLEASE]]);
 	}
 
 	/**
@@ -127,7 +89,7 @@ class OfferMixQuery extends oldDb\OfferMixQuery
 	 */
 	public function notResponseStorageDealType(): self
 	{
-		return $this->andWhere(['!=', OfferMix::tableName() . '.deal_type', OfferMix::DEAL_TYPE_RESPONSE_STORAGE]);
+		return $this->andWhere(['!=', OfferMix::tableName() . '.deal_type', OfferMixOld::DEAL_TYPE_RESPONSE_STORAGE]);
 	}
 
 	/**
