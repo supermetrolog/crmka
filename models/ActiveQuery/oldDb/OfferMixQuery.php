@@ -58,23 +58,6 @@ class OfferMixQuery extends ActiveQuery
 	/**
 	 * @throws ErrorException
 	 */
-	public function leftJoinChatMember(): self
-	{
-		$subQuery = ChatMember::find()
-		                      ->from(ChatMember::getTable())
-		                      ->select([
-			                      'chat_member_id' => ChatMember::field('id'),
-			                      'object_id'      => 'ocm.object_id'
-		                      ])
-		                      ->andWhere(['model_type' => ObjectChatMember::getMorphClass()])
-		                      ->leftJoin(['ocm' => ObjectChatMember::getTable()], 'ocm.id = ' . ChatMember::xfield('model_id'));
-
-		return $this->leftJoin(['cm' => $subQuery], $this->field('object_id') . '=' . 'cm.object_id');
-	}
-
-	/**
-	 * @throws ErrorException
-	 */
 
 	public function leftJoinLastCallRelation(): self
 	{

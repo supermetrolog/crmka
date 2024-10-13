@@ -1274,10 +1274,10 @@ class OfferMixSearch extends Search
 			                           ]
 		                           ))
 		                           ->joinForSearch(true)
-		                           ->leftJoinChatMember()
+		                           ->joinWith(['chatMember cm'])
 		                           ->leftJoinLastCallRelation()
 		                           ->leftJoin(['cmm' => $this->makeMessageQuery()],
-			                           'cmm.to_chat_member_id' . '=' . 'cm.chat_member_id'
+			                           'cmm.to_chat_member_id' . '=' . 'cm.id'
 		                           )
 		                           ->with([
 			                           'object.objectFloors',
