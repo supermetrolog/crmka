@@ -24,6 +24,8 @@ class CreateTaskCommentService
 		]);
 
 		$comment->saveOrThrow();
+		
+		$comment->refresh();
 
 		return $comment;
 	}
