@@ -743,9 +743,9 @@ class OffersPdf extends Model
             return $model->heating;
         }
 
-        if ($model->heated) {
-            return "есть";
-        }
+		if ($model->heated == 1) {
+			return "есть";
+		}
 
         return "нет";
     }
@@ -1311,9 +1311,9 @@ class OffersPdf extends Model
                             return $this->data->heating;
                         }
 
-                        if ($this->data->heated) {
-                            return "есть";
-                        }
+						if ($this->data->heated == 1) {
+							return "есть";
+						}
 
                         return "нет";
                     },
