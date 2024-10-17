@@ -6,6 +6,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\Task;
 use app\models\TaskObserver;
+use app\models\TaskTag;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -22,6 +23,7 @@ class TaskSearch extends Form
 	public $expired;
 	public $completed;
 	public $multiple;
+	public $tag_ids;
 
 
 	public function rules(): array
@@ -31,6 +33,11 @@ class TaskSearch extends Form
 			[['deleted', 'expired', 'completed', 'multiple'], 'boolean'],
 			['status', 'each', 'rule' => ['integer']],
 			[['message', 'start', 'end', 'created_by_type'], 'safe'],
+			['tag_ids', 'each', 'rule' => [
+				'exist',
+				'targetClass'     => TaskTag::class,
+				'targetAttribute' => ['tag_ids' => 'id'],
+			]]
 		];
 	}
 
@@ -40,7 +47,10 @@ class TaskSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = Task::find()->with(['user.userProfile', 'createdByUser.userProfile', 'tags', 'observers.user.userProfile'])->notDeleted();
+		$query = Task::find()
+		             ->with(['user.userProfile', 'createdByUser.userProfile', 'tags', 'observers.user.userProfile'])
+		             ->joinWith(['tags'])
+		             ->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
@@ -120,6 +130,8 @@ class TaskSearch extends Form
 		$query->andFilterWhere(['or',
 		                        ['like', Task::getColumn('message'), $this->message],
 		                        ['like', Task::getColumn('id'), $this->message]]);
+
+		$query->andFilterWhere(['in', TaskTag::xfield('id'), $this->tag_ids]);
 
 		return $dataProvider;
 	}
