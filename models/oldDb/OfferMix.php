@@ -716,6 +716,10 @@ class OfferMix extends AR
 			return ['photo' => json_decode($this->object->photo)];
 		};
 
+		$extraFields['offer'] = function () {
+			return $this->offer;
+		};
+
 		return $extraFields;
 	}
 
