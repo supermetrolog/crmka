@@ -112,6 +112,7 @@ return
 			'controller'    => 'oldDb/object',
 			'except'        => [],
 			'extraPatterns' => [
+				'GET,OPTIONS'                               => 'index',
 				'GET,OPTIONS offers'                        => 'offers',
 				'GET,OPTIONS offers-map'                    => 'offers-map',
 				'GET,OPTIONS offers-count'                  => 'offers-count',
@@ -158,13 +159,6 @@ return
 			'controller'    => ['company-events-log' => 'company-events-log'],
 			'except'        => [],
 			'extraPatterns' => [],
-		],
-		[
-			'class'         => 'yii\rest\UrlRule',
-			'controller'    => ['objects' => 'objects'],
-			'extraPatterns' => [
-				'GET,OPTIONS' => 'index'
-			],
 		],
 		[
 			'class'         => 'yii\rest\UrlRule',

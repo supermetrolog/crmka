@@ -1270,7 +1270,7 @@ class OfferMixSearch extends Search
 			                           $this->getSelect(),
 			                           [
 				                           'last_call_rel_id'     => 'last_call_rel.id',
-				                           'unread_message_count' => 'COUNT(DISTINCT cmm.id)',
+				                           'unread_message_count' => 'COUNT(DISTINCT cmm.id)'
 			                           ]
 		                           ))
 		                           ->joinForSearch(true)
