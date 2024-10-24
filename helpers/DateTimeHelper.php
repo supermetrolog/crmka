@@ -39,4 +39,17 @@ class DateTimeHelper
 	{
 		return new DateTime($datetime);
 	}
+
+	/**
+	 * @throws Exception
+	 */
+	public static function makef(string $datetime, string $format = 'Y-m-d H:i:s'): string
+	{
+		return self::make($datetime)->format($format);
+	}
+
+	public static function fromUnix(int $timestamp): string
+	{
+		return date('Y-m-d H:i:s', $timestamp);
+	}
 }
