@@ -56,4 +56,9 @@ class MediaQuery extends AQ
 	{
 		return $this->byModelId($id)->byModelType($type);
 	}
+
+	public function byCategory(string $category): self
+	{
+		return $this->andWhere([$this->field('category') => $category]);
+	}
 }
