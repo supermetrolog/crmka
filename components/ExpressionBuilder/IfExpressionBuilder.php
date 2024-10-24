@@ -50,7 +50,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function condition(string $condition): self
 	{
-		if (StringHelper::empty($condition)) {
+		if (StringHelper::isEmpty($condition)) {
 			throw new InvalidValueException('Condition expression cannot be empty string');
 		}
 
@@ -68,7 +68,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function left(string $trueExpression): self
 	{
-		if (StringHelper::empty($trueExpression)) {
+		if (StringHelper::isEmpty($trueExpression)) {
 			throw new InvalidValueException('True (left) expression cannot be empty string');
 		}
 
@@ -86,7 +86,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function right(string $falseExpression): self
 	{
-		if (StringHelper::empty($falseExpression)) {
+		if (StringHelper::isEmpty($falseExpression)) {
 			throw new InvalidValueException('False (right) expression cannot be empty string');
 		}
 
@@ -104,7 +104,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 	 */
 	public function as(string $alias): self
 	{
-		if (StringHelper::empty($alias)) {
+		if (StringHelper::isEmpty($alias)) {
 			throw new InvalidValueException('Alias for final expression cannot be empty string');
 		}
 

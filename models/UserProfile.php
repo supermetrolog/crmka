@@ -120,6 +120,7 @@ class UserProfile extends AR
 		);
 	}
 
+	// TODO: Удалить, когда переведем все на ресурсы
 	public function fields(): array
 	{
 		$fields                = parent::fields();

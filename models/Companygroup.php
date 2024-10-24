@@ -2,82 +2,80 @@
 
 namespace app\models;
 
-use Yii;
+use app\helpers\StringHelper;
+use app\kernel\common\models\AR\AR;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "companygroup".
  *
- * @property int $id
- * @property string $nameEng
- * @property string $nameRu
- * @property int|null $formOfOrganization
+ * @property int         $id
+ * @property string      $nameEng
+ * @property string      $nameRu
+ * @property int|null    $formOfOrganization
  * @property string|null $description
  *
- * @property Company[] $companies
+ * @property Company[]   $companies
  */
-class Companygroup extends \yii\db\ActiveRecord
+class Companygroup extends AR
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return 'companygroup';
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function tableName(): string
+	{
+		return 'companygroup';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['nameRu'], 'required'],
-            [['description'], 'string'],
-            [['formOfOrganization'], 'integer'],
-            [['nameEng', 'nameRu'], 'string', 'max' => 255],
-        ];
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function rules(): array
+	{
+		return [
+			[['nameRu'], 'required'],
+			[['description'], 'string'],
+			[['formOfOrganization'], 'integer'],
+			[['nameEng', 'nameRu'], 'string', 'max' => 255],
+		];
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'nameEng' => 'Name Eng',
-            'nameRu' => 'Name Ru',
-            'description' => 'Description',
-            'formOfOrganization' => 'FormOfOrganization'
-        ];
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function attributeLabels(): array
+	{
+		return [
+			'id'                 => 'ID',
+			'nameEng'            => 'Name Eng',
+			'nameRu'             => 'Name Ru',
+			'description'        => 'Description',
+			'formOfOrganization' => 'FormOfOrganization'
+		];
+	}
 
-    public function fields()
-    {
-        $fields = parent::fields();
-        $fields['full_name'] = function ($fields) {
-            $formOfOrganization = $fields['formOfOrganization'];
-            $nameEng = $fields['nameEng'];
-            $nameRu = $fields['nameRu'];
-            $name = "";
-            if ($formOfOrganization !== null) {
-                $name .= Company::FORM_OF_ORGANIZATION_LIST[$formOfOrganization];
-            }
-            $name .= " $nameRu";
-            if ($nameEng) {
-                $name .= " - $nameEng";
-            }
-            return trim($name);
-        };
-        return $fields;
-    }
-    /**
-     * Gets query for [[Companies]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCompanies()
-    {
-        return $this->hasMany(Company::className(), ['companyGroup_id' => 'id']);
-    }
+	public function getFullName(): string
+	{
+		$formOfOrganization = $this->formOfOrganization;
+		$nameEng            = $this->nameEng;
+		$nameRu             = $this->nameRu;
+
+		$name = StringHelper::join(
+			StringHelper::SYMBOL_SPACE,
+			$nameRu,
+			$formOfOrganization !== null ? Company::FORM_OF_ORGANIZATION_LIST[$formOfOrganization] : ""
+		);
+
+		return StringHelper::join(' - ', $name, $nameEng ?? "");
+	}
+
+	/**
+	 * Gets query for [[Companies]].
+	 *
+	 * @return ActiveQuery
+	 */
+	public function getCompanies(): ActiveQuery
+	{
+		return $this->hasMany(Company::class, ['companyGroup_id' => 'id']);
+	}
 }

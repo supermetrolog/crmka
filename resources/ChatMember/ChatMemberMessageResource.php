@@ -8,7 +8,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMemberMessage;
 use app\resources\AlertResource;
 use app\resources\Contact\ContactShortResource;
-use app\resources\MediaResource;
+use app\resources\Media\MediaResource;
 use app\resources\ReminderResource;
 use app\resources\Task\TaskResource;
 use app\resources\UserNotificationResource;

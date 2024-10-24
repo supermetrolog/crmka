@@ -23,7 +23,7 @@ use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
 use app\resources\ChatMember\ChatMemberStatisticResource;
-use app\resources\MediaResource;
+use app\resources\Media\MediaResource;
 use app\usecases\ChatMember\ChatMemberService;
 use Throwable;
 use yii\base\ErrorException;

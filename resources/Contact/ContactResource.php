@@ -6,6 +6,11 @@ namespace app\resources\Contact;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Contact;
+use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\Contact\Email\ContactEmailResource;
+use app\resources\Contact\Phone\ContactPhoneResource;
+use app\resources\Contact\WayOfInforming\ContactWayOfInformingResource;
+use app\resources\Contact\Website\ContactWebsiteResource;
 
 class ContactResource extends JsonResource
 {
@@ -24,6 +29,7 @@ class ContactResource extends JsonResource
 			'first_name'          => $this->resource->first_name,
 			'middle_name'         => $this->resource->middle_name,
 			'last_name'           => $this->resource->last_name,
+			'full_name'           => $this->resource->getFullName(),
 			'type'                => $this->resource->type,
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
@@ -38,9 +44,11 @@ class ContactResource extends JsonResource
 			'warning_why_comment' => $this->resource->warning_why_comment,
 			'position_unknown'    => $this->resource->position_unknown,
 			'isMain'              => $this->resource->isMain,
-
-			'emails' => $this->resource->emails,
-			'phones' => $this->resource->phones,
+			'consultant'          => UserShortResource::tryMakeArray($this->resource->consultant),
+			'emails'              => ContactEmailResource::collection($this->resource->emails),
+			'phones'              => ContactPhoneResource::collection($this->resource->phones),
+			'wayOfInformings'     => ContactWayOfInformingResource::collection($this->resource->wayOfInformings),
+			'websites'            => ContactWebsiteResource::collection($this->resource->websites)
 		];
 	}
 }

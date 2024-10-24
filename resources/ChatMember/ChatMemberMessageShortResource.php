@@ -7,7 +7,7 @@ namespace app\resources\ChatMember;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMemberMessage;
 use app\resources\Contact\ContactShortResource;
-use app\resources\MediaResource;
+use app\resources\Media\MediaResource;
 
 class ChatMemberMessageShortResource extends JsonResource
 {

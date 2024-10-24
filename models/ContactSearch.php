@@ -2,98 +2,116 @@
 
 namespace app\models;
 
-use yii\base\Model;
+use app\helpers\SQLHelper;
+use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\common\models\Form\Form;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
-use app\models\Contact;
 
 /**
  * ContactSearch represents the model behind the search form of `app\models\Contact`.
  */
-class ContactSearch extends Contact
+class ContactSearch extends Form
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['company_id', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'status', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
-            [['id', 'middle_name', 'last_name', 'created_at', 'updated_at', 'first_name', 'passive_why_comment', 'warning_why_comment'], 'safe'],
-        ];
-    }
+	public $id;
+	public $company_id;
+	public $type;
+	public $first_name;
+	public $middle_name;
+	public $last_name;
+	public $created_at;
+	public $updated_at;
+	public $consultant_id;
+	public $position;
+	public $faceToFaceMeeting;
+	public $warning;
+	public $good;
+	public $status;
+	public $passive_why;
+	public $passive_why_comment;
+	public $warning_why_comment;
+	public $position_unknown;
+	public $isMain;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function scenarios()
-    {
-        // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
-    }
-    public function stringToArray($value)
-    {
-        if (is_string($value)) {
-            return explode(",", $value);
-        }
-        return $value;
-    }
-    public function normalizeProps()
-    {
-        $this->id = $this->stringToArray($this->id);
-    }
-    /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
-     */
-    public function search($params)
-    {
-        $query = Contact::find()->with(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant.userProfile', 'contactComments.author.userProfile']);
+	public $search;
 
-        // add conditions that should always apply here
+	/**
+	 * {@inheritdoc}
+	 */
+	public function rules(): array
+	{
+		return [
+			[['company_id', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'status', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
+			[['id', 'middle_name', 'last_name', 'created_at', 'updated_at', 'first_name', 'passive_why_comment', 'warning_why_comment', 'search'], 'safe'],
+		];
+	}
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => [
-                'defaultPageSize' => 50,
-                'pageSizeLimit' => [0, 50],
-            ],
-        ]);
 
-        $this->load($params, '');
-        $this->normalizeProps();
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
+	/**
+	 * @param array $params
+	 *
+	 * @return ActiveDataProvider
+	 * @throws ErrorException
+	 * @throws ValidateException
+	 */
+	public function search(array $params): ActiveDataProvider
+	{
+		$query = Contact::find()
+		                ->with(['emails', 'phones', 'websites', 'wayOfInformings', 'consultant.userProfile', 'contactComments.author.userProfile']);
 
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'company_id' => $this->company_id,
-            'type' => $this->type,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'consultant_id' => $this->consultant_id,
-            'position' => $this->position,
-            'faceToFaceMeeting' => $this->faceToFaceMeeting,
-            'warning' => $this->warning,
-            'good' => $this->good,
-            'status' => $this->status,
-            'passive_why' => $this->passive_why,
-            'position_unknown' => $this->position_unknown,
-            'isMain' => $this->isMain,
-        ]);
+		$dataProvider = new ActiveDataProvider([
+			'query'      => $query,
+			'pagination' => [
+				'pageSize' => 50,
+			],
+		]);
 
-        $query->andFilterWhere(['like', 'middle_name', $this->middle_name])
-            ->andFilterWhere(['like', 'last_name', $this->last_name])
-            ->andFilterWhere(['like', 'first_name', $this->first_name])
-            ->andFilterWhere(['like', 'passive_why_comment', $this->passive_why_comment])
-            ->andFilterWhere(['like', 'warning_why_comment', $this->warning_why_comment]);
+		$this->load($params);
+		$this->validateOrThrow();
 
-        return $dataProvider;
-    }
+		$query->andFilterWhere([
+			'id'                => $this->id,
+			'company_id'        => $this->company_id,
+			'type'              => $this->type,
+			'created_at'        => $this->created_at,
+			'updated_at'        => $this->updated_at,
+			'consultant_id'     => $this->consultant_id,
+			'position'          => $this->position,
+			'faceToFaceMeeting' => $this->faceToFaceMeeting,
+			'warning'           => $this->warning,
+			'good'              => $this->good,
+			'status'            => $this->status,
+			'passive_why'       => $this->passive_why,
+			'position_unknown'  => $this->position_unknown,
+			'isMain'            => $this->isMain,
+		]);
+
+		$query->andFilterWhere(['like', 'middle_name', $this->middle_name])
+		      ->andFilterWhere(['like', 'last_name', $this->last_name])
+		      ->andFilterWhere(['like', 'first_name', $this->first_name])
+		      ->andFilterWhere(['like', 'passive_why_comment', $this->passive_why_comment])
+		      ->andFilterWhere(['like', 'warning_why_comment', $this->warning_why_comment]);
+
+		if (!empty($this->search)) {
+			$query->andFilterWhere([
+				'or',
+				[
+					'like',
+					SQLHelper::concatWithCoalesce([
+						Contact::xfield('first_name'),
+						Contact::xfield('middle_name'),
+						Contact::xfield('last_name')
+					]),
+					$this->search
+				],
+				['like', 'id', $this->search],
+				['like', 'company_id', $this->search],
+				['like', 'passive_why_comment', $this->search],
+				['like', 'warning_why_comment', $this->search]
+
+			]);
+		}
+
+		return $dataProvider;
+	}
 }

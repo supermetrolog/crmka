@@ -5,6 +5,7 @@ namespace app\models;
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\events\NotificationEvent;
 use app\exceptions\ValidationErrorHttpException;
+use app\helpers\StringHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
@@ -297,9 +298,21 @@ class Request extends AR
 		}
 	}
 
+	public function getFormatName(): string
+	{
+		$name = StringHelper::join(' - ', $this->name ?? "", self::DEAL_TYPE_LIST[$this->dealType]);
+		$area = StringHelper::join(' - ', $this->minArea, $this->maxArea);
+
+		return StringHelper::join(' ', $name, $area, 'м');
+	}
+
 	public function fields(): array
 	{
-		$fields                      = parent::fields();
+		$fields = parent::fields();
+
+		$fields['format_name'] = fn() => $this->getFormatName();
+
+
 		$fields['movingDate']        = function ($fields) {
 			if ($fields['movingDate']) {
 				return date('Y-m-d', strtotime($fields['movingDate']));
@@ -316,11 +329,6 @@ class Request extends AR
 		};
 		$fields['created_at_format']    = function ($fields) {
 			return $fields['created_at'] ? Yii::$app->formatter->format($fields['created_at'], 'datetime') : null;
-		};
-		$fields['format_name']          = function ($fields) {
-			$name = $fields['name'] ? $fields['name'] . " - " : "";
-
-			return $name . self::DEAL_TYPE_LIST[$fields['dealType']] . " {$fields['minArea']} - {$fields['maxArea']} м";
 		};
 		$fields['progress_percent']     = function () {
 			return rand(10, 100);

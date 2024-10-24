@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\resources;
+namespace app\resources\Media;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Media;
@@ -30,6 +30,7 @@ class MediaResource extends JsonResource
 			'model_type'    => $this->resource->model_type,
 			'model_id'      => $this->resource->model_id,
 			'mime_type'     => $this->resource->mime_type,
+			'src'           => $this->resource->getSrc()
 		];
 	}
 }

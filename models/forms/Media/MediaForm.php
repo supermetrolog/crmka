@@ -14,6 +14,7 @@ class MediaForm extends Form
 	 * @var UploadedFile[]
 	 */
 	public $files;
+	public $file;
 	public $category;
 	public $model_type;
 	public $model_id;
@@ -23,6 +24,7 @@ class MediaForm extends Form
 		return [
 			[['category', 'model_type', 'model_id'], 'required'],
 			[['files'], 'each', 'rule' => ['file'], 'skipOnEmpty' => true],
+			['file', 'file', 'skipOnEmpty' => true],
 		];
 	}
 
@@ -41,5 +43,16 @@ class MediaForm extends Form
 		}
 
 		return $dtos;
+	}
+
+	public function getDto(): CreateMediaDto
+	{
+		return new CreateMediaDto([
+			'category'     => $this->category,
+			'model_type'   => $this->model_type,
+			'model_id'     => $this->model_id,
+			'uploadedFile' => $this->file,
+			'mime_type'    => mime_content_type($this->file->tempName),
+		]);
 	}
 }

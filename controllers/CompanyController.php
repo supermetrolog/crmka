@@ -2,91 +2,227 @@
 
 namespace app\controllers;
 
-use app\behaviors\BaseControllerBehaviors;
-use yii\rest\ActiveController;
-use Yii;
+use app\dto\Company\CompanyContactsDto;
+use app\dto\Company\CompanyMiniModelsDto;
+use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\kernel\common\models\exceptions\ValidateException;
 use app\models\Company;
 use app\models\CompanySearch;
-use app\models\Productrange;
-use app\models\UploadFile;
-use yii\helpers\ArrayHelper;
+use app\models\forms\Company\CompanyForm;
+use app\models\forms\Company\CompanyMediaForm;
+use app\repositories\CompanyRepository;
+use app\repositories\ProductRangeRepository;
+use app\resources\Company\CompanyInListResource;
+use app\resources\Company\CompanyViewResource;
+use app\usecases\Company\CompanyService;
+use app\usecases\Company\CompanyWithGeneralContactService;
+use Throwable;
+use yii\base\ErrorException;
+use yii\data\ActiveDataProvider;
 use yii\web\UploadedFile;
-use yii\web\NotFoundHttpException;
-use yii\filters\Cors;
 
-class CompanyController extends ActiveController
+class CompanyController extends AppController
 {
-    public $modelClass = 'app\models\Company';
+	private CompanyWithGeneralContactService $companyWithGeneralContactService;
 
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors();
-        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index', 'view']);
-        $behaviors['corsFilter'] = [
-            'class' => Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['*'],
-                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-                'Access-Control-Expose-Headers' => ['X-Pagination-Total-Count', 'X-Pagination-Page-Count', 'X-Pagination-Current-Page', 'X-Pagination-Per-Page', 'Link']
-            ],
-        ];
-        return $behaviors;
-    }
+	private ProductrangeRepository $productRangeRepository;
 
-    public function actions()
-    {
-        $actions = parent::actions();
-        unset($actions['index']);
-        unset($actions['view']);
-        unset($actions['create']);
-        unset($actions['update']);
-        unset($actions['delete']);
-        return $actions;
-    }
-    public function actionIndex()
-    {
-        $searchModel = new CompanySearch();
-        return $searchModel->search(Yii::$app->request->queryParams);
-    }
-    public function actionView($id)
-    {
-        return Company::getCompanyInfo($id);
-    }
-    public function actionCreate()
-    {
-        $request = json_decode(Yii::$app->request->post('data'), true);
-        $model = new UploadFile();
-        $model->files = UploadedFile::getInstancesByName('files');
-        return Company::createCompany($request, $model);
-    }
-    public function actionUpdate($id)
-    {
-        $request = json_decode(Yii::$app->request->post('data'), true);
-        $model = new UploadFile();
+	private CompanyRepository $companyRepository;
 
-        $model->files = UploadedFile::getInstancesByName('files');
-        return Company::updateCompany($this->findModel($id), $request, $model);
-    }
-    public function actionSearch()
-    {
-        $search = new CompanySearch();
-        $searchByAttr['CompanySearch'] = Yii::$app->request->queryParams;
-        return $search->search($searchByAttr);
-    }
-    public function actionProductRangeList()
-    {
-        return ArrayHelper::getColumn(Productrange::find()->select('product')->distinct()->asArray()->all(), 'product');
-    }
-    public function actionInTheBankList()
-    {
-        return ArrayHelper::getColumn(Company::find()->select('inTheBank')->where(['is not', 'inTheBank', new \yii\db\Expression('null')])->distinct()->asArray()->all(), 'inTheBank');
-    }
-    protected function findModel($id)
-    {
-        if (($model = Company::findOne($id)) !== null) {
-            return $model;
-        }
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
+	private CompanyService $companyService;
+
+	public function __construct(
+		$id,
+		$module,
+		CompanyWithGeneralContactService $companyWithGeneralContactService,
+		ProductrangeRepository $productRangeRepository,
+		CompanyRepository $companyRepository,
+		CompanyService $companyService,
+		array $config = []
+	)
+	{
+		$this->companyWithGeneralContactService = $companyWithGeneralContactService;
+		$this->companyService                   = $companyService;
+		$this->productRangeRepository           = $productRangeRepository;
+		$this->companyRepository                = $companyRepository;
+
+		parent::__construct($id, $module, $config);
+	}
+
+	/**
+	 * @return ActiveDataProvider
+	 * @throws ErrorException
+	 * @throws ValidateException
+	 */
+	public function actionIndex(): ActiveDataProvider
+	{
+		$searchModel = new CompanySearch();
+
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return CompanyInListResource::fromDataProvider($dataProvider);
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return CompanyViewResource
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
+	 */
+	public function actionView($id): CompanyViewResource
+	{
+		$model = $this->findModel($id);
+
+		return new CompanyViewResource($model);
+	}
+
+	/**
+	 * @return CompanyViewResource
+	 * @throws Throwable
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 */
+	public function actionCreate(): CompanyViewResource
+	{
+		$form = new CompanyForm();
+
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$companyMediaForm = new CompanyMediaForm();
+
+		$companyMediaForm->load([
+			'logo'  => UploadedFile::getInstanceByName('logo'),
+			'files' => UploadedFile::getInstancesByName('files'),
+		]);
+		$companyMediaForm->validateOrThrow();
+
+		$companyMiniModelsDto = new CompanyMiniModelsDto([
+			'productRanges' => $this->request->post('productRanges') ?? [],
+			'categories'    => $this->request->post('categories') ?? []
+		]);
+
+		$contactsData = $this->request->post('contacts');
+
+		if ($contactsData) {
+			$companyContactsDto = new CompanyContactsDto($contactsData);
+
+			$company = $this->companyWithGeneralContactService->create(
+				$form->getDto(),
+				$companyMiniModelsDto,
+				$companyContactsDto,
+				$companyMediaForm->getDto()
+			);
+		} else {
+			$company = $this->companyService->create(
+				$form->getDto(),
+				$companyMiniModelsDto,
+				$companyMediaForm->getDto()
+			);
+		}
+
+		return new CompanyViewResource($company);
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return CompanyViewResource
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionUpdate($id): CompanyViewResource
+	{
+		$company = $this->findModel($id);
+
+		$form = new CompanyForm();
+
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$companyMediaForm = new CompanyMediaForm();
+
+		$companyMediaForm->load([
+			'logo'  => UploadedFile::getInstanceByName('new_logo'),
+			'files' => UploadedFile::getInstancesByName('new_files'),
+		]);
+		$companyMediaForm->validateOrThrow();
+
+		$companyMiniModelsDto = new CompanyMiniModelsDto([
+			'productRanges' => $this->request->post('productRanges') ?? [],
+			'categories'    => $this->request->post('categories') ?? []
+		]);
+
+		$contactsData = $this->request->post('contacts');
+
+		$companyContactsDto = new CompanyContactsDto([
+			'emails'   => $contactsData['emails'] ?? [],
+			'phones'   => $contactsData['phones'] ?? [],
+			'websites' => $contactsData['websites'] ?? []
+		]);
+
+		$company = $this->companyWithGeneralContactService->update(
+			$company,
+			$form->getDto(),
+			$companyMiniModelsDto,
+			$companyContactsDto,
+			$companyMediaForm->getDto()
+		);
+
+		return new CompanyViewResource($company);
+	}
+
+	/**
+	 * @return string[]
+	 * @throws ErrorException
+	 */
+	public function actionProductRangeList(): array
+	{
+		return $this->productRangeRepository->getUniqueAll();
+	}
+
+	/**
+	 * @return string[]
+	 * @throws ErrorException
+	 */
+	public function actionInTheBankList(): array
+	{
+		return $this->companyRepository->getBankNameUniqueAll();
+	}
+
+	/**
+	 * @param       $id
+	 *
+	 * @return Company
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
+	 */
+	protected function findModel($id): Company
+	{
+		/** @var Company $model */
+		$model = Company::find()
+		                ->select(Company::field('*'))
+		                ->byId($id)
+		                ->with(['productRanges',
+		                        'categories',
+		                        'companyGroup',
+		                        'deals',
+		                        'files',
+		                        'dealsRequestEmpty.consultant.userProfile',
+		                        'dealsRequestEmpty.offer.generalOffersMix',
+		                        'dealsRequestEmpty.competitor',
+		                        'consultant.userProfile',
+		                        'contacts' => function ($query) {
+			                        $query->with(['phones', 'emails', 'contactComments', 'websites']);
+		                        }])
+		                ->oneOrThrow();
+
+		return $model;
+	}
 }

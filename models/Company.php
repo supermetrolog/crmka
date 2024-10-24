@@ -3,68 +3,78 @@
 namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
-use app\events\NotificationEvent;
-use app\helpers\DbHelper;
+use app\helpers\StringHelper;
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
-use Throwable;
-use yii\base\ErrorException;
-use yii\data\ActiveDataProvider;
-use app\exceptions\ValidationErrorHttpException;
+use app\models\ActiveQuery\MediaQuery;
+use app\models\ActiveQuery\OfferMixQuery;
 use app\models\miniModels\CompanyFile;
-use app\models\oldDb\Objects;
-use app\models\oldDb\OfferMix;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
  * This is the model class for table "company".
  *
- * @property int          $id
- * @property string|null  $nameEng
- * @property string|null  $nameRu
- * @property string|null  $nameBrand
- * @property int|null     $noName
- * @property int|null     $formOfOrganization
- * @property int|null     $companyGroup_id
- * @property string|null  $officeAdress
- * @property int|null     $status
- * @property int          $consultant_id
- * @property int|null     $broker_id
- * @property string|null  $legalAddress
- * @property string|null  $ogrn
- * @property string|null  $inn
- * @property string|null  $kpp
- * @property string|null  $checkingAccount
- * @property string|null  $correspondentAccount
- * @property string|null  $inTheBank
- * @property string|null  $bik
- * @property string|null  $okved
- * @property string|null  $okpo
- * @property string|null  $signatoryName
- * @property string|null  $signatoryMiddleName
- * @property string|null  $signatoryLastName
- * @property string|null  $basis
- * @property string|null  $documentNumber
- * @property int          $activityGroup
- * @property int          $activityProfile
- * @property int/null $processed
- * @property int          $rating
- * @property string|null  $description
- * @property int|null     $passive_why
- * @property string|null  $passive_why_comment
- * @property string|null  $created_at
- * @property string|null  $updated_at
- * @property string|null  $latitude
- * @property string|null  $longitude
+ * @property int                        $id
+ * @property string|null                $nameEng
+ * @property string|null                $nameRu
+ * @property string|null                $nameBrand
+ * @property int|null                   $noName
+ * @property int|null                   $formOfOrganization
+ * @property int|null                   $companyGroup_id
+ * @property string|null                $officeAdress
+ * @property int|null                   $status
+ * @property int                        $consultant_id
+ * @property int|null                   $broker_id
+ * @property string|null                $legalAddress
+ * @property string|null                $ogrn
+ * @property string|null                $inn
+ * @property string|null                $kpp
+ * @property string|null                $checkingAccount
+ * @property string|null                $correspondentAccount
+ * @property string|null                $inTheBank
+ * @property string|null                $bik
+ * @property string|null                $okved
+ * @property string|null                $okpo
+ * @property string|null                $signatoryName
+ * @property string|null                $signatoryMiddleName
+ * @property string|null                $signatoryLastName
+ * @property string|null                $basis
+ * @property string|null                $documentNumber
+ * @property int                        $activityGroup
+ * @property int                        $activityProfile
+ * @property int                        $active
+ * @property int|null                   $processed
+ * @property int                        $rating
+ * @property string|null                $description
+ * @property int|null                   $passive_why
+ * @property string|null                $passive_why_comment
+ * @property string|null                $created_at
+ * @property string|null                $updated_at
+ * @property string|null                $latitude
+ * @property string|null                $longitude
+ * @property ?int                       $media_id
  *
- * @property User         $broker
- * @property Companygroup $companyGroup
- * @property User         $consultant
+ * @property-read ?User                 $broker
+ * @property-read ?Companygroup         $companyGroup
+ * @property-read User                  $consultant
+ * @property-read ?Media                $logo
+ * @property-read Contact               $mainContact
+ * @property-read Contact[]             $contacts
+ * @property-read Category[]            $categories
+ * @property-read Productrange[]        $productRanges
+ * @property-read \app\models\Objects[] $objects
+ * @property-read Request[]             $requests
+ * @property-read Deal[]                $deals
+ * @property-read Deal[]                $dealsRequestEmpty
+ * @property-read CompanyFile[]         $files
+ * @property-read int                   $contactsCount
  */
 class Company extends AR
 {
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
 	public const FORM_OF_ORGANIZATION_LIST = [
 		0 => 'ООО',
 		1 => 'ОАО',
@@ -74,17 +84,20 @@ class Company extends AR
 		5 => 'ИП',
 	];
 
+	public const LOGO_MEDIA_CATEGORY = 'company_logo';
+	public const FILE_MEDIA_CATEGORY = 'company_file';
+
 	public const COMPANY_CREATED_EVENT = 'company_created_event';
 	public const COMPANY_UPDATED_EVENT = 'company_updated_event';
 
 
-	public function init()
+	public function init(): void
 	{
 		$this->on(self::COMPANY_CREATED_EVENT, [Yii::$app->notify, 'notifyUser']);
 		parent::init();
 	}
 
-	public function behaviors()
+	public function behaviors(): array
 	{
 		return [
 			CreateManyMiniModelsBehaviors::class
@@ -94,7 +107,7 @@ class Company extends AR
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function tableName()
+	public static function tableName(): string
 	{
 		return 'company';
 	}
@@ -102,7 +115,7 @@ class Company extends AR
 	/**
 	 * {@inheritdoc}
 	 */
-	public function rules()
+	public function rules(): array
 	{
 		return [
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
@@ -110,9 +123,9 @@ class Company extends AR
 			[['description'], 'string'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'latitude', 'longitude'], 'string', 'max' => 255],
-			[['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['broker_id' => 'id']],
-			[['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::className(), 'targetAttribute' => ['companyGroup_id' => 'id']],
-			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['consultant_id' => 'id']],
+			[['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['broker_id' => 'id']],
+			[['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::class, 'targetAttribute' => ['companyGroup_id' => 'id']],
+			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
 		];
 	}
 
@@ -162,62 +175,48 @@ class Company extends AR
 		];
 	}
 
+	public function getFullName(): string
+	{
+		$formOfOrganization = $this->formOfOrganization;
+		$englishName        = $this->nameEng;
+		$russianName        = $this->nameRu;
+		$brand              = $this->nameBrand;
+		$withoutName        = $this->noName;
+
+		if ($withoutName) {
+			return '-';
+		}
+
+		$name = StringHelper::join(
+			StringHelper::SYMBOL_SPACE,
+			$formOfOrganization ? self::FORM_OF_ORGANIZATION_LIST[$formOfOrganization] : '',
+			$russianName ?? ''
+		);
+
+		if ($englishName) {
+			$name = StringHelper::join(
+				$russianName ? ' - ' : ' ',
+				$name,
+				$englishName
+			);
+		}
+
+		if ($brand) {
+			$name = StringHelper::join(
+				StringHelper::isNotEmpty($name) ? ' - ' : ' ',
+				$name,
+				$brand
+			);
+		}
+
+		return StringHelper::trim($name);
+	}
+
 	public function fields(): array
 	{
 		$fields = parent::fields();
 
-		$fields['progress_percent']  = function () {
-			return rand(10, 100);
-		};
-		$fields['request_count']     = function () {
-			return rand(10, 100);
-		};
-		$fields['offer_count']       = function () {
-			return rand(10, 100);
-		};
-		$fields['object_count']      = function () {
-			return rand(10, 100);
-		};
-		$fields['created_at_format'] = function ($fields) {
-			return Yii::$app->formatter->format($fields['created_at'], 'datetime');
-		};
-		$fields['updated_at_format'] = function ($fields) {
-			return $fields['updated_at'] ? Yii::$app->formatter->format($fields['updated_at'], 'datetime') : null;
-		};
-		$fields['full_name']         = function ($fields) {
-			$formOfOrganization = $fields['formOfOrganization'];
-			$nameEng            = $fields['nameEng'];
-			$nameRu             = $fields['nameRu'];
-			$nameBrand          = $fields['nameBrand'];
-			$noName             = $fields['noName'];
-			if ($noName) {
-				return "-";
-			}
-			$name = "";
-			if ($formOfOrganization !== null) {
-				$name .= self::FORM_OF_ORGANIZATION_LIST[$formOfOrganization];
-			}
-
-			if ($nameRu) {
-				$name .= " $nameRu";
-			}
-			if ($nameEng) {
-				if ($nameRu) {
-					$name .= " - $nameEng";
-				} else {
-					$name .= " $nameEng";
-				}
-			}
-			if ($nameBrand) {
-				if ($name != "") {
-					$name .= " - $nameBrand";
-				} else {
-					$name .= " $nameBrand";
-				}
-			}
-
-			return trim($name);
-		};
+		$fields['full_name'] = fn() => $this->getFullName();
 
 		return $fields;
 	}
@@ -230,9 +229,8 @@ class Company extends AR
 	{
 		$extraFields = parent::extraFields();
 
-		$extraFields['contacts_count'] = function () {
-			return (int)$this->getContacts()->count();
-		};
+		$extraFields['contacts_count'] = fn() => $this->contactsCount;
+
 		$extraFields['requests_count'] = function () {
 			return (int)$this->getRequests()->count();
 		};
@@ -240,7 +238,6 @@ class Company extends AR
 			return (int)$this->getObjects()->count();
 		};
 
-		// TODO:
 		$extraFields['offers_count'] = function ($efields) {
 			$offers = $efields->getOffers()->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => 2])->all();
 
@@ -250,177 +247,9 @@ class Company extends AR
 		return $extraFields;
 	}
 
-	public static function getCompanyList()
+	public function getContactsCount(): ActiveQuery
 	{
-		$dataProvider = new ActiveDataProvider([
-			'query'      => self::find()->joinWith(['requests'])->with([
-				'requests'                                      => function ($query) {
-					$query->where(['status' => Request::STATUS_ACTIVE]);
-				},
-				'companyGroup', 'broker', 'deals', 'consultant' => function ($query) {
-					$query->with('userProfile');
-				}, 'productRanges', 'categories', 'contacts'    => function ($query) {
-					$query->with(['phones', 'emails', 'contactComments']);
-				}
-			]),
-			'pagination' => [
-				'pageSize' => 0,
-			],
-			'sort'       => [
-				'attributes' => [
-					'default'            => [
-						'asc'     => ['request.created_at' => SORT_ASC, 'company.rating' => SORT_ASC, 'company.created_at' => SORT_ASC],
-						'desc'    => ['request.created_at' => SORT_DESC, 'company.rating' => SORT_DESC, 'company.created_at' => SORT_DESC],
-						'default' => SORT_DESC,
-					],
-					'company.rating'     => [
-						'asc'     => ['company.rating' => SORT_ASC],
-						'desc'    => ['company.rating' => SORT_DESC],
-						'default' => SORT_DESC,
-					],
-					'company.created_at' => [
-						'asc'     => ['company.created_at' => SORT_ASC],
-						'desc'    => ['company.created_at' => SORT_DESC],
-						'default' => SORT_DESC,
-					],
-				],
-
-			]
-		]);
-
-		return $dataProvider;
-	}
-
-	public static function getCompanyInfo($id)
-	{
-		return self::find()->with(['productRanges', 'categories', 'companyGroup', 'broker', 'deals', 'consultant'                                      => function ($query) {
-			$query->with(['userProfile']);
-		}, 'files', 'dealsRequestEmpty.consultant.userProfile', 'dealsRequestEmpty.offer.generalOffersMix', 'dealsRequestEmpty.competitor', 'contacts' => function ($query) {
-			$query->with(['phones', 'emails', 'contactComments', 'websites']);
-		}])->where(['company.id' => $id])->limit(1)->one();
-	}
-
-	private function createGeneralContact($post_data)
-	{
-		if (!count($post_data['phones']) && !count($post_data['emails']) && !count($post_data['websites'])) {
-			return;
-		}
-		$post_data['company_id'] = $this->id;
-		$post_data['type']       = Contact::GENERAL_CONTACT_TYPE;
-
-		return Contact::createContact($post_data);
-	}
-
-	private function updateGeneralContact($post_data)
-	{
-		$model = Contact::find()->where(['company_id' => $this->id, 'type' => Contact::GENERAL_CONTACT_TYPE])->one();
-		if (!$model) {
-			return $this->createGeneralContact($post_data);
-		}
-
-		return Contact::updateContact($model, $post_data);
-	}
-
-	private function updateFiles($post_data, $uploadFileModel)
-	{
-		CompanyFile::deleteAll(['company_id' => $this->id]);
-		foreach ($post_data['files'] as $file) {
-			$model = new CompanyFile();
-			if (!$model->load($file, '') || !$model->save()) {
-				throw new ValidationErrorHttpException($model->getErrorSummary(false));
-			}
-		}
-		$this->uploadFiles($uploadFileModel);
-	}
-
-	private function uploadFiles($uploadFileModel)
-	{
-		foreach ($uploadFileModel->files as $file) {
-			if (!$uploadFileModel->uploadOne($file)) {
-				throw new ValidationErrorHttpException($uploadFileModel->getErrorSummary(false));
-			}
-			$companyFileModel             = new CompanyFile();
-			$companyFileModel->company_id = $this->id;
-			$companyFileModel->name       = $file->name;
-			$companyFileModel->type       = $file->type;
-			$companyFileModel->filename   = $uploadFileModel->filename;
-			$companyFileModel->size       = (string)$file->size;
-			if (!$companyFileModel->save()) {
-				throw new ValidationErrorHttpException($companyFileModel->getErrorSummary(false));
-			}
-		}
-	}
-
-	public static function createCompany($post_data, $uploadFileModel)
-	{
-		$db          = Yii::$app->db;
-		$model       = new Company();
-		$transaction = $db->beginTransaction();
-		try {
-			if ($model->load($post_data, '') && $model->save()) {
-				$model->createManyMiniModels([
-					Category::class     => $post_data['categories'],
-					Productrange::class => $post_data['productRanges'],
-				]);
-				$model->createGeneralContact($post_data['contacts']);
-				$model->uploadFiles($uploadFileModel);
-
-				$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-					'consultant_id' => $model->consultant_id,
-					'type'          => Notification::TYPE_COMPANY_INFO,
-					'title'         => 'компания',
-					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
-				]));
-
-				$transaction->commit();
-
-				return ['message' => "Компания создана", 'data' => $model->id];
-			}
-			throw new ValidationErrorHttpException($model->getErrorSummary(false));
-		} catch (Throwable $th) {
-			$transaction->rollBack();
-			throw $th;
-		}
-	}
-
-	public static function updateCompany(Company $model, $post_data, $uploadFileModel = [])
-	{
-		$db              = Yii::$app->db;
-		$transaction     = $db->beginTransaction();
-		$oldConsultantId = $model->consultant_id;
-		try {
-			$post_data['updated_at'] = date('Y-m-d H:i:s');
-			if ($model->load($post_data, '') && $model->save()) {
-				$model->updateManyMiniModels([
-					Category::class     => $post_data['categories'],
-					Productrange::class => $post_data['productRanges'],
-				]);
-				$model->updateGeneralContact($post_data['contacts']);
-				$model->updateFiles($post_data, $uploadFileModel);
-				// $transaction->rollBack();
-				if ($oldConsultantId != $model->consultant_id) {
-					$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-						'consultant_id' => $oldConsultantId,
-						'type'          => Notification::TYPE_COMPANY_INFO,
-						'title'         => 'компания',
-						'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_company.php', ['model' => $model])
-					]));
-					$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-						'consultant_id' => $model->consultant_id,
-						'type'          => Notification::TYPE_COMPANY_INFO,
-						'title'         => 'компания',
-						'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
-					]));
-				}
-				$transaction->commit();
-
-				return ['message' => "Компания изменена", 'data' => $model->id];
-			}
-			throw new ValidationErrorHttpException($model->getErrorSummary(false));
-		} catch (Throwable $th) {
-			$transaction->rollBack();
-			throw $th;
-		}
+		return $this->getContacts()->select('COUNT(*)');
 	}
 
 	/**
@@ -428,9 +257,9 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getBroker()
+	public function getBroker(): ActiveQuery
 	{
-		return $this->hasOne(User::className(), ['id' => 'broker_id']);
+		return $this->hasOne(User::class, ['id' => 'broker_id']);
 	}
 
 	/**
@@ -438,9 +267,9 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getCompanyGroup()
+	public function getCompanyGroup(): ActiveQuery
 	{
-		return $this->hasOne(Companygroup::className(), ['id' => 'companyGroup_id']);
+		return $this->hasOne(Companygroup::class, ['id' => 'companyGroup_id']);
 	}
 
 	/**
@@ -448,9 +277,9 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getConsultant()
+	public function getConsultant(): ActiveQuery
 	{
-		return $this->hasOne(User::className(), ['id' => 'consultant_id']);
+		return $this->hasOne(User::class, ['id' => 'consultant_id']);
 	}
 
 	/**
@@ -458,9 +287,9 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getFiles()
+	public function getFiles(): ActiveQuery
 	{
-		return $this->hasMany(CompanyFile::className(), ['company_id' => 'id']);
+		return $this->hasMany(CompanyFile::class, ['company_id' => 'id']);
 	}
 
 	/**
@@ -468,9 +297,9 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getContacts()
+	public function getContacts(): ActiveQuery
 	{
-		return $this->hasMany(Contact::className(), ['company_id' => 'id']);
+		return $this->hasMany(Contact::class, ['company_id' => 'id']);
 	}
 
 	/**
@@ -480,7 +309,7 @@ class Company extends AR
 	 */
 	public function getMainContact(): ActiveQuery
 	{
-		return $this->hasOne(Contact::className(), ['company_id' => 'id'])
+		return $this->hasOne(Contact::class, ['company_id' => 'id'])
 		            ->where(['contact.type' => Contact::DEFAULT_CONTACT_TYPE, 'contact.isMain' => Contact::IS_MAIN_CONTACT]);
 	}
 
@@ -489,9 +318,10 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getDeals()
+	public function getDeals(): ActiveQuery
 	{
-		return $this->hasMany(Deal::className(), ['company_id' => 'id'])->andWhere(['!=', 'status', Deal::STATUS_DELETED]);
+		return $this->hasMany(Deal::class, ['company_id' => 'id'])
+		            ->andWhere(['!=', 'status', Deal::STATUS_DELETED]);
 	}
 
 	/**
@@ -499,9 +329,11 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getDealsRequestEmpty()
+	public function getDealsRequestEmpty(): ActiveQuery
 	{
-		return $this->hasMany(Deal::className(), ['company_id' => 'id'])->where(['is', 'request_id', new Expression('null')])->andWhere(['!=', 'status', Deal::STATUS_DELETED]);
+		return $this->hasMany(Deal::class, ['company_id' => 'id'])
+		            ->where(['is', 'request_id', new Expression('null')])
+		            ->andWhere(['!=', 'status', Deal::STATUS_DELETED]);
 	}
 
 	/**
@@ -509,9 +341,9 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getCategories()
+	public function getCategories(): ActiveQuery
 	{
-		return $this->hasMany(Category::className(), ['company_id' => 'id']);
+		return $this->hasMany(Category::class, ['company_id' => 'id']);
 	}
 
 	/**
@@ -519,9 +351,9 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getProductRanges()
+	public function getProductRanges(): ActiveQuery
 	{
-		return $this->hasMany(Productrange::className(), ['company_id' => 'id']);
+		return $this->hasMany(Productrange::class, ['company_id' => 'id']);
 	}
 
 
@@ -530,19 +362,22 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getObjects()
+	public function getObjects(): ActiveQuery
 	{
-		return $this->hasMany(Objects::className(), ['company_id' => 'id']);
+		return $this->hasMany(Objects::class, ['company_id' => 'id']);
 	}
 
 	/**
 	 * Gets query for [[OfferMix]].
 	 *
-	 * @return ActiveQuery
+	 * @return OfferMixQuery
 	 */
-	public function getOffers()
+	public function getOffers(): OfferMixQuery
 	{
-		return $this->hasMany(OfferMix::className(), ['company_id' => 'id']);
+		/** @var OfferMixQuery $query */
+		$query = $this->hasMany(OfferMix::class, ['company_id' => 'id']);
+
+		return $query;
 	}
 
 	/**
@@ -550,8 +385,31 @@ class Company extends AR
 	 *
 	 * @return ActiveQuery
 	 */
-	public function getRequests()
+	public function getRequests(): ActiveQuery
 	{
-		return $this->hasMany(Request::className(), ['company_id' => 'id']);
+		return $this->hasMany(Request::class, ['company_id' => 'id']);
+	}
+
+	/**
+	 * @return MediaQuery
+	 */
+	public function getLogo(): MediaQuery
+	{
+		/** @var MediaQuery $query */
+		$query = $this->hasOne(Media::class, ['model_id' => 'id']);
+
+		$query->notDeleted()
+		      ->byModelType(self::getMorphClass())
+		      ->byCategory(self::LOGO_MEDIA_CATEGORY);
+
+		return $query;
+	}
+
+	/**
+	 * @return AQ
+	 */
+	public static function find(): AQ
+	{
+		return new AQ(static::class);
 	}
 }

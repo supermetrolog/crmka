@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\DateTimeHelper;
 use app\helpers\JsonFieldNormalizer;
 use app\kernel\common\models\AQ\AQ;
 use app\models\crane\Crane;
@@ -140,6 +141,16 @@ class Objects extends oldDb\Objects
 		return Yii::$app->params['url']['image_not_found'];
 	}
 
+	public function getUpdatedAt(): string
+	{
+		return DateTimeHelper::fromUnix($this->last_update > 0 ? $this->last_update : $this->publ_time);
+	}
+
+	public function getCreatedAt(): string
+	{
+		return DateTimeHelper::fromUnix($this->publ_time);
+	}
+
 	/**
 	 * @return array
 	 */
@@ -181,19 +192,19 @@ class Objects extends oldDb\Objects
 			return $this->getBuildingOnTerritoryId();
 		};
 
-		$fields['internet_type'] = function () {
+		$fields['internet_type']               = function () {
 			return $this->getInternetType();
 		};
-		$fields['power']         = function () {
+		$fields['power']                       = function () {
 			return $this->getPower();
 		};
-		$fields['videos']         = function () {
+		$fields['videos']                      = function () {
 			return $this->getVideos();
 		};
-		$fields['building_property_documents']         = function () {
+		$fields['building_property_documents'] = function () {
 			return $this->getBuildingPropertyDocuments();
 		};
-		$fields['photos_360']         = function () {
+		$fields['photos_360']                  = function () {
 			return $this->getPhotos360();
 		};
 

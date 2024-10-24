@@ -7,6 +7,7 @@ namespace app\helpers;
 class StringHelper
 {
 	public const SYMBOL_SPACE = ' ';
+	public const SYMBOL_SLASH = '/';
 
 	/**
 	 * Checks if a string is empty.
@@ -17,7 +18,7 @@ class StringHelper
 	 *
 	 * @return bool True if the string is empty, false otherwise.
 	 */
-	public static function empty(string $string): bool
+	public static function isEmpty(string $string): bool
 	{
 		return strlen($string) === 0;
 	}
@@ -31,9 +32,9 @@ class StringHelper
 	 *
 	 * @return bool True if the string is not empty, false otherwise.
 	 */
-	public static function notEmpty(string $string): bool
+	public static function isNotEmpty(string $string): bool
 	{
-		return !self::empty($string);
+		return !self::isEmpty($string);
 	}
 
 	/** Truncates a string to a given maximum length.
@@ -111,8 +112,23 @@ class StringHelper
 
 	public static function join(string $separator = ' ', string ...$strings): string
 	{
-		$notEmptyStrings = ArrayHelper::filter($strings, fn($str) => self::notEmpty($str));
+		$notEmptyStrings = ArrayHelper::filter($strings, static fn($str) => self::isNotEmpty($str));
 
 		return join($separator, $notEmptyStrings);
+	}
+
+	public static function length(string $string): int
+	{
+		return strlen($string);
+	}
+
+	public static function isOnlyDigits(string $string): bool
+	{
+		return ctype_digit($string);
+	}
+
+	public static function extractDigits(string $string): string
+	{
+		return preg_replace('/[^0-9]/', '', $string);
 	}
 }
