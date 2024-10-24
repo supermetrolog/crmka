@@ -54,9 +54,12 @@ return
 			'controller'    => 'contact',
 			'except'        => [],
 			'extraPatterns' => [
+				'GET,OPTIONS'                       => 'index',
+				'POST,OPTIONS'                      => 'create',
+				'POST,OPTIONS create-comment'       => 'create-comment',
 				'GET,OPTIONS company-contacts/<id>' => 'company-contacts',
-				'POST create-comment'               => 'create-comment',
-				'OPTIONS create-comment'            => 'options',
+				'GET,OPTIONS <id>'                  => 'view',
+				'PUT,OPTIONS <id>'                  => 'update',
 			],
 		],
 		[
