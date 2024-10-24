@@ -7,6 +7,7 @@ namespace app\helpers;
 class StringHelper
 {
 	public const SYMBOL_SPACE = ' ';
+	public const SYMBOL_SLASH = '/';
 
 	/**
 	 * Checks if a string is empty.
@@ -114,5 +115,20 @@ class StringHelper
 		$notEmptyStrings = ArrayHelper::filter($strings, fn($str) => self::notEmpty($str));
 
 		return join($separator, $notEmptyStrings);
+	}
+
+	public static function length(string $string): int
+	{
+		return strlen($string);
+	}
+
+	public static function isOnlyDigits(string $string): bool
+	{
+		return ctype_digit($string);
+	}
+
+	public static function extractDigits(string $string): string
+	{
+		return preg_replace('/[^0-9]/', '', $string);
 	}
 }
