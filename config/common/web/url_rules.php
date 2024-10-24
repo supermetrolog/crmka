@@ -20,12 +20,16 @@ return
 		],
 		[
 			'class'         => 'yii\rest\UrlRule',
-			'controller'    => 'company',
+			'controller'    => ['companies' => 'company'],
 			'except'        => [],
 			'extraPatterns' => [
-				'GET,OPTIONS search'             => 'search',
+				'GET,OPTIONS'                    => 'index',
 				'GET,OPTIONS product-range-list' => 'product-range-list',
 				'GET,OPTIONS in-the-bank-list'   => 'in-the-bank-list',
+				'POST,OPTIONS'                   => 'create',
+				'GET,OPTIONS <id>'               => 'view',
+				'PUT,OPTIONS <id>'               => 'update',
+				'DELETE,OPTIONS <id>'            => 'delete',
 			],
 		],
 		[
