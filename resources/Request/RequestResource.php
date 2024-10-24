@@ -6,7 +6,6 @@ namespace app\resources\Request;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Request;
-use app\resources\ChatMember\ChatMemberModel\CompanyShortResource;
 
 class RequestResource extends JsonResource
 {
@@ -56,13 +55,7 @@ class RequestResource extends JsonResource
 			'outside_mkad'                  => $this->resource->outside_mkad,
 			'region_neardy'                 => $this->resource->region_neardy,
 			'contact_id'                    => $this->resource->contact_id,
-			'related_updated_at'            => $this->resource->related_updated_at,
-			'regions'                       => $this->resource->regions,
-			'directions'                    => $this->resource->directions,
-			'districts'                     => $this->resource->districts,
-			'objectTypes'                   => $this->resource->objectTypes,
-			'objectClasses'                 => $this->resource->objectClasses,
-			'company'                       => CompanyShortResource::tryMakeArray($this->resource->company),
+			'related_updated_at'            => $this->resource->related_updated_at
 		];
 	}
 }
