@@ -69,7 +69,6 @@ use yii\db\Expression;
  * @property-read Deal[]                $deals
  * @property-read Deal[]                $dealsRequestEmpty
  * @property-read CompanyFile[]         $files
- * @property-read int                   $contactsCount
  */
 class Company extends AR
 {
@@ -229,7 +228,7 @@ class Company extends AR
 	{
 		$extraFields = parent::extraFields();
 
-		$extraFields['contacts_count'] = fn() => $this->contactsCount;
+		$extraFields['contacts_count'] = fn() => (int)$this->getContacts()->count();
 
 		$extraFields['requests_count'] = function () {
 			return (int)$this->getRequests()->count();
@@ -245,11 +244,6 @@ class Company extends AR
 		};
 
 		return $extraFields;
-	}
-
-	public function getContactsCount(): ActiveQuery
-	{
-		return $this->getContacts()->select('COUNT(*)');
 	}
 
 	/**
