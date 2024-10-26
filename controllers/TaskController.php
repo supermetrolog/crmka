@@ -196,7 +196,7 @@ class TaskController extends AppController
 		$form->setScenario(TaskForm::SCENARIO_UPDATE);
 
 		$form->load($this->request->post());
-		$form->created_by_id = $this->user->id;
+		$form->created_by_id = $model->created_by_id;
 		$form->validateOrThrow();
 
 		$model = $this->service->update($model, $form->getDto());
