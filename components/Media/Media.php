@@ -12,8 +12,8 @@ class Media extends Component
 {
 	private PathBuilderFactory $pathBuilderFactory;
 
-	public string $diskPath;
-	public string $baseUrl;
+	private string $diskPath;
+	private string $baseUrl;
 
 	public function __construct(PathBuilderFactory $pathBuilderFactory, string $baseUrl, string $diskPath, $config = [])
 	{
@@ -36,8 +36,7 @@ class Media extends Component
 			->addPart($this->baseUrl)
 			->addPart($filePath)
 			->build()
-			->getAbs();
-//		return StringHelper::join(StringHelper::SYMBOL_SLASH, $this->baseUrl, $filePath);
+			->getRel();
 	}
 
 	/**

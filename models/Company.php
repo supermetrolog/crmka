@@ -6,6 +6,7 @@ use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\helpers\StringHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use app\models\miniModels\CompanyFile;
@@ -69,6 +70,7 @@ use yii\db\Expression;
  * @property-read Deal[]                $deals
  * @property-read Deal[]                $dealsRequestEmpty
  * @property-read CompanyFile[]         $files
+ * @property-read Contact               $generalContact
  */
 class Company extends AR
 {
@@ -398,6 +400,19 @@ class Company extends AR
 		      ->byCategory(self::LOGO_MEDIA_CATEGORY);
 
 		return $query;
+	}
+
+	public function getLogoUrl(): ?string
+	{
+		return $this->logo ? $this->logo->src : null;
+	}
+
+	public function getGeneralContact(): ContactQuery
+	{
+		/** @var ContactQuery $query */
+		$query = $this->hasOne(Contact::class, ['company_id' => 'id']);
+
+		return $query->general();
 	}
 
 	/**

@@ -7,7 +7,6 @@ namespace app\usecases\Company;
 use app\dto\Company\CompanyContactsDto;
 use app\dto\Contact\CreateContactDto;
 use app\dto\Contact\UpdateContactDto;
-use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Company;
 use app\models\Contact;
@@ -102,16 +101,14 @@ class CompanyGeneralContactService
 	}
 
 	/**
-	 * @param int $companyId
+	 * @param Contact $contact
 	 *
 	 * @return void
-	 * @throws ModelNotFoundException
 	 * @throws StaleObjectException
 	 * @throws Throwable
 	 */
-	public function deleteByCompanyId(int $companyId): void
+	public function delete(Contact $contact): void
 	{
-		$contact = Contact::find()->byCompanyId($companyId)->general()->oneOrThrow();
 		$this->contactService->delete($contact);
 	}
 }

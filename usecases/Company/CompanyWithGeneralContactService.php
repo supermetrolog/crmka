@@ -13,7 +13,6 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Company;
-use app\models\Contact;
 use Throwable;
 use yii\db\StaleObjectException;
 
@@ -101,7 +100,7 @@ class CompanyWithGeneralContactService
 				$companyMediaDto
 			);
 
-			$contact = Contact::find()->byCompanyId($company->id)->general()->one();
+			$contact = $updatedCompany->generalContact;
 
 			if ($contact) {
 				$this->companyGeneralContactService->update($contact, $contactsDto);
@@ -134,7 +133,7 @@ class CompanyWithGeneralContactService
 
 		try {
 			$this->companyService->delete($company);
-			$this->companyGeneralContactService->deleteByCompanyId($company->id);
+			$this->companyGeneralContactService->delete($company->generalContact);
 
 			$tx->commit();
 		} catch (Throwable $th) {

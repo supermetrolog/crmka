@@ -30,14 +30,9 @@ class CompanyViewResource extends JsonResource
 				'categories'        => CompanyCategoryResource::collection($this->resource->categories),
 				'productRanges'     => CompanyProductRangeResource::collection($this->resource->productRanges),
 				'files'             => CompanyFileResource::collection($this->resource->files),
-				'logo'              => $this->getLogo(),
+				'logo'              => $this->resource->getLogoUrl(),
 				'dealsRequestEmpty' => $this->resource->dealsRequestEmpty
 			]
 		);
-	}
-
-	public function getLogo(): ?string
-	{
-		return $this->resource->logo ? $this->resource->logo->src : null;
 	}
 }

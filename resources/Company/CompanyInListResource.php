@@ -49,7 +49,7 @@ class CompanyInListResource extends JsonResource
 			'consultant_id'       => $this->resource->consultant_id,
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
-			'logo'                => $this->getLogo(),
+			'logo'                => $this->resource->getLogoUrl(),
 
 			'consultant'    => UserShortResource::tryMakeArray($this->resource->consultant),
 			'mainContact'   => CompanyContactResource::tryMakeArray($this->resource->mainContact),
@@ -60,10 +60,5 @@ class CompanyInListResource extends JsonResource
 			'objects'  => CompanyObjectResource::collection($this->resource->objects),
 			'requests' => CompanyRequestResource::collection($this->resource->requests)
 		];
-	}
-
-	private function getLogo(): ?string
-	{
-		return $this->resource->logo ? $this->resource->logo->src : null;
 	}
 }

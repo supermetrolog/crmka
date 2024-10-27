@@ -113,15 +113,15 @@ class CompanyService
 				$this->saveLogo($model, $mediaDto->logo);
 			}
 
-//			$model->trigger(
-//				Company::COMPANY_CREATED_EVENT,
-//				new NotificationEvent([
-//					'consultant_id' => $model->consultant_id,
-//					'type'          => Notification::TYPE_COMPANY_INFO,
-//					'title'         => 'компания',
-//					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
-//				])
-//			);
+			$model->trigger(
+				Company::COMPANY_CREATED_EVENT,
+				new NotificationEvent([
+					'consultant_id' => $model->consultant_id,
+					'type'          => Notification::TYPE_COMPANY_INFO,
+					'title'         => 'компания',
+					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
+				])
+			);
 
 			$tx->commit();
 
@@ -197,9 +197,9 @@ class CompanyService
 			$this->deleteMissingFiles($model->files, $dto->files);
 			$this->saveFiles($model, $mediaDto->files);
 
-			$logoShouldBeDeleted = !$dto->logo_id || $mediaDto->logo;
+			$logoShouldBeDeleted = (!$dto->logo_id || $mediaDto->logo) && $model->logo;
 
-			if ($logoShouldBeDeleted && $model->logo) {
+			if ($logoShouldBeDeleted) {
 				$this->mediaService->delete($model->logo);
 			}
 

@@ -5,7 +5,6 @@ namespace app\models;
 use app\components\ExpressionBuilder\FieldExpressionBuilder;
 use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\helpers\ArrayHelper;
-use app\helpers\DateTimeHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\TimelineQuery;
@@ -50,19 +49,6 @@ class CompanySearch extends Form
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd'], 'safe'],
 		];
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public function load($data, $formName = null): bool
-	{
-		if (isset($data['dateStart']) || isset($data['dateEnd'])) {
-			$data['dateStart'] = $data['dateStart'] ?? DateTimeHelper::makef('01.01.1970', 'Y-m-d');
-			$data['dateEnd']   = $data['dateEnd'] ?? DateTimeHelper::nowf('Y-m-d');
-		}
-
-		return parent::load($data, $formName);
 	}
 
 	/**
@@ -228,7 +214,8 @@ class CompanySearch extends Form
 		$query->andFilterWhere(['like', Company::field('nameEng'), $this->nameEng])
 		      ->andFilterWhere(['like', Company::field('nameRu'), $this->nameRu])
 		      ->andFilterWhere(['like', Company::field('formOfOrganization'), $this->formOfOrganization])
-		      ->andFilterWhere(['between', Company::field('created_at'), $this->dateStart, $this->dateEnd]);
+		      ->andFilterWhere(['>=', Company::field('created_at'), $this->dateStart])
+		      ->andFilterWhere(['<=', Company::field('created_at'), $this->dateEnd]);
 
 
 		return $dataProvider;
