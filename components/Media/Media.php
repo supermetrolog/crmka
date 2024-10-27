@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace app\components\Media;
 
 use app\components\PathBuilder\PathBuilderFactory;
-use app\helpers\StringHelper;
-use Yii;
 use yii\base\Component;
 use yii\web\UploadedFile;
 
@@ -14,27 +12,32 @@ class Media extends Component
 {
 	private PathBuilderFactory $pathBuilderFactory;
 
-	public string  $diskPath;
-	public string  $baseFolder;
-	private string $baseUrl;
+	public string $diskPath;
+	public string $baseUrl;
 
-	public function __construct(PathBuilderFactory $pathBuilderFactory, $baseUrl = null, $config = [])
+	public function __construct(PathBuilderFactory $pathBuilderFactory, string $baseUrl, string $diskPath, $config = [])
 	{
 		parent::__construct($config);
 
 		$this->pathBuilderFactory = $pathBuilderFactory;
-		$this->diskPath           = $this->pathBuilderFactory->create()->addPart($this->diskPath)->build()->getRel();
+		$this->baseUrl            = $baseUrl;
 
-		if (!$baseUrl) {
-			$this->baseUrl = Yii::$app->request->hostInfo . $this->baseFolder;
-		} else {
-			$this->baseUrl = $baseUrl;
-		}
+		$this->diskPath = $this->pathBuilderFactory
+			->create()
+			->addPart($diskPath)
+			->build()
+			->getRel();
 	}
 
 	public function getUrl(string $filePath): string
 	{
-		return StringHelper::join(StringHelper::SYMBOL_SLASH, $this->baseUrl, $filePath);
+		return $this->pathBuilderFactory
+			->create()
+			->addPart($this->baseUrl)
+			->addPart($filePath)
+			->build()
+			->getAbs();
+//		return StringHelper::join(StringHelper::SYMBOL_SLASH, $this->baseUrl, $filePath);
 	}
 
 	/**

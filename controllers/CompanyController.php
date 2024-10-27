@@ -2,21 +2,20 @@
 
 namespace app\controllers;
 
-use app\dto\Company\CompanyContactsDto;
-use app\dto\Company\CompanyMiniModelsDto;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\models\Company;
 use app\models\CompanySearch;
+use app\models\forms\Company\CompanyContactsForm;
 use app\models\forms\Company\CompanyForm;
 use app\models\forms\Company\CompanyMediaForm;
+use app\models\forms\Company\CompanyMiniModelsForm;
 use app\repositories\CompanyRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
 use app\resources\Company\CompanyViewResource;
-use app\usecases\Company\CompanyService;
 use app\usecases\Company\CompanyWithGeneralContactService;
 use Throwable;
 use yii\base\ErrorException;
@@ -27,24 +26,21 @@ class CompanyController extends AppController
 {
 	private CompanyWithGeneralContactService $companyWithGeneralContactService;
 
-	private ProductrangeRepository $productRangeRepository;
+	private ProductRangeRepository $productRangeRepository;
 
 	private CompanyRepository $companyRepository;
 
-	private CompanyService $companyService;
 
 	public function __construct(
 		$id,
 		$module,
 		CompanyWithGeneralContactService $companyWithGeneralContactService,
-		ProductrangeRepository $productRangeRepository,
+		ProductRangeRepository $productRangeRepository,
 		CompanyRepository $companyRepository,
-		CompanyService $companyService,
 		array $config = []
 	)
 	{
 		$this->companyWithGeneralContactService = $companyWithGeneralContactService;
-		$this->companyService                   = $companyService;
 		$this->productRangeRepository           = $productRangeRepository;
 		$this->companyRepository                = $companyRepository;
 
@@ -93,36 +89,34 @@ class CompanyController extends AppController
 		$form->validateOrThrow();
 
 		$companyMediaForm = new CompanyMediaForm();
-
 		$companyMediaForm->load([
 			'logo'  => UploadedFile::getInstanceByName('logo'),
 			'files' => UploadedFile::getInstancesByName('files'),
 		]);
 		$companyMediaForm->validateOrThrow();
 
-		$companyMiniModelsDto = new CompanyMiniModelsDto([
+		$companyMiniModelsForm = new CompanyMiniModelsForm();
+		$companyMiniModelsForm->load([
 			'productRanges' => $this->request->post('productRanges') ?? [],
-			'categories'    => $this->request->post('categories') ?? []
+			'categories'    => $this->request->post('categories') ?? [],
 		]);
+		$companyMiniModelsForm->validateOrThrow();
 
-		$contactsData = $this->request->post('contacts');
+		$contactsData        = $this->request->post('contacts');
+		$companyContactsForm = new CompanyContactsForm();
+		$companyContactsForm->load([
+			'emails'   => $contactsData['emails'] ?? [],
+			'phones'   => $contactsData['phones'] ?? [],
+			'websites' => $contactsData['websites'] ?? []
+		]);
+		$companyContactsForm->validateOrThrow();
 
-		if ($contactsData) {
-			$companyContactsDto = new CompanyContactsDto($contactsData);
-
-			$company = $this->companyWithGeneralContactService->create(
-				$form->getDto(),
-				$companyMiniModelsDto,
-				$companyContactsDto,
-				$companyMediaForm->getDto()
-			);
-		} else {
-			$company = $this->companyService->create(
-				$form->getDto(),
-				$companyMiniModelsDto,
-				$companyMediaForm->getDto()
-			);
-		}
+		$company = $this->companyWithGeneralContactService->create(
+			$form->getDto(),
+			$companyMiniModelsForm->getDto(),
+			$companyContactsForm->getDto(),
+			$companyMediaForm->getDto()
+		);
 
 		return new CompanyViewResource($company);
 	}
@@ -147,31 +141,33 @@ class CompanyController extends AppController
 		$form->validateOrThrow();
 
 		$companyMediaForm = new CompanyMediaForm();
-
 		$companyMediaForm->load([
 			'logo'  => UploadedFile::getInstanceByName('new_logo'),
 			'files' => UploadedFile::getInstancesByName('new_files'),
 		]);
 		$companyMediaForm->validateOrThrow();
 
-		$companyMiniModelsDto = new CompanyMiniModelsDto([
+		$companyMiniModelsForm = new CompanyMiniModelsForm();
+		$companyMiniModelsForm->load([
 			'productRanges' => $this->request->post('productRanges') ?? [],
-			'categories'    => $this->request->post('categories') ?? []
+			'categories'    => $this->request->post('categories') ?? [],
 		]);
+		$companyMiniModelsForm->validateOrThrow();
 
-		$contactsData = $this->request->post('contacts');
-
-		$companyContactsDto = new CompanyContactsDto([
+		$contactsData        = $this->request->post('contacts');
+		$companyContactsForm = new CompanyContactsForm();
+		$companyContactsForm->load([
 			'emails'   => $contactsData['emails'] ?? [],
 			'phones'   => $contactsData['phones'] ?? [],
 			'websites' => $contactsData['websites'] ?? []
 		]);
+		$companyContactsForm->validateOrThrow();
 
 		$company = $this->companyWithGeneralContactService->update(
 			$company,
 			$form->getDto(),
-			$companyMiniModelsDto,
-			$companyContactsDto,
+			$companyMiniModelsForm->getDto(),
+			$companyContactsForm->getDto(),
 			$companyMediaForm->getDto()
 		);
 

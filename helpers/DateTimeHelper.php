@@ -48,8 +48,13 @@ class DateTimeHelper
 		return self::make($datetime)->format($format);
 	}
 
-	public static function fromUnix(int $timestamp): string
+	public static function fromUnix(int $timestamp): DateTimeInterface
 	{
-		return date('Y-m-d H:i:s', $timestamp);
+		return (new DateTime())->setTimestamp($timestamp);
+	}
+
+	public static function fromUnixf(int $timestamp, string $format = 'Y-m-d H:i:s'): string
+	{
+		return (new DateTime())->setTimestamp($timestamp)->format($format);
 	}
 }

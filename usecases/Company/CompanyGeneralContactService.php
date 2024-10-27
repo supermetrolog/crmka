@@ -102,16 +102,16 @@ class CompanyGeneralContactService
 	}
 
 	/**
-	 * @param Company $company
+	 * @param int $companyId
 	 *
 	 * @return void
+	 * @throws ModelNotFoundException
 	 * @throws StaleObjectException
 	 * @throws Throwable
-	 * @throws ModelNotFoundException
 	 */
-	public function delete(Company $company): void
+	public function deleteByCompanyId(int $companyId): void
 	{
-		$contact = Contact::find()->byCompanyId($company->id)->general()->oneOrThrow();
+		$contact = Contact::find()->byCompanyId($companyId)->general()->oneOrThrow();
 		$this->contactService->delete($contact);
 	}
 }

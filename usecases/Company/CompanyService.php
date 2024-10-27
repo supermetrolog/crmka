@@ -16,6 +16,8 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Category;
 use app\models\Company;
+use app\models\Media;
+use app\models\miniModels\CompanyFile;
 use app\models\Notification;
 use app\models\Productrange;
 use app\usecases\Media\CreateMediaService;
@@ -24,6 +26,7 @@ use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper as YiiArrayHelper;
+use yii\web\UploadedFile;
 
 class CompanyService
 {
@@ -104,39 +107,23 @@ class CompanyService
 				Productrange::class => $miniModelsDto->productRanges
 			]);
 
-			foreach ($mediaDto->files as $file) {
-				$this->companyFileService->create(new CreateCompanyFileDto([
-					'company_id' => $model->id,
-					'file'       => $file,
-				]));
-			}
+			$this->saveFiles($model, $mediaDto->files);
 
 			if ($mediaDto->logo) {
-				$this->createMediaService->create(new CreateMediaDto([
-					'model_id'     => $model->id,
-					'model_type'   => Company::getMorphClass(),
-					'category'     => Company::LOGO_MEDIA_CATEGORY,
-					'uploadedFile' => $mediaDto->logo,
-					'mime_type'    => mime_content_type($mediaDto->logo->tempName)
-				]));
+				$this->saveLogo($model, $mediaDto->logo);
 			}
+
+//			$model->trigger(
+//				Company::COMPANY_CREATED_EVENT,
+//				new NotificationEvent([
+//					'consultant_id' => $model->consultant_id,
+//					'type'          => Notification::TYPE_COMPANY_INFO,
+//					'title'         => 'компания',
+//					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
+//				])
+//			);
 
 			$tx->commit();
-
-			// TODO: 0_0 Вынесу это в eventManager, скоро займусь им
-			try {
-				$model->trigger(
-					Company::COMPANY_CREATED_EVENT,
-					new NotificationEvent([
-						'consultant_id' => $model->consultant_id,
-						'type'          => Notification::TYPE_COMPANY_INFO,
-						'title'         => 'компания',
-						'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
-					])
-				);
-			} catch (Throwable $th) {
-				Yii::error($th->getMessage(), 'Ошибка создания уведомления о новой компании');
-			}
 
 			return $model;
 		} catch (Throwable $th) {
@@ -207,22 +194,8 @@ class CompanyService
 				Productrange::class => $miniModelsDto->productRanges
 			]);
 
-			$deletedFiles = ArrayHelper::diffByCallback(
-				$model->files,
-				$dto->files,
-				static fn($oldFile, $newFile) => YiiArrayHelper::getValue($oldFile, 'id') - YiiArrayHelper::getValue($newFile, 'id')
-			);
-
-			foreach ($deletedFiles as $file) {
-				$this->companyFileService->delete($file);
-			}
-
-			foreach ($mediaDto->files as $file) {
-				$this->companyFileService->create(new CreateCompanyFileDto([
-					'company_id' => $model->id,
-					'file'       => $file
-				]));
-			}
+			$this->deleteMissingFiles($model->files, $dto->files);
+			$this->saveFiles($model, $mediaDto->files);
 
 			$logoShouldBeDeleted = !$dto->logo_id || $mediaDto->logo;
 
@@ -231,39 +204,87 @@ class CompanyService
 			}
 
 			if ($mediaDto->logo) {
-				$this->createMediaService->create(new CreateMediaDto([
-					'model_id'     => $model->id,
-					'model_type'   => Company::getMorphClass(),
-					'category'     => Company::LOGO_MEDIA_CATEGORY,
-					'uploadedFile' => $mediaDto->logo,
-					'mime_type'    => mime_content_type($mediaDto->logo->tempName)
-				]));
+				$this->saveLogo($model, $mediaDto->logo);
 			}
+
+			$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
+				'consultant_id' => $oldConsultantId,
+				'type'          => Notification::TYPE_COMPANY_INFO,
+				'title'         => 'компания',
+				'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_company.php', ['model' => $model])
+			]));
+
+			$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
+				'consultant_id' => $model->consultant_id,
+				'type'          => Notification::TYPE_COMPANY_INFO,
+				'title'         => 'компания',
+				'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
+			]));
 
 			$tx->commit();
-
-			try {
-				$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-					'consultant_id' => $oldConsultantId,
-					'type'          => Notification::TYPE_COMPANY_INFO,
-					'title'         => 'компания',
-					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_company.php', ['model' => $model])
-				]));
-
-				$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-					'consultant_id' => $model->consultant_id,
-					'type'          => Notification::TYPE_COMPANY_INFO,
-					'title'         => 'компания',
-					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
-				]));
-			} catch (Throwable $th) {
-				Yii::error($th->getMessage(), 'Ошибка создания уведомления о смене консультанта компании');
-			}
 
 			return $model;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
+		}
+	}
+
+	/**
+	 * @param Company        $model
+	 * @param UploadedFile[] $files
+	 *
+	 * @return void
+	 * @throws SaveMediaErrorException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function saveFiles(Company $model, array $files): void
+	{
+		foreach ($files as $file) {
+			$this->companyFileService->create(new CreateCompanyFileDto([
+				'company_id' => $model->id,
+				'file'       => $file
+			]));
+		}
+	}
+
+	/**
+	 * @param Company      $model
+	 * @param UploadedFile $logo
+	 *
+	 * @return Media
+	 * @throws Throwable
+	 */
+	public function saveLogo(Company $model, UploadedFile $logo): Media
+	{
+		return $this->createMediaService->create(new CreateMediaDto([
+			'model_id'     => $model->id,
+			'model_type'   => Company::getMorphClass(),
+			'category'     => Company::LOGO_MEDIA_CATEGORY,
+			'uploadedFile' => $logo,
+			'mime_type'    => mime_content_type($logo->tempName)
+		]));
+	}
+
+	/**
+	 * @param CompanyFile[] $oldFiles
+	 * @param array         $newFiles
+	 *
+	 * @return void
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 */
+	public function deleteMissingFiles(array $oldFiles, array $newFiles): void
+	{
+		$deletedFiles = ArrayHelper::diffByCallback(
+			$oldFiles,
+			$newFiles,
+			static fn($oldFile, $newFile) => YiiArrayHelper::getValue($oldFile, 'id') - YiiArrayHelper::getValue($newFile, 'id')
+		);
+
+		foreach ($deletedFiles as $file) {
+			$this->companyFileService->delete($file);
 		}
 	}
 

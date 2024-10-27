@@ -143,12 +143,12 @@ class Objects extends oldDb\Objects
 
 	public function getUpdatedAt(): string
 	{
-		return DateTimeHelper::fromUnix($this->last_update > 0 ? $this->last_update : $this->publ_time);
+		return DateTimeHelper::fromUnixf($this->last_update > 0 ? $this->last_update : $this->publ_time);
 	}
 
 	public function getCreatedAt(): string
 	{
-		return DateTimeHelper::fromUnix($this->publ_time);
+		return DateTimeHelper::fromUnixf($this->publ_time);
 	}
 
 	/**

@@ -134,7 +134,7 @@ class CompanyWithGeneralContactService
 
 		try {
 			$this->companyService->delete($company);
-			$this->companyGeneralContactService->delete($company);
+			$this->companyGeneralContactService->deleteByCompanyId($company->id);
 
 			$tx->commit();
 		} catch (Throwable $th) {
