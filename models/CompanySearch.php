@@ -2,9 +2,13 @@
 
 namespace app\models;
 
+use app\components\ExpressionBuilder\FieldExpressionBuilder;
+use app\components\ExpressionBuilder\IfExpressionBuilder;
+use app\helpers\ArrayHelper;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\ActiveQuery\TimelineQuery;
 use app\models\miniModels\Phone;
 use Exception;
 use yii\base\ErrorException;
@@ -77,8 +81,8 @@ class CompanySearch extends Form
 		                ->joinWith(['requests', 'categories', 'contacts.phones'])
 		                ->with([
 			                'requests' => function ($query) {
-				                $query->with(['timelines' => function ($query) {
-					                $query->with(['timelineSteps'])->where(['timeline.status' => Timeline::STATUS_ACTIVE]);
+				                $query->with(['timelines' => function (TimelineQuery $query) {
+					                $query->with(['timelineSteps'])->active();
 				                }]);
 			                },
 			                'logo',
@@ -108,29 +112,65 @@ class CompanySearch extends Form
 					'rating',
 					'status',
 					'requests' => [
-						'asc'  => new Expression('case when request.status = 1 then request.created_at else NULL end ASC'),
-						'desc' => new Expression('case when request.status = 1 then request.created_at else NULL end DESC'),
+						'asc'  => IfExpressionBuilder::create()
+						                             ->condition('request.status = 1')
+						                             ->left(Request::field('created_at'))
+						                             ->right('NULL')
+						                             ->beforeBuild(fn($expression) => "$expression ASC")
+						                             ->build(),
+						'desc' => IfExpressionBuilder::create()
+						                             ->condition('request.status = 1')
+						                             ->left(Request::field('created_at'))
+						                             ->right('NULL')
+						                             ->beforeBuild(fn($expression) => "$expression DESC")
+						                             ->build()
 					],
 					'default'  => [
 						'asc'     => [
-							new Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end ASC'),
-							new Expression("FIELD(request.status, 0,2,1) ASC"),
-							// 'request.related_updated_at' => SORT_ASC,
-							new Expression("IF(request.related_updated_at, request.related_updated_at, request.created_at) ASC"),
-							'request.created_at' => SORT_ASC,
-							'request.updated_at' => SORT_ASC,
-							'company.created_at' => SORT_ASC
+							IfExpressionBuilder::create()
+							                   ->condition('NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR)')
+							                   ->left(Company::field('created_at'))
+							                   ->right('NULL')
+							                   ->beforeBuild(fn($expression) => "$expression ASC")
+							                   ->build(),
+							FieldExpressionBuilder::create()
+							                      ->field(Request::field('status'))
+							                      ->values(0, 2, 1)
+							                      ->beforeBuild(fn($expression) => "$expression ASC")
+							                      ->build(),
+							IfExpressionBuilder::create()
+							                   ->condition(Request::field('related_updated_at'))
+							                   ->left(Request::field('related_updated_at'))
+							                   ->right(Request::field('created_at'))
+							                   ->beforeBuild(fn($expression) => "$expression ASC")
+							                   ->build(),
+							Request::field('created_at') => SORT_ASC,
+							Request::field('updated_at') => SORT_ASC,
+							Company::field('created_at') => SORT_ASC
 						],
 						'desc'    => [
-							new Expression('case when NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR) then company.created_at else NULL end DESC'),
-							new Expression("FIELD(request.status, 0,2,1) DESC"),
-							// 'request.related_updated_at' => SORT_DESC,
-							new Expression("IF(request.related_updated_at, request.related_updated_at, request.created_at) DESC"),
-							'request.created_at' => SORT_DESC,
-							'request.updated_at' => SORT_DESC,
-							'company.created_at' => SORT_DESC
+							IfExpressionBuilder::create()
+							                   ->condition('NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR)')
+							                   ->left(Company::field('created_at'))
+							                   ->right('NULL')
+							                   ->beforeBuild(fn($expression) => "$expression DESC")
+							                   ->build(),
+							FieldExpressionBuilder::create()
+							                      ->field(Request::field('status'))
+							                      ->values(0, 2, 1)
+							                      ->beforeBuild(fn($expression) => "$expression DESC")
+							                      ->build(),
+							IfExpressionBuilder::create()
+							                   ->condition(Request::field('related_updated_at'))
+							                   ->left(Request::field('related_updated_at'))
+							                   ->right(Request::field('created_at'))
+							                   ->beforeBuild(fn($expression) => "$expression DESC")
+							                   ->build(),
+							Request::field('created_at') => SORT_DESC,
+							Request::field('updated_at') => SORT_DESC,
+							Company::field('created_at') => SORT_DESC
 						],
-						'default' => SORT_DESC,
+						'default' => SORT_DESC
 					],
 				],
 			]
