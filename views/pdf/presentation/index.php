@@ -1,7 +1,7 @@
 <?php
 
-use app\models\pdf\OffersPdf;
 use app\models\oldDb\OfferMix;
+use app\models\pdf\OffersPdf;
 
 /** @var OffersPdf $model */
 ?>
@@ -20,7 +20,7 @@ use app\models\oldDb\OfferMix;
 		<tr>
 			<td class="logo">
 				<div class="image">
-					<img src="<?= $model->getHost() ?>/images/logo-plr.png" alt="">
+					<img src="<?= $model->getHost() ?>/images/logo.png" alt="">
 				</div>
 			</td>
 			<td class="consultant">
