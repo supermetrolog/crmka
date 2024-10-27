@@ -6,6 +6,6 @@ use yii\base\BaseObject;
 
 class UpdateContactCommentDto extends BaseObject
 {
-	public int $comment;
+	public string $comment;
 
 }

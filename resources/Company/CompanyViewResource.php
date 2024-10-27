@@ -38,6 +38,6 @@ class CompanyViewResource extends JsonResource
 
 	public function getLogo(): ?string
 	{
-		return $this->resource->logo->src ?? null;
+		return $this->resource->logo ? $this->resource->logo->src : null;
 	}
 }

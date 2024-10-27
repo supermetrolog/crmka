@@ -131,7 +131,7 @@ class Contact extends AR
 			$this->last_name ?? ""
 		);
 
-		return StringHelper::isNotEmpty($fullName) ? $fullName : null;
+		return $fullName ?: null;
 	}
 
 	public function getShortName(): ?string
@@ -142,7 +142,18 @@ class Contact extends AR
 			$this->last_name ?? ""
 		);
 
-		return StringHelper::isNotEmpty($shortName) ? $shortName : null;
+		return $shortName ?: null;
+	}
+
+	public function getFirstAndLastName(): ?string
+	{
+		$name = StringHelper::join(
+			StringHelper::SYMBOL_SPACE,
+			$fs->first_name ?? "",
+			$fs->last_name ?? ""
+		);
+
+		return $name ?: null;
 	}
 
 	// TODO: Удалить после того как перейдем на Resource
@@ -153,15 +164,7 @@ class Contact extends AR
 		$fields['full_name']  = fn() => $this->getFullName();
 		$fields['short_name'] = fn() => $this->getShortName();
 
-		$fields['first_and_last_name'] = static function ($fs) {
-			$name = StringHelper::join(
-				StringHelper::SYMBOL_SPACE,
-				$fs->first_name ?? "",
-				$fs->last_name ?? ""
-			);
-
-			return StringHelper::isNotEmpty($name) ? $name : null;
-		};
+		$fields['first_and_last_name'] = fn() => $this->getFirstAndLastName();
 
 		$fields['updated_at'] = static function ($fs) {
 			return $fs->updated_at === "0000-00-00 00:00:00" ? null : $fs->updated_at;

@@ -64,6 +64,6 @@ class CompanyInListResource extends JsonResource
 
 	private function getLogo(): ?string
 	{
-		return $this->resource->logo->src ?? null;
+		return $this->resource->logo ? $this->resource->logo->src : null;
 	}
 }

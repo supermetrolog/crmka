@@ -216,6 +216,7 @@ class Company extends AR
 		$fields = parent::fields();
 
 		$fields['full_name'] = fn() => $this->getFullName();
+		$fields['logo']      = fn() => $this->logo ? $this->logo->src : null;
 
 		return $fields;
 	}

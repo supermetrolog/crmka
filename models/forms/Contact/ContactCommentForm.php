@@ -8,6 +8,7 @@ use app\dto\ContactComment\CreateContactCommentDto;
 use app\dto\ContactComment\UpdateContactCommentDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Contact;
+use app\models\User;
 
 class ContactCommentForm extends Form
 {
@@ -24,7 +25,8 @@ class ContactCommentForm extends Form
 			[['author_id', 'contact_id'], 'integer'],
 			[['author_id', 'comment', 'contact_id'], 'required'],
 			[['comment'], 'string', 'max' => 255],
-			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']]
+			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
+			[['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['author_id' => 'id']]
 		];
 	}
 
