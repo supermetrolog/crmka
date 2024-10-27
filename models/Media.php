@@ -2,23 +2,28 @@
 
 namespace app\models;
 
+use app\components\Media\Media as MediaComponent;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\MediaQuery;
+use Yii;
+use yii\base\InvalidConfigException;
+use yii\di\NotInstantiableException;
 
 /**
  * This is the model class for table "media".
  *
- * @property int         $id
- * @property string      $name
- * @property string      $original_name
- * @property string      $extension
- * @property string      $path
- * @property string      $category
- * @property string      $model_type
- * @property int         $model_id
- * @property string      $created_at
- * @property string|null $deleted_at
- * @property string      $mime_type
+ * @property int          $id
+ * @property string       $name
+ * @property string       $original_name
+ * @property string       $extension
+ * @property string       $path
+ * @property string       $category
+ * @property string       $model_type
+ * @property int          $model_id
+ * @property string       $created_at
+ * @property string|null  $deleted_at
+ * @property string       $mime_type
+ * @property-read ?string $src;
  */
 class Media extends AR
 {
@@ -54,6 +59,16 @@ class Media extends AR
 			'deleted_at'    => 'Deleted At',
 			'mime_type'     => 'Mime Type',
 		];
+	}
+
+	/**
+	 * @return string|null
+	 * @throws InvalidConfigException
+	 * @throws NotInstantiableException
+	 */
+	public function getSrc(): ?string
+	{
+		return Yii::$container->get(MediaComponent::class)->getUrl($this->path);
 	}
 
 	public static function find(): MediaQuery

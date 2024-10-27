@@ -22,8 +22,8 @@ class UserProfileFullResource extends JsonResource
 		return ArrayHelper::merge(
 			UserProfileResource::make($this->resource)->toArray(),
 			[
-				'emails' => $this->resource->emails,
-				'phones' => $this->resource->phones
+				'emails' => UserProfileEmailResource::collection($this->resource->emails),
+				'phones' => UserProfilePhoneResource::collection($this->resource->phones)
 			]
 		);
 	}

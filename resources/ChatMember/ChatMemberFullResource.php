@@ -11,7 +11,7 @@ use app\models\Request;
 use app\models\User;
 use app\resources\Call\CallResource;
 use app\resources\Object\ObjectChatMemberResource;
-use app\resources\Request\RequestResource;
+use app\resources\Request\RequestInChatMemberResource;
 use app\resources\User\UserResource;
 use UnexpectedValueException;
 
@@ -43,7 +43,7 @@ class ChatMemberFullResource extends JsonResource
 		$model = $this->resource->model;
 
 		if ($model instanceof Request) {
-			return new RequestResource($model);
+			return new RequestInChatMemberResource($model);
 		}
 
 		if ($model instanceof ObjectChatMember) {

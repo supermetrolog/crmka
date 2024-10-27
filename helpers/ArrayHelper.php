@@ -71,4 +71,31 @@ class ArrayHelper
 	{
 		return array_filter($array, $fn);
 	}
+
+	/**
+	 * @param array    $array
+	 * @param callable $fn
+	 *
+	 * @return mixed|null
+	 */
+	public static function find(array $array, callable $fn)
+	{
+		foreach ($array as $key => $value) {
+			if ($fn($value, $key)) {
+				return $value;
+			}
+		}
+
+		return null;
+	}
+
+	public static function diffByCallback(array $firstArray, array $secondArray, callable $fn): array
+	{
+		return array_udiff($firstArray, $secondArray, $fn);
+	}
+
+	public static function length(array $array): int
+	{
+		return count($array);
+	}
 }

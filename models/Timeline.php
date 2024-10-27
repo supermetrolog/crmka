@@ -2,10 +2,10 @@
 
 namespace app\models;
 
-use app\models\miniModels\TimelineStep;
-use yii\data\ActiveDataProvider;
 use app\exceptions\ValidationErrorHttpException;
+use app\models\ActiveQuery\TimelineQuery;
 use app\models\miniModels\TimelineActionComment;
+use app\models\miniModels\TimelineStep;
 use LogicException;
 use Yii;
 
@@ -162,22 +162,28 @@ class Timeline extends \yii\db\ActiveRecord
         return $this->hasOne(Request::className(), ['id' => 'request_id']);
     }
 
-    /**
-     * Gets query for [[TimelineSteps]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTimelineSteps()
-    {
-        return $this->hasMany(TimelineStep::className(), ['timeline_id' => 'id']);
-    }
-    /**
-     * Gets query for [[TimelineSteps]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTimelineActionComments()
-    {
-        return $this->hasMany(TimelineActionComment::className(), ['timeline_id' => 'id']);
-    }
+	/**
+	 * Gets query for [[TimelineSteps]].
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getTimelineSteps()
+	{
+		return $this->hasMany(TimelineStep::className(), ['timeline_id' => 'id']);
+	}
+
+	/**
+	 * Gets query for [[TimelineSteps]].
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getTimelineActionComments()
+	{
+		return $this->hasMany(TimelineActionComment::className(), ['timeline_id' => 'id']);
+	}
+
+	public static function find(): TimelineQuery
+	{
+		return new TimelineQuery(get_called_class());
+	}
 }
