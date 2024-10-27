@@ -8,6 +8,7 @@ class StringHelper
 {
 	public const SYMBOL_SPACE = ' ';
 	public const SYMBOL_SLASH = '/';
+	public const SYMBOL_COMMA = ',';
 
 	/**
 	 * Checks if a string is empty.
@@ -20,7 +21,7 @@ class StringHelper
 	 */
 	public static function isEmpty(string $string): bool
 	{
-		return strlen($string) === 0;
+		return self::length($string) === 0;
 	}
 
 	/**
@@ -46,7 +47,7 @@ class StringHelper
 	 */
 	public static function truncate(string $string, int $maxLength): string
 	{
-		if (strlen($string) <= $maxLength) {
+		if (self::length($string) <= $maxLength) {
 			return $string;
 		}
 
@@ -55,7 +56,7 @@ class StringHelper
 
 	public static function startWith(string $string, string $prefix): bool
 	{
-		return strncmp($string, $prefix, strlen($prefix)) === 0;
+		return strncmp($string, $prefix, self::length($prefix)) === 0;
 	}
 
 	/**
@@ -74,7 +75,7 @@ class StringHelper
 			return null;
 		}
 
-		return substr($string, $pos + strlen($after));
+		return substr($string, $pos + self::length($after));
 	}
 
 	/**
@@ -119,7 +120,7 @@ class StringHelper
 
 	public static function length(string $string): int
 	{
-		return strlen($string);
+		return mb_strlen($string);
 	}
 
 	public static function isOnlyDigits(string $string): bool
@@ -130,5 +131,15 @@ class StringHelper
 	public static function extractDigits(string $string): string
 	{
 		return preg_replace('/[^0-9]/', '', $string);
+	}
+
+	/**
+	 * @param mixed $mbString
+	 *
+	 * @return bool
+	 */
+	public static function isString($mbString): bool
+	{
+		return is_string($mbString);
 	}
 }

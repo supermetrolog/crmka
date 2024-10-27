@@ -5,8 +5,9 @@ namespace app\models;
 use app\components\Media\Media as MediaComponent;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\MediaQuery;
-use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\di\NotInstantiableException;
 
 /**
  * This is the model class for table "media".
@@ -60,15 +61,14 @@ class Media extends AR
 		];
 	}
 
+	/**
+	 * @return string|null
+	 * @throws InvalidConfigException
+	 * @throws NotInstantiableException
+	 */
 	public function getSrc(): ?string
 	{
-		try {
-			return Yii::$container->get(MediaComponent::class)->getUrl($this->path);
-		} catch (Throwable $th) {
-			Yii::error($th->getMessage(), 'Media src generation error');
-
-			return null;
-		}
+		return Yii::$container->get(MediaComponent::class)->getUrl($this->path);
 	}
 
 	public static function find(): MediaQuery

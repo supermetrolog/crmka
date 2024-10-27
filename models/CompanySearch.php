@@ -179,8 +179,7 @@ class CompanySearch extends Form
 			Category::field('category')       => $this->categories
 		]);
 
-
-		if ($this->categories && count($this->categories) > 1) {
+		if (ArrayHelper::isArray($this->categories) && ArrayHelper::length($this->categories) > 1) {
 			$query->groupBy(Company::field('id'));
 			$query->andFilterHaving(['>', new Expression('COUNT(DISTINCT category.category)'), count($this->categories) - 1]);
 		}

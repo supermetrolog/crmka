@@ -93,4 +93,9 @@ class ArrayHelper
 	{
 		return array_udiff($firstArray, $secondArray, $fn);
 	}
+
+	public static function length(array $array): int
+	{
+		return count($array);
+	}
 }
