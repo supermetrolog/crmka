@@ -94,6 +94,9 @@ class Company extends AR
 	public const COMPANY_CREATED_EVENT = 'company_created_event';
 	public const COMPANY_UPDATED_EVENT = 'company_updated_event';
 
+	private ?int $_requestsCount = null;
+	private ?int $_objectsCount  = null;
+
 
 	public function init(): void
 	{
@@ -237,10 +240,10 @@ class Company extends AR
 		$extraFields['contacts_count'] = fn() => (int)$this->getContacts()->count();
 
 		$extraFields['requests_count'] = function () {
-			return (int)$this->getRequests()->count();
+			return $this->getRequestsCount();
 		};
 		$extraFields['objects_count']  = function () {
-			return (int)$this->getObjects()->count();
+			return $this->getObjectsCount();
 		};
 
 		$extraFields['offers_count'] = function ($efields) {
@@ -367,6 +370,15 @@ class Company extends AR
 		return $this->hasMany(Objects::class, ['company_id' => 'id']);
 	}
 
+	public function getObjectsCount(): int
+	{
+		if ($this->_objectsCount === null) {
+			$this->_objectsCount = $this->getObjects()->count();
+		}
+
+		return $this->_objectsCount;
+	}
+
 	/**
 	 * Gets query for [[OfferMix]].
 	 *
@@ -388,6 +400,15 @@ class Company extends AR
 	public function getRequests(): ActiveQuery
 	{
 		return $this->hasMany(Request::class, ['company_id' => 'id']);
+	}
+
+	public function getRequestsCount(): int
+	{
+		if ($this->_requestsCount === null) {
+			$this->_requestsCount = $this->getRequests()->count();
+		}
+
+		return $this->_requestsCount;
 	}
 
 	/**
