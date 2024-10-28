@@ -361,13 +361,11 @@ class Company extends AR
 
 
 	/**
-	 * Gets query for [[Objects]].
-	 *
-	 * @return ActiveQuery
+	 * @throws ErrorException
 	 */
 	public function getObjects(): ActiveQuery
 	{
-		return $this->hasMany(Objects::class, ['company_id' => 'id']);
+		return $this->hasMany(Objects::class, ['company_id' => 'id'])->from(Objects::getTable());
 	}
 
 	public function getObjectsCount(): int

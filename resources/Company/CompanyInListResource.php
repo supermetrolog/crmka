@@ -58,7 +58,11 @@ class CompanyInListResource extends JsonResource
 			'companyGroup'  => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
 
 			'objects'  => CompanyObjectResource::collection($this->resource->objects),
-			'requests' => CompanyRequestResource::collection($this->resource->requests)
+			'requests' => CompanyRequestResource::collection($this->resource->requests),
+
+			'objects_count'  => $this->resource->objects_count,
+			'requests_count' => $this->resource->requests_count,
+			'contacts_count' => $this->resource->contacts_count
 		];
 	}
 }

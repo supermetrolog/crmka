@@ -34,8 +34,9 @@ class CompanyViewResource extends JsonResource
 				'files'             => CompanyFileResource::collection($this->resource->files),
 				'logo'              => $this->resource->getLogoUrl(),
 				'dealsRequestEmpty' => $this->resource->dealsRequestEmpty,
-				'objects_count'     => $this->resource->getObjectsCount(),
-				'requests_count'    => $this->resource->getRequestsCount()
+				'objects_count'     => $this->resource->objects_count,
+				'requests_count'    => $this->resource->requests_count,
+				'contacts_count'    => $this->resource->contacts_count,
 			]
 		);
 	}
