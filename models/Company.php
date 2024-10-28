@@ -6,11 +6,13 @@ use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\helpers\StringHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use app\models\miniModels\CompanyFile;
 use Yii;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 
@@ -71,6 +73,7 @@ use yii\db\Expression;
  * @property-read Deal[]                $dealsRequestEmpty
  * @property-read CompanyFile[]         $files
  * @property-read Contact               $generalContact
+ * @property-read ChatMember            $chatMember
  */
 class Company extends AR
 {
@@ -413,6 +416,15 @@ class Company extends AR
 		$query = $this->hasOne(Contact::class, ['company_id' => 'id']);
 
 		return $query->general();
+	}
+
+	/**
+	 * @return ChatMemberQuery|ActiveQuery
+	 * @throws ErrorException
+	 */
+	public function getChatMember(): ChatMemberQuery
+	{
+		return $this->morphHasOne(ChatMember::class);
 	}
 
 	/**

@@ -6,10 +6,12 @@ namespace app\resources\ChatMember;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
+use app\models\Company;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
 use app\resources\Call\CallResource;
+use app\resources\ChatMember\ChatMemberModel\CompanyBaseResource;
 use app\resources\Object\ObjectChatMemberResource;
 use app\resources\Request\RequestInChatMemberResource;
 use app\resources\User\UserResource;
@@ -52,6 +54,10 @@ class ChatMemberFullResource extends JsonResource
 
 		if ($model instanceof User) {
 			return new UserResource($model);
+		}
+
+		if ($model instanceof Company) {
+			return new CompanyBaseResource($model);
 		}
 
 		throw new UnexpectedValueException('Unknown model type');
