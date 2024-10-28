@@ -27,6 +27,8 @@ class CompanyBaseResource extends JsonResource
 			'noName'          => $this->resource->noName,
 			'activityGroup'   => $this->resource->activityGroup,
 			'activityProfile' => $this->resource->activityProfile,
+			'consultant_id'   => $this->resource->consultant_id,
+			'consultant'      => $this->resource->consultant,
 			'full_name'       => $this->resource->getFullName(),
 			'logo'            => $this->resource->getLogoUrl(),
 			'categories'      => CompanyCategoryResource::collection($this->resource->categories),

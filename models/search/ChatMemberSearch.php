@@ -115,7 +115,7 @@ class ChatMemberSearch extends Form
 			                             'request.objectClasses',
 		                             ])
 		                             ->with(['user.userProfile'])
-		                             ->with(['company.logo', 'company.categories'])
+		                             ->with(['company.logo', 'company.categories', 'company.companyGroup', 'company.consultant'])
 		                             ->groupBy(ChatMember::field('id'));
 
 		$dataProvider = new ActiveDataProvider([
