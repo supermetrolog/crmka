@@ -115,11 +115,11 @@ table {
 }
 
 #header table td.logo .image {
-    width: 200px;
+	width: 240px;
 }
 
 #header table td.logo .image img {
-    width: 200px;
+	width: 240px;
 }
 
 #header table td.consultant {
