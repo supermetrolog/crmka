@@ -171,13 +171,13 @@ class CompanySearch extends Form
 		$this->validateOrThrow();
 
 		$query->orFilterWhere([Company::field('id') => $this->all])
-		      ->orFilterWhere([Company::field('nameEng') => ['like', Company::field('nameEng'), $this->all]])
-		      ->orFilterWhere([Company::field('nameRu') => ['like', Company::field('nameRu'), $this->all]])
-		      ->orFilterWhere([Company::field('nameBrand') => ['like', Company::field('nameBrand'), $this->all]])
-		      ->orFilterWhere([Contact::field('first_name') => ['like', Contact::field('first_name'), $this->all]])
-		      ->orFilterWhere([Contact::field('middle_name') => ['like', Contact::field('middle_name'), $this->all]])
-		      ->orFilterWhere([Contact::field('last_name') => ['like', Contact::field('last_name'), $this->all]])
-		      ->orFilterWhere([Phone::field('phone') => ['like', Phone::field('phone'), $this->all]]);
+		      ->orFilterWhere(['like', Company::field('nameEng'), $this->all])
+		      ->orFilterWhere(['like', Company::field('nameRu'), $this->all])
+		      ->orFilterWhere(['like', Company::field('nameBrand'), $this->all])
+		      ->orFilterWhere(['like', Contact::field('first_name'), $this->all])
+		      ->orFilterWhere(['like', Contact::field('middle_name'), $this->all])
+		      ->orFilterWhere(['like', Contact::field('last_name'), $this->all])
+		      ->orFilterWhere(['like', Phone::field('phone'), $this->all]);
 
 
 		if ($this->all) {
