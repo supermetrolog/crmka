@@ -118,11 +118,13 @@ table {
 }
 
 #header table td.logo .image {
-	width: 240px;
+	width: 186px;
+	height: 30px;
 }
 
-#header table td.logo .image img {
-	width: 240px;
+#header table td. .image img {
+	width: 186px;
+	height: 30px;
 }
 
 #header table td.consultant {
