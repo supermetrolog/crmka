@@ -1,6 +1,4 @@
 body {
-	--danger-color: #8E0606;
-
 	padding-top: 1.5cm;
 	padding-bottom: 0cm;
 	font-family: Montserrat;
@@ -49,7 +47,7 @@ div.page-no-absolute:first-child {
 }
 
 span.danger {
-	color: var(--danger-color);
+	color: #8E0606;
 	font-weight: bold;
 }
 
@@ -75,7 +73,7 @@ table {
 }
 
 .title h3 {
-	border-bottom: 2px solid var(--danger-color);
+	border-bottom: 2px solid #8E0606;
 	text-transform: uppercase;
 	display: inline-block;
 }
@@ -142,7 +140,7 @@ table {
 
 #header table td.consultant div {
 	display: inline-block;
-	border-right: 1px solid var(--danger-color);
+	border-right: 1px solid #8E0606;
 	padding-right: 10px;
 	min-height: 35px;
 	height: 35px;
@@ -181,7 +179,7 @@ table {
 }
 
 #footer table {
-	border-top: 2px solid var(--danger-color);
+	border-top: 2px solid #8E0606;
 	margin-bottom: 0;
 	font-size: 9.5px;
 	max-height: 25px;
@@ -215,7 +213,7 @@ table {
 #footer table td.contacts > div li i {
 	position: absolute;
 	font-size: 4px;
-	color: var(--danger-color);
+	color: #8E0606;
 	top: 9px;
 	left: -5px;
 }
@@ -412,7 +410,7 @@ table {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background-color: var(--danger-color);
+	background-color: #8E0606;
 	/* height: 20px; */
 	/* width: 80px; */
 	width: auto;
@@ -489,7 +487,7 @@ table.digital-info-container {
 .digital-info td.two div {
 	/* width: 300px; */
 	height: 78px;
-	outline: 1px solid var(--danger-color);
+	outline: 1px solid #8E0606;
 	padding: 10px 15px;
 	padding-right: 0 !important;
 	margin-right: 4px;
