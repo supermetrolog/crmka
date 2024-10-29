@@ -9,6 +9,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\TimelineQuery;
 use app\models\miniModels\Phone;
+use app\models\views\CompanySearchView;
 use Exception;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
@@ -61,26 +62,30 @@ class CompanySearch extends Form
 	 */
 	public function search($params): ActiveDataProvider
 	{
-		$query = Company::find()
-		                ->distinct()
-		                ->select([Company::field('*')])
-		                ->joinWith(['requests', 'categories', 'contacts.phones'])
-		                ->with([
-			                'requests' => function ($query) {
-				                $query->with(['timelines' => function (TimelineQuery $query) {
-					                $query->with(['timelineSteps'])->active();
-				                }]);
-			                },
-			                'logo',
-			                'companyGroup',
-			                'consultant.userProfile',
-			                'productRanges',
-			                'mainContact.emails',
-			                'mainContact.phones',
-			                'categories',
-			                'objects.offerMix.generalOffersMix',
-			                'objects.objectFloors'
-		                ]);
+		$query = CompanySearchView::find()
+		                          ->select([
+			                          Company::field('*'),
+			                          'objects_count'  => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
+			                          'requests_count' => 'COUNT(DISTINCT request.id)',
+			                          'contacts_count' => 'COUNT(DISTINCT contact.id)'
+		                          ])
+		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects'])
+		                          ->with([
+			                          'requests' => function ($query) {
+				                          $query->with(['timelines' => function (TimelineQuery $query) {
+					                          $query->with(['timelineSteps'])->active();
+				                          }]);
+			                          },
+			                          'logo',
+			                          'companyGroup',
+			                          'consultant.userProfile',
+			                          'productRanges',
+			                          'mainContact.emails',
+			                          'mainContact.phones',
+			                          'categories',
+			                          'objects.offerMix.generalOffersMix',
+			                          'objects.objectFloors'
+		                          ])->groupBy(Company::field('id'));
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
@@ -166,13 +171,13 @@ class CompanySearch extends Form
 		$this->validateOrThrow();
 
 		$query->orFilterWhere([Company::field('id') => $this->all])
-		      ->orFilterWhere([Company::field('nameEng') => ['like', Company::field('nameEng'), $this->all]])
-		      ->orFilterWhere([Company::field('nameRu') => ['like', Company::field('nameRu'), $this->all]])
-		      ->orFilterWhere([Company::field('nameBrand') => ['like', Company::field('nameBrand'), $this->all]])
-		      ->orFilterWhere([Contact::field('first_name') => ['like', Contact::field('first_name'), $this->all]])
-		      ->orFilterWhere([Contact::field('middle_name') => ['like', Contact::field('middle_name'), $this->all]])
-		      ->orFilterWhere([Contact::field('last_name') => ['like', Contact::field('last_name'), $this->all]])
-		      ->orFilterWhere([Phone::field('phone') => ['like', Phone::field('phone'), $this->all]]);
+		      ->orFilterWhere(['like', Company::field('nameEng'), $this->all])
+		      ->orFilterWhere(['like', Company::field('nameRu'), $this->all])
+		      ->orFilterWhere(['like', Company::field('nameBrand'), $this->all])
+		      ->orFilterWhere(['like', Contact::field('first_name'), $this->all])
+		      ->orFilterWhere(['like', Contact::field('middle_name'), $this->all])
+		      ->orFilterWhere(['like', Contact::field('last_name'), $this->all])
+		      ->orFilterWhere(['like', Phone::field('phone'), $this->all]);
 
 
 		if ($this->all) {

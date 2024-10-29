@@ -101,7 +101,8 @@ class ChatMemberSearch extends Form
 		                             ->joinWith([
 			                             'objectChatMember.object',
 			                             'request',
-			                             'user'
+			                             'user',
+			                             'company'
 		                             ])
 		                             ->with(['lastCall.user.userProfile'])
 		                             ->with(['objectChatMember.object.company'])
@@ -114,6 +115,7 @@ class ChatMemberSearch extends Form
 			                             'request.objectClasses',
 		                             ])
 		                             ->with(['user.userProfile'])
+		                             ->with(['company.logo', 'company.categories', 'company.companyGroup', 'company.consultant'])
 		                             ->groupBy(ChatMember::field('id'));
 
 		$dataProvider = new ActiveDataProvider([
@@ -167,7 +169,8 @@ class ChatMemberSearch extends Form
 							                   ->left(Objects::field('last_update'))
 							                   ->right(Objects::field('publ_time'))
 							                   ->beforeBuild(fn($expression) => "$expression ASC")
-							                   ->build()
+							                   ->build(),
+							Company::field('updated_at')                                      => SORT_ASC
 						],
 						'desc' => [
 							IfExpressionBuilder::create()
@@ -183,18 +186,33 @@ class ChatMemberSearch extends Form
 							                   ->left(Objects::field('last_update'))
 							                   ->right(Objects::field('publ_time'))
 							                   ->beforeBuild(fn($expression) => "$expression DESC")
-							                   ->build()
+							                   ->build(),
+							Company::field('updated_at')                                      => SORT_DESC
 						]
 					],
 					'default'      => [
 						'asc'  => [
 							'cmle.updated_at'            => SORT_ASC,
 							'cmm.chat_member_message_id' => SORT_ASC,
+							IfExpressionBuilder::create()
+							                   ->condition(Objects::field('last_update'))
+							                   ->left(Objects::field('last_update'))
+							                   ->right(Objects::field('publ_time'))
+							                   ->beforeBuild(fn($expression) => "$expression ASC")
+							                   ->build(),
+							Company::field('updated_at') => SORT_ASC,
 							ChatMember::field('id')      => SORT_ASC,
 						],
 						'desc' => [
 							'cmle.updated_at'            => SORT_DESC,
 							'cmm.chat_member_message_id' => SORT_DESC,
+							IfExpressionBuilder::create()
+							                   ->condition(Objects::field('last_update'))
+							                   ->left(Objects::field('last_update'))
+							                   ->right(Objects::field('publ_time'))
+							                   ->beforeBuild(fn($expression) => "$expression DESC")
+							                   ->build(),
+							Company::field('updated_at') => SORT_DESC,
 							ChatMember::field('id')      => SORT_ASC,
 						],
 					]
@@ -227,13 +245,8 @@ class ChatMemberSearch extends Form
 						'user_profile.last_name'),
 					$this->search
 				],
-			]);
-
-			$query->andWhere([
-				'OR',
-				['IS NOT', 'request_company.id', null],
-				['IS NOT', 'object_company.id', null],
-				['IS NOT', 'user_profile.id', null],
+				['like', Company::field('nameEng'), $this->search],
+				['like', Company::field('nameRu'), $this->search],
 			]);
 		}
 

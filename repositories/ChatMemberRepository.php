@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\repositories;
 
+use app\dto\ChatMemberView\StatisticChatMemberViewDto;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\TaskQuery;
@@ -13,9 +14,11 @@ use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\models\Notification\UserNotification;
+use app\models\Objects;
 use app\models\Relation;
 use app\models\Task;
 use app\models\TaskObserver;
+use app\models\User;
 use app\models\views\ChatMemberStatisticView;
 use yii\base\ErrorException;
 use yii\db\Expression;
@@ -23,14 +26,13 @@ use yii\db\Expression;
 class ChatMemberRepository
 {
 	/**
-	 * @param int[]    $chat_member_ids
-	 * @param string[] $model_types array of model types like ['request', 'object', 'user] etc. (use getMorphClass() method in models)
-	 *
 	 * @return ChatMemberStatisticView[]
 	 * @throws ErrorException
 	 */
-	public function getStatisticByIdsAndModelTypes(array $chat_member_ids, array $model_types): array
+	public function getStatisticByIdsAndModelTypes(StatisticChatMemberViewDto $dto): array
 	{
+		$needCallingQuery = $this->makeNeedingCallCountQuery($dto->model_types);
+
 		$lastEventQuery = ChatMemberLastEvent::find()
 		                                     ->select([
 			                                     ChatMemberLastEvent::field('event_chat_member_id')
@@ -42,18 +44,21 @@ class ChatMemberRepository
 		$chatMemberQuery = ChatMemberStatisticView::find()
 		                                          ->select([
 			                                          'chat_member_id'            => ChatMemberStatisticView::field('id'),
+			                                          'consultant_id'             => 'user.id',
 			                                          'unread_task_count'         => 'COUNT(DISTINCT tasks.id)',
 			                                          'unread_notification_count' => 'COUNT(DISTINCT notifications.id)',
 			                                          'unread_message_count'      => 'COUNT(DISTINCT messages.id) - COUNT(DISTINCT message_views.id)',
-			                                          'outdated_call_count'       => $this->makeNeedingCallCountQuery($model_types)
+			                                          'outdated_call_count'       => 'COUNT(DISTINCT cls.id)'
 		                                          ])
-		                                          ->leftJoin(['tasks' => $this->makeTaskQuery($model_types)], [
+		                                          ->byModelType(User::getMorphClass())
+		                                          ->joinWith(['user'])
+		                                          ->leftJoin(['tasks' => $this->makeTaskQuery($dto->model_types)], [
 			                                          'tasks.observer_id' => ChatMemberStatisticView::xfield('model_id')
 		                                          ])
-		                                          ->leftJoin(['notifications' => $this->makeNotificationQuery($model_types)], [
+		                                          ->leftJoin(['notifications' => $this->makeNotificationQuery($dto->model_types)], [
 			                                          'notifications.user_id' => ChatMemberStatisticView::xfield('model_id')
 		                                          ])
-		                                          ->leftJoin(['messages' => $this->makeMessagesQuery($model_types)], [
+		                                          ->leftJoin(['messages' => $this->makeMessagesQuery($dto->model_types)], [
 			                                          'messages.to_chat_member_id' => $lastEventQuery,
 		                                          ])
 		                                          ->leftJoin(['message_views' => ChatMemberMessageView::getTable()], [
@@ -65,10 +70,19 @@ class ChatMemberRepository
 				                                          ['message_views.chat_member_id' => null],
 			                                          ]
 		                                          ])
-		                                          ->andWhere([ChatMemberStatisticView::field('id') => $chat_member_ids])
+		                                          ->leftJoin(['cls' => $needCallingQuery], ['or', 'cls.consultant_id = user.id', 'cls.consultant_id_old = user.user_id_old'])
+		                                          ->andWhere([ChatMemberStatisticView::field('id') => $dto->chat_member_ids])
 		                                          ->groupBy(ChatMemberStatisticView::field('id'));
 
-		return $chatMemberQuery->all();
+		/** @var ChatMemberStatisticView[] $statistics */
+		$statistics          = $chatMemberQuery->all();
+		$allNeedingCallCount = (int)$needCallingQuery->count();
+
+		foreach ($statistics as $statistic) {
+			$statistic->outdated_call_count_all = $allNeedingCallCount;
+		}
+
+		return $statistics;
 	}
 
 	/**
@@ -149,12 +163,17 @@ class ChatMemberRepository
 	private function makeNeedingCallCountQuery(array $model_types): ChatMemberQuery
 	{
 		return ChatMember::find()
-		                 ->select([
-			                 'count' => 'COUNT(*)'
-		                 ])
+		                 ->select(
+			                 [
+				                 'id'                => ChatMember::field('id'),
+				                 'model_type'        => ChatMember::field('model_type'),
+				                 'consultant_id'     => 'COALESCE(company.consultant_id, null)',
+				                 'consultant_id_old' => Objects::field('agent_id')
+			                 ]
+		                 )
 		                 ->leftJoinLastCallRelation()
 		                 ->byModelTypes($model_types)
-		                 ->joinWith(['objectChatMember.object', 'request'])
+		                 ->joinWith(['objectChatMember.object', 'company'])
 		                 ->needCalling();
 	}
 

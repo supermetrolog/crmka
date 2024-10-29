@@ -60,7 +60,7 @@ class TaskTagSearch extends Form
 		      ->andFilterWhere(['like', 'description', $this->description])
 		      ->andFilterWhere(['like', 'color', $this->color]);
 
-		if (!isset($this->search)) {
+		if (isset($this->search)) {
 			$query->andFilterWhere([
 				'or',
 				['like', 'name', $this->search],

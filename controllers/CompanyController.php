@@ -12,6 +12,8 @@ use app\models\forms\Company\CompanyContactsForm;
 use app\models\forms\Company\CompanyForm;
 use app\models\forms\Company\CompanyMediaForm;
 use app\models\forms\Company\CompanyMiniModelsForm;
+use app\models\Objects;
+use app\models\views\CompanySearchView;
 use app\repositories\CompanyRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
@@ -201,23 +203,29 @@ class CompanyController extends AppController
 	 */
 	protected function findModel($id): Company
 	{
-		/** @var Company $model */
-		$model = Company::find()
-		                ->select(Company::field('*'))
-		                ->byId($id)
-		                ->with(['productRanges',
-		                        'categories',
-		                        'companyGroup',
-		                        'deals',
-		                        'files',
-		                        'dealsRequestEmpty.consultant.userProfile',
-		                        'dealsRequestEmpty.offer.generalOffersMix',
-		                        'dealsRequestEmpty.competitor',
-		                        'consultant.userProfile',
-		                        'contacts' => function ($query) {
-			                        $query->with(['phones', 'emails', 'contactComments', 'websites']);
-		                        }])
-		                ->oneOrThrow();
+		/** @var CompanySearchView $model */
+		$model = CompanySearchView::find()
+		                          ->select([
+			                          Company::field('*'),
+			                          'objects_count'  => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
+			                          'requests_count' => 'COUNT(DISTINCT request.id)',
+			                          'contacts_count' => 'COUNT(DISTINCT contact.id)'
+		                          ])
+		                          ->byId($id)
+		                          ->joinWith(['requests', 'contacts', 'objects'])
+		                          ->with(['productRanges',
+		                                  'categories',
+		                                  'companyGroup',
+		                                  'deals',
+		                                  'files',
+		                                  'dealsRequestEmpty.consultant.userProfile',
+		                                  'dealsRequestEmpty.offer.generalOffersMix',
+		                                  'dealsRequestEmpty.competitor',
+		                                  'consultant.userProfile',
+		                                  'contacts' => function ($query) {
+			                                  $query->with(['phones', 'emails', 'contactComments', 'websites']);
+		                                  }])
+		                          ->oneOrThrow();
 
 		return $model;
 	}

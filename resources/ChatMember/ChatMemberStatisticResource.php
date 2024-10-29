@@ -23,7 +23,8 @@ class ChatMemberStatisticResource extends JsonResource
 			'unread_task_count'         => $this->resource->unread_task_count,
 			'unread_notification_count' => $this->resource->unread_notification_count,
 			'unread_message_count'      => $this->resource->unread_message_count,
-			'outdated_call_count'       => $this->resource->outdated_call_count
+			'outdated_call_count'       => $this->resource->outdated_call_count,
+			'outdated_call_count_all'   => $this->resource->outdated_call_count_all,
 		];
 	}
 }
