@@ -16,7 +16,7 @@ $svg = '<svg viewBox="0 0 249 40" fill="none" xmlns="http://www.w3.org/2000/svg"
 </svg>
 ';
 
-$logo       = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" width="240" />';
+$logo       = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" width="186" height="30" />';
 $logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" width="124" height="18" />';
 
 /** @var OffersPdf $model */
