@@ -17,7 +17,7 @@ $svg = '<svg viewBox="0 0 249 40" fill="none" xmlns="http://www.w3.org/2000/svg"
 ';
 
 $logo       = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" width="186" height="30" />';
-$logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" width="124" height="18" />';
+$logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" width="125" height="20" />';
 
 /** @var OffersPdf $model */
 ?>
@@ -117,9 +117,7 @@ $logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" 
 									<span class="btn-fake"><?= $model->data->from_mkad ?> км от МКАД</span>
 								<?php endif; ?>
 							</div>
-
 						</div>
-
 					</div>
 				</div>
 			</td>
@@ -440,7 +438,7 @@ $logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" 
 			<h3 class="four">Характеристики</h3>
 		</div>
 	<?php else : ?>
-		<div class="title mt-header-min-min">
+		<div class="title mt-header-min">
 			<h3 class="four">Характеристики</h3>
 		</div>
 	<?php endif; ?>
