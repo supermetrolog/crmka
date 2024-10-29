@@ -1,7 +1,9 @@
 body {
-    padding-top: 1.5cm;
-    padding-bottom: 0cm;
-    font-family: Montserrat;
+	--danger-color: #8E0606;
+
+	padding-top: 1.5cm;
+	padding-bottom: 0cm;
+	font-family: Montserrat;
 }
 
 hr {
@@ -47,8 +49,8 @@ div.page-no-absolute:first-child {
 }
 
 span.danger {
-    color: #982e06;
-    font-weight: bold;
+	color: var(--danger-color);
+	font-weight: bold;
 }
 
 tr {
@@ -73,9 +75,9 @@ table {
 }
 
 .title h3 {
-    border-bottom: 2px solid #982e06;
-    text-transform: uppercase;
-    display: inline-block;
+	border-bottom: 2px solid var(--danger-color);
+	text-transform: uppercase;
+	display: inline-block;
 }
 
 .title .one {
@@ -106,12 +108,13 @@ table {
 /* *********** HEADER ************ */
 
 #header {
-    position: fixed;
-    top: 0cm;
-    left: 0cm;
-    right: 0cm;
-    height: 1.5cm;
-    z-index: 999;
+	position: fixed;
+	top: 0cm;
+	left: 0cm;
+	right: 0cm;
+	height: 1.5cm;
+	z-index: 999;
+	padding-left: 3px;
 }
 
 #header table td.logo .image {
@@ -136,12 +139,12 @@ table {
 } */
 
 #header table td.consultant div {
-    display: inline-block;
-    border-right: 1px solid #982e06;
-    padding-right: 10px;
-    min-height: 35px;
-    height: 35px;
-    vertical-align: top;
+	display: inline-block;
+	border-right: 1px solid var(--danger-color);
+	padding-right: 10px;
+	min-height: 35px;
+	height: 35px;
+	vertical-align: top;
 }
 
 #header table td.consultant div.phones {
@@ -176,11 +179,11 @@ table {
 }
 
 #footer table {
-    border-top: 2px solid #982e06;
-    margin-bottom: 0;
-    font-size: 9.5px;
-    max-height: 25px;
-    padding-top: 10px;
+	border-top: 2px solid var(--danger-color);
+	margin-bottom: 0;
+	font-size: 9.5px;
+	max-height: 25px;
+	padding-top: 10px;
 }
 
 #footer table td>div {
@@ -207,12 +210,12 @@ table {
     margin-right: 20px;
 }
 
-#footer table td.contacts>div li i {
-    position: absolute;
-    font-size: 4px;
-    color: #982e06;
-    top: 9px;
-    left: -5px;
+#footer table td.contacts > div li i {
+	position: absolute;
+	font-size: 4px;
+	color: var(--danger-color);
+	top: 9px;
+	left: -5px;
 }
 
 #footer table td.contacts>div li p {
@@ -404,26 +407,28 @@ table {
 }
 
 .main-info td.left .image .extra-info .object_id {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: #982e06;
-    /* height: 20px; */
-    /* width: 80px; */
-    width: auto;
-    text-transform: uppercase;
-    font-size: 12px;
-    color: white;
-    padding: 5px 15px 5px 15px;
-    /* padding: 5px 0; */
-    vertical-align: middle;
-    z-index: 3;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: var(--danger-color);
+	/* height: 20px; */
+	/* width: 80px; */
+	width: auto;
+	text-transform: uppercase;
+	font-size: 12px;
+	color: white;
+	padding: 5px 15px 5px 15px;
+	/* padding: 5px 0; */
+	vertical-align: middle;
+	z-index: 3;
 }
 
 .main-info td.left .image .extra-info .object_id p {
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	position: relative;
+	z-index: 4;
 }
 
 .main-info td.left .image .extra-info .object_id p b {
@@ -433,18 +438,17 @@ table {
 }
 
 .main-info td.left .image .extra-info .object_id::before {
-    content: '';
-    background: inherit;
-    /* background-color: black; */
-    width: 25px;
-    height: 25px;
-    display: block;
-    position: absolute;
-    right: -14px;
-    top: 4px;
-    transform: rotate(45deg);
-    border-radius: 0 0 0 2px;
-    z-index: 2;
+	content: '';
+	background: inherit;
+	width: 24px;
+	height: 24px;
+	display: block;
+	position: absolute;
+	right: -12.2px;
+	top: 5px;
+	transform: rotate(45deg);
+	border-radius: 0 0 0 2px;
+	z-index: 2;
 }
 
 
@@ -481,15 +485,15 @@ table.digital-info-container {
 }
 
 .digital-info td.two div {
-    /* width: 300px; */
-    height: 78px;
-    outline: 1px solid #8b2e0a;
-    padding: 10px 15px;
-    padding-right: 0 !important;
-    margin-right: 4px;
-    max-width: 298px;
-    width: 298px;
-    min-width: 298px;
+	/* width: 300px; */
+	height: 78px;
+	outline: 1px solid var(--danger-color);
+	padding: 10px 15px;
+	padding-right: 0 !important;
+	margin-right: 4px;
+	max-width: 298px;
+	width: 298px;
+	min-width: 298px;
 }
 
 .digital-info td.three>div {
