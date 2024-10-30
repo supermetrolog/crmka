@@ -209,9 +209,6 @@ class CompanySearch extends Form
 			Category::field('category')       => $this->categories
 		]);
 
-		$query->andFilterWhere(['in', Category::field('category'), $this->categories]);
-
-
 		$query->andFilterWhere(['like', Company::field('nameEng'), $this->nameEng])
 		      ->andFilterWhere(['like', Company::field('nameRu'), $this->nameRu])
 		      ->andFilterWhere(['like', Company::field('formOfOrganization'), $this->formOfOrganization])
