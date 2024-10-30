@@ -57,4 +57,17 @@ class DateTimeHelper
 	{
 		return (new DateTime())->setTimestamp($timestamp)->format($format);
 	}
+
+	public static function unix(): int
+	{
+		return time();
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public static function makeUnix(string $datetime): int
+	{
+		return self::make($datetime)->getTimestamp();
+	}
 }
