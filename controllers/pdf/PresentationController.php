@@ -58,14 +58,14 @@ class PresentationController extends Controller
 		$pdfManager->render();
 		$pdfManager->save();
 
-//		$pyScriptPath = Yii::$app->params['compressorPath'];
-//		$pythonPath = Yii::$app->params['pythonPath'];
-//		$inPath = $pdfManager->getPdfPath();
-//		$outPath = $pdfTmpDir . "/" . Yii::$app->security->generateRandomString() . ".pdf";
-//		$pythonCompressor = new PythonPdfCompress($pythonPath, $pyScriptPath, $inPath, $outPath);
-//		$pythonCompressor->Compress();
-//		// Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
-//		$pythonCompressor->deleteOriginalFileAndChangeFileName();
+		$pyScriptPath     = Yii::$app->params['compressorPath'];
+		$pythonPath       = Yii::$app->params['pythonPath'];
+		$inPath           = $pdfManager->getPdfPath();
+		$outPath          = $pdfTmpDir . "/" . Yii::$app->security->generateRandomString() . ".pdf";
+		$pythonCompressor = new PythonPdfCompress($pythonPath, $pyScriptPath, $inPath, $outPath);
+		$pythonCompressor->Compress();
+		// Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
+		$pythonCompressor->deleteOriginalFileAndChangeFileName();
 		$pdfContent = file_get_contents($pdfManager->getPdfPath());
 
 		$pdfManager->removeFile();

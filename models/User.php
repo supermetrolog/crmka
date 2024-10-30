@@ -46,6 +46,9 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	const ROLE_OWNER      = 4;
 	const ROLE_ADMIN      = 5;
 
+	protected bool $useUnixSoftUpdate = true;
+	protected bool $useUnixSoftCreate = true;
+
 	public static function getRoles(): array
 	{
 		return [
@@ -128,15 +131,6 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 		];
 
 		return $behaviors;
-	}
-
-	public function beforeSave($insert): bool
-	{
-		parent::beforeSave($insert);
-
-		$this->updated_at = time();
-
-		return true;
 	}
 
 	public function getEmailForSend(): array
