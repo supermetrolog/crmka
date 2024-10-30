@@ -90,8 +90,7 @@ class UserService
 			$model->load([
 				'email'          => $dto->email,
 				'email_username' => $dto->email_username,
-				'role'           => $dto->role,
-				'updated_at'     => time(),
+				'role'           => $dto->role
 			]);
 
 			if ($dto->email_password !== null) {

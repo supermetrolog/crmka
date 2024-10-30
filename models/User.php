@@ -130,6 +130,15 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 		return $behaviors;
 	}
 
+	public function beforeSave($insert): bool
+	{
+		parent::beforeSave($insert);
+
+		$this->updated_at = time();
+
+		return true;
+	}
+
 	public function getEmailForSend(): array
 	{
 		$defaultFrom = [Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']];
