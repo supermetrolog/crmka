@@ -15,22 +15,26 @@ use app\models\User;
 use Throwable;
 use yii\base\Security;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
 class UserService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
 	private UserProfileService           $userProfileService;
+	private UserAccessTokenService       $accessTokenService;
 	private Security                     $security;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		UserProfileService $userProfileService,
+		UserAccessTokenService $accessTokenService,
 		Security $security
 	)
 	{
 		$this->security            = $security;
 		$this->transactionBeginner = $transactionBeginner;
 		$this->userProfileService  = $userProfileService;
+		$this->accessTokenService  = $accessTokenService;
 	}
 
 	/**
@@ -117,24 +121,27 @@ class UserService
 	}
 
 	/**
-	 * @param User $model The model to delete.
-	 *
-	 * @return void
-	 * @throws SaveModelException If the model cannot be saved.
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws StaleObjectException
 	 */
 	public function delete(User $model): void
 	{
 		$model->status = User::STATUS_DELETED;
+		$this->accessTokenService->deleteAllByUserId($model->id);
 
 		$model->saveOrThrow();
 	}
 
 	/**
 	 * @throws SaveModelException
+	 * @throws StaleObjectException
+	 * @throws Throwable
 	 */
 	public function archive(User $model): void
 	{
 		$model->status = User::STATUS_INACTIVE;
+		$this->accessTokenService->deleteAllByUserId($model->id);
 
 		$model->saveOrThrow();
 	}

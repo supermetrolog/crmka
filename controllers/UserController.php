@@ -26,7 +26,6 @@ use app\resources\User\UserWithContactsResource;
 use app\usecases\Auth\AuthService;
 use app\usecases\User\UserAccessTokenService;
 use app\usecases\User\UserService;
-use app\usecases\User\UserWithAccessTokenService;
 use Exception;
 use Throwable;
 use yii\base\ErrorException;
@@ -39,12 +38,11 @@ use yii\web\UploadedFile;
 
 class UserController extends AppController
 {
-	private AuthService                $authService;
-	private UserService                $userService;
-	private UserAccessTokenRepository  $accessTokenRepository;
-	private UserAccessTokenService     $accessTokenService;
-	private UserWithAccessTokenService $userWithAccessTokenService;
-	protected array                    $exceptAuthActions = ['login'];
+	private AuthService               $authService;
+	private UserService               $userService;
+	private UserAccessTokenRepository $accessTokenRepository;
+	private UserAccessTokenService    $accessTokenService;
+	protected array                   $exceptAuthActions = ['login'];
 
 
 	public function __construct(
@@ -54,15 +52,13 @@ class UserController extends AppController
 		UserService $userService,
 		UserAccessTokenRepository $accessTokenRepository,
 		UserAccessTokenService $accessTokenService,
-		UserWithAccessTokenService $userWithAccessTokenService,
 		array $config = []
 	)
 	{
-		$this->authService                = $authService;
-		$this->userService                = $userService;
-		$this->accessTokenRepository      = $accessTokenRepository;
-		$this->accessTokenService         = $accessTokenService;
-		$this->userWithAccessTokenService = $userWithAccessTokenService;
+		$this->authService           = $authService;
+		$this->userService           = $userService;
+		$this->accessTokenRepository = $accessTokenRepository;
+		$this->accessTokenService    = $accessTokenService;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -185,7 +181,7 @@ class UserController extends AppController
 		}
 
 		$user = $this->findModel($id);
-		$this->userWithAccessTokenService->delete($user);
+		$this->userService->delete($user);
 
 		return new SuccessResponse('Пользователь успешно удален');
 	}
@@ -305,7 +301,7 @@ class UserController extends AppController
 
 		$user = $this->findModel($id);
 
-		$this->userWithAccessTokenService->archive($user);
+		$this->userService->archive($user);
 
 		return new SuccessResponse('Пользователь отправлен в архив');
 	}
