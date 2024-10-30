@@ -12,6 +12,7 @@ use app\resources\Company\File\CompanyFileResource;
 use app\resources\Company\Group\CompanyGroupResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Contact\ContactResource;
+use app\resources\Media\MediaShortResource;
 
 class CompanyViewResource extends JsonResource
 {
@@ -32,7 +33,7 @@ class CompanyViewResource extends JsonResource
 				'productRanges'     => CompanyProductRangeResource::collection($this->resource->productRanges),
 				'companyGroup'      => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
 				'files'             => CompanyFileResource::collection($this->resource->files),
-				'logo'              => $this->resource->getLogoUrl(),
+				'logo'              => MediaShortResource::tryMakeArray($this->resource->logo),
 				'dealsRequestEmpty' => $this->resource->dealsRequestEmpty,
 				'objects_count'     => $this->resource->objects_count,
 				'requests_count'    => $this->resource->requests_count,
