@@ -26,6 +26,7 @@ use app\resources\User\UserWithContactsResource;
 use app\usecases\Auth\AuthService;
 use app\usecases\User\UserAccessTokenService;
 use app\usecases\User\UserService;
+use app\usecases\User\UserWithAccessTokenService;
 use Exception;
 use Throwable;
 use yii\base\ErrorException;
@@ -38,11 +39,12 @@ use yii\web\UploadedFile;
 
 class UserController extends AppController
 {
-	private AuthService               $authService;
-	private UserService               $userService;
-	private UserAccessTokenRepository $accessTokenRepository;
-	private UserAccessTokenService    $accessTokenService;
-	protected array                   $exceptAuthActions = ['login'];
+	private AuthService                $authService;
+	private UserService                $userService;
+	private UserAccessTokenRepository  $accessTokenRepository;
+	private UserAccessTokenService     $accessTokenService;
+	private UserWithAccessTokenService $userWithAccessTokenService;
+	protected array                    $exceptAuthActions = ['login'];
 
 
 	public function __construct(
@@ -52,13 +54,15 @@ class UserController extends AppController
 		UserService $userService,
 		UserAccessTokenRepository $accessTokenRepository,
 		UserAccessTokenService $accessTokenService,
+		UserWithAccessTokenService $userWithAccessTokenService,
 		array $config = []
 	)
 	{
-		$this->authService           = $authService;
-		$this->userService           = $userService;
-		$this->accessTokenRepository = $accessTokenRepository;
-		$this->accessTokenService    = $accessTokenService;
+		$this->authService                = $authService;
+		$this->userService                = $userService;
+		$this->accessTokenRepository      = $accessTokenRepository;
+		$this->accessTokenService         = $accessTokenService;
+		$this->userWithAccessTokenService = $userWithAccessTokenService;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -166,12 +170,11 @@ class UserController extends AppController
 
 
 	/**
-	 * @param int $id
-	 *
-	 * @return SuccessResponse
 	 * @throws ForbiddenHttpException
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
+	 * @throws StaleObjectException
+	 * @throws Throwable
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
@@ -182,7 +185,7 @@ class UserController extends AppController
 		}
 
 		$user = $this->findModel($id);
-		$this->userService->delete($user);
+		$this->userWithAccessTokenService->delete($user);
 
 		return new SuccessResponse('Пользователь успешно удален');
 	}
@@ -282,6 +285,50 @@ class UserController extends AppController
 		}
 
 		return new SuccessResponse('Сессии успешно удалены');
+	}
+
+	/**
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 */
+	public function actionArchive($id): SuccessResponse
+	{
+		$identity = $this->user->identity;
+
+		// TODO: Заменить на RBAC
+		if (!$identity->isAdministrator() && !$identity->isOwner()) {
+			throw new ForbiddenHttpException('У вас нет прав на архивацию пользователей');
+		}
+
+		$user = $this->findModel($id);
+
+		$this->userWithAccessTokenService->archive($user);
+
+		return new SuccessResponse('Пользователь отправлен в архив');
+	}
+
+	/**
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 */
+	public function actionRestore($id): SuccessResponse
+	{
+		$identity = $this->user->identity;
+
+		// TODO: Заменить на RBAC
+		if (!$identity->isAdministrator() && !$identity->isOwner()) {
+			throw new ForbiddenHttpException('У вас нет прав на архивацию пользователей');
+		}
+
+		$user = $this->findModel($id);
+
+		$this->userService->restore($user);
+
+		return new SuccessResponse('Пользователь восстановлен из архива');
 	}
 
 	/**

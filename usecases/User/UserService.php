@@ -128,4 +128,24 @@ class UserService
 
 		$model->saveOrThrow();
 	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function archive(User $model): void
+	{
+		$model->status = User::STATUS_INACTIVE;
+
+		$model->saveOrThrow();
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function restore(User $model): void
+	{
+		$model->status = User::STATUS_ACTIVE;
+
+		$model->saveOrThrow();
+	}
 }

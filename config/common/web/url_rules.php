@@ -16,6 +16,8 @@ return
 				'POST,OPTIONS logout'          => 'logout',
 				'GET,OPTIONS <id>/sessions'    => 'sessions',
 				'DELETE,OPTIONS <id>/sessions' => 'delete-sessions',
+				'GET,OPTIONS <id>/archive'     => 'archive',
+				'GET,OPTIONS <id>/restore'     => 'restore',
 			],
 		],
 		[
