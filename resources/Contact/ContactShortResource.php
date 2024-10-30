@@ -6,6 +6,7 @@ namespace app\resources\Contact;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Contact;
+use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 
 class ContactShortResource extends JsonResource
 {
@@ -38,6 +39,7 @@ class ContactShortResource extends JsonResource
 			'warning_why_comment' => $this->resource->warning_why_comment,
 			'position_unknown'    => $this->resource->position_unknown,
 			'isMain'              => $this->resource->isMain,
+			'consultant'          => UserShortResource::tryMakeArray($this->resource->consultant)
 		];
 	}
 }

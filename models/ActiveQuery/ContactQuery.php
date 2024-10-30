@@ -26,7 +26,7 @@ class ContactQuery extends AQ
 	}
 
 	/**
-	 * @return Contact|ActiveRecord|null
+	 * @return Contact|ActiveRecord
 	 * @throws ModelNotFoundException
 	 */
 	public function oneOrThrow($db = null): Contact
@@ -42,5 +42,20 @@ class ContactQuery extends AQ
 	public function byId(?int $id): self
 	{
 		return $this->andWhere([$this->field('id') => $id]);
+	}
+
+	public function byCompanyId(int $id): self
+	{
+		return $this->andWhere([$this->field('company_id') => $id]);
+	}
+
+	public function general(): self
+	{
+		return $this->andWhere([$this->field('type') => Contact::GENERAL_CONTACT_TYPE]);
+	}
+
+	public function main(): self
+	{
+		return $this->andWhere([$this->field('isMain') => Contact::IS_MAIN_CONTACT]);
 	}
 }

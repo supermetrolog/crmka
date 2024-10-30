@@ -39,4 +39,35 @@ class DateTimeHelper
 	{
 		return new DateTime($datetime);
 	}
+
+	/**
+	 * @throws Exception
+	 */
+	public static function makef(string $datetime, string $format = 'Y-m-d H:i:s'): string
+	{
+		return self::make($datetime)->format($format);
+	}
+
+	public static function fromUnix(int $timestamp): DateTimeInterface
+	{
+		return (new DateTime())->setTimestamp($timestamp);
+	}
+
+	public static function fromUnixf(int $timestamp, string $format = 'Y-m-d H:i:s'): string
+	{
+		return (new DateTime())->setTimestamp($timestamp)->format($format);
+	}
+
+	public static function unix(): int
+	{
+		return time();
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public static function makeUnix(string $datetime): int
+	{
+		return self::make($datetime)->getTimestamp();
+	}
 }

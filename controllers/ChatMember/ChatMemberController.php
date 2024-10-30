@@ -2,7 +2,6 @@
 
 namespace app\controllers\ChatMember;
 
-use app\helpers\ArrayHelper;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -12,6 +11,7 @@ use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMember;
 use app\models\forms\Call\CallForm;
 use app\models\forms\ChatMember\PinChatMemberMessageForm;
+use app\models\forms\ChatMember\StatisticChatMemberViewForm;
 use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
 use app\models\search\ChatMemberMediaSearch;
 use app\models\search\ChatMemberSearch;
@@ -23,7 +23,7 @@ use app\resources\ChatMember\ChatMemberFullResource;
 use app\resources\ChatMember\ChatMemberMessageResource;
 use app\resources\ChatMember\ChatMemberResource;
 use app\resources\ChatMember\ChatMemberStatisticResource;
-use app\resources\MediaResource;
+use app\resources\Media\MediaResource;
 use app\usecases\ChatMember\ChatMemberService;
 use Throwable;
 use yii\base\ErrorException;
@@ -71,16 +71,16 @@ class ChatMemberController extends AppController
 
 	/**
 	 * @throws ErrorException
+	 * @throws ValidateException
 	 */
 	public function actionStatistic(): array
 	{
-		$model_types     = ArrayHelper::toArray($this->request->get('model_types'));
-		$chat_member_ids = ArrayHelper::map(
-			ArrayHelper::toArray($this->request->get('chat_member_ids')),
-			fn($element) => (int)$element
-		);
+		$form = new StatisticChatMemberViewForm();
 
-		$resource = $this->repository->getStatisticByIdsAndModelTypes($chat_member_ids, $model_types);
+		$form->load($this->request->get());
+		$form->validateOrThrow();
+
+		$resource = $this->repository->getStatisticByIdsAndModelTypes($form->getDto());
 
 		return ChatMemberStatisticResource::collection($resource);
 	}

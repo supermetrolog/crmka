@@ -166,12 +166,11 @@ class UserController extends AppController
 
 
 	/**
-	 * @param int $id
-	 *
-	 * @return SuccessResponse
 	 * @throws ForbiddenHttpException
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
+	 * @throws StaleObjectException
+	 * @throws Throwable
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
@@ -282,6 +281,50 @@ class UserController extends AppController
 		}
 
 		return new SuccessResponse('Сессии успешно удалены');
+	}
+
+	/**
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 */
+	public function actionArchive($id): SuccessResponse
+	{
+		$identity = $this->user->identity;
+
+		// TODO: Заменить на RBAC
+		if (!$identity->isAdministrator() && !$identity->isOwner()) {
+			throw new ForbiddenHttpException('У вас нет прав на архивацию пользователей');
+		}
+
+		$user = $this->findModel($id);
+
+		$this->userService->archive($user);
+
+		return new SuccessResponse('Пользователь отправлен в архив');
+	}
+
+	/**
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 */
+	public function actionRestore($id): SuccessResponse
+	{
+		$identity = $this->user->identity;
+
+		// TODO: Заменить на RBAC
+		if (!$identity->isAdministrator() && !$identity->isOwner()) {
+			throw new ForbiddenHttpException('У вас нет прав на архивацию пользователей');
+		}
+
+		$user = $this->findModel($id);
+
+		$this->userService->restore($user);
+
+		return new SuccessResponse('Пользователь восстановлен из архива');
 	}
 
 	/**

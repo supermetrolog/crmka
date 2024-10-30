@@ -15,22 +15,26 @@ use app\models\User;
 use Throwable;
 use yii\base\Security;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
 class UserService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
 	private UserProfileService           $userProfileService;
+	private UserAccessTokenService       $accessTokenService;
 	private Security                     $security;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		UserProfileService $userProfileService,
+		UserAccessTokenService $accessTokenService,
 		Security $security
 	)
 	{
 		$this->security            = $security;
 		$this->transactionBeginner = $transactionBeginner;
 		$this->userProfileService  = $userProfileService;
+		$this->accessTokenService  = $accessTokenService;
 	}
 
 	/**
@@ -90,8 +94,7 @@ class UserService
 			$model->load([
 				'email'          => $dto->email,
 				'email_username' => $dto->email_username,
-				'role'           => $dto->role,
-				'updated_at'     => time(),
+				'role'           => $dto->role
 			]);
 
 			if ($dto->email_password !== null) {
@@ -118,14 +121,55 @@ class UserService
 	}
 
 	/**
-	 * @param User $model The model to delete.
-	 *
-	 * @return void
-	 * @throws SaveModelException If the model cannot be saved.
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws StaleObjectException
 	 */
 	public function delete(User $model): void
 	{
-		$model->status = User::STATUS_DELETED;
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$model->status = User::STATUS_DELETED;
+			$this->accessTokenService->deleteAllByUserId($model->id);
+
+			$model->saveOrThrow();
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 */
+	public function archive(User $model): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$model->status = User::STATUS_INACTIVE;
+			$this->accessTokenService->deleteAllByUserId($model->id);
+
+			$model->saveOrThrow();
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function restore(User $model): void
+	{
+		$model->status = User::STATUS_ACTIVE;
 
 		$model->saveOrThrow();
 	}

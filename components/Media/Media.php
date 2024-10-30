@@ -12,14 +12,31 @@ class Media extends Component
 {
 	private PathBuilderFactory $pathBuilderFactory;
 
-	public string $diskPath;
+	private string $diskPath;
+	private string $baseUrl;
 
-	public function __construct(PathBuilderFactory $pathBuilderFactory, $config = [])
+	public function __construct(PathBuilderFactory $pathBuilderFactory, string $baseUrl, string $diskPath, $config = [])
 	{
 		parent::__construct($config);
 
 		$this->pathBuilderFactory = $pathBuilderFactory;
-		$this->diskPath           = $this->pathBuilderFactory->create()->addPart($this->diskPath)->build()->getRel();
+		$this->baseUrl            = $baseUrl;
+
+		$this->diskPath = $this->pathBuilderFactory
+			->create()
+			->addPart($diskPath)
+			->build()
+			->getRel();
+	}
+
+	public function getUrl(string $filePath): string
+	{
+		return $this->pathBuilderFactory
+			->create()
+			->addPart($this->baseUrl)
+			->addPart($filePath)
+			->build()
+			->getRel();
 	}
 
 	/**

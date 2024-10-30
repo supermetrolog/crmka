@@ -6,9 +6,9 @@ use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
 use app\models\ChatMember;
+use app\models\Company;
 use app\models\Objects;
 use app\models\Relation;
-use app\models\Request;
 use app\models\views\ChatMemberSearchView;
 use yii\base\ErrorException;
 use yii\db\ActiveRecord;
@@ -87,13 +87,12 @@ class ChatMemberQuery extends AQ
 				[
 					'and',
 					['last_call_rel.created_at' => null],
-					['<', SQLHelper::fromUnixTime(Objects::field('last_update')), $interval]
+					[
+						'or',
+						['<', SQLHelper::fromUnixTime(Objects::field('last_update')), $interval],
+						['<', Company::field('updated_at'), $interval],
+					]
 				],
-				[
-					'and',
-					['last_call_rel.created_at' => null],
-					['<', Request::field('updated_at'), $interval]
-				]
 			]
 		);
 	}

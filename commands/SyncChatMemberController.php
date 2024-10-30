@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\commands;
 
-use app\actions\ChatMember\SyncCommercialOfferChatMemberAction;
+use app\actions\ChatMember\SyncCompanyChatMemberAction;
 use app\actions\ChatMember\SyncObjectChatMemberAction;
 use app\actions\ChatMember\SyncRequestChatMemberAction;
 use app\actions\ChatMember\SyncUserChatMemberAction;
@@ -16,10 +16,11 @@ class SyncChatMemberController extends Controller
 	public function actions(): array
 	{
 		return [
-			'requests' => SyncRequestChatMemberAction::class,
+			'requests'  => SyncRequestChatMemberAction::class,
 			//			'commercial-offers' => SyncCommercialOfferChatMemberAction::class,
-			'users'    => SyncUserChatMemberAction::class,
-			'objects'  => SyncObjectChatMemberAction::class,
+			'users'     => SyncUserChatMemberAction::class,
+			'objects'   => SyncObjectChatMemberAction::class,
+			'companies' => SyncCompanyChatMemberAction::class,
 		];
 	}
 }

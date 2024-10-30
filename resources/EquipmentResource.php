@@ -7,9 +7,9 @@ namespace app\resources;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Equipment;
 use app\resources\Call\CallResource;
-use app\resources\ChatMember\ChatMemberModel\CompanyResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Contact\ContactResource;
+use app\resources\Media\MediaResource;
 
 class EquipmentResource extends JsonResource
 {
