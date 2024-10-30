@@ -127,10 +127,19 @@ class UserService
 	 */
 	public function delete(User $model): void
 	{
-		$model->status = User::STATUS_DELETED;
-		$this->accessTokenService->deleteAllByUserId($model->id);
+		$tx = $this->transactionBeginner->begin();
 
-		$model->saveOrThrow();
+		try {
+			$model->status = User::STATUS_DELETED;
+			$this->accessTokenService->deleteAllByUserId($model->id);
+
+			$model->saveOrThrow();
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 
 	/**
@@ -140,10 +149,19 @@ class UserService
 	 */
 	public function archive(User $model): void
 	{
-		$model->status = User::STATUS_INACTIVE;
-		$this->accessTokenService->deleteAllByUserId($model->id);
+		$tx = $this->transactionBeginner->begin();
 
-		$model->saveOrThrow();
+		try {
+			$model->status = User::STATUS_INACTIVE;
+			$this->accessTokenService->deleteAllByUserId($model->id);
+
+			$model->saveOrThrow();
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 
 	/**
