@@ -68,7 +68,7 @@ class CompanyForm extends Form
 	public function validateCompanyName(string $attribute): void
 	{
 		if (!$this->hasErrors()) {
-			if ($this->noName === 1) {
+			if ((int)$this->noName === 1) {
 				return;
 			}
 
