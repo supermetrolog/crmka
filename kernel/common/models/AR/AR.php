@@ -26,6 +26,9 @@ class AR extends ActiveRecord
 	protected bool $useSoftUpdate = false;
 	protected bool $useSoftCreate = false;
 
+	protected bool $useUnixSoftCreate = false;
+	protected bool $useUnixSoftUpdate = false;
+
 
 	public function formName(): string
 	{
@@ -101,21 +104,37 @@ class AR extends ActiveRecord
 	 */
 	public function save($runValidation = true, $attributeNames = null): bool
 	{
-		if ($this->useSoftUpdate && !$this->hasAttribute(self::SOFT_UPDATE_ATTRIBUTE)) {
+		if (($this->useSoftUpdate || $this->useUnixSoftUpdate) && !$this->hasAttribute(self::SOFT_UPDATE_ATTRIBUTE)) {
 			throw new ErrorException('Soft update attribute (' . self::SOFT_UPDATE_ATTRIBUTE . ') not exist');
+		}
+
+		if ($this->useUnixSoftUpdate && $this->useSoftUpdate) {
+			throw new ErrorException('You can not use useUnixSoftUpdate and useSoftUpdate at the same time');
 		}
 
 		if ($this->useSoftUpdate) {
 			$this->setAttribute(self::SOFT_UPDATE_ATTRIBUTE, DateTimeHelper::nowf());
 		}
 
+		if ($this->useUnixSoftUpdate) {
+			$this->setAttribute(self::SOFT_UPDATE_ATTRIBUTE, DateTimeHelper::unix());
+		}
+
 		if ($this->isNewRecord) {
-			if ($this->useSoftCreate && !$this->hasAttribute(self::SOFT_CREATE_ATTRIBUTE)) {
+			if (($this->useSoftCreate || $this->useUnixSoftCreate) && !$this->hasAttribute(self::SOFT_CREATE_ATTRIBUTE)) {
 				throw new ErrorException('Soft create attribute (' . self::SOFT_CREATE_ATTRIBUTE . ') not exist');
+			}
+
+			if ($this->useUnixSoftCreate && $this->useSoftCreate) {
+				throw new ErrorException('You can not use useUnixSoftCreate and useSoftCreate at the same time');
 			}
 
 			if ($this->useSoftCreate) {
 				$this->setAttribute(self::SOFT_CREATE_ATTRIBUTE, DateTimeHelper::nowf());
+			}
+
+			if ($this->useUnixSoftCreate) {
+				$this->setAttribute(self::SOFT_CREATE_ATTRIBUTE, DateTimeHelper::unix());
 			}
 		}
 

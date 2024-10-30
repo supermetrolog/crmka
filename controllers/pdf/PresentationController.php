@@ -2,18 +2,15 @@
 
 namespace app\controllers\pdf;
 
-use app\helpers\TranslateHelper;
-use app\models\pdf\PdfManager;
-use app\services\pythonpdfcompress\PythonPdfCompress;
-use Exception;
-use yii\web\Controller;
 use app\behaviors\BaseControllerBehaviors;
+use app\helpers\TranslateHelper;
 use app\models\pdf\OffersPdf;
-use Dompdf\Dompdf;
+use app\models\pdf\PdfManager;
 use Dompdf\Options;
+use Exception;
 use Yii;
+use yii\web\Controller;
 use yii\web\RangeNotSatisfiableHttpException;
-use yii\web\Response;
 
 class PresentationController extends Controller
 {
@@ -40,7 +37,7 @@ class PresentationController extends Controller
 	 * @throws RangeNotSatisfiableHttpException
 	 * @throws Exception
 	 */
-	public function actionIndex(): Response
+	public function actionIndex()
 	{
 		$pdfTmpDir = Yii::$app->params['pdf']['tmp_dir'];
 
@@ -50,19 +47,21 @@ class PresentationController extends Controller
 		$options->set('isRemoteEnabled', true);
 		$options->set('isJavascriptEnabled', true);
 
+		return $this->render('index', ['model' => $model]);
+
 		$pdfManager = new PdfManager($options, $this->translate($model->getPresentationName()), $pdfTmpDir);
 
-		$html   = $this->renderPartial('index', ['model' => $model]);
+		$html = $this->renderPartial('index', ['model' => $model]);
 
 		$pdfManager->loadHtml($html);
 		$pdfManager->setPaper('A4');
 		$pdfManager->render();
 		$pdfManager->save();
 
-		$pyScriptPath = Yii::$app->params['compressorPath'];
-		$pythonPath = Yii::$app->params['pythonPath'];
-		$inPath = $pdfManager->getPdfPath();
-		$outPath = $pdfTmpDir . "/" . Yii::$app->security->generateRandomString() . ".pdf";
+		$pyScriptPath     = Yii::$app->params['compressorPath'];
+		$pythonPath       = Yii::$app->params['pythonPath'];
+		$inPath           = $pdfManager->getPdfPath();
+		$outPath          = $pdfTmpDir . "/" . Yii::$app->security->generateRandomString() . ".pdf";
 		$pythonCompressor = new PythonPdfCompress($pythonPath, $pyScriptPath, $inPath, $outPath);
 		$pythonCompressor->Compress();
 		// Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
