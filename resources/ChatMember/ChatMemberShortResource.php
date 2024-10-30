@@ -6,9 +6,11 @@ namespace app\resources\ChatMember;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
+use app\models\Company;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;
+use app\resources\ChatMember\ChatMemberModel\CompanyBaseResource;
 use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
 use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
@@ -49,6 +51,10 @@ class ChatMemberShortResource extends JsonResource
 
 		if ($model instanceof User) {
 			return new UserShortResource($model);
+		}
+
+		if ($model instanceof Company) {
+			return new CompanyBaseResource($model);
 		}
 
 		throw new UnexpectedValueException('Unknown model type');

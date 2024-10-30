@@ -4,7 +4,6 @@ namespace app\models;
 
 use app\components\ExpressionBuilder\FieldExpressionBuilder;
 use app\components\ExpressionBuilder\IfExpressionBuilder;
-use app\helpers\ArrayHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\TimelineQuery;
@@ -209,12 +208,6 @@ class CompanySearch extends Form
 			Company::field('activityProfile') => $this->activityProfile,
 			Category::field('category')       => $this->categories
 		]);
-
-		if (ArrayHelper::isArray($this->categories) && ArrayHelper::length($this->categories) > 1) {
-			$query->groupBy(Company::field('id'));
-			$query->andFilterHaving(['>', new Expression('COUNT(DISTINCT category.category)'), count($this->categories) - 1]);
-		}
-
 
 		$query->andFilterWhere(['like', Company::field('nameEng'), $this->nameEng])
 		      ->andFilterWhere(['like', Company::field('nameRu'), $this->nameRu])
