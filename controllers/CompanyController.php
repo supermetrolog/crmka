@@ -238,9 +238,9 @@ class CompanyController extends AppController
 
 		$form->validateOrThrow();
 
-		$this->companyService->updateLogo($company, $form->logo);
+		$updatedLogo = $this->companyService->updateLogo($company, $form->logo);
 
-		return new MediaShortResource($company->logo);
+		return new MediaShortResource($updatedLogo);
 	}
 
 	/**

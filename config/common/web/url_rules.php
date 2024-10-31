@@ -33,7 +33,7 @@ return
 				'PUT,OPTIONS <id>'               => 'update',
 				'DELETE,OPTIONS <id>'            => 'delete',
 				'DELETE,OPTIONS <id>/logo'       => 'delete-logo',
-				'POST,OPTION <id>/logo'          => 'update-logo',
+				'POST,OPTIONS <id>/logo'         => 'update-logo',
 			],
 		],
 		[
