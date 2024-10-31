@@ -200,7 +200,7 @@ class CompanyService
 			$logoShouldBeDeleted = (!$dto->logo_id || $mediaDto->logo) && $model->logo;
 
 			if ($logoShouldBeDeleted) {
-				$this->mediaService->delete($model->logo);
+				$this->deleteLogo($model);
 			}
 
 			if ($mediaDto->logo) {
@@ -298,5 +298,38 @@ class CompanyService
 	public function delete(Company $model): void
 	{
 		$model->delete();
+	}
+
+	/**
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 */
+	public function deleteLogo(Company $model): void
+	{
+		$this->mediaService->delete($model->logo);
+	}
+
+	/**
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 */
+	public function updateLogo(Company $model, UploadedFile $logoFile): Media
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			if ($model->logo) {
+				$this->deleteLogo($model);
+			}
+
+			$createdLogo = $this->saveLogo($model, $logoFile);
+
+			$tx->commit();
+
+			return $createdLogo;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 }

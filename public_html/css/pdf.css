@@ -1,7 +1,7 @@
 body {
-    padding-top: 1.5cm;
-    padding-bottom: 0cm;
-    font-family: Montserrat;
+	padding-top: 1.5cm;
+	padding-bottom: 0cm;
+	font-family: Montserrat;
 }
 
 hr {
@@ -47,8 +47,8 @@ div.page-no-absolute:first-child {
 }
 
 span.danger {
-    color: #982e06;
-    font-weight: bold;
+	color: #8E0606;
+	font-weight: bold;
 }
 
 tr {
@@ -73,9 +73,9 @@ table {
 }
 
 .title h3 {
-    border-bottom: 2px solid #982e06;
-    text-transform: uppercase;
-    display: inline-block;
+	border-bottom: 2px solid #8E0606;
+	text-transform: uppercase;
+	display: inline-block;
 }
 
 .title .one {
@@ -106,20 +106,23 @@ table {
 /* *********** HEADER ************ */
 
 #header {
-    position: fixed;
-    top: 0cm;
-    left: 0cm;
-    right: 0cm;
-    height: 1.5cm;
-    z-index: 999;
+	position: fixed;
+	top: 0cm;
+	left: 0cm;
+	right: 0cm;
+	height: 1.5cm;
+	z-index: 999;
+	padding-left: 3px;
 }
 
 #header table td.logo .image {
-    width: 200px;
+	width: 186px;
+	height: 30px;
 }
 
-#header table td.logo .image img {
-    width: 200px;
+#header table td. .image img {
+	width: 186px;
+	height: 30px;
 }
 
 #header table td.consultant {
@@ -136,12 +139,12 @@ table {
 } */
 
 #header table td.consultant div {
-    display: inline-block;
-    border-right: 1px solid #982e06;
-    padding-right: 10px;
-    min-height: 35px;
-    height: 35px;
-    vertical-align: top;
+	display: inline-block;
+	border-right: 1px solid #8E0606;
+	padding-right: 10px;
+	min-height: 35px;
+	height: 35px;
+	vertical-align: top;
 }
 
 #header table td.consultant div.phones {
@@ -152,9 +155,13 @@ table {
     padding-right: 0;
 }
 
-#header table td.consultant>div p.name {
-    font-size: 14px;
-    vertical-align: top;
+#header table td.consultant .phones {
+	text-align: left;
+}
+
+#header table td.consultant > div p.name {
+	font-size: 14px;
+	vertical-align: top;
 }
 
 #header table td.consultant>div p.position {
@@ -176,11 +183,11 @@ table {
 }
 
 #footer table {
-    border-top: 2px solid #982e06;
-    margin-bottom: 0;
-    font-size: 9.5px;
-    max-height: 25px;
-    padding-top: 10px;
+	border-top: 2px solid #8E0606;
+	margin-bottom: 0;
+	font-size: 9.5px;
+	max-height: 25px;
+	padding-top: 10px;
 }
 
 #footer table td>div {
@@ -203,16 +210,20 @@ table {
     margin-right: 4px;
 }
 
-#footer table td.contacts>div li:first-child {
-    margin-right: 20px;
+#footer table td.contacts > div li {
+	margin-right: 10px;
 }
 
-#footer table td.contacts>div li i {
-    position: absolute;
-    font-size: 4px;
-    color: #982e06;
-    top: 9px;
-    left: -5px;
+#footer table td.contacts > div li:first-child {
+	margin-right: 20px;
+}
+
+#footer table td.contacts > div li i {
+	position: absolute;
+	font-size: 4px;
+	color: #8E0606;
+	top: 10px;
+	left: -6px;
 }
 
 #footer table td.contacts>div li p {
@@ -228,21 +239,22 @@ table {
     color: black;
 }
 
-#footer table td.image>div {
-    max-height: 25px;
-    height: 25px;
+#footer table td.image > div {
+	max-height: 18px;
+	height: 18px;
 }
 
-#footer table td.image>div .logo {
-    width: 100px;
-    max-height: 25px;
-    height: 25px;
-    margin-left: auto;
+#footer table td.image > div .logo {
+	width: 120px;
+	max-height: 28px;
+	height: 18px;
+	margin-top: -8px;
+	margin-left: -25px;
 }
 
-#footer table td.image>div img {
-    max-height: 25px;
-    width: 100%;
+#footer table td.image > div img {
+	max-height: 18px;
+	width: 120px;
 }
 
 .page-number {
@@ -342,12 +354,12 @@ table {
 }
 
 .main-info td.right .image {
-    max-height: 375px;
-    /* height: 373px; */
-    width: 240px;
-    max-width: 240px;
-    outline: 2px solid #ccc;
-    margin-left: 5px;
+	max-height: 375px;
+	/* height: 373px; */
+	width: 240px;
+	max-width: 240px;
+	outline: 1px solid #ccc;
+	margin-left: 5px;
 }
 
 .main-info td.right .image img {
@@ -404,26 +416,28 @@ table {
 }
 
 .main-info td.left .image .extra-info .object_id {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: #982e06;
-    /* height: 20px; */
-    /* width: 80px; */
-    width: auto;
-    text-transform: uppercase;
-    font-size: 12px;
-    color: white;
-    padding: 5px 15px 5px 15px;
-    /* padding: 5px 0; */
-    vertical-align: middle;
-    z-index: 3;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #8E0606;
+	/* height: 20px; */
+	/* width: 80px; */
+	width: auto;
+	text-transform: uppercase;
+	font-size: 12px;
+	color: white;
+	padding: 5px 15px 5px 15px;
+	/* padding: 5px 0; */
+	vertical-align: middle;
+	z-index: 3;
 }
 
 .main-info td.left .image .extra-info .object_id p {
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	position: relative;
+	z-index: 4;
 }
 
 .main-info td.left .image .extra-info .object_id p b {
@@ -433,18 +447,17 @@ table {
 }
 
 .main-info td.left .image .extra-info .object_id::before {
-    content: '';
-    background: inherit;
-    /* background-color: black; */
-    width: 25px;
-    height: 25px;
-    display: block;
-    position: absolute;
-    right: -14px;
-    top: 4px;
-    transform: rotate(45deg);
-    border-radius: 0 0 0 2px;
-    z-index: 2;
+	content: '';
+	background: inherit;
+	width: 24px;
+	height: 24px;
+	display: block;
+	position: absolute;
+	right: -12.2px;
+	top: 5px;
+	transform: rotate(45deg);
+	border-radius: 0 0 0 2px;
+	z-index: 2;
 }
 
 
@@ -481,15 +494,15 @@ table.digital-info-container {
 }
 
 .digital-info td.two div {
-    /* width: 300px; */
-    height: 78px;
-    outline: 1px solid #8b2e0a;
-    padding: 10px 15px;
-    padding-right: 0 !important;
-    margin-right: 4px;
-    max-width: 298px;
-    width: 298px;
-    min-width: 298px;
+	/* width: 300px; */
+	height: 78px;
+	outline: 1px solid #8E0606;
+	padding: 10px 15px;
+	padding-right: 0 !important;
+	margin-right: 4px;
+	max-width: 298px;
+	width: 298px;
+	min-width: 298px;
 }
 
 .digital-info td.three>div {
@@ -544,11 +557,11 @@ table.digital-info-container {
     border-collapse: collapse;
 }
 
-.digital-info td.three .items td>div {
-    width: 100%;
-    height: 51px;
-    font-weight: normal;
-    text-align: center;
+.digital-info td.three .items td > div {
+	width: 100%;
+	height: 48.5px;
+	font-weight: normal;
+	text-align: center;
 }
 
 .digital-info td.three .items {
@@ -868,4 +881,8 @@ table.digital-info-container {
 
 .params-new .even td>div {
     background-color: #f0f0f0;
+}
+
+.c_two .digital-info .items {
+	margin-top: 7px;
 }

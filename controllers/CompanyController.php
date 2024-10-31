@@ -6,10 +6,12 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\SuccessResponse;
 use app\models\Company;
 use app\models\CompanySearch;
 use app\models\forms\Company\CompanyContactsForm;
 use app\models\forms\Company\CompanyForm;
+use app\models\forms\Company\CompanyLogoForm;
 use app\models\forms\Company\CompanyMediaForm;
 use app\models\forms\Company\CompanyMiniModelsForm;
 use app\models\Objects;
@@ -18,10 +20,14 @@ use app\repositories\CompanyRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
 use app\resources\Company\CompanyViewResource;
+use app\resources\Company\CreatedCompanyResource;
+use app\resources\Media\MediaShortResource;
+use app\usecases\Company\CompanyService;
 use app\usecases\Company\CompanyWithGeneralContactService;
 use Throwable;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
+use yii\db\StaleObjectException;
 use yii\web\UploadedFile;
 
 class CompanyController extends AppController
@@ -32,16 +38,20 @@ class CompanyController extends AppController
 
 	private CompanyRepository $companyRepository;
 
+	private CompanyService $companyService;
+
 
 	public function __construct(
 		$id,
 		$module,
+		CompanyService $companyService,
 		CompanyWithGeneralContactService $companyWithGeneralContactService,
 		ProductRangeRepository $productRangeRepository,
 		CompanyRepository $companyRepository,
 		array $config = []
 	)
 	{
+		$this->companyService                   = $companyService;
 		$this->companyWithGeneralContactService = $companyWithGeneralContactService;
 		$this->productRangeRepository           = $productRangeRepository;
 		$this->companyRepository                = $companyRepository;
@@ -83,7 +93,7 @@ class CompanyController extends AppController
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 */
-	public function actionCreate(): CompanyViewResource
+	public function actionCreate(): CreatedCompanyResource
 	{
 		$form = new CompanyForm();
 
@@ -120,7 +130,8 @@ class CompanyController extends AppController
 			$companyMediaForm->getDto()
 		);
 
-		return new CompanyViewResource($company);
+
+		return new CreatedCompanyResource($company);
 	}
 
 	/**
@@ -192,6 +203,44 @@ class CompanyController extends AppController
 	public function actionInTheBankList(): array
 	{
 		return $this->companyRepository->getBankNameUniqueAll();
+	}
+
+	/**
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 * @throws StaleObjectException
+	 */
+	public function actionDeleteLogo($id): SuccessResponse
+	{
+		$company = $this->findModel($id);
+		$this->companyService->deleteLogo($company);
+
+		return new SuccessResponse('Логотип компании удален');
+	}
+
+	/**
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionUpdateLogo($id): MediaShortResource
+	{
+		$company = $this->findModel($id);
+
+		$form = new CompanyLogoForm();
+
+		$form->load([
+			'logo' => UploadedFile::getInstanceByName('logo'),
+		]);
+
+		$form->validateOrThrow();
+
+		$updatedLogo = $this->companyService->updateLogo($company, $form->logo);
+
+		return new MediaShortResource($updatedLogo);
 	}
 
 	/**
