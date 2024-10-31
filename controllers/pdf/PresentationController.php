@@ -6,6 +6,7 @@ use app\behaviors\BaseControllerBehaviors;
 use app\helpers\TranslateHelper;
 use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
+use app\services\pythonpdfcompress\PythonPdfCompress;
 use Dompdf\Options;
 use Exception;
 use Yii;
