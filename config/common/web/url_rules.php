@@ -32,6 +32,8 @@ return
 				'GET,OPTIONS <id>'               => 'view',
 				'PUT,OPTIONS <id>'               => 'update',
 				'DELETE,OPTIONS <id>'            => 'delete',
+				'DELETE,OPTIONS <id>/logo'       => 'deleteLogo',
+				'POST,OPTION <id>/logo'          => 'updateLogo',
 			],
 		],
 		[
