@@ -18,6 +18,7 @@ use app\repositories\CompanyRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
 use app\resources\Company\CompanyViewResource;
+use app\resources\Company\CreatedCompanyResource;
 use app\usecases\Company\CompanyWithGeneralContactService;
 use Throwable;
 use yii\base\ErrorException;
@@ -83,7 +84,7 @@ class CompanyController extends AppController
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 */
-	public function actionCreate(): CompanyViewResource
+	public function actionCreate(): CreatedCompanyResource
 	{
 		$form = new CompanyForm();
 
@@ -120,7 +121,8 @@ class CompanyController extends AppController
 			$companyMediaForm->getDto()
 		);
 
-		return new CompanyViewResource($company);
+
+		return new CreatedCompanyResource($company);
 	}
 
 	/**
