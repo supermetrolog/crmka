@@ -284,7 +284,7 @@ class Contact extends AR
 
 	public function getRelatedContacts(): ActiveQuery
 	{
-		return $this->hasMany(Contact::class, ['company_id' => 'company_id', ['!=', 'id', 'id']]);
+		return $this->hasMany(Contact::class, ['company_id' => 'company_id'])->andWhere(['!=', 'id', $this->id]);
 	}
 
 	public static function find(): ContactQuery
