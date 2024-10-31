@@ -108,6 +108,8 @@ class ContactService
 			$model->isMain = Contact::IS_MAIN_CONTACT;
 			$model->saveOrThrow();
 
+			$tx->commit();
+
 			return $model;
 		} catch (Throwable $th) {
 			$tx->rollBack();
