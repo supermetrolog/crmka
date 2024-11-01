@@ -11,8 +11,8 @@ use Exception;
 class UserProfileForm extends Form
 {
 	public string  $first_name;
-	public ?string $middle_name;
-	public string  $last_name;
+	public string  $middle_name;
+	public ?string $last_name;
 	public ?string $caller_id = null;
 	public array   $phones    = [];
 	public array   $emails    = [];
@@ -20,7 +20,7 @@ class UserProfileForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['first_name', 'last_name'], 'required'],
+			[['first_name', 'middle_name'], 'required'],
 			[['first_name', 'middle_name', 'last_name', 'caller_id'], 'string', 'max' => 255],
 			[['caller_id'], 'unique']
 		];
