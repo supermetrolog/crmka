@@ -3,11 +3,13 @@
 namespace app\models;
 
 use app\components\Notification\Interfaces\NotifiableInterface;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\UserAccessTokenQuery;
 use app\models\ActiveQuery\UserQuery;
+use Exception;
 use Yii;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -37,6 +39,8 @@ use yii\web\IdentityInterface;
  */
 class User extends AR implements IdentityInterface, NotifiableInterface
 {
+	public const ACTIVITY_TIMEOUT = 300; // 5 minutes
+
 	const STATUS_DELETED  = 0;
 	const STATUS_INACTIVE = 9;
 	const STATUS_ACTIVE   = 10;
@@ -269,5 +273,17 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	public function isOwner(): bool
 	{
 		return $this->role === self::ROLE_OWNER;
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function isOnline(): bool
+	{
+		if (!$this->last_seen) {
+			return false;
+		}
+
+		return (DateTimeHelper::unix() - DateTimeHelper::makeUnix($this->last_seen)) <= self::ACTIVITY_TIMEOUT;
 	}
 }

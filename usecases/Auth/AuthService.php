@@ -10,11 +10,13 @@ use app\exceptions\InvalidPasswordException;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
 use app\helpers\StringHelper;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\User;
 use app\models\UserAccessToken;
 use app\usecases\User\UserAccessTokenService;
+use app\usecases\User\UserService;
 use Throwable;
 use yii\base\Exception;
 use yii\base\Security;
@@ -23,16 +25,22 @@ use yii\db\StaleObjectException;
 class AuthService
 {
 
-	private Security               $security;
-	private UserAccessTokenService $userAccessTokenService;
+	private Security                     $security;
+	private UserService                  $userService;
+	private UserAccessTokenService       $userAccessTokenService;
+	private TransactionBeginnerInterface $transactionBeginner;
 
 	public function __construct(
 		Security $security,
-		UserAccessTokenService $userAccessTokenService
+		UserService $userService,
+		UserAccessTokenService $userAccessTokenService,
+		TransactionBeginnerInterface $transactionBeginner
 	)
 	{
 		$this->security               = $security;
+		$this->userService            = $userService;
 		$this->userAccessTokenService = $userAccessTokenService;
+		$this->transactionBeginner    = $transactionBeginner;
 	}
 
 	/**
@@ -53,13 +61,23 @@ class AuthService
 			throw new InvalidPasswordException();
 		}
 
-		$userAccessToken = $this->generateAccessToken($user, $userAgentDto);
+		$tx = $this->transactionBeginner->begin();
 
-		return new AuthResultDto([
-			'user'          => $user,
-			'accessToken'   => $userAccessToken->access_token,
-			'accessTokenId' => $userAccessToken->id
-		]);
+		try {
+			$userAccessToken = $this->generateAccessToken($user, $userAgentDto);
+			$this->userService->updateActivity($user);
+
+			$tx->commit();
+
+			return new AuthResultDto([
+				'user'          => $user,
+				'accessToken'   => $userAccessToken->access_token,
+				'accessTokenId' => $userAccessToken->id
+			]);
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 
 	/**
@@ -110,7 +128,7 @@ class AuthService
 	 * @throws StaleObjectException
 	 * @throws Throwable
 	 */
-	public function logout(string $token)
+	public function logout(string $token): void
 	{
 		$userAccessToken = UserAccessToken::find()->byToken($token)->oneOrThrow();
 		$this->userAccessTokenService->delete($userAccessToken);

@@ -14,6 +14,7 @@ return
 				'DELETE,OPTIONS <id>'          => 'delete',
 				'POST,OPTIONS login'           => 'login',
 				'POST,OPTIONS logout'          => 'logout',
+				'POST,OPTIONS activity'        => 'activity',
 				'GET,OPTIONS <id>/sessions'    => 'sessions',
 				'DELETE,OPTIONS <id>/sessions' => 'delete-sessions',
 				'GET,OPTIONS <id>/archive'     => 'archive',

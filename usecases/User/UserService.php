@@ -8,6 +8,7 @@ use app\dto\User\CreateUserDto;
 use app\dto\User\CreateUserProfileDto;
 use app\dto\User\UpdateUserDto;
 use app\exceptions\ValidationErrorHttpException;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\UploadFile;
@@ -170,6 +171,16 @@ class UserService
 	public function restore(User $model): void
 	{
 		$model->status = User::STATUS_ACTIVE;
+
+		$model->saveOrThrow();
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function updateActivity(User $model): void
+	{
+		$model->last_seen = DateTimeHelper::nowf();
 
 		$model->saveOrThrow();
 	}

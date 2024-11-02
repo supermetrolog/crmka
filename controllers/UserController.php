@@ -328,6 +328,18 @@ class UserController extends AppController
 	}
 
 	/**
+	 * @throws SaveModelException
+	 */
+	public function actionActivity(): SuccessResponse
+	{
+		$identity = $this->user->identity;
+
+		$this->userService->updateActivity($identity);
+
+		return new SuccessResponse();
+	}
+
+	/**
 	 * Finds the User model based on its primary key value.
 	 * If the model is not found, a 404 HTTP exception will be thrown.
 	 *
