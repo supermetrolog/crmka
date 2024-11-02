@@ -29,6 +29,7 @@ use yii\web\IdentityInterface;
  * @property int                    $updated_at
  * @property int                    $role
  * @property int                    $user_id_old
+ * @property ?string                $last_seen
  *
  * @property UserProfile            $userProfile
  * @property ChatMember             $chatMember
@@ -99,6 +100,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 				'string',
 				'max' => 255
 			],
+			[['last_seen'], 'safe'],
 			[['username'], 'unique'],
 			[['email'], 'unique'],
 			[['password_reset_token'], 'unique'],
@@ -120,6 +122,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 			'status'               => 'Status',
 			'created_at'           => 'Created At',
 			'updated_at'           => 'Updated At',
+			'last_seen'            => 'Last Seen',
 		];
 	}
 
