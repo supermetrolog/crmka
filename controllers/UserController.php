@@ -19,6 +19,7 @@ use app\models\search\UserSearch;
 use app\models\UploadFile;
 use app\models\User;
 use app\repositories\UserAccessTokenRepository;
+use app\repositories\UserRepository;
 use app\resources\Auth\AuthLoginResource;
 use app\resources\User\UserAccessTokenResource;
 use app\resources\User\UserResource;
@@ -41,6 +42,7 @@ class UserController extends AppController
 	private AuthService               $authService;
 	private UserService               $userService;
 	private UserAccessTokenRepository $accessTokenRepository;
+	private UserRepository            $userRepository;
 	private UserAccessTokenService    $accessTokenService;
 	protected array                   $exceptAuthActions = ['login'];
 
@@ -51,6 +53,7 @@ class UserController extends AppController
 		AuthService $authService,
 		UserService $userService,
 		UserAccessTokenRepository $accessTokenRepository,
+		UserRepository $userRepository,
 		UserAccessTokenService $accessTokenService,
 		array $config = []
 	)
@@ -58,6 +61,7 @@ class UserController extends AppController
 		$this->authService           = $authService;
 		$this->userService           = $userService;
 		$this->accessTokenRepository = $accessTokenRepository;
+		$this->userRepository        = $userRepository;
 		$this->accessTokenService    = $accessTokenService;
 
 		parent::__construct($id, $module, $config);
@@ -337,6 +341,11 @@ class UserController extends AppController
 		$this->userService->updateActivity($identity);
 
 		return new SuccessResponse();
+	}
+
+	public function actionOnline(): int
+	{
+		return $this->userRepository->getOnlineCount();
 	}
 
 	/**
