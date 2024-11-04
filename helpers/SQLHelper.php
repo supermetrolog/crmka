@@ -25,6 +25,11 @@ class SQLHelper
 		return 'FROM_UNIXTIME(' . $time . ')';
 	}
 
+	public static function toUnixTime(?string $date): string
+	{
+		return 'UNIX_TIMESTAMP(' . $date . ')';
+	}
+
 	/**
 	 * Subtracts a time interval from a date.
 	 *

@@ -30,7 +30,7 @@ class UserAccessTokenQuery extends AQ
 	}
 
 	/**
-	 * @return UserAccessToken|ActiveRecord|null
+	 * @return UserAccessToken|ActiveRecord
 	 * @throws ModelNotFoundException
 	 */
 	public function oneOrThrow($db = null): UserAccessToken

@@ -98,4 +98,9 @@ class ArrayHelper
 	{
 		return count($array);
 	}
+	
+	public static function includes(array $array, $needle): bool
+	{
+		return in_array($needle, $array, true);
+	}
 }
