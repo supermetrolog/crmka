@@ -18,10 +18,12 @@ use app\models\forms\User\UserProfileForm;
 use app\models\search\UserSearch;
 use app\models\UploadFile;
 use app\models\User;
+use app\models\views\UserOnlineView;
 use app\repositories\UserAccessTokenRepository;
 use app\repositories\UserRepository;
 use app\resources\Auth\AuthLoginResource;
 use app\resources\User\UserAccessTokenResource;
+use app\resources\User\UserOnlineResource;
 use app\resources\User\UserResource;
 use app\resources\User\UserWithContactsResource;
 use app\usecases\Auth\AuthService;
@@ -343,9 +345,12 @@ class UserController extends AppController
 		return new SuccessResponse();
 	}
 
-	public function actionOnline(): int
+	public function actionOnline(): UserOnlineResource
 	{
-		return $this->userRepository->getOnlineCount();
+		$resource               = new UserOnlineView();
+		$resource->online_count = $this->userRepository->getOnlineCount();
+
+		return new UserOnlineResource($resource);
 	}
 
 	/**
