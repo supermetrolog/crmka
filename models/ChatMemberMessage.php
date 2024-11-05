@@ -205,6 +205,20 @@ class ChatMemberMessage extends AR
 		return $query;
 	}
 
+	public function isSystem(): bool
+	{
+		$modelType = $this->fromChatMember->model_type;
+
+		if ($modelType !== User::getMorphClass()) {
+			return false;
+		}
+
+		/** @var User $model */
+		$model = $this->fromChatMember->model;
+
+		return $model->isSystem();
+	}
+
 
 	public static function find(): ChatMemberMessageQuery
 	{

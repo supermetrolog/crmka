@@ -50,6 +50,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	const ROLE_MODERATOR  = 3;
 	const ROLE_OWNER      = 4;
 	const ROLE_ADMIN      = 5;
+	const ROLE_SYSTEM     = 6;
 
 	protected bool $useUnixSoftUpdate = true;
 	protected bool $useUnixSoftCreate = true;
@@ -61,7 +62,8 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 			self::ROLE_CONSULTANT,
 			self::ROLE_MODERATOR,
 			self::ROLE_OWNER,
-			self::ROLE_ADMIN
+			self::ROLE_ADMIN,
+			self::ROLE_SYSTEM
 		];
 	}
 
@@ -273,6 +275,11 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	public function isOwner(): bool
 	{
 		return $this->role === self::ROLE_OWNER;
+	}
+
+	public function isSystem(): bool
+	{
+		return $this->role === self::ROLE_SYSTEM;
 	}
 
 	/**
