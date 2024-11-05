@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace app\resources;
+namespace app\resources\Survey;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Survey;
-use app\resources\Contact\ContactResource;
-use app\resources\User\UserResource;
 
-class SurveyResource extends JsonResource
+class SurveyShortResource extends JsonResource
 {
 	private Survey $resource;
 
@@ -26,9 +24,6 @@ class SurveyResource extends JsonResource
 			'contact_id' => $this->resource->contact_id,
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
-
-			'user'    => UserResource::make($this->resource->user)->toArray(),
-			'contact' => ContactResource::make($this->resource->contact)->toArray(),
 		];
 	}
 }

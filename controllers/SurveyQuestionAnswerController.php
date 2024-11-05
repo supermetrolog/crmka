@@ -2,15 +2,15 @@
 
 namespace app\controllers;
 
+use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
-use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
 use app\models\search\SurveyQuestionAnswerSearch;
 use app\models\SurveyQuestionAnswer;
 use app\repositories\SurveyQuestionAnswerRepository;
-use app\resources\SurveyQuestionAnswerResource;
+use app\resources\Survey\SurveyQuestionAnswerResource;
 use app\usecases\SurveyQuestionAnswer\SurveyQuestionAnswerService;
 use Throwable;
 use yii\data\ActiveDataProvider;
