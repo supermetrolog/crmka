@@ -1,7 +1,9 @@
 <?php
 
+use app\components\EventManager;
 use app\components\Media\Media;
 use app\components\PathBuilder\PathBuilderFactory;
+use app\listeners\CreateSurveySystemChatMessageListener;
 use yii\di\Container;
 use yii\helpers\ArrayHelper;
 
@@ -42,7 +44,14 @@ return ArrayHelper::merge(
 						Yii::$app->request->hostInfo . Yii::$app->params['media']['baseFolder'],
 						Yii::$app->params['media']['diskPath']
 					);
-				}
+				},
+				CreateSurveySystemChatMessageListener::class
+			]
+		],
+		'bootstrap'  => [
+			'eventManager' => [
+				'class'  => EventManager::class,
+				'config' => require __DIR__ . '/../common/events.php'
 			]
 		]
 	]
