@@ -10,6 +10,7 @@ use app\dto\Alert\CreateAlertDto;
 use app\dto\ChatMember\CreateChatMemberLastEventDto;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\ChatMember\CreateChatMemberMessageViewDto;
+use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\dto\ChatMember\UpdateChatMemberMessageDto;
 use app\dto\Media\CreateMediaDto;
 use app\dto\Notification\CreateNotificationDto;
@@ -31,6 +32,7 @@ use app\models\Reminder;
 use app\models\Task;
 use app\models\User;
 use app\repositories\ChatMemberMessageRepository;
+use app\repositories\ChatMemberRepository;
 use app\usecases\Alert\CreateAlertService;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
@@ -54,6 +56,7 @@ class ChatMemberMessageService
 	protected ChatMemberMessageRepository  $chatMemberMessageRepository;
 	protected ChatMemberLastEventService   $chatMemberLastEventService;
 	protected MediaService                 $mediaService;
+	protected ChatMemberRepository         $chatMemberRepository;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -66,7 +69,8 @@ class ChatMemberMessageService
 		NotifierFactory $notifierFactory,
 		ChatMemberMessageRepository $chatMemberMessageRepository,
 		ChatMemberLastEventService $chatMemberLastEventService,
-		MediaService $mediaService
+		MediaService $mediaService,
+		ChatMemberRepository $chatMemberRepository
 	)
 	{
 		$this->transactionBeginner          = $transactionBeginner;
@@ -80,6 +84,7 @@ class ChatMemberMessageService
 		$this->chatMemberMessageRepository  = $chatMemberMessageRepository;
 		$this->chatMemberLastEventService   = $chatMemberLastEventService;
 		$this->mediaService                 = $mediaService;
+		$this->chatMemberRepository         = $chatMemberRepository;
 	}
 
 	/**
@@ -461,5 +466,23 @@ class ChatMemberMessageService
 			'chat_member_id'       => $member_id,
 			'event_chat_member_id' => $chat_id,
 		]));
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function createSystemMessage(CreateChatMemberSystemMessageDto $dto): ChatMemberMessage
+	{
+		$chatMemberMessageDto = new CreateChatMemberMessageDto([
+			'from'       => $this->chatMemberRepository->getSystemChatMember(),
+			'to'         => $dto->to,
+			'replyTo'    => $dto->replyTo,
+			'message'    => $dto->message,
+			'contactIds' => $dto->contactIds,
+			'tagIds'     => $dto->tagIds
+		]);
+
+		return $this->create($chatMemberMessageDto);
 	}
 }
