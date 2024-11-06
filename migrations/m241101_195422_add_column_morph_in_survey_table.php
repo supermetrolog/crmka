@@ -12,7 +12,7 @@ class m241101_195422_add_column_morph_in_survey_table extends Migration
 	 */
 	public function safeUp()
 	{
-		$table = "{{%survey}}";
+		$table = "survey";
 
 		$this->addMorphColumn($table);
 	}
@@ -22,11 +22,11 @@ class m241101_195422_add_column_morph_in_survey_table extends Migration
 	 */
 	public function safeDown()
 	{
-		$table = "{{%survey}}";
+		$table = "survey";
 
 		$this->dropMorphColumn($table);
-
-		return false;
+//
+//		return false;
 	}
 
 	/*
