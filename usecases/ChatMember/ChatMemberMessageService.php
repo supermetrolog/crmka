@@ -152,7 +152,7 @@ class ChatMemberMessageService
 				]));
 			}
 
-			$this->markMessageAsRead($message, $message->from_chat_member_id);
+			$this->markMessageAsRead($message, $message->fromChatMember);
 
 			$this->markChatAsLatestForMember($message->to_chat_member_id, $message->from_chat_member_id);
 
@@ -420,8 +420,11 @@ class ChatMemberMessageService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
+			/** @var ChatMember $fromChatMember */
+			$fromChatMember = ChatMember::find()->byId($from_chat_member_id)->one();
+
 			foreach ($this->chatMemberMessageRepository->findPreviousUnreadByMessage($message, $from_chat_member_id) as $unreadMessage) {
-				$this->markMessageAsRead($unreadMessage, $from_chat_member_id);
+				$this->markMessageAsRead($unreadMessage, $fromChatMember);
 			}
 
 			$this->markChatAsLatestForMember($message->to_chat_member_id, $from_chat_member_id);
@@ -437,11 +440,11 @@ class ChatMemberMessageService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function markMessageAsRead(ChatMemberMessage $message, int $from_chat_member_id): void
+	private function markMessageAsRead(ChatMemberMessage $message, ChatMember $fromChatMember): void
 	{
 		$this->chatMemberMessageViewService->create(new CreateChatMemberMessageViewDto([
-			'message'             => $message,
-			'from_chat_member_id' => $from_chat_member_id,
+			'message'        => $message,
+			'fromChatMember' => $fromChatMember
 		]));
 	}
 
