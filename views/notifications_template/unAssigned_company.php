@@ -1,7 +1,10 @@
-<?
-$company = (object) $model->toArray();
+<?php
+
+use app\models\Company;
+
+/** @var Company $model */
 ?>
 <p>
-    От вас откреплена компания:
-    <a href='/companies/<?= $company->id ?>'><?= $company->full_name ?></a>
+	От вас откреплена компания:
+	<a href='/companies/<?= $model->id ?>'><?= $model->getFullName() ?></a>
 <p>
