@@ -29,6 +29,7 @@ use app\models\Contact;
 use app\models\Notification\UserNotification;
 use app\models\Relation;
 use app\models\Reminder;
+use app\models\Survey;
 use app\models\Task;
 use app\models\User;
 use app\repositories\ChatMemberMessageRepository;
@@ -129,6 +130,15 @@ class ChatMemberMessageService
 				]));
 			}
 
+			foreach ($dto->surveyIds as $surveyId) {
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $message::getMorphClass(),
+					'first_id'    => $message->id,
+					'second_type' => Survey::getMorphClass(),
+					'second_id'   => $surveyId,
+				]));
+			}
+
 			$message->refresh();
 
 			foreach ($mediaDtos as $mediaDto) {
@@ -188,6 +198,13 @@ class ChatMemberMessageService
 
 			$this->relationService->deleteByQuery($query);
 
+			$query = Relation::find()
+			                 ->byFirst($message->id, $message::getMorphClass())
+			                 ->bySecondType(Survey::getMorphClass())
+			                 ->notSecondIds($dto->surveyIds);
+
+			$this->relationService->deleteByQuery($query);
+
 			foreach ($dto->contactIds as $contactId) {
 				$this->relationService->createIfNotExists(new CreateRelationDto([
 					'first_type'  => $message::getMorphClass(),
@@ -203,6 +220,15 @@ class ChatMemberMessageService
 					'first_id'    => $message->id,
 					'second_type' => ChatMemberMessageTag::getMorphClass(),
 					'second_id'   => $tagId,
+				]));
+			}
+
+			foreach ($dto->surveyIds as $surveyId) {
+				$this->relationService->create(new CreateRelationDto([
+					'first_type'  => $message::getMorphClass(),
+					'first_id'    => $message->id,
+					'second_type' => Survey::getMorphClass(),
+					'second_id'   => $surveyId,
 				]));
 			}
 
@@ -480,7 +506,8 @@ class ChatMemberMessageService
 			'replyTo'    => $dto->replyTo,
 			'message'    => $dto->message,
 			'contactIds' => $dto->contactIds,
-			'tagIds'     => $dto->tagIds
+			'tagIds'     => $dto->tagIds,
+			'surveyIds'  => $dto->surveyIds
 		]);
 
 		return $this->create($chatMemberMessageDto);

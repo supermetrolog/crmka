@@ -16,4 +16,5 @@ class CreateChatMemberMessageDto extends BaseObject
 	public ?string            $message;
 	public array              $contactIds;
 	public array              $tagIds;
+	public array              $surveyIds;
 }

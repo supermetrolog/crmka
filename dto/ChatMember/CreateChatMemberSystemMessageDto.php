@@ -11,8 +11,9 @@ use yii\base\BaseObject;
 class CreateChatMemberSystemMessageDto extends BaseObject
 {
 	public ChatMember         $to;
-	public ?ChatMemberMessage $replyTo;
+	public ?ChatMemberMessage $replyTo    = null;
 	public ?string            $message;
 	public array              $contactIds = [];
 	public array              $tagIds     = [];
+	public array              $surveyIds  = [];
 }

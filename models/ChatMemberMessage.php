@@ -11,6 +11,7 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\ReminderQuery;
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\UserNotificationQuery;
 use app\models\Notification\UserNotification;
@@ -195,6 +196,18 @@ class ChatMemberMessage extends AR
 			'chat_member_message_id' => 'id',
 			'chat_member_id'         => 'from_chat_member_id',
 		]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getSurveys(): SurveyQuery
+	{
+		/** @var SurveyQuery $query */
+		$query = $this->morphHasManyVia(Survey::class, 'id', 'second')
+		              ->via('relationFirst');
+
+		return $query;
 	}
 
 	public function getReplyTo(): ChatMemberMessageQuery

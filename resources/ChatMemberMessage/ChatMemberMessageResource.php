@@ -45,6 +45,7 @@ class ChatMemberMessageResource extends JsonResource
 			'tags'                => ChatMemberMessageTagResource::collection($this->resource->tags),
 			'files'               => MediaResource::collection($this->resource->files),
 			'reply_to'            => ChatMemberMessageShortResource::tryMakeArray($this->resource->replyTo),
+			'surveys'             => ChatMemberMessageSurveyResource::collection($this->resource->surveys)
 		];
 	}
 }
