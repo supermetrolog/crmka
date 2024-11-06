@@ -6,9 +6,11 @@ namespace app\helpers;
 
 class StringHelper
 {
-	public const SYMBOL_SPACE = ' ';
-	public const SYMBOL_SLASH = '/';
-	public const SYMBOL_COMMA = ',';
+	public const SYMBOL_SPACE        = ' ';
+	public const SYMBOL_SLASH        = '/';
+	public const SYMBOL_COMMA        = ',';
+	public const SYMBOL_SPACED_COMMA = ', ';
+	public const SYMBOL_EMPTY        = '';
 
 	/**
 	 * Checks if a string is empty.
@@ -142,4 +144,10 @@ class StringHelper
 	{
 		return is_string($mbString);
 	}
+
+	public static function substrCount(string $haystack, string $needle): int
+	{
+		return substr_count($haystack, $needle);
+	}
+
 }

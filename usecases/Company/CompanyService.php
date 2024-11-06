@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace app\usecases\Company;
 
+use app\components\EventManager;
 use app\components\Media\SaveMediaErrorException;
 use app\dto\Company\CompanyDto;
 use app\dto\Company\CompanyMediaDto;
 use app\dto\Company\CompanyMiniModelsDto;
 use app\dto\Company\CreateCompanyFileDto;
 use app\dto\Media\CreateMediaDto;
+use app\events\Company\ChangeConsultantCompanyEvent;
 use app\events\NotificationEvent;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -20,6 +22,7 @@ use app\models\Media;
 use app\models\miniModels\CompanyFile;
 use app\models\Notification;
 use app\models\Productrange;
+use app\models\User;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
 use Throwable;
@@ -33,6 +36,7 @@ class CompanyService
 	private TransactionBeginnerInterface $transactionBeginner;
 
 	private CompanyFileService $companyFileService;
+	private EventManager       $eventManager;
 
 	private CreateMediaService $createMediaService;
 
@@ -42,13 +46,15 @@ class CompanyService
 		TransactionBeginnerInterface $transactionBeginner,
 		CompanyFileService $companyFileService,
 		CreateMediaService $createMediaService,
-		MediaService $mediaService
+		MediaService $mediaService,
+		EventManager $eventManager
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
 		$this->companyFileService  = $companyFileService;
 		$this->createMediaService  = $createMediaService;
 		$this->mediaService        = $mediaService;
+		$this->eventManager        = $eventManager;
 	}
 
 	/**
@@ -113,6 +119,7 @@ class CompanyService
 				$this->saveLogo($model, $mediaDto->logo);
 			}
 
+			// TODO: Переделать на EventManager
 			$model->trigger(
 				Company::COMPANY_CREATED_EVENT,
 				new NotificationEvent([
@@ -207,19 +214,27 @@ class CompanyService
 				$this->saveLogo($model, $mediaDto->logo);
 			}
 
-			$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-				'consultant_id' => $oldConsultantId,
-				'type'          => Notification::TYPE_COMPANY_INFO,
-				'title'         => 'компания',
-				'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_company.php', ['model' => $model])
-			]));
+			// TODO: Переделать на EventManager
+			if ($oldConsultantId !== $model->consultant_id) {
+				$oldConsultant = User::find()->byId($oldConsultantId)->one();
+				$newConsultant = User::find()->byId($model->consultant_id)->one();
 
-			$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-				'consultant_id' => $model->consultant_id,
-				'type'          => Notification::TYPE_COMPANY_INFO,
-				'title'         => 'компания',
-				'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
-			]));
+				$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
+					'consultant_id' => $oldConsultant->id,
+					'type'          => Notification::TYPE_COMPANY_INFO,
+					'title'         => 'компания',
+					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_company.php', ['model' => $model])
+				]));
+
+				$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
+					'consultant_id' => $model->consultant_id,
+					'type'          => Notification::TYPE_COMPANY_INFO,
+					'title'         => 'компания',
+					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
+				]));
+
+				$this->eventManager->trigger(new ChangeConsultantCompanyEvent($model, $oldConsultant, $newConsultant));
+			}
 
 			$tx->commit();
 
