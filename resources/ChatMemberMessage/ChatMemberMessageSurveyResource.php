@@ -6,8 +6,8 @@ namespace app\resources\ChatMemberMessage;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Survey;
+use app\resources\ChatMember\ChatMemberBaseResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
-use app\resources\ChatMember\ChatMemberShortResource;
 use app\resources\Contact\ContactShortResource;
 
 class ChatMemberMessageSurveyResource extends JsonResource
@@ -32,7 +32,7 @@ class ChatMemberMessageSurveyResource extends JsonResource
 
 			'user'        => UserShortResource::make($this->resource->user)->toArray(),
 			'contact'     => ContactShortResource::make($this->resource->contact)->toArray(),
-			'chat_member' => ChatMemberShortResource::make($this->resource->chatMember)->toArray(),
+			'chat_member' => ChatMemberBaseResource::make($this->resource->chatMember)->toArray(),
 		];
 	}
 }

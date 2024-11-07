@@ -113,30 +113,15 @@ class ChatMemberMessageService
 			$message->saveOrThrow();
 
 			foreach ($dto->contactIds as $contactId) {
-				$this->relationService->create(new CreateRelationDto([
-					'first_type'  => $message::getMorphClass(),
-					'first_id'    => $message->id,
-					'second_type' => Contact::getMorphClass(),
-					'second_id'   => $contactId,
-				]));
+				$this->linkRelation($message, Contact::getMorphClass(), $contactId);
 			}
 
 			foreach ($dto->tagIds as $tagId) {
-				$this->relationService->create(new CreateRelationDto([
-					'first_type'  => $message::getMorphClass(),
-					'first_id'    => $message->id,
-					'second_type' => ChatMemberMessageTag::getMorphClass(),
-					'second_id'   => $tagId,
-				]));
+				$this->linkRelation($message, ChatMemberMessageTag::getMorphClass(), $tagId);
 			}
 
 			foreach ($dto->surveyIds as $surveyId) {
-				$this->relationService->create(new CreateRelationDto([
-					'first_type'  => $message::getMorphClass(),
-					'first_id'    => $message->id,
-					'second_type' => Survey::getMorphClass(),
-					'second_id'   => $surveyId,
-				]));
+				$this->linkRelation($message, Survey::getMorphClass(), $surveyId);
 			}
 
 			$message->refresh();
@@ -165,6 +150,66 @@ class ChatMemberMessageService
 		}
 	}
 
+	/**
+	 * @param string|int $relationId
+	 *
+	 * @throws SaveModelException
+	 */
+	private function linkRelation(ChatMemberMessage $message, string $relationType, $relationId): void
+	{
+		$this->relationService->create(new CreateRelationDto([
+			'first_type'  => $message::getMorphClass(),
+			'first_id'    => $message->id,
+			'second_type' => $relationType,
+			'second_id'   => $relationId,
+		]));
+	}
+
+	/**
+	 * @param string|int $relationId
+	 *
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function linkIfNotExistsRelation(ChatMemberMessage $message, string $relationType, $relationId): void
+	{
+		$this->relationService->createIfNotExists(new CreateRelationDto([
+			'first_type'  => $message::getMorphClass(),
+			'first_id'    => $message->id,
+			'second_type' => $relationType,
+			'second_id'   => $relationId
+		]));
+	}
+
+	/**
+	 * @param array<int|string> $relationIds
+	 *
+	 * @throws Throwable
+	 */
+	private function unlinkDeletedRelations(ChatMemberMessage $message, string $relationType, array $relationIds): void
+	{
+		$query = Relation::find()
+		                 ->byFirst($message->id, $message::getMorphClass())
+		                 ->bySecondType($relationType)
+		                 ->notSecondIds($relationIds);
+
+		$this->relationService->deleteByQuery($query);
+	}
+
+	/**
+	 * @param array<string|int> $relationIds
+	 *
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function updateRelations(ChatMemberMessage $message, string $relationType, array $relationIds): void
+	{
+		$this->unlinkDeletedRelations($message, $relationType, $relationIds);
+
+		foreach ($relationIds as $relationId) {
+			$this->linkIfNotExistsRelation($message, $relationType, $relationId);
+		}
+	}
 
 	/**
 	 * @param ChatMemberMessage          $message
@@ -184,53 +229,9 @@ class ChatMemberMessageService
 
 			$message->saveOrThrow();
 
-			$query = Relation::find()
-			                 ->byFirst($message->id, $message::getMorphClass())
-			                 ->bySecondType(Contact::getMorphClass())
-			                 ->notSecondIds($dto->contactIds);
-
-			$this->relationService->deleteByQuery($query);
-
-			$query = Relation::find()
-			                 ->byFirst($message->id, $message::getMorphClass())
-			                 ->bySecondType(ChatMemberMessageTag::getMorphClass())
-			                 ->notSecondIds($dto->tagIds);
-
-			$this->relationService->deleteByQuery($query);
-
-			$query = Relation::find()
-			                 ->byFirst($message->id, $message::getMorphClass())
-			                 ->bySecondType(Survey::getMorphClass())
-			                 ->notSecondIds($dto->surveyIds);
-
-			$this->relationService->deleteByQuery($query);
-
-			foreach ($dto->contactIds as $contactId) {
-				$this->relationService->createIfNotExists(new CreateRelationDto([
-					'first_type'  => $message::getMorphClass(),
-					'first_id'    => $message->id,
-					'second_type' => Contact::getMorphClass(),
-					'second_id'   => $contactId,
-				]));
-			}
-
-			foreach ($dto->tagIds as $tagId) {
-				$this->relationService->createIfNotExists(new CreateRelationDto([
-					'first_type'  => $message::getMorphClass(),
-					'first_id'    => $message->id,
-					'second_type' => ChatMemberMessageTag::getMorphClass(),
-					'second_id'   => $tagId,
-				]));
-			}
-
-			foreach ($dto->surveyIds as $surveyId) {
-				$this->relationService->create(new CreateRelationDto([
-					'first_type'  => $message::getMorphClass(),
-					'first_id'    => $message->id,
-					'second_type' => Survey::getMorphClass(),
-					'second_id'   => $surveyId,
-				]));
-			}
+			$this->updateRelations($message, Contact::getMorphClass(), $dto->contactIds);
+			$this->updateRelations($message, ChatMemberMessageTag::getMorphClass(), $dto->tagIds);
+			$this->updateRelations($message, Survey::getMorphClass(), $dto->surveyIds);
 
 			$deletedMedias = $message->getFiles()->andWhere(['not in', 'id', $dto->currentFiles])->all();
 
@@ -294,12 +295,7 @@ class ChatMemberMessageService
 		try {
 			$task = $this->createTaskService->create($createTaskDto);
 
-			$this->relationService->create(new CreateRelationDto([
-				'first_type'  => $message::getMorphClass(),
-				'first_id'    => $message->id,
-				'second_type' => $task::getMorphClass(),
-				'second_id'   => $task->id,
-			]));
+			$this->linkRelation($message, Task::getMorphClass(), $task->id);
 
 			if ($task->user_id !== $task->created_by_id) {
 				$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $task->user_id);
@@ -356,12 +352,7 @@ class ChatMemberMessageService
 		try {
 			$reminder = $this->createReminderService->create($createReminderDto);
 
-			$this->relationService->create(new CreateRelationDto([
-				'first_type'  => $message::getMorphClass(),
-				'first_id'    => $message->id,
-				'second_type' => $reminder::getMorphClass(),
-				'second_id'   => $reminder->id,
-			]));
+			$this->linkRelation($message, Reminder::getMorphClass(), $reminder->id);
 
 			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $reminder->user_id);
 
@@ -395,12 +386,7 @@ class ChatMemberMessageService
 				->setCreatedById($dto->created_by_id)
 				->send();
 
-			$this->relationService->create(new CreateRelationDto([
-				'first_type'  => $message::getMorphClass(),
-				'first_id'    => $message->id,
-				'second_type' => $userNotification::getMorphClass(),
-				'second_id'   => $userNotification->id,
-			]));
+			$this->linkRelation($message, UserNotification::getMorphClass(), $userNotification->id);
 
 			$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $userNotification->user_id);
 

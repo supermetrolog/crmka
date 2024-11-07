@@ -63,12 +63,7 @@ class ChatMemberMessageSearch extends Form
 		                          ->with([
 			                          'surveys.user.userProfile',
 			                          'surveys.contact.consultant.userProfile',
-			                          'surveys.chatMember.user.userProfile',
-			                          'surveys.chatMember.request.company',
-			                          'surveys.chatMember.objectChatMember.object.company',
-			                          'surveys.chatMember.company.categories',
-			                          'surveys.chatMember.company.companyGroup',
-			                          'surveys.chatMember.company.logo'
+			                          'surveys.chatMember'
 		                          ])
 		                          ->notDeleted()
 		                          ->orderBy([ChatMemberMessage::field('id') => SORT_DESC])

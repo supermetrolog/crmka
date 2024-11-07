@@ -10,8 +10,8 @@ class ChangeConsultantCompanyChatMemberSystemMessage extends AbstractChatMemberS
 {
 	protected string $template = 'Ответственный консультант компании изменен с %s на %s';
 
-	private ?User $oldConsultant;
-	private ?User $consultant;
+	private ?User $oldConsultant = null;
+	private ?User $consultant    = null;
 
 	public function validateOrThrow(): void
 	{

@@ -3,8 +3,6 @@
 use app\components\EventManager;
 use app\components\Media\Media;
 use app\components\PathBuilder\PathBuilderFactory;
-use app\listeners\ChangeConsultantCompanySystemChatMessageListener;
-use app\listeners\CreateSurveySystemChatMessageListener;
 use yii\di\Container;
 use yii\helpers\ArrayHelper;
 
@@ -36,8 +34,6 @@ return ArrayHelper::merge(
 				'showScriptName'      => false,
 				'rules'               => require __DIR__ . "/url_rules.php"
 			],
-			CreateSurveySystemChatMessageListener::class,
-			ChangeConsultantCompanySystemChatMessageListener::class
 		],
 		'container'  => [
 			'singletons' => [
@@ -51,10 +47,7 @@ return ArrayHelper::merge(
 			]
 		],
 		'bootstrap'  => [
-			'eventManager' => [
-				'class'  => EventManager::class,
-				'config' => require __DIR__ . '/../common/events.php'
-			]
+			EventManager::class
 		]
 	]
 );

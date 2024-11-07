@@ -4,9 +4,8 @@ namespace app\events;
 
 use app\models\ChatMember;
 use app\models\Survey;
-use yii\base\Event;
 
-class CreateSurveyEvent extends Event
+class CreateSurveyEvent extends AbstractEvent
 {
 	public Survey $survey;
 
