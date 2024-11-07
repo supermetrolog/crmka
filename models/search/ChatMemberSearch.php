@@ -105,7 +105,7 @@ class ChatMemberSearch extends Form
 			                             'company'
 		                             ])
 		                             ->with(['lastCall.user.userProfile'])
-		                             ->with(['objectChatMember.object.company'])
+		                             ->with(['objectChatMember.object.company', 'objectChatMember.object.offers'])
 		                             ->with([
 			                             'request.company',
 			                             'request.regions',
