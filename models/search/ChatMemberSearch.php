@@ -3,6 +3,7 @@
 namespace app\models\search;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
+use app\helpers\StringHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
@@ -229,13 +230,15 @@ class ChatMemberSearch extends Form
 			$query->leftJoin(['object_company' => Company::tableName()], ['object_company.id' => Objects::xfield('company_id')]);
 			$query->leftJoin(['user_profile' => UserProfile::tableName()], ['user_profile.user_id' => User::xfield('id')]);
 
+			$searchWords = StringHelper::explode(StringHelper::SYMBOL_SPACE, $this->search);
+
 			$query->andFilterWhere([
 				'or',
-				['like', 'request_company.nameEng', $this->search],
-				['like', 'request_company.nameRu', $this->search],
-				['like', 'object_company.nameEng', $this->search],
-				['like', 'object_company.nameRu', $this->search],
-				['like', Objects::field('address'), $this->search],
+				['like', 'request_company.nameEng', $searchWords],
+				['like', 'request_company.nameRu', $searchWords],
+				['like', 'object_company.nameEng', $searchWords],
+				['like', 'object_company.nameRu', $searchWords],
+				['like', Objects::field('address'), $searchWords],
 				[
 					'like',
 					sprintf(
@@ -243,10 +246,10 @@ class ChatMemberSearch extends Form
 						'user_profile.first_name',
 						'user_profile.middle_name',
 						'user_profile.last_name'),
-					$this->search
+					$searchWords
 				],
-				['like', Company::field('nameEng'), $this->search],
-				['like', Company::field('nameRu'), $this->search],
+				['like', Company::field('nameEng'), $searchWords],
+				['like', Company::field('nameRu'), $searchWords],
 			]);
 		}
 
