@@ -21,6 +21,7 @@ class QuestionResource extends JsonResource
 		return [
 			'id'         => $this->resource->id,
 			'text'       => $this->resource->text,
+			'group'      => $this->resource->group,
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'deleted_at' => $this->resource->deleted_at,

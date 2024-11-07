@@ -13,6 +13,7 @@ use app\models\ActiveQuery\QuestionQuery;
  * @property string           $created_at
  * @property string           $updated_at
  * @property string|null      $deleted_at
+ * @property ?string          $group
  *
  * @property QuestionAnswer[] $answers
  */
@@ -31,7 +32,7 @@ class Question extends AR
 	{
 		return [
 			[['text'], 'required'],
-			[['text'], 'string'],
+			[['text', 'group'], 'string'],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 		];
 	}
@@ -41,6 +42,7 @@ class Question extends AR
 		return [
 			'id'         => 'ID',
 			'text'       => 'Text',
+			'group'      => 'Group',
 			'created_at' => 'Created At',
 			'updated_at' => 'Updated At',
 			'deleted_at' => 'Deleted At',

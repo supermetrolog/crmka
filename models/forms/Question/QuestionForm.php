@@ -15,12 +15,14 @@ class QuestionForm extends Form
 	public const SCENARIO_UPDATE = 'scenario_update';
 
 	public $text;
+	public $group;
 
 	public function rules(): array
 	{
 		return [
 			[['text'], 'required'],
 			[['text'], 'string', 'max' => 1024],
+			[['group'], 'string', 'max' => 64]
 		];
 	}
 
@@ -28,6 +30,7 @@ class QuestionForm extends Form
 	{
 		$common = [
 			'text',
+			'group'
 		];
 
 		return [
@@ -45,12 +48,14 @@ class QuestionForm extends Form
 		switch ($this->getScenario()) {
 			case self::SCENARIO_CREATE:
 				return new CreateQuestionDto([
-					'text' => $this->text,
+					'text'  => $this->text,
+					'group' => $this->group
 				]);
 
 			default:
 				return new UpdateQuestionDto([
-					'text' => $this->text,
+					'text'  => $this->text,
+					'group' => $this->group
 				]);
 		}
 	}
