@@ -11,7 +11,6 @@ use app\models\ChatMember;
 use app\models\CommercialOffer;
 use app\models\ObjectChatMember;
 use app\models\Objects;
-use app\models\Request;
 use app\usecases\ChatMember\ChatMemberService;
 use yii\base\ErrorException;
 use yii\base\InvalidConfigException;
@@ -92,7 +91,7 @@ class  SyncObjectChatMemberAction extends Action
 
 		/** @var Objects $object */
 		foreach ($query->each(1000) as $object) {
-			if ($object->rentOrSale) {
+			if ($object->rentOrSale || (!$object->sublease && !$object->responseStorage)) {
 				$this->storeObjectChatMember($object, 'rent_or_sale');
 			}
 			if ($object->sublease) {
@@ -114,7 +113,7 @@ class  SyncObjectChatMemberAction extends Action
 				'object_id'  => $object->id,
 				'type'       => $type,
 				'created_at' => DateTimeHelper::nowf(),
-				'updated_at'  => DateTimeHelper::nowf(),
+				'updated_at' => DateTimeHelper::nowf(),
 			],
 			['updated_at' => DateTimeHelper::nowf()]
 		);
