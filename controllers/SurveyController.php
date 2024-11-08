@@ -2,18 +2,15 @@
 
 namespace app\controllers;
 
-use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
-use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Survey\SurveyForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
-use app\models\Question;
-use app\models\QuestionAnswer;
 use app\models\search\SurveySearch;
 use app\models\Survey;
-use app\models\SurveyQuestionAnswer;
+use app\repositories\QuestionRepository;
 use app\repositories\SurveyRepository;
 use app\resources\SurveyResource;
 use app\resources\SurveyShortResource;
@@ -21,26 +18,27 @@ use app\resources\SurveyWithQuestionsResource;
 use app\usecases\Survey\SurveyService;
 use Throwable;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
-use yii\db\Expression;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
 class SurveyController extends AppController
 {
-	private SurveyService    $service;
-	private SurveyRepository $repository;
+	private SurveyService      $service;
+	private SurveyRepository   $repository;
+	private QuestionRepository $questionRepository;
 
 	public function __construct(
 		$id,
 		$module,
 		SurveyService $service,
 		SurveyRepository $repository,
+		QuestionRepository $questionRepository,
 		array $config = []
 	)
 	{
-		$this->service    = $service;
-		$this->repository = $repository;
+		$this->service            = $service;
+		$this->repository         = $repository;
+		$this->questionRepository = $questionRepository;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -71,12 +69,7 @@ class SurveyController extends AppController
 	{
 		return new SurveyWithQuestionsResource(
 			$this->findModel($id),
-			Question::find()
-			        ->with([
-				        'answers.surveyQuestionAnswer' => function (ActiveQuery $query) use ($id) {
-					        $query->where([SurveyQuestionAnswer::field('survey_id') => $id]);
-				        }
-			        ])->all(),
+			$this->questionRepository->getWithAnswersBySurveyId($id)
 		);
 	}
 
