@@ -31,8 +31,9 @@ class QuestionAnswer extends AR
 	public const CATEGORY_TAB         = 'tab';
 	public const CATEGORY_CHECKBOX    = 'checkbox';
 
-	public const ANSWER_ID_WITH_DISABLE_REQUESTS_EVENT = 40;
-	public const ANSWER_ID_WITH_NEW_RENTERS_EVENT      = 45;
+	public const ANSWER_ID_WITH_DISABLE_REQUESTS_EVENT    = 40;
+	public const ANSWER_ID_WITH_NEW_RENTERS_EVENT         = 45;
+	public const ANSWER_ID_WITH_DEVELOPMENT_COMPANY_EVENT = 3;
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;

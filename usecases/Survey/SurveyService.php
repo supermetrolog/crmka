@@ -9,6 +9,7 @@ use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
 use app\events\Survey\CreateSurveyEvent;
+use app\events\Survey\SurveyCompanyPlannedDevelopEvent;
 use app\events\Survey\SurveyRequestsNoLongerRelevantEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -103,6 +104,15 @@ class SurveyService
 
 			if ($eventShouldBeTriggered) {
 				$event = new SurveyRequestsNoLongerRelevantEvent($answer->survey_id);
+				$this->eventManager->trigger($event);
+			}
+		}
+
+		if ($answer->question_answer_id === QuestionAnswer::ANSWER_ID_WITH_DEVELOPMENT_COMPANY_EVENT) {
+			$eventShouldBeTriggered = json_decode($answer->value);
+
+			if ($eventShouldBeTriggered) {
+				$event = new SurveyCompanyPlannedDevelopEvent($answer->survey_id);
 				$this->eventManager->trigger($event);
 			}
 		}
