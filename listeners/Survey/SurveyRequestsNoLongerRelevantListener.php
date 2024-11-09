@@ -110,7 +110,7 @@ class SurveyRequestsNoLongerRelevantListener implements EventListenerInterface
 			                                   ->add(DateIntervalHelper::days(self::DAYS_FOR_TASK_EXECUTION)),
 			'created_by_type' => $user::getMorphClass(),
 			'created_by_id'   => $user->id,
-			'tagIds'          => [TaskTag::SURVEY_TASk_TAG_ID],
+			'tagIds'          => [TaskTag::SURVEY_TASK_TAG_ID],
 			'observerIds'     => []
 		]);
 
