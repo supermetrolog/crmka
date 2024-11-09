@@ -1,7 +1,8 @@
 <?php
 
-namespace app\events;
+namespace app\events\Survey;
 
+use app\events\AbstractEvent;
 use app\models\ChatMember;
 use app\models\Survey;
 

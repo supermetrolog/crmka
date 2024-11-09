@@ -1,12 +1,13 @@
 <?php
 
-namespace app\listeners;
+namespace app\listeners\Company;
 
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\dto\Notification\CreateNotificationDto;
 use app\events\Company\ChangeConsultantCompanyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\listeners\EventListenerInterface;
 use app\models\Notification\NotificationChannel;
 use app\services\ChatMemberSystemMessage\ChangeConsultantCompanyChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;

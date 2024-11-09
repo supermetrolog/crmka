@@ -22,6 +22,8 @@ use yii\db\ActiveQuery;
  */
 class TaskTag extends AR
 {
+	public const SURVEY_TASk_TAG_ID = 5;
+
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
 

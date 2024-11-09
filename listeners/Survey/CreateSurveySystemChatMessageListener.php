@@ -1,10 +1,11 @@
 <?php
 
-namespace app\listeners;
+namespace app\listeners\Survey;
 
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
-use app\events\CreateSurveyEvent;
+use app\events\Survey\CreateSurveyEvent;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\listeners\EventListenerInterface;
 use app\services\ChatMemberSystemMessage\CreateSurveyChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
