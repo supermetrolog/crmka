@@ -105,7 +105,7 @@ class SurveyRequestsNoLongerRelevantListener implements EventListenerInterface
 			'user'            => $moderator,
 			'message'         => self::TASK_MESSAGE_TEXT,
 			'status'          => Task::STATUS_CREATED,
-			'start'           => DateTimeHelper::nowf(),
+			'start'           => DateTimeHelper::now(),
 			'end'             => DateTimeHelper::now()
 			                                   ->add(DateIntervalHelper::days(self::DAYS_FOR_TASK_EXECUTION)),
 			'created_by_type' => $user::getMorphClass(),

@@ -64,12 +64,12 @@ class SurveyService
 		try {
 			$survey = $this->create($dto);
 
+			$event = new CreateSurveyEvent($survey);
+			$this->eventManager->trigger($event);
+
 			foreach ($answerDtos as $answerDto) {
 				$this->createSurveyQuestionAnswer($survey, $answerDto);
 			}
-
-			$event = new CreateSurveyEvent($survey);
-			$this->eventManager->trigger($event);
 
 			$tx->commit();
 
