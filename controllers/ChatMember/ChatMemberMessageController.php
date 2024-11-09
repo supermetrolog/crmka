@@ -9,7 +9,6 @@ use app\kernel\web\http\responses\SuccessResponse;
 use app\models\ChatMemberMessage;
 use app\models\forms\Alert\AlertForm;
 use app\models\forms\ChatMember\ChatMemberMessageForm;
-use app\models\forms\ChatMember\ChatMemberSystemMessageForm;
 use app\models\forms\ChatMember\ViewChatMemberMessageForm;
 use app\models\forms\Media\MediaForm;
 use app\models\forms\Notification\NotificationForm;
@@ -90,24 +89,6 @@ class ChatMemberMessageController extends AppController
 		$model = $this->service->create($form->getDto(), $mediaForm->getDtos());
 
 		return new ChatMemberMessageResource($model);
-	}
-
-	/**
-	 * @throws ValidateException
-	 * @throws SaveModelException
-	 * @throws Throwable
-	 */
-	public function actionCreateSystem(): ChatMemberMessageResource
-	{
-		$form = new ChatMemberSystemMessageForm();
-
-		$form->load($this->request->post());
-
-		$form->validateOrThrow();
-
-		$message = $this->service->createSystemMessage($form->getDto());
-
-		return new ChatMemberMessageResource($message);
 	}
 
 	/**
