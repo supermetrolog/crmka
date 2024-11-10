@@ -50,7 +50,7 @@ class m241110_134327_create_question_answer_effect_table extends Migration
 	 */
 	public function safeDown()
 	{
-		$tableName = '{{%answer_question_effect}}';
+		$tableName = '{{%question_answer_effect}}';
 
 		$this->foreignKeyDrop($tableName, ['question_answer_id']);
 		$this->foreignKeyDrop($tableName, ['effect_id']);
