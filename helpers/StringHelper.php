@@ -150,4 +150,8 @@ class StringHelper
 		return substr_count($haystack, $needle);
 	}
 
+	public static function explode(string $delimiter, string $string): array
+	{
+		return explode($delimiter, $string);
+	}
 }
