@@ -8,5 +8,6 @@ use yii\base\BaseObject;
 
 class UpdateQuestionDto extends BaseObject
 {
-	public string $text;
+	public string  $text;
+	public ?string $group;
 }
