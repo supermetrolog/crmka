@@ -6,6 +6,7 @@ namespace app\resources\ChatMember\ChatMemberModel;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Objects;
+use app\resources\Offer\ShortMixedOfferInObjectResource;
 
 class ObjectShortResource extends JsonResource
 {
@@ -30,7 +31,7 @@ class ObjectShortResource extends JsonResource
 			'updated_at'   => $this->getUpdatedAt(),
 			'created_at'   => $this->resource->publ_time,
 			'company'      => CompanyShortResource::tryMakeArray($this->resource->company),
-			'offers'       => $this->resource->offers
+			'offers'       => ShortMixedOfferInObjectResource::collection($this->resource->offers)
 		];
 	}
 

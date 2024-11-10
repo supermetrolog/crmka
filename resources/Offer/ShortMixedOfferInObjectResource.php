@@ -19,9 +19,10 @@ class ShortMixedOfferInObjectResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'id'        => $this->resource->id,
-			'deal_type' => $this->resource->deal_type,
-			'status'    => $this->resource->status
+			'id'         => $this->resource->id,
+			'deal_type'  => $this->resource->deal_type,
+			'status'     => $this->resource->status,
+			'is_deleted' => $this->resource->isDeleted()
 		];
 	}
 }
