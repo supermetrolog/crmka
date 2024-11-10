@@ -43,7 +43,7 @@ class QuestionAnswerEffectListener implements EventListenerInterface
 
 		foreach ($questionAnswers as $answer) {
 			if ($answer->hasEffectByKind(EffectKind::REQUESTS_NO_LONGER_RELEVANT)) {
-				$eventShouldBeTriggered = (bool)json_decode($answer->surveyQuestionAnswer->value);
+				$eventShouldBeTriggered = $answer->surveyQuestionAnswer->value;
 
 				if ($eventShouldBeTriggered) {
 					$event = new SurveyRequestsNoLongerRelevantEvent($survey->id);
@@ -52,7 +52,7 @@ class QuestionAnswerEffectListener implements EventListenerInterface
 			}
 
 			if ($answer->hasEffectByKind(EffectKind::COMPANY_PLANNED_DEVELOP)) {
-				$eventShouldBeTriggered = (bool)json_decode($answer->surveyQuestionAnswer->value);
+				$eventShouldBeTriggered = $answer->surveyQuestionAnswer->value;
 
 				if ($eventShouldBeTriggered) {
 					$event = new SurveyCompanyPlannedDevelopEvent($survey->id);
