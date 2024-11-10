@@ -23,7 +23,7 @@ class QuestionAnswerForm extends Form
 	public $field_id;
 	public $category;
 	public $value;
-	public $effect_ids;
+	public $effect_ids = [];
 
 	public function rules(): array
 	{
