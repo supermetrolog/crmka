@@ -91,14 +91,20 @@ class  SyncObjectChatMemberAction extends Action
 
 		/** @var Objects $object */
 		foreach ($query->each(1000) as $object) {
-			if ($object->rentOrSale || (!$object->sublease && !$object->responseStorage)) {
+			if ($object->rentOrSale) {
 				$this->storeObjectChatMember($object, 'rent_or_sale');
 			}
+
 			if ($object->sublease) {
 				$this->storeObjectChatMember($object, 'sublease');
 			}
+
 			if ($object->responseStorage) {
 				$this->storeObjectChatMember($object, 'response_storage');
+			}
+
+			if (!$object->rentOrSale && !$object->sublease && !$object->responseStorage) {
+				$this->storeObjectChatMember($object, 'rent_or_sale');
 			}
 		}
 	}
