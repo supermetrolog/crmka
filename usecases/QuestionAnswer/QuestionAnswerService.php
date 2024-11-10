@@ -6,6 +6,7 @@ namespace app\usecases\QuestionAnswer;
 
 use app\dto\QuestionAnswer\CreateQuestionAnswerDto;
 use app\dto\QuestionAnswer\UpdateQuestionAnswerDto;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\QuestionAnswer;
 use Throwable;
@@ -14,24 +15,40 @@ use yii\db\StaleObjectException;
 
 class QuestionAnswerService
 {
+	private TransactionBeginnerInterface $transactionBeginner;
+
+	public function __construct(TransactionBeginnerInterface $transactionBeginner)
+	{
+		$this->transactionBeginner = $transactionBeginner;
+	}
+
 	/**
 	 * @throws SaveModelException
 	 * @throws Exception
 	 */
 	public function create(CreateQuestionAnswerDto $dto): QuestionAnswer
 	{
-		$model = new QuestionAnswer([
-			'question_id' => $dto->question_id,
-			'field_id'    => $dto->field_id,
-			'category'    => $dto->category,
-			'value'       => $dto->value,
-		]);
+		$tx = $this->transactionBeginner->begin();
 
-		$model->saveOrThrow();
+		try {
+			$model = new QuestionAnswer([
+				'question_id' => $dto->question_id,
+				'field_id'    => $dto->field_id,
+				'category'    => $dto->category,
+				'value'       => $dto->value,
+			]);
 
-		$model->linkManyToManyRelations('effects', $dto->effectIds);
+			$model->saveOrThrow();
 
-		return $model;
+			$model->linkManyToManyRelations('effects', $dto->effectIds);
+
+			$tx->commit();
+
+			return $model;
+		} catch (Throwable $e) {
+			$tx->rollBack();
+			throw $e;
+		}
 	}
 
 	/**
@@ -40,18 +57,27 @@ class QuestionAnswerService
 	 */
 	public function update(QuestionAnswer $model, UpdateQuestionAnswerDto $dto): QuestionAnswer
 	{
-		$model->load([
-			'question_id' => $dto->question_id,
-			'field_id'    => $dto->field_id,
-			'category'    => $dto->category,
-			'value'       => $dto->value,
-		]);
+		$tx = $this->transactionBeginner->begin();
 
-		$model->saveOrThrow();
+		try {
+			$model->load([
+				'question_id' => $dto->question_id,
+				'field_id'    => $dto->field_id,
+				'category'    => $dto->category,
+				'value'       => $dto->value,
+			]);
 
-		$model->updateManyToManyRelations('effects', $dto->effectIds);
+			$model->saveOrThrow();
 
-		return $model;
+			$model->updateManyToManyRelations('effects', $dto->effectIds);
+
+			$tx->commit();
+
+			return $model;
+		} catch (Throwable $e) {
+			$tx->rollBack();
+			throw $e;
+		}
 	}
 
 	/**
