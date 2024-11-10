@@ -10,7 +10,6 @@ use app\events\Survey\SurveyRequestsNoLongerRelevantEvent;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
-use app\models\Survey;
 use Throwable;
 use yii\base\Event;
 
@@ -34,7 +33,6 @@ class QuestionAnswerEffectListener implements EventListenerInterface
 	 */
 	public function handle(Event $event): void
 	{
-		/** @var Survey $survey */
 		$survey = $event->getSurvey();
 
 		$questionAnswers = $survey->getQuestionAnswers()
