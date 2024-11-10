@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use Exception;
+use yii\helpers\ArrayHelper as YiiArrayHelper;
+
 class ArrayHelper
 {
 	public static function walk(array &$array, callable $callback): void
@@ -98,9 +101,23 @@ class ArrayHelper
 	{
 		return count($array);
 	}
-	
+
 	public static function includes(array $array, $needle): bool
 	{
 		return in_array($needle, $array, true);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public static function includesByKey(array $array, $needle, $key): bool
+	{
+		foreach ($array as $item) {
+			if (YiiArrayHelper::getValue($item, $key) === $needle) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

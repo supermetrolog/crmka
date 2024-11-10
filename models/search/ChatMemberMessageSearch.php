@@ -60,6 +60,11 @@ class ChatMemberMessageSearch extends Form
 		                          ->with(['reminders.createdByUser.userProfile'])
 		                          ->with(['contacts', 'tags', 'notifications', 'files'])
 		                          ->with(['replyTo.fromChatMember.user.userProfile'])
+		                          ->with([
+			                          'surveys.user.userProfile',
+			                          'surveys.contact.consultant.userProfile',
+			                          'surveys.chatMember'
+		                          ])
 		                          ->notDeleted()
 		                          ->orderBy([ChatMemberMessage::field('id') => SORT_DESC])
 		                          ->limit(30);

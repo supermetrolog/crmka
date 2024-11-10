@@ -55,6 +55,11 @@ class UserQuery extends AQ
 		return $this;
 	}
 
+	public function system(): self
+	{
+		return $this->byRole(User::ROLE_SYSTEM);
+	}
+
 	public function byUsername(string $username): self
 	{
 		return $this->andWhere(['username' => $username]);

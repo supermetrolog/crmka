@@ -12,4 +12,5 @@ class CreateQuestionAnswerDto extends BaseObject
 	public int     $field_id;
 	public string  $category;
 	public ?string $value;
+	public array   $effectIds;
 }

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace app\usecases\Survey;
 
+use app\components\EventManager;
 use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
+use app\events\Survey\CreateSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Survey;
@@ -18,15 +20,18 @@ use yii\db\StaleObjectException;
 class SurveyService
 {
 	private TransactionBeginnerInterface  $transactionBeginner;
+	private EventManager                  $eventManager;
 	protected SurveyQuestionAnswerService $surveyQuestionAnswerService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
-		SurveyQuestionAnswerService $surveyQuestionAnswerService
+		SurveyQuestionAnswerService $surveyQuestionAnswerService,
+		EventManager $eventManager
 	)
 	{
 		$this->transactionBeginner         = $transactionBeginner;
 		$this->surveyQuestionAnswerService = $surveyQuestionAnswerService;
+		$this->eventManager                = $eventManager;
 	}
 
 	/**
@@ -55,15 +60,18 @@ class SurveyService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$question = $this->create($dto);
+			$survey = $this->create($dto);
+
+			$event = new CreateSurveyEvent($survey);
 
 			foreach ($answerDtos as $answerDto) {
-				$this->createSurveyQuestionAnswer($question, $answerDto);
+				$this->createSurveyQuestionAnswer($survey, $answerDto);
 			}
 
+			$this->eventManager->trigger($event);
 			$tx->commit();
 
-			return $question;
+			return $survey;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;

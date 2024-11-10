@@ -12,4 +12,9 @@ class UserRepository
 	{
 		return (int)User::find()->online()->count();
 	}
+
+	public function getModerator(): ?User
+	{
+		return User::find()->byRole(User::ROLE_MODERATOR)->one();
+	}
 }

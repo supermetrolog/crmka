@@ -63,6 +63,12 @@ class SurveyQuestionAnswer extends AR
 		return $this->hasOne(Survey::className(), ['id' => 'survey_id']);
 	}
 
+	public function getBool(): bool
+	{
+		// TODO: Добавить нормальную обработку c проверкой field и 1/0
+		return $this->value === 'true';
+	}
+
 
 	public static function find(): SurveyQuestionAnswerQuery
 	{

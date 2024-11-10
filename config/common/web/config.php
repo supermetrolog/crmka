@@ -1,5 +1,6 @@
 <?php
 
+use app\components\EventManager;
 use app\components\Media\Media;
 use app\components\PathBuilder\PathBuilderFactory;
 use yii\di\Container;
@@ -32,7 +33,7 @@ return ArrayHelper::merge(
 				'enableStrictParsing' => true,
 				'showScriptName'      => false,
 				'rules'               => require __DIR__ . "/url_rules.php"
-			]
+			],
 		],
 		'container'  => [
 			'singletons' => [
@@ -44,6 +45,9 @@ return ArrayHelper::merge(
 					);
 				}
 			]
+		],
+		'bootstrap'  => [
+			EventManager::class
 		]
 	]
 );

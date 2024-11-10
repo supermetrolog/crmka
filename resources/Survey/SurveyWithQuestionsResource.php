@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace app\resources;
+namespace app\resources\Survey;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Question;
 use app\models\Survey;
 use app\resources\Contact\ContactResource;
+use app\resources\QuestionAnswerResource;
+use app\resources\QuestionResource;
 use app\resources\User\UserResource;
 
 class SurveyWithQuestionsResource extends JsonResource

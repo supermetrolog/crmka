@@ -25,6 +25,7 @@ class ContactShortResource extends JsonResource
 			'first_name'          => $this->resource->first_name,
 			'middle_name'         => $this->resource->middle_name,
 			'last_name'           => $this->resource->last_name,
+			'full_name'           => $this->resource->getFullName(),
 			'type'                => $this->resource->type,
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,

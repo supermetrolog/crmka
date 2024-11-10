@@ -5,6 +5,7 @@ namespace app\models\ActiveQuery;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\SurveyQuestionAnswer;
+use yii\base\ErrorException;
 use yii\db\ActiveRecord;
 
 /**
@@ -14,21 +15,21 @@ use yii\db\ActiveRecord;
  */
 class SurveyQuestionAnswerQuery extends AQ
 {
-    /**
-     * @return SurveyQuestionAnswer[]|ActiveRecord[]
-     */
-    public function all($db = null): array
-    {
-        return parent::all($db);
-    }
+	/**
+	 * @return SurveyQuestionAnswer[]|ActiveRecord[]
+	 */
+	public function all($db = null): array
+	{
+		return parent::all($db);
+	}
 
 	/**
 	 * @return SurveyQuestionAnswer|ActiveRecord|null
 	 */
-    public function one($db = null): ?SurveyQuestionAnswer
-    {
-        return parent::one($db);
-    }
+	public function one($db = null): ?SurveyQuestionAnswer
+	{
+		return parent::one($db);
+	}
 
 	/**
 	 * @return SurveyQuestionAnswer|ActiveRecord
@@ -37,5 +38,13 @@ class SurveyQuestionAnswerQuery extends AQ
 	public function oneOrThrow($db = null): SurveyQuestionAnswer
 	{
 		return parent::oneOrThrow($db);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function bySurveyId(int $surveyId): SurveyQuestionAnswerQuery
+	{
+		return $this->andWhere([SurveyQuestionAnswer::field('survey_id') => $surveyId]);
 	}
 }

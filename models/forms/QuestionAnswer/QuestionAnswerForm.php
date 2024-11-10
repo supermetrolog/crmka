@@ -7,6 +7,7 @@ namespace app\models\forms\QuestionAnswer;
 use app\dto\QuestionAnswer\CreateQuestionAnswerDto;
 use app\dto\QuestionAnswer\UpdateQuestionAnswerDto;
 use app\kernel\common\models\Form\Form;
+use app\models\Effect;
 use app\models\Field;
 use app\models\Question;
 use app\models\QuestionAnswer;
@@ -22,6 +23,7 @@ class QuestionAnswerForm extends Form
 	public $field_id;
 	public $category;
 	public $value;
+	public $effect_ids;
 
 	public function rules(): array
 	{
@@ -33,6 +35,11 @@ class QuestionAnswerForm extends Form
 			[['category', 'value'], 'string', 'max' => 255],
 			[['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],
 			[['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
+			['effect_ids', 'each', 'rule' => [
+				'exist',
+				'targetClass'     => Effect::class,
+				'targetAttribute' => ['effect_ids' => 'id'],
+			]]
 		];
 	}
 
@@ -42,6 +49,7 @@ class QuestionAnswerForm extends Form
 			'field_id',
 			'category',
 			'value',
+			'effect_ids'
 		];
 
 		return [
@@ -64,12 +72,14 @@ class QuestionAnswerForm extends Form
 					'field_id'    => $this->field_id,
 					'category'    => $this->category,
 					'value'       => $this->value,
+					'effectIds'   => $this->effect_ids
 				]);
 			case self::SCENARIO_CREATE_WITH_QUESTION:
 				return new CreateQuestionAnswerDto([
-					'field_id' => $this->field_id,
-					'category' => $this->category,
-					'value'    => $this->value,
+					'field_id'  => $this->field_id,
+					'category'  => $this->category,
+					'value'     => $this->value,
+					'effectIds' => $this->effect_ids
 				]);
 
 			default:
@@ -78,6 +88,7 @@ class QuestionAnswerForm extends Form
 					'field_id'    => $this->field_id,
 					'category'    => $this->category,
 					'value'       => $this->value,
+					'effectIds'   => $this->effect_ids
 				]);
 		}
 	}
