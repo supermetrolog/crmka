@@ -7,6 +7,7 @@ namespace app\models\forms\Effect;
 use app\dto\Effect\CreateEffectDto;
 use app\dto\Effect\UpdateEffectDto;
 use app\kernel\common\models\Form\Form;
+use app\models\Effect;
 
 class EffectForm extends Form
 {
@@ -22,7 +23,7 @@ class EffectForm extends Form
 		return [
 			[['title', 'kind'], 'required'],
 			[['title', 'kind'], 'string', 'max' => 64],
-			[['kind'], 'unique'],
+			[['kind'], 'unique', 'targetClass' => Effect::class],
 			[['description'], 'string', 'max' => 255],
 		];
 	}
