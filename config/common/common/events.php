@@ -7,13 +7,15 @@ use app\events\Survey\SurveyRequestsNoLongerRelevantEvent;
 use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
 use app\listeners\Survey\CreateSurveyUpdateLastCallListener;
+use app\listeners\Survey\QuestionAnswerEffectListener;
 use app\listeners\Survey\SurveyCompanyPlannedDevelopListener;
 use app\listeners\Survey\SurveyRequestsNoLongerRelevantListener;
 
 return [
 	CreateSurveyEvent::class                   => [
 		CreateSurveySystemChatMessageListener::class,
-		CreateSurveyUpdateLastCallListener::class
+		CreateSurveyUpdateLastCallListener::class,
+		QuestionAnswerEffectListener::class
 	],
 	ChangeConsultantCompanyEvent::class        => [
 		ChangeConsultantCompanySystemChatMessageListener::class

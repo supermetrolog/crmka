@@ -9,11 +9,8 @@ use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
 use app\events\Survey\CreateSurveyEvent;
-use app\events\Survey\SurveyCompanyPlannedDevelopEvent;
-use app\events\Survey\SurveyRequestsNoLongerRelevantEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\usecases\SurveyQuestionAnswer\SurveyQuestionAnswerService;
@@ -66,12 +63,12 @@ class SurveyService
 			$survey = $this->create($dto);
 
 			$event = new CreateSurveyEvent($survey);
-			$this->eventManager->trigger($event);
 
 			foreach ($answerDtos as $answerDto) {
 				$this->createSurveyQuestionAnswer($survey, $answerDto);
 			}
 
+			$this->eventManager->trigger($event);
 			$tx->commit();
 
 			return $survey;
@@ -90,32 +87,7 @@ class SurveyService
 	{
 		$dto->survey_id = $survey->id;
 
-		$answer = $this->surveyQuestionAnswerService->create($dto);
-
-		$this->trackEvents($answer);
-
-		return $answer;
-	}
-
-	private function trackEvents(SurveyQuestionAnswer $answer): void
-	{
-		if ($answer->question_answer_id === QuestionAnswer::ANSWER_ID_WITH_DISABLE_REQUESTS_EVENT) {
-			$eventShouldBeTriggered = json_decode($answer->value);
-
-			if ($eventShouldBeTriggered) {
-				$event = new SurveyRequestsNoLongerRelevantEvent($answer->survey_id);
-				$this->eventManager->trigger($event);
-			}
-		}
-
-		if ($answer->question_answer_id === QuestionAnswer::ANSWER_ID_WITH_DEVELOPMENT_COMPANY_EVENT) {
-			$eventShouldBeTriggered = json_decode($answer->value);
-
-			if ($eventShouldBeTriggered) {
-				$event = new SurveyCompanyPlannedDevelopEvent($answer->survey_id);
-				$this->eventManager->trigger($event);
-			}
-		}
+		return $this->surveyQuestionAnswerService->create($dto);
 	}
 
 	/**

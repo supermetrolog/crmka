@@ -9,12 +9,14 @@ use app\dto\QuestionAnswer\UpdateQuestionAnswerDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\QuestionAnswer;
 use Throwable;
+use yii\db\Exception;
 use yii\db\StaleObjectException;
 
 class QuestionAnswerService
 {
 	/**
 	 * @throws SaveModelException
+	 * @throws Exception
 	 */
 	public function create(CreateQuestionAnswerDto $dto): QuestionAnswer
 	{
@@ -27,11 +29,14 @@ class QuestionAnswerService
 
 		$model->saveOrThrow();
 
+		$model->linkManyToManyRelations('effects', $dto->effectIds);
+
 		return $model;
 	}
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Exception
 	 */
 	public function update(QuestionAnswer $model, UpdateQuestionAnswerDto $dto): QuestionAnswer
 	{
@@ -43,6 +48,8 @@ class QuestionAnswerService
 		]);
 
 		$model->saveOrThrow();
+
+		$model->updateManyToManyRelations('effects', $dto->effectIds);
 
 		return $model;
 	}

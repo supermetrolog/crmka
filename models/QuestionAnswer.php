@@ -2,11 +2,15 @@
 
 namespace app\models;
 
+use app\helpers\ArrayHelper;
 use app\kernel\common\models\AR\AR;
+use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
+use app\models\ActiveQuery\EffectQuery;
 use app\models\ActiveQuery\FieldQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\QuestionQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
+use Exception;
 use yii\db\ActiveQuery;
 
 /**
@@ -23,17 +27,16 @@ use yii\db\ActiveQuery;
  *
  * @property Field                $field
  * @property SurveyQuestionAnswer $surveyQuestionAnswer
+ * @property-read Effect[]        $effects
  */
 class QuestionAnswer extends AR
 {
+	use ManyToManyTrait;
+
 	public const CATEGORY_YES_NO      = 'yes-no';
 	public const CATEGORY_TEXT_ANSWER = 'text-answer';
 	public const CATEGORY_TAB         = 'tab';
 	public const CATEGORY_CHECKBOX    = 'checkbox';
-
-	public const ANSWER_ID_WITH_DISABLE_REQUESTS_EVENT    = 40;
-	public const ANSWER_ID_WITH_NEW_RENTERS_EVENT         = 45;
-	public const ANSWER_ID_WITH_DEVELOPMENT_COMPANY_EVENT = 3;
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -103,6 +106,25 @@ class QuestionAnswer extends AR
 	public function getSurveyQuestionAnswer(): SurveyQuestionAnswerQuery
 	{
 		return $this->hasOne(SurveyQuestionAnswer::className(), ['question_answer_id' => 'id']);
+	}
+
+	public function getQuestionAnswerEffects(): ActiveQuery
+	{
+		return $this->hasMany(QuestionAnswerEffect::class, ['question_answer_id' => 'id']);
+	}
+
+	public function getEffects(): EffectQuery
+	{
+		/** @var EffectQuery */
+		return $this->hasMany(Effect::class, ['id' => 'effect_id'])->via('questionAnswerEffects');
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function hasEffectByKind(string $kind): bool
+	{
+		return ArrayHelper::includesByKey($this->effects, $kind, 'kind');
 	}
 
 	public static function find(): QuestionAnswerQuery
