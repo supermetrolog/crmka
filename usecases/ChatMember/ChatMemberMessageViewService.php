@@ -27,6 +27,7 @@ class ChatMemberMessageViewService
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function create(CreateChatMemberMessageViewDto $dto): ChatMemberMessageView
 	{
@@ -34,14 +35,14 @@ class ChatMemberMessageViewService
 
 		try {
 			$model = new ChatMemberMessageView([
-				'chat_member_id'         => $dto->from_chat_member_id,
+				'chat_member_id'         => $dto->fromChatMember->id,
 				'chat_member_message_id' => $dto->message->id,
 			]);
 
 			$model->saveOrThrow();
 
 			foreach ($dto->message->notifications as $notification) {
-				if ($notification->user_id === $dto->from_chat_member_id) {
+				if ($notification->user_id == $dto->fromChatMember->model_id) {
 					$this->notificationService->viewed($notification);
 				}
 			}

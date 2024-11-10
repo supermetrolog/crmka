@@ -196,4 +196,16 @@ class ChatMemberRepository
 		                        ->andWhere(['chat_member_rel.model_type' => $model_types])
 		                        ->notDeleted();
 	}
+
+
+	public function getSystemChatMember(): ?ChatMember
+	{
+		$systemUser = User::find()->system()->one();
+
+		if (!$systemUser) {
+			return null;
+		}
+
+		return ChatMember::find()->byMorph($systemUser->id, User::getMorphClass())->one();
+	}
 }

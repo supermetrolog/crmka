@@ -16,7 +16,7 @@ use app\models\forms\Reminder\ReminderForm;
 use app\models\forms\Task\TaskForm;
 use app\models\search\ChatMemberMessageSearch;
 use app\resources\AlertResource;
-use app\resources\ChatMember\ChatMemberMessageResource;
+use app\resources\ChatMemberMessage\ChatMemberMessageResource;
 use app\resources\ReminderResource;
 use app\resources\Task\TaskResource;
 use app\resources\UserNotificationResource;

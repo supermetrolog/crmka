@@ -685,7 +685,7 @@ class Objects extends AR
 	{
 		/** @var OfferMixQuery $query */
 		$query = $this->hasMany(OfferMix::class, ['object_id' => 'id']);
-		$query->notDeleted()->andWhere([OfferMix::field('type_id') => OfferMixOld::GENERAL_TYPE_ID]);
+		$query->andWhere([OfferMix::field('type_id') => OfferMixOld::GENERAL_TYPE_ID]);
 
 		return $query;
 	}

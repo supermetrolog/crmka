@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\resources\ChatMember;
+namespace app\resources\ChatMemberMessage;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMemberMessageTag;

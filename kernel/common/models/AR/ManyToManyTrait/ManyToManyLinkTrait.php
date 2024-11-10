@@ -48,7 +48,8 @@ trait ManyToManyLinkTrait
 		$transaction = $connection->beginTransaction();
 
 		try {
-			$hasSoftDelete = $viaModel->hasAttribute(self::SOFT_DELETE_ATTRIBUTE);
+			$instance      = new $via->modelClass;
+			$hasSoftDelete = $instance->hasAttribute(self::SOFT_DELETE_ATTRIBUTE);
 
 			$currentRelationsQuery = $viaModel::find()
 			                                  ->from($viaTableName)

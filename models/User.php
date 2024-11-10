@@ -3,11 +3,13 @@
 namespace app\models;
 
 use app\components\Notification\Interfaces\NotifiableInterface;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\UserAccessTokenQuery;
 use app\models\ActiveQuery\UserQuery;
+use Exception;
 use Yii;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -29,6 +31,7 @@ use yii\web\IdentityInterface;
  * @property int                    $updated_at
  * @property int                    $role
  * @property int                    $user_id_old
+ * @property ?string                $last_seen
  *
  * @property UserProfile            $userProfile
  * @property ChatMember             $chatMember
@@ -36,6 +39,8 @@ use yii\web\IdentityInterface;
  */
 class User extends AR implements IdentityInterface, NotifiableInterface
 {
+	public const ACTIVITY_TIMEOUT = 300; // 5 minutes
+
 	const STATUS_DELETED  = 0;
 	const STATUS_INACTIVE = 9;
 	const STATUS_ACTIVE   = 10;
@@ -45,6 +50,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	const ROLE_MODERATOR  = 3;
 	const ROLE_OWNER      = 4;
 	const ROLE_ADMIN      = 5;
+	const ROLE_SYSTEM     = 6;
 
 	protected bool $useUnixSoftUpdate = true;
 	protected bool $useUnixSoftCreate = true;
@@ -56,7 +62,8 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 			self::ROLE_CONSULTANT,
 			self::ROLE_MODERATOR,
 			self::ROLE_OWNER,
-			self::ROLE_ADMIN
+			self::ROLE_ADMIN,
+			self::ROLE_SYSTEM
 		];
 	}
 
@@ -99,6 +106,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 				'string',
 				'max' => 255
 			],
+			[['last_seen'], 'safe'],
 			[['username'], 'unique'],
 			[['email'], 'unique'],
 			[['password_reset_token'], 'unique'],
@@ -120,6 +128,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 			'status'               => 'Status',
 			'created_at'           => 'Created At',
 			'updated_at'           => 'Updated At',
+			'last_seen'            => 'Last Seen',
 		];
 	}
 
@@ -266,5 +275,22 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	public function isOwner(): bool
 	{
 		return $this->role === self::ROLE_OWNER;
+	}
+
+	public function isSystem(): bool
+	{
+		return $this->role === self::ROLE_SYSTEM;
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function isOnline(): bool
+	{
+		if (!$this->last_seen) {
+			return false;
+		}
+
+		return (DateTimeHelper::unix() - DateTimeHelper::makeUnix($this->last_seen)) <= self::ACTIVITY_TIMEOUT;
 	}
 }

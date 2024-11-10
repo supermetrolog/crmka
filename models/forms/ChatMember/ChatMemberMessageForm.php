@@ -14,6 +14,7 @@ use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageTag;
 use app\models\Contact;
 use app\models\Media;
+use app\models\Survey;
 
 class ChatMemberMessageForm extends Form
 {
@@ -27,6 +28,7 @@ class ChatMemberMessageForm extends Form
 	public $tag_ids       = [];
 	public $reply_to_id   = null;
 	public $current_files = [];
+	public $survey_ids    = [];
 
 	public $files = [];
 
@@ -65,6 +67,11 @@ class ChatMemberMessageForm extends Form
 				'exist',
 				'targetClass'     => Media::class,
 				'targetAttribute' => ['current_files' => 'id'],
+			]],
+			['survey_ids', 'each', 'rule' => [
+				'exist',
+				'targetClass'     => Survey::class,
+				'targetAttribute' => ['survey_ids' => 'id'],
 			]]
 		];
 	}
@@ -75,7 +82,8 @@ class ChatMemberMessageForm extends Form
 			'message',
 			'contact_ids',
 			'tag_ids',
-			'files'
+			'files',
+			'survey_ids'
 		];
 
 		return [
@@ -97,6 +105,7 @@ class ChatMemberMessageForm extends Form
 				'contactIds' => $this->contact_ids,
 				'tagIds'     => $this->tag_ids,
 				'replyTo'    => $this->getReplyTo(),
+				'surveyIds'  => $this->survey_ids
 			]);
 		}
 
@@ -104,7 +113,8 @@ class ChatMemberMessageForm extends Form
 			'message'      => $this->message,
 			'contactIds'   => $this->contact_ids,
 			'tagIds'       => $this->tag_ids,
-			'currentFiles' => $this->current_files
+			'currentFiles' => $this->current_files,
+			'surveyIds'    => $this->survey_ids
 		]);
 	}
 

@@ -20,7 +20,7 @@ class UserForm extends Form
 	public string  $email_username;
 	public ?string $email_password = null;
 	public int     $role;
-	public ?string $password;
+	public ?string $password       = null;
 
 	public function rules(): array
 	{
@@ -30,7 +30,9 @@ class UserForm extends Form
 			['password', 'string', 'min' => 4],
 			['username', 'string', 'min' => 4],
 			[['email', 'email_password', 'email_username'], 'string', 'max' => 255],
-			['username', 'validateUsername']
+			['username', 'validateUsername'],
+			['role', 'integer'],
+			['role', 'in', 'range' => User::getRoles()]
 		];
 	}
 

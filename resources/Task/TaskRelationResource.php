@@ -8,8 +8,8 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Task;
-use app\resources\ChatMember\ChatMemberMessageShortResource;
 use app\resources\ChatMember\ChatMemberShortResource;
+use app\resources\ChatMemberMessage\ChatMemberMessageShortResource;
 
 class TaskRelationResource extends JsonResource
 {

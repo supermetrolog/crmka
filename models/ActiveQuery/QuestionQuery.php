@@ -18,20 +18,20 @@ class QuestionQuery extends AQ
 	use SoftDeleteTrait;
 
 	/**
-     * @return Question[]|ActiveRecord[]
-     */
-    public function all($db = null): array
-    {
-        return parent::all($db);
-    }
+	 * @return Question[]|ActiveRecord[]
+	 */
+	public function all($db = null): array
+	{
+		return parent::all($db);
+	}
 
 	/**
 	 * @return Question|ActiveRecord|null
 	 */
-    public function one($db = null): ?Question
-    {
-        return parent::one($db);
-    }
+	public function one($db = null): ?Question
+	{
+		return parent::one($db);
+	}
 
 	/**
 	 * @return Question|ActiveRecord
@@ -40,5 +40,10 @@ class QuestionQuery extends AQ
 	public function oneOrThrow($db = null): Question
 	{
 		return parent::oneOrThrow($db);
+	}
+
+	public function byGroup(string $group): self
+	{
+		return $this->andWhere([$this->field('group') => $group]);
 	}
 }

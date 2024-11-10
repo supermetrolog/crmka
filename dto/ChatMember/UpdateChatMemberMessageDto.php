@@ -12,4 +12,5 @@ class UpdateChatMemberMessageDto extends BaseObject
 	public array  $contactIds;
 	public array  $tagIds;
 	public array  $currentFiles;
+	public array  $surveyIds;
 }

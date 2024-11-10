@@ -18,9 +18,12 @@ use app\models\forms\User\UserProfileForm;
 use app\models\search\UserSearch;
 use app\models\UploadFile;
 use app\models\User;
+use app\models\views\UserOnlineView;
 use app\repositories\UserAccessTokenRepository;
+use app\repositories\UserRepository;
 use app\resources\Auth\AuthLoginResource;
 use app\resources\User\UserAccessTokenResource;
+use app\resources\User\UserOnlineResource;
 use app\resources\User\UserResource;
 use app\resources\User\UserWithContactsResource;
 use app\usecases\Auth\AuthService;
@@ -41,6 +44,7 @@ class UserController extends AppController
 	private AuthService               $authService;
 	private UserService               $userService;
 	private UserAccessTokenRepository $accessTokenRepository;
+	private UserRepository            $userRepository;
 	private UserAccessTokenService    $accessTokenService;
 	protected array                   $exceptAuthActions = ['login'];
 
@@ -51,6 +55,7 @@ class UserController extends AppController
 		AuthService $authService,
 		UserService $userService,
 		UserAccessTokenRepository $accessTokenRepository,
+		UserRepository $userRepository,
 		UserAccessTokenService $accessTokenService,
 		array $config = []
 	)
@@ -58,6 +63,7 @@ class UserController extends AppController
 		$this->authService           = $authService;
 		$this->userService           = $userService;
 		$this->accessTokenRepository = $accessTokenRepository;
+		$this->userRepository        = $userRepository;
 		$this->accessTokenService    = $accessTokenService;
 
 		parent::__construct($id, $module, $config);
@@ -325,6 +331,26 @@ class UserController extends AppController
 		$this->userService->restore($user);
 
 		return new SuccessResponse('Пользователь восстановлен из архива');
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function actionActivity(): SuccessResponse
+	{
+		$identity = $this->user->identity;
+
+		$this->userService->updateActivity($identity);
+
+		return new SuccessResponse();
+	}
+
+	public function actionOnline(): UserOnlineResource
+	{
+		$resource               = new UserOnlineView();
+		$resource->online_count = $this->userRepository->getOnlineCount();
+
+		return new UserOnlineResource($resource);
 	}
 
 	/**

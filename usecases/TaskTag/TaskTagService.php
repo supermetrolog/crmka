@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace app\usecases\TaskTag;
 
 use app\dto\TaskTag\TaskTagDto;
+use app\exceptions\ReservedModelException;
+use app\helpers\ArrayHelper;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\TaskTag;
 use Throwable;
@@ -51,6 +53,10 @@ class TaskTagService
 	 */
 	public function delete(TaskTag $model): void
 	{
+		if (ArrayHelper::includes(TaskTag::RESERVED_TAG_IDS, $model->id)) {
+			throw new ReservedModelException();
+		}
+
 		$model->delete();
 	}
 }
