@@ -69,7 +69,7 @@ class SurveyController extends AppController
 		return new SurveyWithQuestionsResource(
 			$this->findModel($id),
 			Question::find()
-			        ->with([
+			        ->joinWith([
 				        'answers.surveyQuestionAnswer' => function (ActiveQuery $query) use ($id) {
 					        $query->where([SurveyQuestionAnswer::field('survey_id') => $id]);
 				        }
