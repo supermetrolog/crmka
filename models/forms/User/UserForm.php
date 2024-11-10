@@ -20,7 +20,7 @@ class UserForm extends Form
 	public string  $email_username;
 	public ?string $email_password = null;
 	public int     $role;
-	public ?string $password;
+	public ?string $password       = null;
 
 	public function rules(): array
 	{
