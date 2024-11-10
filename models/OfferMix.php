@@ -16,6 +16,8 @@ use yii\helpers\Json;
  */
 class OfferMix extends oldDb\OfferMix implements OfferInterface
 {
+	public const DELETED_TRUE_VALUE      = 1;
+	public const DELETED_FALSE_VALUE     = 0;
 	public const HEATING_CENTRAL_STRING  = 'Центральное';
 	public const HEATING_AUTO_STRING     = 'Автономное';
 	public const OPEX_INCLUDED           = 1;
@@ -479,5 +481,10 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 		              ->from(ChatMember::getTable());
 
 		return $query;
+	}
+
+	public function isDeleted(): bool
+	{
+		return $this->deleted === self::DELETED_TRUE_VALUE;
 	}
 }
