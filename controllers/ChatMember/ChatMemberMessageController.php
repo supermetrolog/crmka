@@ -149,7 +149,7 @@ class ChatMemberMessageController extends AppController
 
 		$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
 
-		$taskForm->load($this->request->post());
+		$taskForm->load($this->request->post('task'));
 
 		$taskForm->created_by_id   = $this->user->id;
 		$taskForm->created_by_type = $this->user->identity::getMorphClass();
