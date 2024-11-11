@@ -12,7 +12,7 @@ class UserProfileForm extends Form
 {
 	public string  $first_name;
 	public string  $middle_name;
-	public ?string $last_name;
+	public ?string $last_name = null;
 	public ?string $caller_id = null;
 	public array   $phones    = [];
 	public array   $emails    = [];
