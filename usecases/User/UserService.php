@@ -175,13 +175,8 @@ class UserService
 		$model->saveOrThrow();
 	}
 
-	/**
-	 * @throws SaveModelException
-	 */
 	public function updateActivity(User $model): void
 	{
-		$model->last_seen = DateTimeHelper::nowf();
-
-		$model->saveOrThrow();
+		$model->updateAttributes(['last_seen' => DateTimeHelper::nowf()]);
 	}
 }
