@@ -19,11 +19,12 @@ class SurveyShortResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'id'         => $this->resource->id,
-			'user_id'    => $this->resource->user_id,
-			'contact_id' => $this->resource->contact_id,
-			'created_at' => $this->resource->created_at,
-			'updated_at' => $this->resource->updated_at,
+			'id'             => $this->resource->id,
+			'user_id'        => $this->resource->user_id,
+			'contact_id'     => $this->resource->contact_id,
+			'created_at'     => $this->resource->created_at,
+			'updated_at'     => $this->resource->updated_at,
+			'chat_member_id' => $this->resource->chat_member_id
 		];
 	}
 }
