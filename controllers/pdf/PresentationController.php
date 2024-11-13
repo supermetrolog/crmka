@@ -6,11 +6,13 @@ use app\behaviors\BaseControllerBehaviors;
 use app\helpers\TranslateHelper;
 use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
+use app\services\pythonpdfcompress\PythonPdfCompress;
 use Dompdf\Options;
 use Exception;
 use Yii;
 use yii\web\Controller;
 use yii\web\RangeNotSatisfiableHttpException;
+use yii\web\Response;
 
 class PresentationController extends Controller
 {
@@ -37,7 +39,7 @@ class PresentationController extends Controller
 	 * @throws RangeNotSatisfiableHttpException
 	 * @throws Exception
 	 */
-	public function actionIndex()
+	public function actionIndex(): Response
 	{
 		$pdfTmpDir = Yii::$app->params['pdf']['tmp_dir'];
 
@@ -46,8 +48,6 @@ class PresentationController extends Controller
 		$options = new Options();
 		$options->set('isRemoteEnabled', true);
 		$options->set('isJavascriptEnabled', true);
-
-		return $this->render('index', ['model' => $model]);
 
 		$pdfManager = new PdfManager($options, $this->translate($model->getPresentationName()), $pdfTmpDir);
 

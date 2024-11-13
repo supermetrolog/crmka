@@ -226,6 +226,7 @@ return
 			'controller'    => ['chat-member-messages' => 'ChatMember/chat-member-message'],
 			'extraPatterns' => [
 				'POST,OPTIONS'                          => 'create',
+				'POST,OPTIONS with-task'                => 'create-with-task',
 				'PUT,OPTIONS <id>'                      => 'update',
 				'DELETE,OPTIONS <id>'                   => 'delete',
 				'POST,OPTIONS create-task/<id>'         => 'create-task',

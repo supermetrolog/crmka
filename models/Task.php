@@ -198,8 +198,33 @@ class Task extends AR
 		return $this->getObservers()->select('user_id')->column();
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function getTargetUserObserver(): ActiveQuery
 	{
-		return $this->hasOne(TaskObserver::class, ['task_id' => 'id'])->andWhere(['user_id' => $this->user_id]);
+		return $this->hasOne(TaskObserver::class, ['user_id' => 'user_id', 'task_id' => 'id']);
+	}
+
+	public function isViewed(): bool
+	{
+		$targetUserObserver = $this->targetUserObserver;
+
+		if ($targetUserObserver === null) {
+			return false;
+		}
+
+		return $targetUserObserver->viewed_at !== null;
+	}
+
+	public function getViewedAt(): ?string
+	{
+		$targetUserObserver = $this->targetUserObserver;
+
+		if ($targetUserObserver === null) {
+			return null;
+		}
+
+		return $targetUserObserver->viewed_at;
 	}
 }

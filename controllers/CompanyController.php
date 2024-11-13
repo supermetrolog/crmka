@@ -32,6 +32,7 @@ use yii\web\UploadedFile;
 
 class CompanyController extends AppController
 {
+	protected array                          $exceptAuthActions = ['index'];
 	private CompanyWithGeneralContactService $companyWithGeneralContactService;
 
 	private ProductRangeRepository $productRangeRepository;

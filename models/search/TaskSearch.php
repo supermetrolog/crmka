@@ -25,6 +25,8 @@ class TaskSearch extends Form
 	public $multiple;
 	public $tag_ids;
 
+	public $current_user_id;
+
 
 	public function rules(): array
 	{
@@ -49,7 +51,7 @@ class TaskSearch extends Form
 	{
 		$query = Task::find()
 		             ->with(['user.userProfile', 'createdByUser.userProfile', 'tags', 'observers.user.userProfile'])
-		             ->joinWith(['tags'])
+		             ->joinWith(['tags', 'targetUserObserver tuo'])
 		             ->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
@@ -57,6 +59,29 @@ class TaskSearch extends Form
 			'pagination' => [
 				'pageSize' => 100
 			],
+			'sort'       => [
+				'enableMultiSort' => true,
+				'defaultOrder'    => [
+					'updated_at' => SORT_DESC,
+				],
+				'attributes'      => [
+					'created_at',
+					'updated_at',
+					'impossible_to',
+					'end',
+					'start',
+					'viewed_at' => [
+						'asc'  => [
+							new Expression('CASE WHEN tuo.user_id = ' . $this->current_user_id . ' AND tuo.viewed_at IS NULL THEN 0 ELSE 1 END ASC'),
+							'updated_at' => SORT_ASC
+						],
+						'desc' => [
+							new Expression('CASE WHEN tuo.user_id = ' . $this->current_user_id . ' AND tuo.viewed_at IS NULL THEN 0 ELSE 1 END ASC'),
+							'updated_at' => SORT_DESC
+						]
+					]
+				]
+			]
 		]);
 
 		$this->load($params);
