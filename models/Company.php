@@ -10,6 +10,7 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
+use app\models\ActiveQuery\RequestQuery;
 use app\models\miniModels\CompanyFile;
 use Yii;
 use yii\base\ErrorException;
@@ -373,13 +374,9 @@ class Company extends AR
 		return $query;
 	}
 
-	/**
-	 * Gets query for [[Contacts]].
-	 *
-	 * @return ActiveQuery
-	 */
-	public function getRequests(): ActiveQuery
+	public function getRequests(): RequestQuery
 	{
+		/** @var RequestQuery */
 		return $this->hasMany(Request::class, ['company_id' => 'id']);
 	}
 
