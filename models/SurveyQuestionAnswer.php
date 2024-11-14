@@ -2,10 +2,13 @@
 
 namespace app\models;
 
+use app\helpers\TypeConverterHelper;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\FieldQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 
 /**
@@ -18,6 +21,7 @@ use yii\db\ActiveQuery;
  *
  * @property QuestionAnswer $questionAnswer
  * @property Survey         $survey
+ * @property-read Field     $field
  */
 class SurveyQuestionAnswer extends AR
 {
@@ -63,10 +67,36 @@ class SurveyQuestionAnswer extends AR
 		return $this->hasOne(Survey::className(), ['id' => 'survey_id']);
 	}
 
+	public function getField(): FieldQuery
+	{
+		/** @var FieldQuery */
+		return $this->hasOne(Field::class, ['id' => 'field_id'])->via('questionAnswer');
+	}
+
+	protected function toBool(): bool
+	{
+		return TypeConverterHelper::toBool($this->value);
+	}
+
+	public function getMaybeBool(bool $fallback = false): bool
+	{
+		if ($this->field->canBeConvertedToBool()) {
+			return $this->toBool();
+		}
+
+		return $fallback;
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public function getBool(): bool
 	{
-		// TODO: Добавить нормальную обработку c проверкой field и 1/0
-		return $this->value === 'true';
+		if ($this->field->canBeConvertedToBool()) {
+			return $this->toBool();
+		}
+
+		throw new Exception('Answer with this field cannot be converted to bool');
 	}
 
 

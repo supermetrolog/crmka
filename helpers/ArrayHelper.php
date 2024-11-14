@@ -120,4 +120,10 @@ class ArrayHelper
 
 		return false;
 	}
+
+	/** @param mixed $needle */
+	public static function keyExists(array $array, $needle): bool
+	{
+		return array_key_exists($needle, $array);
+	}
 }

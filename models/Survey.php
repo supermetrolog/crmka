@@ -24,6 +24,7 @@ use yii\db\ActiveQuery;
  * @property-read SurveyQuestionAnswer[] $surveyQuestionAnswers
  * @property-read QuestionAnswer[]       $questionAnswers
  * @property-read Question[]             $questions
+ * @property-read ChatMember             $chatMember
  */
 class Survey extends AR
 {

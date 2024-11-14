@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\ArrayHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\FieldQuery;
 
@@ -22,10 +23,17 @@ class Field extends AR
 	public const FIELD_TYPE_TAB_CHECKBOX = 'tab-checkbox';
 	public const FIELD_TYPE_INPUT        = 'input';
 	public const FIELD_TYPE_TEXTAREA     = 'textarea';
+	public const FIELD_TYPE_CUSTOM       = 'custom';
 
 	public const TYPE_BOOLEAN = 'boolean';
 	public const TYPE_STRING  = 'string';
 	public const TYPE_INTEGER = 'integer';
+	public const TYPE_JSON    = 'json';
+
+	protected const convertableToBool = [
+		self::TYPE_BOOLEAN,
+		self::TYPE_INTEGER
+	];
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -67,6 +75,7 @@ class Field extends AR
 			self::FIELD_TYPE_TAB_CHECKBOX,
 			self::FIELD_TYPE_INPUT,
 			self::FIELD_TYPE_TEXTAREA,
+			self::FIELD_TYPE_CUSTOM
 		];
 	}
 
@@ -76,7 +85,13 @@ class Field extends AR
 			self::TYPE_BOOLEAN,
 			self::TYPE_STRING,
 			self::TYPE_INTEGER,
+			self::TYPE_JSON
 		];
+	}
+
+	public function canBeConvertedToBool(): bool
+	{
+		return ArrayHelper::includes(self::convertableToBool, $this->type);
 	}
 
 	public static function find(): FieldQuery
