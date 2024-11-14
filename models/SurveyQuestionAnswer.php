@@ -8,8 +8,10 @@ use app\models\ActiveQuery\FieldQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
+use Throwable;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "survey_question_answer".
@@ -78,13 +80,20 @@ class SurveyQuestionAnswer extends AR
 		return TypeConverterHelper::toBool($this->value);
 	}
 
+	/** @return mixed */
+	protected function toJSON()
+	{
+		return Json::decode($this->value);
+	}
+
+
 	public function getMaybeBool(bool $fallback = false): bool
 	{
-		if ($this->field->canBeConvertedToBool()) {
+		try {
 			return $this->toBool();
+		} catch (Throwable $e) {
+			return $fallback;
 		}
-
-		return $fallback;
 	}
 
 	/**
@@ -97,6 +106,31 @@ class SurveyQuestionAnswer extends AR
 		}
 
 		throw new Exception('Answer with this field cannot be converted to bool');
+	}
+
+	/**
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function getJSON()
+	{
+		if ($this->field->canBeConvertedToJSON()) {
+			return $this->toJSON();
+		}
+
+		throw new Exception('Answer with this field cannot be converted to json');
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function getString(): string
+	{
+		if ($this->field->canBeConvertedToString()) {
+			return $this->value;
+		}
+
+		throw new Exception('Answer with this field cannot be converted to string');
 	}
 
 

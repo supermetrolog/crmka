@@ -10,8 +10,8 @@ use app\models\ActiveQuery\FieldQuery;
  * This is the model class for table "field".
  *
  * @property int         $id
- * @property int         $field_type
- * @property int         $type
+ * @property string      $field_type
+ * @property string      $type
  * @property string      $created_at
  * @property string      $updated_at
  * @property string|null $deleted_at
@@ -32,6 +32,11 @@ class Field extends AR
 
 	protected const convertableToBool = [
 		self::TYPE_BOOLEAN,
+		self::TYPE_INTEGER
+	];
+
+	protected const convertableToString = [
+		self::TYPE_STRING,
 		self::TYPE_INTEGER
 	];
 
@@ -92,6 +97,21 @@ class Field extends AR
 	public function canBeConvertedToBool(): bool
 	{
 		return ArrayHelper::includes(self::convertableToBool, $this->type);
+	}
+
+	public function canBeConvertedToJSON(): bool
+	{
+		return $this->type === self::TYPE_JSON;
+	}
+
+	public function canBeConvertedToString(): bool
+	{
+		return ArrayHelper::includes(self::convertableToString, $this->type);
+	}
+
+	public function canBeConvertedToInteger(): bool
+	{
+		return $this->type === self::TYPE_INTEGER;
 	}
 
 	public static function find(): FieldQuery
