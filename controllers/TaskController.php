@@ -75,7 +75,10 @@ class TaskController extends AppController
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
-		$searchModel  = new TaskSearch();
+		$searchModel = new TaskSearch();
+
+		$searchModel->current_user_id = $this->user->id;
+
 		$dataProvider = $searchModel->search($this->request->get());
 
 		return TaskResource::fromDataProvider($dataProvider);
