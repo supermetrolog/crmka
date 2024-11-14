@@ -25,7 +25,7 @@ class TaskSearch extends Form
 	public $multiple;
 	public $tag_ids;
 
-	public $current_user_id;
+	public int $current_user_id;
 
 
 	public function rules(): array
@@ -72,11 +72,17 @@ class TaskSearch extends Form
 					'start',
 					'viewed_at' => [
 						'asc'  => [
-							new Expression('CASE WHEN tuo.user_id = ' . $this->current_user_id . ' AND tuo.viewed_at IS NULL THEN 0 ELSE 1 END ASC'),
+							new Expression(
+								'CASE WHEN tuo.user_id = :current_user_id AND tuo.viewed_at IS NULL THEN 0 ELSE 1 END ASC',
+								[':current_user_id' => $this->current_user_id]
+							),
 							'updated_at' => SORT_ASC
 						],
 						'desc' => [
-							new Expression('CASE WHEN tuo.user_id = ' . $this->current_user_id . ' AND tuo.viewed_at IS NULL THEN 0 ELSE 1 END ASC'),
+							new Expression(
+								'CASE WHEN tuo.user_id = :current_user_id AND tuo.viewed_at IS NULL THEN 0 ELSE 1 END ASC',
+								[':current_user_id' => $this->current_user_id]
+							),
 							'updated_at' => SORT_DESC
 						]
 					]
