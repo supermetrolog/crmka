@@ -28,6 +28,7 @@ class ObjectShortResource extends JsonResource
 			'object_class' => $this->resource->object_class,
 			'test_only'    => $this->resource->test_only,
 			'thumb'        => $this->resource->getThumb(),
+			'photos'       => $this->resource->getPhotos(),
 			'updated_at'   => $this->getUpdatedAt(),
 			'created_at'   => $this->resource->publ_time,
 			'company'      => CompanyShortResource::tryMakeArray($this->resource->company),
