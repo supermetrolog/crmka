@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\exceptions\QuestionAnswerConversionException;
 use app\helpers\TypeConverterHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\FieldQuery;
@@ -105,7 +106,7 @@ class SurveyQuestionAnswer extends AR
 			return $this->toBool();
 		}
 
-		throw new Exception('Answer with this field cannot be converted to bool');
+		throw new QuestionAnswerConversionException('bool');
 	}
 
 	/**
@@ -118,7 +119,7 @@ class SurveyQuestionAnswer extends AR
 			return $this->toJSON();
 		}
 
-		throw new Exception('Answer with this field cannot be converted to json');
+		throw new QuestionAnswerConversionException('json');
 	}
 
 	/**
@@ -130,7 +131,7 @@ class SurveyQuestionAnswer extends AR
 			return $this->value;
 		}
 
-		throw new Exception('Answer with this field cannot be converted to string');
+		throw new QuestionAnswerConversionException('string');
 	}
 
 
