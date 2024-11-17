@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\repositories;
 
 use app\dto\ChatMemberView\StatisticChatMemberViewDto;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\TaskQuery;
@@ -13,6 +14,7 @@ use app\models\ChatMember;
 use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
+use app\models\Company;
 use app\models\Notification\UserNotification;
 use app\models\Objects;
 use app\models\Relation;
@@ -207,5 +209,14 @@ class ChatMemberRepository
 		}
 
 		return ChatMember::find()->byMorph($systemUser->id, User::getMorphClass())->one();
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function getByCompanyId(int $company_id): ChatMember
+	{
+		/** @var ChatMember */
+		return ChatMember::find()->byMorph($company_id, Company::getMorphClass())->oneOrThrow();
 	}
 }

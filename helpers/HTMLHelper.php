@@ -6,8 +6,6 @@ namespace app\helpers;
 
 class HTMLHelper
 {
-	public const ICON_ROCKET = 'fa-solid fa-rocket';
-
 	public static function deleted(string $text): string
 	{
 		return StringHelper::join(StringHelper::SYMBOL_EMPTY, '<del>', $text, '</del>');
@@ -30,5 +28,10 @@ class HTMLHelper
 	public static function icon(string $prefix, string $name): string
 	{
 		return StringHelper::join(StringHelper::SYMBOL_EMPTY, '<i class="fa-', $prefix, ' fa-', $name, '"></i>');
+	}
+
+	public static function squareMeters(string $value): string
+	{
+		return StringHelper::join(StringHelper::SYMBOL_SPACE, $value, 'м<sup>2</sup>');
 	}
 }
