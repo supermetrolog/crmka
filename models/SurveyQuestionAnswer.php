@@ -2,11 +2,17 @@
 
 namespace app\models;
 
+use app\exceptions\QuestionAnswerConversionException;
+use app\helpers\TypeConverterHelper;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\FieldQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
+use Throwable;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "survey_question_answer".
@@ -18,6 +24,7 @@ use yii\db\ActiveQuery;
  *
  * @property QuestionAnswer $questionAnswer
  * @property Survey         $survey
+ * @property-read Field     $field
  */
 class SurveyQuestionAnswer extends AR
 {
@@ -63,10 +70,68 @@ class SurveyQuestionAnswer extends AR
 		return $this->hasOne(Survey::className(), ['id' => 'survey_id']);
 	}
 
+	public function getField(): FieldQuery
+	{
+		/** @var FieldQuery */
+		return $this->hasOne(Field::class, ['id' => 'field_id'])->via('questionAnswer');
+	}
+
+	protected function toBool(): bool
+	{
+		return TypeConverterHelper::toBool($this->value);
+	}
+
+	/** @return mixed */
+	protected function toJSON()
+	{
+		return Json::decode($this->value);
+	}
+
+
+	public function getMaybeBool(bool $fallback = false): bool
+	{
+		try {
+			return $this->toBool();
+		} catch (Throwable $e) {
+			return $fallback;
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public function getBool(): bool
 	{
-		// TODO: Добавить нормальную обработку c проверкой field и 1/0
-		return $this->value === 'true';
+		if ($this->field->canBeConvertedToBool()) {
+			return $this->toBool();
+		}
+
+		throw new QuestionAnswerConversionException('bool');
+	}
+
+	/**
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function getJSON()
+	{
+		if ($this->field->canBeConvertedToJSON()) {
+			return $this->toJSON();
+		}
+
+		throw new QuestionAnswerConversionException('json');
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function getString(): string
+	{
+		if ($this->field->canBeConvertedToString()) {
+			return $this->value;
+		}
+
+		throw new QuestionAnswerConversionException('string');
 	}
 
 

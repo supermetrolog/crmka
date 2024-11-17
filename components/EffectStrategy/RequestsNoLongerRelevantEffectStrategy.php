@@ -1,18 +1,18 @@
 <?php
 
-namespace app\listeners\Survey;
+namespace app\components\EffectStrategy;
 
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\dto\Task\CreateTaskDto;
-use app\events\Survey\SurveyRequestsNoLongerRelevantEvent;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\listeners\EventListenerInterface;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
+use app\models\Company;
+use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\Task;
 use app\models\TaskTag;
@@ -20,12 +20,9 @@ use app\models\User;
 use app\repositories\UserRepository;
 use app\services\ChatMemberSystemMessage\RequestsNoLongerRelevantChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
-use Exception;
 use Throwable;
-use yii\base\Event;
 
-
-class SurveyRequestsNoLongerRelevantListener implements EventListenerInterface
+class RequestsNoLongerRelevantEffectStrategy implements EffectStrategyInterface
 {
 	private const DAYS_FOR_TASK_EXECUTION = 7; // days
 	private const TASK_MESSAGE_TEXT       = 'Запросы компании устарели, необходимо отправить их в пассив.';
@@ -46,22 +43,35 @@ class SurveyRequestsNoLongerRelevantListener implements EventListenerInterface
 	}
 
 	/**
-	 * @param SurveyRequestsNoLongerRelevantEvent $event
-	 *
 	 * @throws Throwable
-	 * @throws SaveModelException
 	 */
-	public function handle(Event $event): void
+	public function handle(Survey $survey, QuestionAnswer $answer): void
 	{
-		$surveyId = $event->getSurveyId();
+		$surveyQuestionAnswer  = $answer->surveyQuestionAnswer;
+		$effectShouldBeProcess = $surveyQuestionAnswer->getMaybeBool();
 
-		$survey = Survey::find()->byId($surveyId)->oneOrThrow();
+		if ($effectShouldBeProcess) {
+			$this->process($survey);
+		}
+	}
 
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function process(Survey $survey): void
+	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$message = $this->sendSystemMessage($survey->chatMember, $survey);
-			$this->createTask($message, $survey->user);
+			$chatMember = $survey->chatMember;
+
+			if ($chatMember->model_type !== Company::getMorphClass()) {
+				$chatMember = $chatMember->model->company->chatMember;
+			}
+
+			$message = $this->sendSystemMessageIntoCompany($chatMember, $survey);
+			$this->createTaskForMessage($message, $survey->user);
 
 			$tx->commit();
 		} catch (Throwable $th) {
@@ -74,7 +84,7 @@ class SurveyRequestsNoLongerRelevantListener implements EventListenerInterface
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function sendSystemMessage(ChatMember $chatMember, Survey $survey): ChatMemberMessage
+	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey): ChatMemberMessage
 	{
 		$message = RequestsNoLongerRelevantChatMemberSystemMessage::create()->toMessage();
 
@@ -91,9 +101,8 @@ class SurveyRequestsNoLongerRelevantListener implements EventListenerInterface
 	/**
 	 * @throws SaveModelException
 	 * @throws Throwable
-	 * @throws Exception
 	 */
-	private function createTask(ChatMemberMessage $message, User $user): void
+	private function createTaskForMessage(ChatMemberMessage $message, User $user): void
 	{
 		$moderator = $this->userRepository->getModerator();
 

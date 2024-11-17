@@ -154,4 +154,9 @@ class StringHelper
 	{
 		return explode($delimiter, $string);
 	}
+
+	public static function toLower(string $string): string
+	{
+		return strtolower($string);
+	}
 }
