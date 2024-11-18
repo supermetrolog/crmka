@@ -6,9 +6,9 @@ use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\events\NotificationEvent;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\StringHelper;
-use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\RequestQuery;
 use app\models\miniModels\RequestDirection;
 use app\models\miniModels\RequestDistrict;
 use app\models\miniModels\RequestGateType;
@@ -485,8 +485,8 @@ class Request extends AR
 		return $this->morphHasOne(ChatMember::class);
 	}
 
-	public static function find(): AQ
+	public static function find(): RequestQuery
 	{
-		return new AQ(get_called_class());
+		return new RequestQuery(get_called_class());
 	}
 }

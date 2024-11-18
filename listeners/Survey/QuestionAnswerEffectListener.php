@@ -2,34 +2,29 @@
 
 namespace app\listeners\Survey;
 
-use app\components\EventManager;
-use app\enum\EffectKind;
+use app\components\EffectStrategy\Factory\EffectStrategyFactory;
 use app\events\Survey\CreateSurveyEvent;
-use app\events\Survey\SurveyCompanyPlannedDevelopEvent;
-use app\events\Survey\SurveyRequestsNoLongerRelevantEvent;
-use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
-use Throwable;
 use yii\base\Event;
+use yii\base\InvalidConfigException;
+use yii\di\NotInstantiableException;
 
 
 class QuestionAnswerEffectListener implements EventListenerInterface
 {
-	private EventManager $eventManager;
+	private EffectStrategyFactory $effectStrategyFactory;
 
-	public function __construct(
-		EventManager $eventManager
-	)
+	public function __construct(EffectStrategyFactory $effectStrategyFactory)
 	{
-		$this->eventManager = $eventManager;
+		$this->effectStrategyFactory = $effectStrategyFactory;
 	}
 
 	/**
 	 * @param CreateSurveyEvent $event
 	 *
-	 * @throws Throwable
-	 * @throws SaveModelException
+	 * @throws InvalidConfigException
+	 * @throws NotInstantiableException
 	 */
 	public function handle(Event $event): void
 	{
@@ -42,21 +37,10 @@ class QuestionAnswerEffectListener implements EventListenerInterface
 		                          ->all();
 
 		foreach ($questionAnswers as $answer) {
-			if ($answer->hasEffectByKind(EffectKind::REQUESTS_NO_LONGER_RELEVANT)) {
-				$eventShouldBeTriggered = $answer->surveyQuestionAnswer->getBool();
-
-				if ($eventShouldBeTriggered) {
-					$event = new SurveyRequestsNoLongerRelevantEvent($survey->id);
-					$this->eventManager->trigger($event);
-				}
-			}
-
-			if ($answer->hasEffectByKind(EffectKind::COMPANY_PLANNED_DEVELOP)) {
-				$eventShouldBeTriggered = $answer->surveyQuestionAnswer->getBool();
-
-				if ($eventShouldBeTriggered) {
-					$event = new SurveyCompanyPlannedDevelopEvent($survey->id);
-					$this->eventManager->trigger($event);
+			foreach ($answer->effects as $effect) {
+				if ($this->effectStrategyFactory->hasStrategy($effect->kind)) {
+					$this->effectStrategyFactory->createStrategy($effect->kind)
+					                            ->handle($survey, $answer);
 				}
 			}
 		}

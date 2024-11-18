@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\ArrayHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\FieldQuery;
 
@@ -9,8 +10,8 @@ use app\models\ActiveQuery\FieldQuery;
  * This is the model class for table "field".
  *
  * @property int         $id
- * @property int         $field_type
- * @property int         $type
+ * @property string      $field_type
+ * @property string      $type
  * @property string      $created_at
  * @property string      $updated_at
  * @property string|null $deleted_at
@@ -22,10 +23,22 @@ class Field extends AR
 	public const FIELD_TYPE_TAB_CHECKBOX = 'tab-checkbox';
 	public const FIELD_TYPE_INPUT        = 'input';
 	public const FIELD_TYPE_TEXTAREA     = 'textarea';
+	public const FIELD_TYPE_CUSTOM       = 'custom';
 
 	public const TYPE_BOOLEAN = 'boolean';
 	public const TYPE_STRING  = 'string';
 	public const TYPE_INTEGER = 'integer';
+	public const TYPE_JSON    = 'json';
+
+	protected const convertableToBool = [
+		self::TYPE_BOOLEAN,
+		self::TYPE_INTEGER
+	];
+
+	protected const convertableToString = [
+		self::TYPE_STRING,
+		self::TYPE_INTEGER
+	];
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -67,6 +80,7 @@ class Field extends AR
 			self::FIELD_TYPE_TAB_CHECKBOX,
 			self::FIELD_TYPE_INPUT,
 			self::FIELD_TYPE_TEXTAREA,
+			self::FIELD_TYPE_CUSTOM
 		];
 	}
 
@@ -76,7 +90,28 @@ class Field extends AR
 			self::TYPE_BOOLEAN,
 			self::TYPE_STRING,
 			self::TYPE_INTEGER,
+			self::TYPE_JSON
 		];
+	}
+
+	public function canBeConvertedToBool(): bool
+	{
+		return ArrayHelper::includes(self::convertableToBool, $this->type);
+	}
+
+	public function canBeConvertedToJSON(): bool
+	{
+		return $this->type === self::TYPE_JSON;
+	}
+
+	public function canBeConvertedToString(): bool
+	{
+		return ArrayHelper::includes(self::convertableToString, $this->type);
+	}
+
+	public function canBeConvertedToInteger(): bool
+	{
+		return $this->type === self::TYPE_INTEGER;
 	}
 
 	public static function find(): FieldQuery

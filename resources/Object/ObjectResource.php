@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace app\resources\Object;
 
+use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Objects;
-use app\models\Request;
 
 class ObjectResource extends JsonResource
 {
@@ -19,6 +19,11 @@ class ObjectResource extends JsonResource
 
 	public function toArray(): array
 	{
-		return $this->resource->toArray();
+		return ArrayHelper::merge(
+			$this->resource->toArray(),
+			[
+				'location' => $this->resource->location
+			]
+		);
 	}
 }

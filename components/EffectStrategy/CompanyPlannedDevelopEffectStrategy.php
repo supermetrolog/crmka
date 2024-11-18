@@ -1,21 +1,18 @@
 <?php
 
-namespace app\listeners\Survey;
+namespace app\components\EffectStrategy;
 
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
-use app\events\Survey\SurveyCompanyPlannedDevelopEvent;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\listeners\EventListenerInterface;
 use app\models\ChatMember;
 use app\models\ObjectChatMember;
+use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\services\ChatMemberSystemMessage\CompanyPlannedDevelopChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
-use yii\base\Event;
 
-
-class SurveyCompanyPlannedDevelopListener implements EventListenerInterface
+class CompanyPlannedDevelopEffectStrategy implements EffectStrategyInterface
 {
 	private ChatMemberMessageService $chatMemberMessageService;
 
@@ -27,21 +24,28 @@ class SurveyCompanyPlannedDevelopListener implements EventListenerInterface
 	}
 
 	/**
-	 * @param SurveyCompanyPlannedDevelopEvent $event
-	 *
 	 * @throws Throwable
-	 * @throws SaveModelException
 	 */
-	public function handle(Event $event): void
+	public function handle(Survey $survey, QuestionAnswer $answer): void
 	{
-		$surveyId = $event->getSurveyId();
-		$survey   = Survey::find()->byId($surveyId)->oneOrThrow();
+		$surveyQuestionAnswer  = $answer->surveyQuestionAnswer;
+		$effectShouldBeProcess = $surveyQuestionAnswer->getMaybeBool();
 
-		/** @var ChatMember $chatMember */
+		if ($effectShouldBeProcess) {
+			$this->process($survey);
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function process(Survey $survey): void
+	{
 		$chatMember = $survey->chatMember;
 
 		if ($chatMember->model_type === ObjectChatMember::getMorphClass()) {
-			$companyChatMember = $chatMember->model->object->company->chatMember;
+			$companyChatMember = $chatMember->model->company->chatMember;
 
 			$this->sendSystemMessage($companyChatMember, $survey);
 		}
