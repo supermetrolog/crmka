@@ -8,6 +8,7 @@ use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Request;
 use app\resources\ChatMember\ChatMemberModel\CompanyShortResource;
+use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 
 class RequestInChatMemberResource extends JsonResource
 {
@@ -23,7 +24,8 @@ class RequestInChatMemberResource extends JsonResource
 		return ArrayHelper::merge(
 			RequestFullResource::make($this->resource)->toArray(),
 			[
-				'company' => CompanyShortResource::tryMakeArray($this->resource->company),
+				'company'    => CompanyShortResource::tryMakeArray($this->resource->company),
+				'consultant' => UserShortResource::tryMakeArray($this->resource->consultant)
 			]
 		);
 	}
