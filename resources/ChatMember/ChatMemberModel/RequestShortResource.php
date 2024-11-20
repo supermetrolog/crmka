@@ -32,6 +32,8 @@ class RequestShortResource extends JsonResource
 			'districts'        => $this->resource->districts,
 			'objectTypes'      => $this->resource->objectTypes,
 			'objectClasses'    => $this->resource->objectClasses,
+			'consultant_id'    => $this->resource->consultant_id,
+			'consultant'       => UserShortResource::tryMakeArray($this->resource->consultant),
 			'created_at'       => $this->resource->created_at,
 			'updated_at'       => $this->resource->updated_at,
 			'company'          => CompanyShortResource::tryMakeArray($this->resource->company),

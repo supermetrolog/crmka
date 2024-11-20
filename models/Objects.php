@@ -5,6 +5,7 @@ namespace app\models;
 use app\helpers\DateTimeHelper;
 use app\helpers\JsonFieldNormalizer;
 use app\kernel\common\models\AQ\AQ;
+use app\models\ActiveQuery\UserQuery;
 use app\models\crane\Crane;
 use app\models\location\Location;
 use Yii;
@@ -14,6 +15,7 @@ use yii\helpers\Json;
 /**
  * @property ObjectClass $objectClassRecord
  * @property Company     $company
+ * @property-read User   $consultant
  */
 class Objects extends oldDb\Objects
 {
@@ -291,6 +293,12 @@ class Objects extends oldDb\Objects
 	public function getElevatorsRecords(): ActiveQuery
 	{
 		return $this->hasMany(Elevator::class, ['object_id' => 'id']);
+	}
+
+	public function getConsultant(): UserQuery
+	{
+		/** @var UserQuery */
+		return $this->hasOne(User::class, ['user_id_old' => 'agent_id']);
 	}
 
 	public static function find(): AQ
