@@ -151,10 +151,10 @@ class TaskSearch extends Form
 			]);
 		} else {
 			$query->andFilterWhere([
-				'id'            => $this->id,
-				'user_id'       => $this->user_id,
-				'status'        => $this->status,
-				'created_by_id' => $this->created_by_id,
+				Task::field('id')            => $this->id,
+				Task::field('user_id')       => $this->user_id,
+				Task::field('status')        => $this->status,
+				Task::field('created_by_id') => $this->created_by_id,
 			]);
 		}
 

@@ -22,11 +22,12 @@ class CompanyShortResource extends JsonResource
 			'id'                   => $this->resource->id,
 			'nameEng'              => $this->resource->nameEng,
 			'nameRu'               => $this->resource->nameRu,
+			'full_name'            => $this->resource->getFullName(),
 			'noName'               => $this->resource->noName,
-			'is_individual'        => $this->resource->is_individual,
-			'individual_full_name' => $this->resource->individual_full_name,
 			'activityGroup'        => $this->resource->activityGroup,
 			'activityProfile'      => $this->resource->activityProfile,
+			'is_individual'        => $this->resource->is_individual,
+			'individual_full_name' => $this->resource->individual_full_name,
 		];
 	}
 }

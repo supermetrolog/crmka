@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\QuestionQuery;
 
 /**
@@ -49,14 +50,12 @@ class Question extends AR
 		];
 	}
 
-	/**
-	 * Gets query for [[QuestionAnswers]].
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getAnswers()
+	public function getAnswers(): QuestionAnswerQuery
 	{
-		return $this->hasMany(QuestionAnswer::className(), ['question_id' => 'id']);
+		/** @var QuestionAnswerQuery $query */
+		$query = $this->hasMany(QuestionAnswer::class, ['question_id' => 'id']);
+
+		return $query->notDeleted();
 	}
 
 	public static function find(): QuestionQuery
