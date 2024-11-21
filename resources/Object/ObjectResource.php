@@ -7,6 +7,7 @@ namespace app\resources\Object;
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Objects;
+use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 
 class ObjectResource extends JsonResource
 {
@@ -22,7 +23,8 @@ class ObjectResource extends JsonResource
 		return ArrayHelper::merge(
 			$this->resource->toArray(),
 			[
-				'location' => $this->resource->location
+				'location'   => $this->resource->location,
+				'consultant' => UserShortResource::tryMakeArray($this->resource->consultant)
 			]
 		);
 	}

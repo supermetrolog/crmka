@@ -24,6 +24,8 @@ class ObjectShortResource extends JsonResource
 			'address'      => $this->resource->address,
 			'complex_id'   => $this->resource->complex_id,
 			'contact_id'   => $this->resource->contact_id,
+			'agent_id'     => $this->resource->agent_id,
+			'consultant'   => UserShortResource::tryMakeArray($this->resource->consultant),
 			'is_land'      => $this->resource->is_land,
 			'object_class' => $this->resource->object_class,
 			'test_only'    => $this->resource->test_only,

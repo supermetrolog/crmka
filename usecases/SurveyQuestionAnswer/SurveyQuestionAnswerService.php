@@ -10,6 +10,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\SurveyQuestionAnswer;
 use Throwable;
 use yii\db\StaleObjectException;
+use yii\helpers\Json;
 
 class SurveyQuestionAnswerService
 {
@@ -21,7 +22,7 @@ class SurveyQuestionAnswerService
 		$model = new SurveyQuestionAnswer([
 			'question_answer_id' => $dto->question_answer_id,
 			'survey_id'          => $dto->survey_id,
-			'value'              => json_encode($dto->value),
+			'value'              => Json::encode($dto->value),
 		]);
 
 		$model->saveOrThrow();
@@ -37,7 +38,7 @@ class SurveyQuestionAnswerService
 		$model->load([
 			'question_answer_id' => $dto->question_answer_id,
 			'survey_id'          => $dto->survey_id,
-			'value'              => json_encode($dto->value),
+			'value'              => Json::encode($dto->value),
 		]);
 
 		$model->saveOrThrow();
