@@ -103,7 +103,9 @@ class CompanyService
 				'passive_why'          => $dto->passive_why,
 				'passive_why_comment'  => $dto->passive_why_comment,
 				'rating'               => $dto->rating,
-				'processed'            => $dto->processed
+				'processed'            => $dto->processed,
+				'is_individual'        => $dto->is_individual,
+				'individual_full_name' => $dto->individual_full_name
 			]);
 
 			$model->saveOrThrow();
@@ -191,7 +193,9 @@ class CompanyService
 				'passive_why'          => $dto->passive_why,
 				'passive_why_comment'  => $dto->passive_why_comment,
 				'rating'               => $dto->rating,
-				'processed'            => $dto->processed
+				'processed'            => $dto->processed,
+				'is_individual'        => $dto->is_individual,
+				'individual_full_name' => $dto->individual_full_name
 			]);
 
 			$model->saveOrThrow();

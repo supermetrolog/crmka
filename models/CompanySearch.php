@@ -36,6 +36,7 @@ class CompanySearch extends Form
 	public $broker_id;
 	public $active;
 	public $passive_why;
+	public $is_individual;
 
 	public $all;
 	public $processed;
@@ -176,7 +177,8 @@ class CompanySearch extends Form
 		      ->orFilterWhere(['like', Contact::field('first_name'), $this->all])
 		      ->orFilterWhere(['like', Contact::field('middle_name'), $this->all])
 		      ->orFilterWhere(['like', Contact::field('last_name'), $this->all])
-		      ->orFilterWhere(['like', Phone::field('phone'), $this->all]);
+		      ->orFilterWhere(['like', Phone::field('phone'), $this->all])
+		      ->orFilterWhere(['like', Company::field('individual_full_name'), $this->all]);
 
 
 		if ($this->all) {
@@ -206,7 +208,8 @@ class CompanySearch extends Form
 			Company::field('broker_id')       => $this->broker_id,
 			Company::field('activityGroup')   => $this->activityGroup,
 			Company::field('activityProfile') => $this->activityProfile,
-			Category::field('category')       => $this->categories
+			Category::field('category')       => $this->categories,
+			Company::field('is_individual')   => $this->is_individual
 		]);
 
 		$query->andFilterWhere(['like', Company::field('nameEng'), $this->nameEng])

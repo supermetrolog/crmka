@@ -45,8 +45,10 @@ class CompanyForm extends Form
 	public $processed;
 	public $broker_id;
 
-	public $files = [];
+	public $files                = [];
 	public $logo_id;
+	public $is_individual        = false;
+	public $individual_full_name = null;
 
 	public function rules(): array
 	{
@@ -55,7 +57,8 @@ class CompanyForm extends Form
 			[['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
 			[['nameRu', 'nameEng', 'noName'], 'validateCompanyName'],
 			[['description'], 'string'],
-			[['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment'], 'string', 'max' => 255],
+			[['is_individual'], 'boolean'],
+			[['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'individual_full_name'], 'string', 'max' => 255],
 			[['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['broker_id' => 'id']],
 			[['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::class, 'targetAttribute' => ['companyGroup_id' => 'id']],
 			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
@@ -112,6 +115,8 @@ class CompanyForm extends Form
 			'passive_why_comment'  => $this->passive_why_comment,
 			'rating'               => $this->rating,
 			'processed'            => $this->processed,
+			'is_individual'        => $this->is_individual,
+			'individual_full_name' => $this->individual_full_name,
 
 			'files'   => $this->files,
 			'logo_id' => $this->logo_id
