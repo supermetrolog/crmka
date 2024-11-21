@@ -59,6 +59,8 @@ use yii\db\Expression;
  * @property string|null                $latitude
  * @property string|null                $longitude
  * @property ?int                       $media_id
+ * @property bool                       $is_individual
+ * @property ?string                    $individual_full_name
  *
  * @property-read ?User                 $broker
  * @property-read ?Companygroup         $companyGroup
@@ -126,8 +128,9 @@ class Company extends AR
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
 			[['description'], 'string'],
+			[['is_individual'], 'boolean'],
 			[['created_at', 'updated_at'], 'safe'],
-			[['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'latitude', 'longitude'], 'string', 'max' => 255],
+			[['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'latitude', 'longitude', 'individual_full_name'], 'string', 'max' => 255],
 			[['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['broker_id' => 'id']],
 			[['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::class, 'targetAttribute' => ['companyGroup_id' => 'id']],
 			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
@@ -176,7 +179,9 @@ class Company extends AR
 			'passive_why'          => 'PassiveWhy',
 			'passive_why_comment'  => 'PassiveWhyComment',
 			'latitude'             => 'Latitude',
-			'longitude'            => 'Longitude'
+			'longitude'            => 'Longitude',
+			'is_individual'        => 'Individual Person',
+			'individual_full_name' => 'Individual Full Name',
 		];
 	}
 
