@@ -54,6 +54,8 @@ class CompanyBaseResource extends JsonResource
 			'passive_why'          => $this->resource->passive_why,
 			'passive_why_comment'  => $this->resource->passive_why_comment,
 			'consultant_id'        => $this->resource->consultant_id,
+			'is_individual'        => $this->resource->is_individual,
+			'individual_full_name' => $this->resource->individual_full_name,
 			'created_at'           => $this->resource->created_at,
 			'updated_at'           => $this->resource->updated_at
 		];

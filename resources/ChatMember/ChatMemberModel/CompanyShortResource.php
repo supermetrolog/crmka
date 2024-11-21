@@ -19,13 +19,15 @@ class CompanyShortResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'id'              => $this->resource->id,
-			'nameEng'         => $this->resource->nameEng,
-			'nameRu'          => $this->resource->nameRu,
-			'full_name'       => $this->resource->getFullName(),
-			'noName'          => $this->resource->noName,
-			'activityGroup'   => $this->resource->activityGroup,
-			'activityProfile' => $this->resource->activityProfile,
+			'id'                   => $this->resource->id,
+			'nameEng'              => $this->resource->nameEng,
+			'nameRu'               => $this->resource->nameRu,
+			'full_name'            => $this->resource->getFullName(),
+			'noName'               => $this->resource->noName,
+			'activityGroup'        => $this->resource->activityGroup,
+			'activityProfile'      => $this->resource->activityProfile,
+			'is_individual'        => $this->resource->is_individual,
+			'individual_full_name' => $this->resource->individual_full_name,
 		];
 	}
 }

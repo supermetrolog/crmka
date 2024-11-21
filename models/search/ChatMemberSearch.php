@@ -39,6 +39,7 @@ class ChatMemberSearch extends Form
 	public $object_id;
 	public $search;
 	public $status;
+	public $consultant_ids;
 
 	public $current_chat_member_id;
 	public $current_user_id;
@@ -48,6 +49,7 @@ class ChatMemberSearch extends Form
 		return [
 			[['id', 'model_id', 'company_id', 'object_id', 'status'], 'integer'],
 			[['model_type', 'created_at', 'updated_at', 'search'], 'safe'],
+			['consultant_ids', 'each', 'rule' => ['integer']],
 		];
 	}
 
@@ -100,7 +102,7 @@ class ChatMemberSearch extends Form
 		                             ->leftJoin(['cmm' => $messageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
 		                             ->leftJoin(['cmle' => $eventQuery], ChatMember::getColumn('id') . '=' . 'cmle.event_chat_member_id')
 		                             ->joinWith([
-			                             'objectChatMember.object',
+			                             'objectChatMember.object.consultant chm',
 			                             'request',
 			                             'user',
 			                             'company'
@@ -269,6 +271,12 @@ class ChatMemberSearch extends Form
 			ChatMember::field('updated_at')      => $this->updated_at,
 			ObjectChatMember::field('object_id') => $this->object_id,
 			User::field('status')                => $this->status
+		]);
+
+		$query->andFilterWhere([
+			'or',
+			[Company::field('consultant_id') => $this->consultant_ids],
+			['chm.id' => $this->consultant_ids]
 		]);
 
 		return $dataProvider;
