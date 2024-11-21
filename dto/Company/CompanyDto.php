@@ -38,6 +38,8 @@ class CompanyDto extends BaseObject
 	public ?int    $rating;
 	public ?int    $processed;
 
-	public array $files = [];
-	public ?int  $logo_id;
+	public array   $files = [];
+	public ?int    $logo_id;
+	public bool    $is_individual;
+	public ?string $individual_full_name;
 }
