@@ -10,7 +10,7 @@ class CompanyOnObjectChatMemberSystemMessage extends AbstractChatMemberSystemMes
 	private ?int     $surveyId = null;
 	private ?int     $objectId = null;
 	private ?int     $area     = null;
-	protected string $template = '%s  Компания сидит на объекте #%s. Занимает площадь: %s. Подробнее в прикрепленном опросе #%s.';
+	protected string $template = '%s  Компания сидит на объекте %s. Занимает площадь: %s. Подробнее в прикрепленном опросе %s.';
 
 	public function validateOrThrow(): void
 	{
@@ -56,9 +56,9 @@ class CompanyOnObjectChatMemberSystemMessage extends AbstractChatMemberSystemMes
 
 		return [
 			HTMLHelper::icon('solid', 'circle-info'),
-			HTMLHelper::bold($this->objectId),
+			HTMLHelper::bold("#$this->objectId"),
 			$formattedArea,
-			HTMLHelper::bold($this->surveyId),
+			HTMLHelper::bold("#$this->surveyId"),
 		];
 	}
 }
