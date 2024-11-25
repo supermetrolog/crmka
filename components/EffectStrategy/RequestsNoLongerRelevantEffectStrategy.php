@@ -14,6 +14,7 @@ use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Company;
 use app\models\Survey;
+use app\models\SurveyQuestionAnswer;
 use app\models\Task;
 use app\models\TaskTag;
 use app\models\User;
@@ -53,7 +54,7 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function process(Survey $survey, $additionalData = null): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
 	{
 		$tx = $this->transactionBeginner->begin();
 

@@ -2,11 +2,11 @@
 
 namespace app\components\EffectStrategy;
 
-use app\components\EffectStrategy\Traits\HandlingByBoolEffectStrategyTrait;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\dto\Task\CreateTaskDto;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
@@ -14,6 +14,7 @@ use app\models\ChatMemberMessage;
 use app\models\Company;
 use app\models\ObjectChatMember;
 use app\models\Survey;
+use app\models\SurveyQuestionAnswer;
 use app\models\Task;
 use app\models\TaskTag;
 use app\models\User;
@@ -25,37 +26,47 @@ use yii\base\Exception;
 
 class CompanyWantsToSellEffectStrategy extends AbstractEffectStrategy
 {
-	use HandlingByBoolEffectStrategyTrait;
-
 	private const TASK_MESSAGE_TEXT       = '%s (#%s) хочет продать объект, нужно создать или обновить предложение.';
 	private const DAYS_FOR_TASK_EXECUTION = 7; // days
 
-	protected ChatMemberMessageService $chatMemberMessageService;
-	protected UserRepository           $userRepository;
+	protected ChatMemberMessageService     $chatMemberMessageService;
+	protected UserRepository               $userRepository;
+	protected TransactionBeginnerInterface $transactionBeginner;
 
 	public function __construct(
 		ChatMemberMessageService $chatMemberMessageService,
-		UserRepository $userRepository
+		UserRepository $userRepository,
+		TransactionBeginnerInterface $transactionBeginner
 	)
 	{
 		$this->chatMemberMessageService = $chatMemberMessageService;
 		$this->userRepository           = $userRepository;
+		$this->transactionBeginner      = $transactionBeginner;
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function process(Survey $survey, $additionalData = null): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
 	{
 		$chatMember = $survey->chatMember;
 
 		if ($chatMember->model_type === ObjectChatMember::getMorphClass()) {
 			$company = $chatMember->model->company;
 
-			$message = $this->sendSystemMessageIntoObject($chatMember, $survey);
+			$tx = $this->transactionBeginner->begin();
 
-			$this->createTaskForMessage($message, $survey->user, $company);
+			try {
+				$message = $this->sendSystemMessageIntoObject($chatMember, $survey);
+
+				$this->createTaskForMessage($message, $survey->user, $company);
+
+				$tx->commit();
+			} catch (Throwable $th) {
+				$tx->rollback();
+				throw $th;
+			}
 		}
 	}
 

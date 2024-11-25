@@ -2,21 +2,19 @@
 
 namespace app\components\EffectStrategy;
 
-use app\components\EffectStrategy\Traits\HandlingByBoolEffectStrategyTrait;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\ObjectChatMember;
 use app\models\Survey;
+use app\models\SurveyQuestionAnswer;
 use app\services\ChatMemberSystemMessage\CompanyWantsToBuyOrBuildSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 
 class CompanyWantsToBuyOrBuildEffectStrategy extends AbstractEffectStrategy
 {
-	use HandlingByBoolEffectStrategyTrait;
-
 	private ChatMemberMessageService $chatMemberMessageService;
 
 	public function __construct(
@@ -30,7 +28,7 @@ class CompanyWantsToBuyOrBuildEffectStrategy extends AbstractEffectStrategy
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function process(Survey $survey, $additionalData = null): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
 	{
 		$chatMember = $survey->chatMember;
 

@@ -2,17 +2,18 @@
 
 namespace app\components\EffectStrategy;
 
-use app\components\EffectStrategy\Traits\HandlingByBoolEffectStrategyTrait;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\dto\Task\CreateTaskDto;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Company;
 use app\models\Survey;
+use app\models\SurveyQuestionAnswer;
 use app\models\Task;
 use app\models\TaskTag;
 use app\models\User;
@@ -24,28 +25,29 @@ use yii\base\Exception;
 
 class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 {
-	use HandlingByBoolEffectStrategyTrait;
-
 	private const DAYS_FOR_TASK_EXECUTION = 7; // days
 	private const TASK_MESSAGE_TEXT       = 'Новый запрос у %s (#%s), нужно оформить его.';
 
-	protected ChatMemberMessageService $chatMemberMessageService;
-	protected UserRepository           $userRepository;
+	protected ChatMemberMessageService     $chatMemberMessageService;
+	protected UserRepository               $userRepository;
+	protected TransactionBeginnerInterface $transactionBeginner;
 
 	public function __construct(
 		ChatMemberMessageService $chatMemberMessageService,
-		UserRepository $userRepository
+		UserRepository $userRepository,
+		TransactionBeginnerInterface $transactionBeginner
 	)
 	{
 		$this->chatMemberMessageService = $chatMemberMessageService;
 		$this->userRepository           = $userRepository;
+		$this->transactionBeginner      = $transactionBeginner;
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function process(Survey $survey, $additionalData = null): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
 	{
 		$chatMember      = $survey->chatMember;
 		$chatMemberModel = $chatMember->model;
@@ -55,8 +57,18 @@ class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 			$chatMember      = $chatMember->model->company->chatMember;
 		}
 
-		$message = $this->sendSystemMessageIntoCompany($chatMember, $survey);
-		$this->createTaskForMessage($message, $survey->user, $chatMemberModel);
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$message = $this->sendSystemMessageIntoCompany($chatMember, $survey);
+
+			$this->createTaskForMessage($message, $survey->user, $chatMemberModel);
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 	/**

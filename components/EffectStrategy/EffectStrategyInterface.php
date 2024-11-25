@@ -5,6 +5,7 @@ namespace app\components\EffectStrategy;
 
 use app\models\QuestionAnswer;
 use app\models\Survey;
+use app\models\SurveyQuestionAnswer;
 
 interface EffectStrategyInterface
 {
@@ -12,8 +13,5 @@ interface EffectStrategyInterface
 
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer);
 
-	/**
-	 * @param ?mixed $additionalData
-	 */
-	public function process(Survey $survey, $additionalData = null);
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer);
 }

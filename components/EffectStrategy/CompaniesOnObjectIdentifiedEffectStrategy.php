@@ -9,6 +9,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\QuestionAnswer;
 use app\models\Survey;
+use app\models\SurveyQuestionAnswer;
 use app\repositories\ChatMemberRepository;
 use app\services\ChatMemberSystemMessage\CompanyOnObjectChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
@@ -43,31 +44,17 @@ class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 	}
 
 	/**
-	 * @throws Exception
 	 * @throws Throwable
 	 */
-	public function handle(Survey $survey, QuestionAnswer $answer): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
 	{
-		$effectShouldBeProcess = $this->shouldBeProcessed($survey, $answer);
-
-		if ($effectShouldBeProcess) {
-			$this->process($survey, $answer->surveyQuestionAnswer->getJSON());
-		}
-	}
-
-	/**
-	 * @param array $additionalData
-	 *
-	 * @throws Throwable
-	 */
-	public function process(Survey $survey, $additionalData = null): void
-	{
-		$objectId = $survey->chatMember->model->object_id;
+		$companies = $surveyQuestionAnswer->getJSON();
+		$objectId  = $survey->chatMember->model->object_id;
 
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			foreach ($additionalData as $companyData) {
+			foreach ($companies as $companyData) {
 				$companyId = $companyData['company_id'];
 				$area      = $companyData['area'];
 

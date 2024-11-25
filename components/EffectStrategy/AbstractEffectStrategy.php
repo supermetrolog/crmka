@@ -4,6 +4,7 @@ namespace app\components\EffectStrategy;
 
 use app\models\QuestionAnswer;
 use app\models\Survey;
+use app\models\SurveyQuestionAnswer;
 
 abstract class AbstractEffectStrategy implements EffectStrategyInterface
 {
@@ -12,14 +13,14 @@ abstract class AbstractEffectStrategy implements EffectStrategyInterface
 		$effectShouldBeProcess = $this->shouldBeProcessed($survey, $answer);
 
 		if ($effectShouldBeProcess) {
-			$this->process($survey);
+			$this->process($survey, $answer->surveyQuestionAnswer);
 		}
 	}
 
-	abstract public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool;
+	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
+	{
+		return $answer->surveyQuestionAnswer->getMaybeBool();
+	}
 
-	/**
-	 * @param ?mixed $additionalData
-	 */
-	abstract public function process(Survey $survey, $additionalData = null): void;
+	abstract public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void;
 }
