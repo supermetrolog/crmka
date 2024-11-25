@@ -69,11 +69,11 @@ $logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" 
 						</li>
 						<li>
 							<i class="fas fa-circle"></i>
-							<p>САЙТ: <a href="https://readys.ru">READYS.RU</a></p>
+							<p>САЙТ: <a href="https://raysarma.ru">RAYSARMA.RU</a></p>
 						</li>
 						<li>
 							<i class="fas fa-circle"></i>
-							<p>ПОЧТА: <a href="mailto:sklad@realtor.ru">SKLAD@REALTOR.RU</a></p>
+							<p>ПОЧТА: <a href="mailto:info@raysarma.ru">INFO@RAYSARMA.RU</a></p>
 						</li>
 					</ul>
 				</div>
@@ -520,7 +520,7 @@ $logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" 
 				<h3>Узнайте первым о новом, подходящем Вам предложении</h3>
 				<p>Настройте параметры поиска подходящего Вам объекта и как только он появится на рынке, система
 					автоматически пришлет его Вам на почту</p>
-				<a href="https://readys.ru">readys.ru</a>
+				<a href="https://raysarma.ru">raysarma.ru</a>
 			</div>
 		</div>
 		<div class="title">

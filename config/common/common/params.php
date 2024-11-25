@@ -15,7 +15,7 @@ return [
 	'company_phone'  => '+7 (495) 150-03-23',
 	'adminEmail'     => $secrets['adminEmail'],
 	'senderEmail'    => $secrets['senderEmail'],
-	'senderName'     => 'PENNYLANE REALTY',
+	'senderName'     => 'RAYS ARMA',
 	'senderUsername' => $secrets['senderUsername'],
 	'senderPassword' => $secrets['senderPassword'],
 	'compressorPath' => YII_PROJECT_ROOT . "/pdf_compressor.py",
