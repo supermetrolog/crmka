@@ -9,13 +9,14 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\QuestionAnswer;
 use app\models\Survey;
+use app\models\SurveyQuestionAnswer;
 use app\repositories\ChatMemberRepository;
 use app\services\ChatMemberSystemMessage\CompanyOnObjectChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 use yii\base\Exception;
 
-class CompaniesOnObjectIdentifiedEffectStrategy implements EffectStrategyInterface
+class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 {
 	private ChatMemberMessageService     $chatMemberMessageService;
 	private TransactionBeginnerInterface $transactionBeginner;
@@ -34,30 +35,26 @@ class CompaniesOnObjectIdentifiedEffectStrategy implements EffectStrategyInterfa
 
 	/**
 	 * @throws Exception
-	 * @throws Throwable
 	 */
-	public function handle(Survey $survey, QuestionAnswer $answer): void
+	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		$surveyQuestionAnswer  = $answer->surveyQuestionAnswer;
-		$jsonData              = $surveyQuestionAnswer->getJSON();
-		$effectShouldBeProcess = ArrayHelper::isArray($jsonData) && ArrayHelper::length($jsonData) > 0;
+		$jsonData = $answer->surveyQuestionAnswer->getJSON();
 
-		if ($effectShouldBeProcess) {
-			$this->process($survey, $jsonData);
-		}
+		return ArrayHelper::isArray($jsonData) && ArrayHelper::length($jsonData) > 0;
 	}
 
 	/**
 	 * @throws Throwable
 	 */
-	private function process(Survey $survey, array $companiesData): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
 	{
-		$objectId = $survey->chatMember->model->object_id;
+		$companies = $surveyQuestionAnswer->getJSON();
+		$objectId  = $survey->chatMember->model->object_id;
 
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			foreach ($companiesData as $companyData) {
+			foreach ($companies as $companyData) {
 				$companyId = $companyData['company_id'];
 				$area      = $companyData['area'];
 
