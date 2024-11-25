@@ -6,13 +6,14 @@ use app\components\EffectStrategy\Traits\HandlingByBoolEffectStrategyTrait;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
+use app\models\ChatMemberMessage;
 use app\models\ObjectChatMember;
 use app\models\Survey;
-use app\services\ChatMemberSystemMessage\CompanyPlannedDevelopChatMemberSystemMessage;
+use app\services\ChatMemberSystemMessage\CompanyWantsToBuyOrBuildSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 
-class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
+class CompanyWantsToBuyOrBuildEffectStrategy extends AbstractEffectStrategy
 {
 	use HandlingByBoolEffectStrategyTrait;
 
@@ -36,7 +37,7 @@ class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
 		if ($chatMember->model_type === ObjectChatMember::getMorphClass()) {
 			$companyChatMember = $chatMember->model->company->chatMember;
 
-			$this->sendSystemMessage($companyChatMember, $survey);
+			$this->sendSystemMessageIntoCompany($companyChatMember, $survey);
 		}
 	}
 
@@ -44,11 +45,11 @@ class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function sendSystemMessage(ChatMember $chatMember, Survey $survey): void
+	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey): ChatMemberMessage
 	{
-		$message = CompanyPlannedDevelopChatMemberSystemMessage::create()
-		                                                       ->setSurveyId($survey->id)
-		                                                       ->toMessage();
+		$message = CompanyWantsToBuyOrBuildSystemMessage::create()
+		                                                ->setSurveyId($survey->id)
+		                                                ->toMessage();
 
 		$dto = new CreateChatMemberSystemMessageDto([
 			'message'    => $message,
@@ -57,6 +58,6 @@ class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
 			'contactIds' => [$survey->contact_id],
 		]);
 
-		$this->chatMemberMessageService->createSystemMessage($dto);
+		return $this->chatMemberMessageService->createSystemMessage($dto);
 	}
 }

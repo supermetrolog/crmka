@@ -5,10 +5,10 @@ namespace app\services\ChatMemberSystemMessage;
 use app\helpers\HTMLHelper;
 use InvalidArgumentException;
 
-class CompanyPlannedDevelopChatMemberSystemMessage extends AbstractChatMemberSystemMessage
+class CompanyWantsToSellSystemMessage extends AbstractChatMemberSystemMessage
 {
 	private ?int     $surveyId = null;
-	protected string $template = '%s  Компания планирует развитие. Подробнее в прикрепленном опросе %s.';
+	protected string $template = '%s  Компания хочет продать объект. Подробнее в прикрепленном опросе %s.';
 
 	public function validateOrThrow(): void
 	{
@@ -29,7 +29,7 @@ class CompanyPlannedDevelopChatMemberSystemMessage extends AbstractChatMemberSys
 	public function getTemplateArgs(): array
 	{
 		return [
-			HTMLHelper::icon('solid', 'rocket'),
+			HTMLHelper::icon('solid', 'dollar-sign'),
 			HTMLHelper::bold("#$this->surveyId"),
 		];
 	}

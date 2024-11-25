@@ -15,7 +15,7 @@ use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 use yii\base\Exception;
 
-class CompaniesOnObjectIdentifiedEffectStrategy implements EffectStrategyInterface
+class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 {
 	private ChatMemberMessageService     $chatMemberMessageService;
 	private TransactionBeginnerInterface $transactionBeginner;
@@ -34,30 +34,40 @@ class CompaniesOnObjectIdentifiedEffectStrategy implements EffectStrategyInterfa
 
 	/**
 	 * @throws Exception
+	 */
+	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
+	{
+		$jsonData = $answer->surveyQuestionAnswer->getJSON();
+
+		return ArrayHelper::isArray($jsonData) && ArrayHelper::length($jsonData) > 0;
+	}
+
+	/**
+	 * @throws Exception
 	 * @throws Throwable
 	 */
 	public function handle(Survey $survey, QuestionAnswer $answer): void
 	{
-		$surveyQuestionAnswer  = $answer->surveyQuestionAnswer;
-		$jsonData              = $surveyQuestionAnswer->getJSON();
-		$effectShouldBeProcess = ArrayHelper::isArray($jsonData) && ArrayHelper::length($jsonData) > 0;
+		$effectShouldBeProcess = $this->shouldBeProcessed($survey, $answer);
 
 		if ($effectShouldBeProcess) {
-			$this->process($survey, $jsonData);
+			$this->process($survey, $answer->surveyQuestionAnswer->getJSON());
 		}
 	}
 
 	/**
+	 * @param array $additionalData
+	 *
 	 * @throws Throwable
 	 */
-	private function process(Survey $survey, array $companiesData): void
+	public function process(Survey $survey, $additionalData = null): void
 	{
 		$objectId = $survey->chatMember->model->object_id;
 
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			foreach ($companiesData as $companyData) {
+			foreach ($additionalData as $companyData) {
 				$companyId = $companyData['company_id'];
 				$area      = $companyData['area'];
 
