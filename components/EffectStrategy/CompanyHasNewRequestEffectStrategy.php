@@ -12,6 +12,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Company;
+use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\models\Task;
@@ -41,6 +42,11 @@ class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 		$this->chatMemberMessageService = $chatMemberMessageService;
 		$this->userRepository           = $userRepository;
 		$this->transactionBeginner      = $transactionBeginner;
+	}
+
+	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
+	{
+		return $answer->surveyQuestionAnswer->getMaybeBool();
 	}
 
 	/**

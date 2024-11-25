@@ -13,6 +13,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Company;
+use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\models\Task;
@@ -25,8 +26,6 @@ use Throwable;
 
 class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 {
-	use HandlingByBoolEffectStrategyTrait;
-
 	private const TASK_MESSAGE_TEXT       = '%s (#%s) - устарели запросы, необходимо отправить их в пассив.';
 	private const DAYS_FOR_TASK_EXECUTION = 7; // days
 
@@ -43,6 +42,11 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 		$this->chatMemberMessageService = $chatMemberMessageService;
 		$this->userRepository           = $userRepository;
 		$this->transactionBeginner      = $transactionBeginner;
+	}
+
+	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
+	{
+		return $answer->surveyQuestionAnswer->getMaybeBool();
 	}
 
 	protected function getTaskMessageText(Company $company): string

@@ -17,10 +17,7 @@ abstract class AbstractEffectStrategy implements EffectStrategyInterface
 		}
 	}
 
-	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
-	{
-		return $answer->surveyQuestionAnswer->getMaybeBool();
-	}
+	abstract public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool;
 
 	abstract public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void;
 }

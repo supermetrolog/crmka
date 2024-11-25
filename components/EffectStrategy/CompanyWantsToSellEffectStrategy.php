@@ -13,6 +13,7 @@ use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Company;
 use app\models\ObjectChatMember;
+use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\models\Task;
@@ -44,29 +45,31 @@ class CompanyWantsToSellEffectStrategy extends AbstractEffectStrategy
 		$this->transactionBeginner      = $transactionBeginner;
 	}
 
+	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
+	{
+		return $answer->surveyQuestionAnswer->getMaybeBool() && $survey->chatMember->model_type === ObjectChatMember::getMorphClass();
+	}
+
 	/**
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
 	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
 	{
-		$chatMember = $survey->chatMember;
+		$tx = $this->transactionBeginner->begin();
 
-		if ($chatMember->model_type === ObjectChatMember::getMorphClass()) {
-			$company = $chatMember->model->company;
+		try {
+			$chatMember = $survey->chatMember;
+			$company    = $chatMember->model->company;
 
-			$tx = $this->transactionBeginner->begin();
+			$message = $this->sendSystemMessageIntoObject($chatMember, $survey);
 
-			try {
-				$message = $this->sendSystemMessageIntoObject($chatMember, $survey);
+			$this->createTaskForMessage($message, $survey->user, $company);
 
-				$this->createTaskForMessage($message, $survey->user, $company);
-
-				$tx->commit();
-			} catch (Throwable $th) {
-				$tx->rollback();
-				throw $th;
-			}
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
 		}
 	}
 

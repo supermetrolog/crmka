@@ -7,6 +7,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\ObjectChatMember;
+use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\services\ChatMemberSystemMessage\CompanyWantsToBuyOrBuildSystemMessage;
@@ -24,19 +25,20 @@ class CompanyWantsToBuyOrBuildEffectStrategy extends AbstractEffectStrategy
 		$this->chatMemberMessageService = $chatMemberMessageService;
 	}
 
+	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
+	{
+		return $answer->surveyQuestionAnswer->getMaybeBool() && $survey->chatMember->model_type === ObjectChatMember::getMorphClass();
+	}
+
 	/**
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
 	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
 	{
-		$chatMember = $survey->chatMember;
+		$companyChatMember = $survey->chatMember->model->company->chatMember;
 
-		if ($chatMember->model_type === ObjectChatMember::getMorphClass()) {
-			$companyChatMember = $chatMember->model->company->chatMember;
-
-			$this->sendSystemMessageIntoCompany($companyChatMember, $survey);
-		}
+		$this->sendSystemMessageIntoCompany($companyChatMember, $survey);
 	}
 
 	/**
