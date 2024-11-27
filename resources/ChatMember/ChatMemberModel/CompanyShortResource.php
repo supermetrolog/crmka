@@ -24,6 +24,7 @@ class CompanyShortResource extends JsonResource
 			'nameRu'               => $this->resource->nameRu,
 			'full_name'            => $this->resource->getFullName(),
 			'noName'               => $this->resource->noName,
+			'companyGroup_id'      => $this->resource->companyGroup_id,
 			'activityGroup'        => $this->resource->activityGroup,
 			'activityProfile'      => $this->resource->activityProfile,
 			'is_individual'        => $this->resource->is_individual,

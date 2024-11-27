@@ -34,6 +34,7 @@ class CompanyBaseResource extends JsonResource
 			'full_name'            => $this->resource->getFullName(),
 			'logo'                 => $this->resource->getLogoUrl(),
 			'categories'           => CompanyCategoryResource::collection($this->resource->categories),
+			'companyGroup_id'      => $this->resource->companyGroup_id,
 			'companyGroup'         => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
 			'office_address'       => $this->resource->officeAdress,
 			'legal_address'        => $this->resource->legalAddress,

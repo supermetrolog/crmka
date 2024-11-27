@@ -46,6 +46,7 @@ class CompanyBaseResource extends JsonResource
 			'longitude'            => $this->resource->longitude,
 			'basis'                => $this->resource->basis,
 			'documentNumber'       => $this->resource->documentNumber,
+			'companyGroup_id'      => $this->resource->companyGroup_id,
 			'activityGroup'        => $this->resource->activityGroup,
 			'activityProfile'      => $this->resource->activityProfile,
 			'status'               => $this->resource->status,

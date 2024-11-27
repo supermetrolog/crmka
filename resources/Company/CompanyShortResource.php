@@ -32,6 +32,7 @@ class CompanyShortResource extends JsonResource
 			'legalAddress'         => $this->resource->legalAddress,
 			'latitude'             => $this->resource->latitude,
 			'longitude'            => $this->resource->longitude,
+			'companyGroup_id'      => $this->resource->companyGroup_id,
 			'activityGroup'        => $this->resource->activityGroup,
 			'activityProfile'      => $this->resource->activityProfile,
 			'status'               => $this->resource->status,
