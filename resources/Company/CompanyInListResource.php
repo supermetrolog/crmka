@@ -35,7 +35,7 @@ class CompanyInListResource extends JsonResource
 			'rating'               => $this->resource->rating,
 			'description'          => $this->resource->description,
 			'formOfOrganization'   => $this->resource->formOfOrganization,
-			'officeAdres'          => $this->resource->officeAdress,
+			'officeAdress'         => $this->resource->officeAdress,
 			'legalAddress'         => $this->resource->legalAddress,
 			'latitude'             => $this->resource->latitude,
 			'longitude'            => $this->resource->longitude,
