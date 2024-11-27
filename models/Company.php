@@ -199,7 +199,7 @@ class Company extends AR
 
 		$name = StringHelper::join(
 			StringHelper::SYMBOL_SPACE,
-			$formOfOrganization ? self::FORM_OF_ORGANIZATION_LIST[$formOfOrganization] : '',
+			!is_null($formOfOrganization) ? self::FORM_OF_ORGANIZATION_LIST[$formOfOrganization] : '',
 			$russianName ?? ''
 		);
 
