@@ -38,6 +38,7 @@ class CompanyBaseResource extends JsonResource
 			'companyGroup'         => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
 			'office_address'       => $this->resource->officeAdress,
 			'legal_address'        => $this->resource->legalAddress,
+			'status'               => $this->resource->status,
 			'created_at'           => $this->resource->created_at,
 			'updated_at'           => $this->resource->updated_at
 		];

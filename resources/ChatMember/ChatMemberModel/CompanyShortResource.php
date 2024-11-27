@@ -29,6 +29,7 @@ class CompanyShortResource extends JsonResource
 			'activityProfile'      => $this->resource->activityProfile,
 			'is_individual'        => $this->resource->is_individual,
 			'individual_full_name' => $this->resource->individual_full_name,
+			'status'               => $this->resource->status
 		];
 	}
 }
