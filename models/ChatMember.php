@@ -15,27 +15,27 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "chat_member".
  *
- * @property int                   $id
- * @property string                $model_type
- * @property int                   $model_id
- * @property string                $created_at
- * @property string                $updated_at
- * @property int|null              $pinned_chat_member_message_id
+ * @property int                                    $id
+ * @property string                                 $model_type
+ * @property int                                    $model_id
+ * @property string                                 $created_at
+ * @property string                                 $updated_at
+ * @property int|null                               $pinned_chat_member_message_id
  *
- * @property ChatMemberMessage[]   $fromChatMemberMessages
- * @property ChatMemberMessage[]   $toChatMemberMessages
- * @property ChatMemberMessage[]   $messages
- * @property User|OfferMix|Request $model
- * @property OfferMix              $offerMix
- * @property User                  $user
- * @property Request               $request
- * @property CommercialOffer       $commercialOffer
- * @property ObjectChatMember      $objectChatMember
- * @property Objects               $object
- * @property Company               $company
- * @property ChatMemberMessage     $pinnedChatMemberMessage
- * @property Relation[]            $relationFirst
- * @property Call[]                $calls
+ * @property ChatMemberMessage[]                    $fromChatMemberMessages
+ * @property ChatMemberMessage[]                    $toChatMemberMessages
+ * @property ChatMemberMessage[]                    $messages
+ * @property User|OfferMix|Request|ObjectChatMember $model
+ * @property OfferMix                               $offerMix
+ * @property User                                   $user
+ * @property Request                                $request
+ * @property CommercialOffer                        $commercialOffer
+ * @property ObjectChatMember                       $objectChatMember
+ * @property Objects                                $object
+ * @property Company                                $company
+ * @property ChatMemberMessage                      $pinnedChatMemberMessage
+ * @property Relation[]                             $relationFirst
+ * @property Call[]                                 $calls
  */
 class ChatMember extends AR
 {
