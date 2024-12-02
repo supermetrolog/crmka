@@ -11,7 +11,6 @@ use app\models\Effect;
 use app\models\Field;
 use app\models\Question;
 use app\models\QuestionAnswer;
-use Exception;
 
 class QuestionAnswerForm extends Form
 {
@@ -23,6 +22,7 @@ class QuestionAnswerForm extends Form
 	public $field_id;
 	public $category;
 	public $value;
+	public $message;
 	public $effect_ids = [];
 
 	public function rules(): array
@@ -33,6 +33,7 @@ class QuestionAnswerForm extends Form
 			['category', 'in', 'range' => QuestionAnswer::getCategories()],
 			[['category', 'value'], 'safe'],
 			[['category', 'value'], 'string', 'max' => 255],
+			[['message'], 'string', 'max' => 128],
 			[['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],
 			[['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
 			['effect_ids', 'each', 'rule' => [
@@ -49,7 +50,8 @@ class QuestionAnswerForm extends Form
 			'field_id',
 			'category',
 			'value',
-			'effect_ids'
+			'effect_ids',
+			'message'
 		];
 
 		return [
@@ -61,7 +63,6 @@ class QuestionAnswerForm extends Form
 
 	/**
 	 * @return CreateQuestionAnswerDto|UpdateQuestionAnswerDto
-	 * @throws Exception
 	 */
 	public function getDto()
 	{
@@ -72,14 +73,16 @@ class QuestionAnswerForm extends Form
 					'field_id'    => $this->field_id,
 					'category'    => $this->category,
 					'value'       => $this->value,
-					'effectIds'   => $this->effect_ids
+					'effectIds'   => $this->effect_ids,
+					'message'     => $this->message
 				]);
 			case self::SCENARIO_CREATE_WITH_QUESTION:
 				return new CreateQuestionAnswerDto([
 					'field_id'  => $this->field_id,
 					'category'  => $this->category,
 					'value'     => $this->value,
-					'effectIds' => $this->effect_ids
+					'effectIds' => $this->effect_ids,
+					'message'   => $this->message
 				]);
 
 			default:
@@ -88,7 +91,8 @@ class QuestionAnswerForm extends Form
 					'field_id'    => $this->field_id,
 					'category'    => $this->category,
 					'value'       => $this->value,
-					'effectIds'   => $this->effect_ids
+					'effectIds'   => $this->effect_ids,
+					'message'     => $this->message
 				]);
 		}
 	}

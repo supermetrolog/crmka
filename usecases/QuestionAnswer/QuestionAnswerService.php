@@ -36,6 +36,7 @@ class QuestionAnswerService
 				'field_id'    => $dto->field_id,
 				'category'    => $dto->category,
 				'value'       => $dto->value,
+				'message'     => $dto->message
 			]);
 
 			$model->saveOrThrow();
@@ -65,6 +66,7 @@ class QuestionAnswerService
 				'field_id'    => $dto->field_id,
 				'category'    => $dto->category,
 				'value'       => $dto->value,
+				'message'     => $dto->message
 			]);
 
 			$model->saveOrThrow();
