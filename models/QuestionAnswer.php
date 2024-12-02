@@ -130,6 +130,11 @@ class QuestionAnswer extends AR
 		return ArrayHelper::includesByKey($this->effects, $kind, 'kind');
 	}
 
+	public function hasAdditionalMessage(): bool
+	{
+		return !empty($this->message);
+	}
+
 	public static function find(): QuestionAnswerQuery
 	{
 		return new QuestionAnswerQuery(get_called_class());
