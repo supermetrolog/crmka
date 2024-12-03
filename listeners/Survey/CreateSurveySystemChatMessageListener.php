@@ -5,6 +5,7 @@ namespace app\listeners\Survey;
 use app\components\EffectStrategy\Factory\EffectStrategyFactory;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\events\Survey\CreateSurveyEvent;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
@@ -20,13 +21,15 @@ use yii\di\NotInstantiableException;
 
 class CreateSurveySystemChatMessageListener implements EventListenerInterface
 {
-	private ChatMemberMessageService $chatMemberMessageService;
-	private EffectStrategyFactory    $effectStrategyFactory;
+	private ChatMemberMessageService     $chatMemberMessageService;
+	private EffectStrategyFactory        $effectStrategyFactory;
+	private TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(ChatMemberMessageService $chatMemberMessageService, EffectStrategyFactory $effectStrategyFactory)
+	public function __construct(ChatMemberMessageService $chatMemberMessageService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
 	{
 		$this->chatMemberMessageService = $chatMemberMessageService;
 		$this->effectStrategyFactory    = $effectStrategyFactory;
+		$this->transactionBeginner      = $transactionBeginner;
 	}
 
 	/**
@@ -44,16 +47,25 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 		                                              ->setSurvey($survey)
 		                                              ->toMessage();
 
-		$dto = new CreateChatMemberSystemMessageDto([
-			'message'    => $message,
-			'to'         => $chatMember,
-			'surveyIds'  => [$survey->id],
-			'contactIds' => [$survey->contact_id],
-		]);
+		$tx = $this->transactionBeginner->begin();
 
-		$message = $this->chatMemberMessageService->createSystemMessage($dto);
+		try {
+			$dto = new CreateChatMemberSystemMessageDto([
+				'message'    => $message,
+				'to'         => $chatMember,
+				'surveyIds'  => [$survey->id],
+				'contactIds' => [$survey->contact_id],
+			]);
 
-		$this->handleEffects($survey, $message);
+			$message = $this->chatMemberMessageService->createSystemMessage($dto);
+
+			$this->handleEffects($survey, $message);
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 	/**
