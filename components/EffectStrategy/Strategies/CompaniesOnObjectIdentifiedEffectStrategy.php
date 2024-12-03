@@ -1,12 +1,14 @@
 <?php
 
-namespace app\components\EffectStrategy;
+namespace app\components\EffectStrategy\Strategies;
 
+use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
+use app\models\ChatMemberMessage;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
@@ -46,7 +48,7 @@ class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 	/**
 	 * @throws Throwable
 	 */
-	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
 		$companies = $surveyQuestionAnswer->getJSON();
 		$objectId  = $survey->chatMember->model->object_id;

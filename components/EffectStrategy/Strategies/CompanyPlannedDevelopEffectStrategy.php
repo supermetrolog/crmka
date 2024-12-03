@@ -1,10 +1,13 @@
 <?php
 
-namespace app\components\EffectStrategy;
+namespace app\components\EffectStrategy\Strategies;
 
+use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
+use app\models\ChatMemberMessage;
+use app\models\Company;
 use app\models\ObjectChatMember;
 use app\models\QuestionAnswer;
 use app\models\Survey;
@@ -33,18 +36,21 @@ class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
-		$companyChatMember = $survey->chatMember->model->company->chatMember;
+		$chatMember = $survey->chatMember;
 
-		$this->sendSystemMessage($companyChatMember, $survey);
+		if ($chatMember->model_type !== Company::getMorphClass()) {
+			$companyChatMember = $chatMember->model->company->chatMember;
+			$this->sendSystemMessageIntoCompany($companyChatMember, $survey);
+		}
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function sendSystemMessage(ChatMember $chatMember, Survey $survey): void
+	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey): void
 	{
 		$message = CompanyPlannedDevelopChatMemberSystemMessage::create()
 		                                                       ->setSurveyId($survey->id)
