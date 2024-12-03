@@ -17,4 +17,9 @@ class UserRepository
 	{
 		return User::find()->byRole(User::ROLE_MODERATOR)->one();
 	}
+
+	public function findOne(int $id): ?User
+	{
+		return User::find()->byId($id)->one();
+	}
 }
