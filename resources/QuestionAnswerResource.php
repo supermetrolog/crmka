@@ -24,6 +24,7 @@ class QuestionAnswerResource extends JsonResource
 			'field_id'    => $this->resource->field_id,
 			'category'    => $this->resource->category,
 			'value'       => $this->resource->value,
+			'message'     => $this->resource->message,
 			'created_at'  => $this->resource->created_at,
 			'updated_at'  => $this->resource->updated_at,
 			'deleted_at'  => $this->resource->deleted_at,
