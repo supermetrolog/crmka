@@ -83,4 +83,8 @@ class DateTimeHelper
 		return $absolute ? abs($diff) : $diff;
 	}
 
+	public static function format(DateTimeInterface $dateTime, string $format = 'Y-m-d H:i:s'): string
+	{
+		return $dateTime->format($format);
+	}
 }
