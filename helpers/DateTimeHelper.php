@@ -87,4 +87,14 @@ class DateTimeHelper
 	{
 		return $dateTime->format($format);
 	}
+
+	public static function getDayEndTime(DateTimeInterface $dateTime): DateTimeInterface
+	{
+		return (clone $dateTime)->setTime(23, 59, 59);
+	}
+
+	public static function getDayStartTime(DateTimeInterface $dateTime): DateTimeInterface
+	{
+		return (clone $dateTime)->setTime(0, 0, 0);
+	}
 }

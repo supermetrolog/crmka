@@ -73,9 +73,9 @@ class UserActivityService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$this->update($oldModel, $dto, DateTimeHelper::make($oldModel->started_at)->setTime(23, 59, 59));
+			$this->update($oldModel, $dto, DateTimeHelper::getDayEndTime($oldModel->getStartedAt()));
 
-			$newModel = $this->create($dto, (clone $lastActivityAt)->setTime(0, 0, 0), $lastActivityAt);
+			$newModel = $this->create($dto, DateTimeHelper::getDayStartTime($lastActivityAt), $lastActivityAt);
 
 			$tx->commit();
 
@@ -117,7 +117,7 @@ class UserActivityService
 			return true;
 		}
 
-		$diff = DateTimeHelper::diffInMinutes($currentTime, DateTimeHelper::make($lastActivity->last_activity_at));
+		$diff = DateTimeHelper::diffInMinutes($currentTime, $lastActivity->getLastActivityAt());
 
 		return $diff > self::ACTIVITY_TIMEOUT_MINUTES;
 	}
@@ -128,15 +128,27 @@ class UserActivityService
 	private function shouldReCreateActivity(UserActivity $lastActivity, DateTimeInterface $currentTime): bool
 	{
 		return !DateTimeHelper::isSameDate(
-			DateTimeHelper::make($lastActivity->started_at),
+			$lastActivity->getStartedAt(),
 			$currentTime
 		);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function getTotalOnlineTime(User $user, string $startDate, string $endDate): int
 	{
-		// TODO: Implement calculating total online time
+		$activities = UserActivity::find()->byUserId($user->id)->between($startDate, $endDate)->all();
 
-		return 0;
+		$totalTime = 0;
+
+		foreach ($activities as $activity) {
+			$totalTime += DateTimeHelper::diffInMinutes(
+				$activity->getLastActivityAt(),
+				$activity->getStartedAt()
+			);
+		}
+
+		return $totalTime;
 	}
 }

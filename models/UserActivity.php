@@ -2,9 +2,12 @@
 
 namespace app\models;
 
+use app\helpers\DateTimeHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\UserActivityQuery;
 use app\models\ActiveQuery\UserQuery;
+use DateTimeInterface;
+use Exception;
 
 /**
  * This is the model class for table "user_access_token".
@@ -59,6 +62,22 @@ class UserActivity extends AR
 			'started_at'       => 'Started At',
 			'last_activity_at' => 'Last Activity At',
 		];
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function getStartedAt(): DateTimeInterface
+	{
+		return DateTimeHelper::make($this->started_at);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function getLastActivityAt(): DateTimeInterface
+	{
+		return DateTimeHelper::make($this->last_activity_at);
 	}
 
 	public function getUser(): UserQuery
