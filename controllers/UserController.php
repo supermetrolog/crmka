@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\dto\Auth\AuthUserAgentDto;
+use app\dto\User\UserActivityDto;
 use app\exceptions\InvalidBearerTokenException;
 use app\exceptions\InvalidPasswordException;
 use app\exceptions\ValidationErrorHttpException;
@@ -335,12 +336,20 @@ class UserController extends AppController
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function actionActivity(): SuccessResponse
 	{
 		$identity = $this->user->identity;
 
-		$this->userService->updateActivity($identity);
+		$dto = new UserActivityDto([
+			'user_id'    => $identity->id,
+			'user_agent' => $this->request->getUserAgent(),
+			'ip'         => $this->request->getUserIP(),
+			'last_page'  => $this->request->post('last_page'),
+		]);
+
+		$this->userService->updateActivity($identity, $dto);
 
 		return new SuccessResponse();
 	}

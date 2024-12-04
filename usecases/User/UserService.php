@@ -7,6 +7,7 @@ namespace app\usecases\User;
 use app\dto\User\CreateUserDto;
 use app\dto\User\CreateUserProfileDto;
 use app\dto\User\UpdateUserDto;
+use app\dto\User\UserActivityDto;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -23,12 +24,14 @@ class UserService
 	private TransactionBeginnerInterface $transactionBeginner;
 	private UserProfileService           $userProfileService;
 	private UserAccessTokenService       $accessTokenService;
+	private UserActivityService          $userActivityService;
 	private Security                     $security;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		UserProfileService $userProfileService,
 		UserAccessTokenService $accessTokenService,
+		UserActivityService $userActivityService,
 		Security $security
 	)
 	{
@@ -36,6 +39,7 @@ class UserService
 		$this->transactionBeginner = $transactionBeginner;
 		$this->userProfileService  = $userProfileService;
 		$this->accessTokenService  = $accessTokenService;
+		$this->userActivityService = $userActivityService;
 	}
 
 	/**
@@ -175,8 +179,23 @@ class UserService
 		$model->saveOrThrow();
 	}
 
-	public function updateActivity(User $model): void
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function updateActivity(User $model, UserActivityDto $userActivityDto): void
 	{
-		$model->updateAttributes(['last_seen' => DateTimeHelper::nowf()]);
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$model->updateAttributes(['last_seen' => DateTimeHelper::nowf()]);
+
+			$this->userActivityService->track($userActivityDto);
+			
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 }

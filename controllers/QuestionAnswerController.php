@@ -2,18 +2,19 @@
 
 namespace app\controllers;
 
+use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
-use app\kernel\common\controller\AppController;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\QuestionAnswer\QuestionAnswerForm;
-use app\models\search\QuestionAnswerSearch;
 use app\models\QuestionAnswer;
+use app\models\search\QuestionAnswerSearch;
 use app\repositories\QuestionAnswerRepository;
 use app\resources\QuestionAnswerResource;
 use app\usecases\QuestionAnswer\QuestionAnswerService;
 use Throwable;
 use yii\data\ActiveDataProvider;
+use yii\db\Exception;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
@@ -56,7 +57,7 @@ class QuestionAnswerController extends AppController
 	}
 
 	/**
-	 * @return QuestionAnswerResource
+	 * @throws Exception
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
@@ -76,9 +77,7 @@ class QuestionAnswerController extends AppController
 	}
 
 	/**
-	 * @param int $id
-	 *
-	 * @return QuestionAnswerResource
+	 * @throws Exception
 	 * @throws NotFoundHttpException
 	 * @throws SaveModelException
 	 * @throws ValidateException
@@ -114,7 +113,7 @@ class QuestionAnswerController extends AppController
 	/**
 	 * @throws NotFoundHttpException
 	 */
-	protected function findModel(int $id): ?QuestionAnswer
+	protected function findModel(int $id): QuestionAnswer
 	{
 		if (($model = QuestionAnswer::findOne($id)) !== null) {
 			return $model;

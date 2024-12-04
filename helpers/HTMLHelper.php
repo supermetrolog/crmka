@@ -6,6 +6,8 @@ namespace app\helpers;
 
 class HTMLHelper
 {
+	public const TAG_LINE_BREAK = '<br>';
+
 	public static function deleted(string $text): string
 	{
 		return StringHelper::join(StringHelper::SYMBOL_EMPTY, '<del>', $text, '</del>');

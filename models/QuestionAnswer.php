@@ -21,6 +21,7 @@ use yii\db\ActiveQuery;
  * @property int                  $field_id
  * @property int                  $category
  * @property string               $value
+ * @property ?string              $message
  * @property string               $created_at
  * @property string               $updated_at
  * @property string|null          $deleted_at
@@ -55,6 +56,7 @@ class QuestionAnswer extends AR
 			['category', 'in', 'range' => self::getCategories()],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 			[['category', 'value'], 'string', 'max' => 255],
+			[['message'], 'string', 'max' => 128],
 			[['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => Question::className(), 'targetAttribute' => ['question_id' => 'id']],
 			[['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
 		];
@@ -68,6 +70,7 @@ class QuestionAnswer extends AR
 			'field_id'    => 'Field ID',
 			'category'    => 'Category',
 			'value'       => 'Value',
+			'message'     => 'Message',
 			'created_at'  => 'Created At',
 			'updated_at'  => 'Updated At',
 			'deleted_at'  => 'Deleted At',
@@ -125,6 +128,11 @@ class QuestionAnswer extends AR
 	public function hasEffectByKind(string $kind): bool
 	{
 		return ArrayHelper::includesByKey($this->effects, $kind, 'kind');
+	}
+
+	public function hasAdditionalMessage(): bool
+	{
+		return !empty($this->message);
 	}
 
 	public static function find(): QuestionAnswerQuery

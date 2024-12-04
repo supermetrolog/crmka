@@ -70,4 +70,31 @@ class DateTimeHelper
 	{
 		return self::make($datetime)->getTimestamp();
 	}
+
+	public static function isSameDate(DateTimeInterface $first, DateTimeInterface $second): bool
+	{
+		return $first->format('Y-m-d') === $second->format('Y-m-d');
+	}
+
+	public static function diffInMinutes(DateTimeInterface $first, DateTimeInterface $second, bool $absolute = true): int
+	{
+		$diff = (int)(($first->getTimestamp() - $second->getTimestamp()) / 60);
+
+		return $absolute ? abs($diff) : $diff;
+	}
+
+	public static function format(DateTimeInterface $dateTime, string $format = 'Y-m-d H:i:s'): string
+	{
+		return $dateTime->format($format);
+	}
+
+	public static function getDayEndTime(DateTimeInterface $dateTime): DateTimeInterface
+	{
+		return (clone $dateTime)->setTime(23, 59, 59);
+	}
+
+	public static function getDayStartTime(DateTimeInterface $dateTime): DateTimeInterface
+	{
+		return (clone $dateTime)->setTime(0, 0, 0);
+	}
 }

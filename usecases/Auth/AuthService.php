@@ -6,6 +6,7 @@ use app\dto\Auth\AuthLoginDto;
 use app\dto\Auth\AuthResultDto;
 use app\dto\Auth\AuthUserAgentDto;
 use app\dto\User\UserAccessTokenDto;
+use app\dto\User\UserActivityDto;
 use app\exceptions\InvalidPasswordException;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
@@ -65,7 +66,12 @@ class AuthService
 
 		try {
 			$userAccessToken = $this->generateAccessToken($user, $userAgentDto);
-			$this->userService->updateActivity($user);
+			$this->userService->updateActivity($user, new UserActivityDto([
+				'user_id'    => $user->id,
+				'ip'         => $userAgentDto->ip,
+				'user_agent' => $userAgentDto->agent,
+				'last_page'  => null
+			]));
 
 			$tx->commit();
 

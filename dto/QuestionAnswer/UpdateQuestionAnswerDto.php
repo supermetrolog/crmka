@@ -12,5 +12,6 @@ class UpdateQuestionAnswerDto extends BaseObject
 	public int     $field_id;
 	public string  $category;
 	public ?string $value;
+	public ?string $message;
 	public array   $effectIds;
 }
