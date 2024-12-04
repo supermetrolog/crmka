@@ -11,6 +11,8 @@ use Exception;
 
 class UserProfileForm extends Form
 {
+	public ?int $id = null;
+
 	public string  $first_name;
 	public string  $middle_name;
 	public ?string $last_name = null;
@@ -23,7 +25,13 @@ class UserProfileForm extends Form
 		return [
 			[['first_name', 'middle_name'], 'required'],
 			[['first_name', 'middle_name', 'last_name', 'caller_id'], 'string', 'max' => 255],
-			[['caller_id'], 'unique', 'targetClass' => UserProfile::class],
+			[['id'], 'integer'],
+			[['id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => UserProfile::class, 'targetAttribute' => ['id' => 'id']],
+			[['caller_id'], 'unique', 'targetClass' => UserProfile::class, 'filter' => function ($query) {
+				if (!is_null($this->id)) {
+					$query->andWhere(['!=', 'id', $this->id]);
+				}
+			}],
 		];
 	}
 
