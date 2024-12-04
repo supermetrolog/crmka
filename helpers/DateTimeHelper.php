@@ -70,4 +70,9 @@ class DateTimeHelper
 	{
 		return self::make($datetime)->getTimestamp();
 	}
+
+	public static function isSameDate(DateTimeInterface $first, DateTimeInterface $second): bool
+	{
+		return $first->format('Y-m-d') === $second->format('Y-m-d');
+	}
 }
