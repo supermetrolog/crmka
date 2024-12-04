@@ -6,6 +6,7 @@ namespace app\models\forms\User;
 
 use app\dto\User\CreateUserProfileDto;
 use app\kernel\common\models\Form\Form;
+use app\models\UserProfile;
 use Exception;
 
 class UserProfileForm extends Form
@@ -22,7 +23,7 @@ class UserProfileForm extends Form
 		return [
 			[['first_name', 'middle_name'], 'required'],
 			[['first_name', 'middle_name', 'last_name', 'caller_id'], 'string', 'max' => 255],
-			[['caller_id'], 'unique']
+			[['caller_id'], 'unique', 'targetClass' => UserProfile::class],
 		];
 	}
 
