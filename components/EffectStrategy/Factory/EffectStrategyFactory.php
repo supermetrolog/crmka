@@ -3,15 +3,16 @@
 namespace app\components\EffectStrategy\Factory;
 
 
-use app\components\EffectStrategy\CompaniesOnObjectIdentifiedEffectStrategy;
-use app\components\EffectStrategy\CompanyHasNewRequestEffectStrategy;
-use app\components\EffectStrategy\CompanyPlannedDevelopEffectStrategy;
-use app\components\EffectStrategy\CompanyWantsToBuyOrBuildEffectStrategy;
-use app\components\EffectStrategy\CompanyWantsToBuyOrSellEquipmentEffectStrategy;
-use app\components\EffectStrategy\CompanyWantsToSellEffectStrategy;
 use app\components\EffectStrategy\EffectStrategyInterface;
-use app\components\EffectStrategy\ObjectHasEquipmentForSaleEffectStrategy;
-use app\components\EffectStrategy\RequestsNoLongerRelevantEffectStrategy;
+use app\components\EffectStrategy\Strategies\CompaniesOnObjectIdentifiedEffectStrategy;
+use app\components\EffectStrategy\Strategies\CompanyHasNewRequestEffectStrategy;
+use app\components\EffectStrategy\Strategies\CompanyPlannedDevelopEffectStrategy;
+use app\components\EffectStrategy\Strategies\CompanyWantsToBuyOrBuildEffectStrategy;
+use app\components\EffectStrategy\Strategies\CompanyWantsToBuyOrSellEquipmentEffectStrategy;
+use app\components\EffectStrategy\Strategies\CompanyWantsToSellEffectStrategy;
+use app\components\EffectStrategy\Strategies\ObjectHasEquipmentForSaleEffectStrategy;
+use app\components\EffectStrategy\Strategies\ObjectHasFreeAreaEffectStrategy;
+use app\components\EffectStrategy\Strategies\RequestsNoLongerRelevantEffectStrategy;
 use app\enum\EffectKind;
 use app\helpers\ArrayHelper;
 use Yii;
@@ -28,7 +29,8 @@ class EffectStrategyFactory implements EffectStrategyFactoryInterface
 		EffectKind::COMPANY_WANTS_TO_BUY_OR_BUILD          => CompanyWantsToBuyOrBuildEffectStrategy::class,
 		EffectKind::COMPANY_HAS_NEW_REQUEST                => CompanyHasNewRequestEffectStrategy::class,
 		EffectKind::COMPANY_WANTS_TO_BUY_OR_SELL_EQUIPMENT => CompanyWantsToBuyOrSellEquipmentEffectStrategy::class,
-		EffectKind::OBJECT_HAS_EQUIPMENT_FOR_SALE          => ObjectHasEquipmentForSaleEffectStrategy::class
+		EffectKind::OBJECT_HAS_EQUIPMENT_FOR_SALE          => ObjectHasEquipmentForSaleEffectStrategy::class,
+		EffectKind::OBJECT_HAS_FREE_AREA                   => ObjectHasFreeAreaEffectStrategy::class
 	];
 
 	public function hasStrategy(string $effectKind): bool

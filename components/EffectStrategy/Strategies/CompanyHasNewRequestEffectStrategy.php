@@ -1,11 +1,10 @@
 <?php
 
-namespace app\components\EffectStrategy;
+namespace app\components\EffectStrategy\Strategies;
 
+use app\builders\Task\TaskBuilderFactory;
+use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
-use app\dto\Task\CreateTaskDto;
-use app\helpers\DateIntervalHelper;
-use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -15,10 +14,7 @@ use app\models\Company;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
-use app\models\Task;
-use app\models\TaskTag;
 use app\models\User;
-use app\repositories\UserRepository;
 use app\services\ChatMemberSystemMessage\CompanyHasNewRequestSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
@@ -26,22 +22,21 @@ use yii\base\Exception;
 
 class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 {
-	private const DAYS_FOR_TASK_EXECUTION = 7; // days
-	private const TASK_MESSAGE_TEXT       = 'Новый запрос у %s (#%s), нужно оформить его.';
+	private const TASK_MESSAGE_TEXT = 'Новый запрос у %s (#%s), нужно оформить его.';
 
 	protected ChatMemberMessageService     $chatMemberMessageService;
-	protected UserRepository               $userRepository;
 	protected TransactionBeginnerInterface $transactionBeginner;
+	protected TaskBuilderFactory           $taskBuilderFactory;
 
 	public function __construct(
 		ChatMemberMessageService $chatMemberMessageService,
-		UserRepository $userRepository,
-		TransactionBeginnerInterface $transactionBeginner
+		TransactionBeginnerInterface $transactionBeginner,
+		TaskBuilderFactory $taskBuilderFactory
 	)
 	{
 		$this->chatMemberMessageService = $chatMemberMessageService;
-		$this->userRepository           = $userRepository;
 		$this->transactionBeginner      = $transactionBeginner;
+		$this->taskBuilderFactory       = $taskBuilderFactory;
 	}
 
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
@@ -53,22 +48,22 @@ class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
 		$chatMember      = $survey->chatMember;
 		$chatMemberModel = $chatMember->model;
 
-		if ($chatMember->model_type !== Company::getMorphClass()) {
-			$chatMemberModel = $chatMember->model->company;
-			$chatMember      = $chatMember->model->company->chatMember;
-		}
-
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$message = $this->sendSystemMessageIntoCompany($chatMember, $survey);
+			if ($chatMember->model_type !== Company::getMorphClass()) {
+				$chatMemberModel = $chatMember->model->company;
+				$chatMember      = $chatMember->model->company->chatMember;
 
-			$this->createTaskForMessage($message, $survey->user, $chatMemberModel);
+				$this->sendSystemMessageIntoCompany($chatMember, $survey);
+			}
+
+			$this->createTaskForMessage($surveyChatMemberMessage, $survey->user, $chatMemberModel);
 
 			$tx->commit();
 		} catch (Throwable $th) {
@@ -81,7 +76,7 @@ class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey): ChatMemberMessage
+	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey): void
 	{
 		$message = CompanyHasNewRequestSystemMessage::create()
 		                                            ->setSurveyId($survey->id)
@@ -94,7 +89,7 @@ class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 			'contactIds' => [$survey->contact_id],
 		]);
 
-		return $this->chatMemberMessageService->createSystemMessage($dto);
+		$this->chatMemberMessageService->createSystemMessage($dto);
 	}
 
 	protected function getTaskMessage(Company $company): string
@@ -103,31 +98,18 @@ class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 	}
 
 	/**
-	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws Throwable
+	 * @throws ModelNotFoundException
 	 * @throws Exception
 	 */
 	protected function createTaskForMessage(ChatMemberMessage $message, User $user, Company $company): void
 	{
-		$moderator = $this->userRepository->getModerator();
-
-		if (!$moderator) {
-			throw new ModelNotFoundException('Moderator not found');
-		}
-
-		$dto = new CreateTaskDto([
-			'user'            => $moderator,
-			'message'         => $this->getTaskMessage($company),
-			'status'          => Task::STATUS_CREATED,
-			'start'           => DateTimeHelper::now(),
-			'end'             => DateTimeHelper::now()
-			                                   ->add(DateIntervalHelper::days(self::DAYS_FOR_TASK_EXECUTION)),
-			'created_by_type' => $user::getMorphClass(),
-			'created_by_id'   => $user->id,
-			'tagIds'          => [TaskTag::SURVEY_TASK_TAG_ID],
-			'observerIds'     => []
-		]);
+		$dto = $this->taskBuilderFactory
+			->createEffectBuilder()
+			->setMessage($this->getTaskMessage($company))
+			->setCreatedBy($user)
+			->build();
 
 		$this->chatMemberMessageService->createTask($message, $dto);
 	}

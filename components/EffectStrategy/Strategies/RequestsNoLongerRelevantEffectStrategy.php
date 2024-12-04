@@ -1,14 +1,11 @@
 <?php
 
-namespace app\components\EffectStrategy;
+namespace app\components\EffectStrategy\Strategies;
 
-use app\components\EffectStrategy\Traits\HandlingByBoolEffectStrategyTrait;
+use app\builders\Task\TaskBuilderFactory;
+use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
-use app\dto\Task\CreateTaskDto;
-use app\helpers\DateIntervalHelper;
-use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
-use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
@@ -16,32 +13,28 @@ use app\models\Company;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
-use app\models\Task;
-use app\models\TaskTag;
 use app\models\User;
-use app\repositories\UserRepository;
 use app\services\ChatMemberSystemMessage\RequestsNoLongerRelevantChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 
 class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT       = '%s (#%s) - устарели запросы, необходимо отправить их в пассив.';
-	private const DAYS_FOR_TASK_EXECUTION = 7; // days
+	private const TASK_MESSAGE_TEXT = '%s (#%s) - устарели запросы, необходимо отправить их в пассив.';
 
 	private ChatMemberMessageService     $chatMemberMessageService;
-	private UserRepository               $userRepository;
 	private TransactionBeginnerInterface $transactionBeginner;
+	private TaskBuilderFactory           $taskBuilderFactory;
 
 	public function __construct(
 		ChatMemberMessageService $chatMemberMessageService,
-		UserRepository $userRepository,
-		TransactionBeginnerInterface $transactionBeginner
+		TransactionBeginnerInterface $transactionBeginner,
+		TaskBuilderFactory $taskBuilderFactory
 	)
 	{
 		$this->chatMemberMessageService = $chatMemberMessageService;
-		$this->userRepository           = $userRepository;
 		$this->transactionBeginner      = $transactionBeginner;
+		$this->taskBuilderFactory       = $taskBuilderFactory;
 	}
 
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
@@ -49,7 +42,7 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 		return $answer->surveyQuestionAnswer->getMaybeBool();
 	}
 
-	protected function getTaskMessageText(Company $company): string
+	protected function getTaskMessage(Company $company): string
 	{
 		return sprintf(self::TASK_MESSAGE_TEXT, $company->getFullName(), $company->id);
 	}
@@ -58,7 +51,7 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer): void
+	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -69,11 +62,11 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 			if ($chatMember->model_type !== Company::getMorphClass()) {
 				$chatMemberModel = $chatMemberModel->company;
 				$chatMember      = $chatMemberModel->chatMember;
+
+				$this->sendSystemMessageIntoCompany($chatMember, $survey);
 			}
 
-			$message = $this->sendSystemMessageIntoCompany($chatMember, $survey);
-
-			$this->createTaskForMessage($message, $survey->user, $chatMemberModel);
+			$this->createTaskForMessage($surveyChatMemberMessage, $survey->user, $chatMemberModel);
 
 			$tx->commit();
 		} catch (Throwable $th) {
@@ -86,7 +79,7 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey): ChatMemberMessage
+	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey): void
 	{
 		$message = RequestsNoLongerRelevantChatMemberSystemMessage::create()->toMessage();
 
@@ -97,7 +90,7 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 			'contactIds' => [$survey->contact_id],
 		]);
 
-		return $this->chatMemberMessageService->createSystemMessage($dto);
+		$this->chatMemberMessageService->createSystemMessage($dto);
 	}
 
 	/**
@@ -106,24 +99,11 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 	 */
 	private function createTaskForMessage(ChatMemberMessage $message, User $user, Company $company): void
 	{
-		$moderator = $this->userRepository->getModerator();
-
-		if (!$moderator) {
-			throw new ModelNotFoundException('Moderator not found');
-		}
-
-		$dto = new CreateTaskDto([
-			'user'            => $moderator,
-			'message'         => $this->getTaskMessageText($company),
-			'status'          => Task::STATUS_CREATED,
-			'start'           => DateTimeHelper::now(),
-			'end'             => DateTimeHelper::now()
-			                                   ->add(DateIntervalHelper::days(self::DAYS_FOR_TASK_EXECUTION)),
-			'created_by_type' => $user::getMorphClass(),
-			'created_by_id'   => $user->id,
-			'tagIds'          => [TaskTag::SURVEY_TASK_TAG_ID],
-			'observerIds'     => []
-		]);
+		$dto = $this->taskBuilderFactory
+			->createEffectBuilder()
+			->setMessage($this->getTaskMessage($company))
+			->setCreatedBy($user)
+			->build();
 
 		$this->chatMemberMessageService->createTask($message, $dto);
 	}
