@@ -19,21 +19,21 @@ class TaskBuilder
 	protected bool $assignedToCreatedBy = false;
 	protected int  $status              = Task::STATUS_CREATED;
 
-	protected ?User              $user          = null;
-	protected ?User              $createdBy     = null;
-	protected ?int               $createdById   = null;
-	protected ?string            $createdByType = null;
-	protected ?string            $message       = null;
-	protected ?DateTimeInterface $start         = null;
-	protected ?DateTimeInterface $end           = null;
-	protected array              $tagIds        = [];
-	protected array              $observerIds   = [];
+	protected ?User              $user        = null;
+	protected                    $createdBy   = null;
+	protected ?string            $message     = null;
+	protected DateTimeInterface  $start;
+	protected ?DateTimeInterface $end         = null;
+	protected array              $tagIds      = [];
+	protected array              $observerIds = [];
 
 	protected UserRepository $userRepository;
 
 	public function __construct(UserRepository $userRepository)
 	{
 		$this->userRepository = $userRepository;
+
+		$this->setStart(DateTimeHelper::now());
 	}
 
 	public function setStatus(int $status): self
@@ -62,7 +62,7 @@ class TaskBuilder
 	protected function getUser(): ?User
 	{
 		if ($this->assignedToCreatedBy) {
-			return $this->userRepository->findOne($this->getCreatedById());
+			return $this->createdBy;
 		}
 
 		return $this->user;
@@ -84,11 +84,7 @@ class TaskBuilder
 
 	protected function getStart(): DateTimeInterface
 	{
-		if (!is_null($this->start)) {
-			return $this->start;
-		}
-
-		return DateTimeHelper::now();
+		return $this->start;
 	}
 
 	public function setEnd(DateTimeInterface $dateTime): self
@@ -98,17 +94,13 @@ class TaskBuilder
 		return $this;
 	}
 
-	protected function getEnd(): DateTimeInterface
+	protected function getEnd(): ?DateTimeInterface
 	{
 		if ($this->duration) {
 			$this->end = $this->getStart()->add(DateIntervalHelper::days($this->duration));
 		}
 
-		if (!is_null($this->end)) {
-			return $this->end;
-		}
-
-		return DateTimeHelper::now();
+		return $this->end;
 	}
 
 	public function setDuration(int $daysDuration): self
@@ -143,18 +135,22 @@ class TaskBuilder
 		return $this;
 	}
 
-	public function setCreatedBy(User $createdBy): self
+	/**
+	 * @param mixed $createdBy
+	 */
+	public function setCreatedBy($createdBy): self
 	{
 		$this->createdBy = $createdBy;
 
 		return $this;
 	}
 
-	public function setCreatedById(int $createdById): self
+	/**
+	 * @return mixed
+	 */
+	public function getCreatedBy()
 	{
-		$this->createdById = $createdById;
-
-		return $this;
+		return $this->createdBy;
 	}
 
 	protected function getCreatedById(): ?int
@@ -163,18 +159,7 @@ class TaskBuilder
 			return $this->createdBy->id;
 		}
 
-		return $this->createdById;
-	}
-
-	public function setCreatedByType(string $type): self
-	{
-		if ($this->createdBy) {
-			throw new InvalidArgumentException('Created by type already set using created by');
-		}
-
-		$this->createdByType = $type;
-
-		return $this;
+		return null;
 	}
 
 	protected function getCreatedByType(): ?string
@@ -183,7 +168,7 @@ class TaskBuilder
 			return $this->createdBy::getMorphClass();
 		}
 
-		return $this->createdByType;
+		return null;
 	}
 
 	public function assignToCreatedBy(): self
@@ -198,11 +183,7 @@ class TaskBuilder
 	 */
 	public function assignToModerator(): self
 	{
-		$moderator = $this->userRepository->getModerator();
-
-		if (!$moderator) {
-			throw new ModelNotFoundException('Moderator not found');
-		}
+		$moderator = $this->userRepository->getModeratorOrThrow();
 
 		$this->user = $moderator;
 
@@ -223,8 +204,12 @@ class TaskBuilder
 			throw new InvalidArgumentException('Message must be set');
 		}
 
-		if (is_null($this->getCreatedById())) {
-			throw new InvalidArgumentException('Created by id must be set');
+		if (is_null($this->getCreatedBy())) {
+			throw new InvalidArgumentException('Created by must be set');
+		}
+
+		if ($this->assignedToCreatedBy && $this->getCreatedByType() !== User::getMorphClass()) {
+			throw new InvalidArgumentException('Assigning to created by is possible only for users');
 		}
 	}
 
