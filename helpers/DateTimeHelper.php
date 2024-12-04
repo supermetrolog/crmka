@@ -75,4 +75,12 @@ class DateTimeHelper
 	{
 		return $first->format('Y-m-d') === $second->format('Y-m-d');
 	}
+
+	public static function diffInMinutes(DateTimeInterface $first, DateTimeInterface $second, bool $absolute = true): int
+	{
+		$diff = (int)(($first->getTimestamp() - $second->getTimestamp()) / 60);
+
+		return $absolute ? abs($diff) : $diff;
+	}
+
 }
