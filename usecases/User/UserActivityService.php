@@ -34,15 +34,15 @@ class UserActivityService
 	/**
 	 * @throws SaveModelException
 	 */
-	public function create(UserActivityDto $dto, string $startedAt): UserActivity
+	private function create(UserActivityDto $dto, DateTimeInterface $startedAt, ?DateTimeInterface $lastActivityAt = null): UserActivity
 	{
 		$model = new UserActivity([
 			'user_id'          => $dto->user_id,
 			'ip'               => $dto->ip,
 			'user_agent'       => $dto->user_agent,
 			'last_page'        => $dto->last_page,
-			'started_at'       => $startedAt,
-			'last_activity_at' => $startedAt
+			'started_at'       => DateTimeHelper::format($startedAt),
+			'last_activity_at' => DateTimeHelper::format($lastActivityAt ?? $startedAt)
 		]);
 
 		$model->saveOrThrow();
@@ -52,14 +52,15 @@ class UserActivityService
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Exception
 	 */
-	public function update(UserActivity $model, UserActivityDto $dto, string $lastActivityAt): UserActivity
+	private function update(UserActivity $model, UserActivityDto $dto, DateTimeInterface $lastActivityAt): UserActivity
 	{
 		$model->load([
 			'ip'               => $dto->ip,
 			'user_agent'       => $dto->user_agent,
 			'last_page'        => $dto->last_page,
-			'last_activity_at' => $lastActivityAt
+			'last_activity_at' => DateTimeHelper::format($lastActivityAt)
 		]);
 
 		$model->saveOrThrow();
@@ -67,14 +68,14 @@ class UserActivityService
 		return $model;
 	}
 
-	public function recreate(UserActivity $oldModel, UserActivityDto $dto, string $lastActivityAt, string $endedAt): UserActivity
+	private function recreate(UserActivity $oldModel, UserActivityDto $dto, DateTimeInterface $lastActivityAt): UserActivity
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$this->update($oldModel, $dto, $endedAt);
+			$this->update($oldModel, $dto, DateTimeHelper::make($oldModel->started_at)->setTime(23, 59, 59));
 
-			$newModel = $this->create($dto, $lastActivityAt);
+			$newModel = $this->create($dto, (clone $lastActivityAt)->setTime(0, 0, 0), $lastActivityAt);
 
 			$tx->commit();
 
@@ -92,49 +93,43 @@ class UserActivityService
 	 */
 	public function track(UserActivityDto $dto): UserActivity
 	{
-		$currentTime = DateTimeHelper::unix();
+		$currentTime = DateTimeHelper::now();
 
 		$lastActivity = $this->repository->findLastActivityByUserId($dto->user_id);
 
 		if ($this->shouldCreateNewActivity($lastActivity, $currentTime)) {
-			return $this->create($dto, DateTimeHelper::fromUnixf($currentTime));
+			return $this->create($dto, $currentTime);
 		}
 
 		if ($this->shouldReCreateActivity($lastActivity, $currentTime)) {
-			return $this->recreate(
-				$lastActivity,
-				$dto,
-				DateTimeHelper::fromUnixf($currentTime),
-				DateTimeHelper::makef($lastActivity->last_activity_at, 'Y-m-d 23:59:59')
-			);
+			return $this->recreate($lastActivity, $dto, $currentTime);
 		}
 
-		return $this->update($lastActivity, $dto, DateTimeHelper::fromUnixf($currentTime));
-
+		return $this->update($lastActivity, $dto, $currentTime);
 	}
 
 	/**
 	 * @throws Exception
 	 */
-	private function shouldCreateNewActivity(?UserActivity $lastActivity, int $currentTime): bool
+	private function shouldCreateNewActivity(?UserActivity $lastActivity, DateTimeInterface $currentTime): bool
 	{
 		if (is_null($lastActivity)) {
 			return true;
 		}
 
-		$lastActivityUnix = DateTimeHelper::makeUnix($lastActivity->last_activity_at);
+		$diff = DateTimeHelper::diffInMinutes($currentTime, DateTimeHelper::make($lastActivity->last_activity_at));
 
-		return $currentTime - $lastActivityUnix > self::ACTIVITY_TIMEOUT_MINUTES * 60;
+		return $diff > self::ACTIVITY_TIMEOUT_MINUTES;
 	}
 
 	/**
 	 * @throws Exception
 	 */
-	private function shouldReCreateActivity(UserActivity $lastActivity, int $currentTime): bool
+	private function shouldReCreateActivity(UserActivity $lastActivity, DateTimeInterface $currentTime): bool
 	{
 		return !DateTimeHelper::isSameDate(
 			DateTimeHelper::make($lastActivity->started_at),
-			DateTimeHelper::fromUnix($currentTime)
+			$currentTime
 		);
 	}
 
