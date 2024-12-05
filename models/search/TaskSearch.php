@@ -52,6 +52,7 @@ class TaskSearch extends Form
 		$query = Task::find()
 		             ->with(['user.userProfile', 'createdByUser.userProfile', 'tags', 'observers.user.userProfile'])
 		             ->joinWith(['tags', 'targetUserObserver tuo'])
+		             ->groupBy(Task::field('id'))
 		             ->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
