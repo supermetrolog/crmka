@@ -4,8 +4,8 @@ namespace app\models\search;
 
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
-use yii\data\ActiveDataProvider;
 use app\models\QuestionAnswer;
+use yii\data\ActiveDataProvider;
 
 class QuestionAnswerSearch extends Form
 {
@@ -31,7 +31,7 @@ class QuestionAnswerSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = QuestionAnswer::find();
+		$query = QuestionAnswer::find()->with('effects');
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
