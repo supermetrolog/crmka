@@ -344,4 +344,13 @@ class AR extends ActiveRecord
 	{
 		return static::tableName();
 	}
+
+	public function isDeleted(): bool
+	{
+		if ($this->useSoftDelete && $this->hasAttribute(self::SOFT_DELETE_ATTRIBUTE)) {
+			return !is_null($this->getAttribute(self::SOFT_DELETE_ATTRIBUTE));
+		}
+
+		return false;
+	}
 }
