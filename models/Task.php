@@ -124,11 +124,19 @@ class Task extends AR
 	}
 
 	/**
-	 * @return ActiveQuery|TaskQuery
+	 * @return ActiveQuery
 	 */
 	public function getTags(): ActiveQuery
 	{
 		return $this->hasMany(TaskTag::class, ['id' => 'task_tag_id'])->via('taskTags');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getTagIds(): array
+	{
+		return $this->getTaskTags()->select('task_tag_id')->column();
 	}
 
 	/**
@@ -226,5 +234,10 @@ class Task extends AR
 		}
 
 		return $targetUserObserver->viewed_at;
+	}
+
+	public function canBeReassigned(): bool
+	{
+		return $this->status !== self::STATUS_DONE && !$this->isDeleted();
 	}
 }

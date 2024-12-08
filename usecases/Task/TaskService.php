@@ -12,6 +12,7 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
 use app\models\TaskObserver;
+use app\models\User;
 use app\usecases\TaskObserver\TaskObserverService;
 use DateTimeInterface;
 use Exception;
@@ -37,8 +38,9 @@ class TaskService
 	/**
 	 * @throws SaveModelException
 	 * @throws Exception
+	 * @throws Throwable
 	 */
-	public function update(Task $task, UpdateTaskDto $dto): Task
+	public function update(Task $task, UpdateTaskDto $dto, User $initiator): Task
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -52,29 +54,11 @@ class TaskService
 			]);
 
 			$task->saveOrThrow();
-			$task->updateManyToManyRelations('tags', $dto->tagIds);
 
-			$currentObservers = $task->getUserIdsInObservers();
-			$addedObservers   = ArrayHelper::diff($dto->observerIds, $currentObservers);
-			$removedObservers = ArrayHelper::diff($currentObservers, $dto->observerIds);
-
-			foreach ($addedObservers as $observerId) {
-				$this->taskObserverService->create(new CreateTaskObserverDto([
-					'task_id'       => $task->id,
-					'user_id'       => $observerId,
-					'created_by_id' => $dto->created_by_id,
-				]));
-			}
-
-			if (ArrayHelper::notEmpty($removedObservers)) {
-				$this->taskObserverService->deleteAll([
-					'task_id' => $task->id,
-					'user_id' => $removedObservers,
-				]);
-			}
+			$this->updateTags($task, $dto->tagIds);
+			$this->updateObservers($task, $dto->observerIds, $initiator);
 
 			$tx->commit();
-
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;
@@ -84,48 +68,71 @@ class TaskService
 	}
 
 	/**
-	 * Установить статус задачи "В работе"
-	 *
-	 * @param Task $task
-	 *
-	 * @return void
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
+	private function updateObservers(Task $task, array $newObserverIds, User $initiator): void
+	{
+		$currentObserverIds = $task->getUserIdsInObservers();
+
+		$addedObservers   = ArrayHelper::diff($newObserverIds, $currentObserverIds);
+		$removedObservers = ArrayHelper::diff($currentObserverIds, $newObserverIds);
+
+		foreach ($addedObservers as $observerId) {
+			$this->taskObserverService->create(new CreateTaskObserverDto([
+				'task_id'       => $task->id,
+				'user_id'       => $observerId,
+				'created_by_id' => $initiator,
+			]));
+		}
+
+		if (ArrayHelper::notEmpty($removedObservers)) {
+			$this->taskObserverService->deleteAll([
+				'task_id' => $task->id,
+				'user_id' => $removedObservers,
+			]);
+		}
+	}
+
+
+	/**
+	 * @throws Throwable
+	 * @throws \yii\db\Exception
+	 */
+	private function updateTags(Task $task, array $newTagIds): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$task->updateManyToManyRelations('tags', $newTagIds);
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/* @throws SaveModelException */
 	public function accept(Task $task): void
 	{
 		$this->setStatus($task, Task::STATUS_ACCEPTED);
 	}
 
-	/**
-	 * Установить статус задачи "Выполнена"
-	 *
-	 * @param Task $task
-	 *
-	 * @return void
-	 * @throws SaveModelException
-	 */
+	/* @throws SaveModelException */
 	public function done(Task $task): void
 	{
 		$this->setStatus($task, Task::STATUS_DONE);
 	}
 
-	/**
-	 * Установить статус задачи "Отложена"
-	 *
-	 * @param Task $task
-	 *
-	 * @return void
-	 * @throws SaveModelException
-	 */
+	/* @throws SaveModelException */
 	public function impossible(Task $task, ?DateTimeInterface $impossibleToDate): void
 	{
 		$task->impossible_to = $impossibleToDate ? $impossibleToDate->format('Y-m-d H:i:s') : null;
 		$this->setStatus($task, Task::STATUS_IMPOSSIBLE);
 	}
 
-	/**
-	 * @throws SaveModelException
-	 */
+	/* @throws SaveModelException */
 	public function changeStatus(Task $task, ChangeTaskStatusDto $dto): void
 	{
 		switch ($dto->status) {
@@ -146,16 +153,26 @@ class TaskService
 				break;
 			default:
 				throw new UnexpectedValueException('Unexpected status');
-		};
+		}
 	}
 
-	/**
-	 * @throws SaveModelException
-	 */
+	/* @throws SaveModelException */
 	private function setStatus(Task $task, int $status): void
 	{
 		$task->status = $status;
 		$task->saveOrThrow();
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function assign(Task $task, User $user): Task
+	{
+		$task->user_id = $user->id;
+		$task->saveOrThrow();
+
+		return $task;
 	}
 
 	/**

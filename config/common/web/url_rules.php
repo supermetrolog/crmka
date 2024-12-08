@@ -205,6 +205,8 @@ return
 				'GET,OPTIONS <id>/comments'       => 'comments',
 				'POST,OPTIONS <id>/comments'      => 'create-comment',
 				'POST,OPTIONS <id>/read'          => 'read',
+				'POST,OPTIONS <id>/assign'        => 'assign',
+				'GET,OPTIONS <id>/history'        => 'history',
 			],
 		],
 		[
