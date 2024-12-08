@@ -8,7 +8,6 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Task;
 use app\models\User;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
-use app\resources\User\UserResource;
 use UnexpectedValueException;
 
 class TaskResource extends JsonResource
@@ -49,7 +48,7 @@ class TaskResource extends JsonResource
 		$createdBy = $this->resource->createdBy;
 
 		if ($createdBy instanceof User) {
-			return new UserResource($createdBy);
+			return new UserShortResource($createdBy);
 		}
 
 		throw new UnexpectedValueException('Unknown created by type');

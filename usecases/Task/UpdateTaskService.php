@@ -4,36 +4,36 @@ declare(strict_types=1);
 
 namespace app\usecases\Task;
 
-use app\dto\Task\ChangeTaskStatusDto;
-use app\dto\Task\CreateTaskCommentDto;
+use app\dto\Task\UpdateTaskDto;
 use app\dto\TaskHistory\TaskHistoryDto;
+use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
-use app\models\TaskEvent;
+use app\models\User;
 use app\usecases\TaskEvent\TaskEventService;
 use app\usecases\TaskHistory\TaskHistoryService;
 use Throwable;
 
-class ChangeTaskStatusService
+class UpdateTaskService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
 	private TaskService                  $taskService;
-	private CreateTaskCommentService     $createTaskCommentService;
+	private ChangeTaskTrackerService     $changeTaskTrackerService;
 	private TaskHistoryService           $taskHistoryService;
 	private TaskEventService             $taskEventService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		TaskService $taskService,
-		CreateTaskCommentService $createTaskCommentService,
+		ChangeTaskTrackerService $changeTaskTrackerService,
 		TaskHistoryService $taskHistoryService,
 		TaskEventService $taskEventService
 	)
 	{
 		$this->transactionBeginner      = $transactionBeginner;
 		$this->taskService              = $taskService;
-		$this->createTaskCommentService = $createTaskCommentService;
+		$this->changeTaskTrackerService = $changeTaskTrackerService;
 		$this->taskHistoryService       = $taskHistoryService;
 		$this->taskEventService         = $taskEventService;
 	}
@@ -42,39 +42,39 @@ class ChangeTaskStatusService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function changeStatus(Task $task, ChangeTaskStatusDto $dto): void
+	public function update(Task $task, UpdateTaskDto $dto, User $initiator): Task
 	{
-		if ($task->status === $dto->status) {
-			return;
-		}
-
 		$tx = $this->transactionBeginner->begin();
 
+		$oldTask = clone $task;
+
+		$oldTagIds      = $task->getTagIds();
+		$oldObserverIds = $task->getUserIdsInObservers();
+
 		try {
-			$oldTask        = clone $task;
-			$oldObserverIds = $task->getUserIdsInObservers();
-			$oldTagIds      = $task->getTagIds();
+			$updatedTask = $this->taskService->update($task, $dto, $initiator);
 
-			$this->taskService->changeStatus($task, $dto);
+			$changedAttributes = $this->changeTaskTrackerService->trackChanges($updatedTask, $oldTask, $oldTagIds, $oldObserverIds);
 
-			$taskHistory = $this->taskHistoryService->create(new TaskHistoryDto([
-				'task'        => $oldTask,
-				'createdBy'   => $dto->changedBy,
-				'observerIds' => $oldObserverIds,
-				'tagIds'      => $oldTagIds
-			]));
-
-			$this->taskEventService->create(TaskEvent::EVENT_TYPE_STATUS_CHANGED, $taskHistory);
-
-			if ($dto->comment) {
-				$this->createTaskCommentService->create(new CreateTaskCommentDto([
-					'message'       => $dto->comment,
-					'created_by_id' => $dto->changedBy->id,
-					'task_id'       => $task->id
+			if (ArrayHelper::notEmpty($changedAttributes)) {
+				$taskHistory = $this->taskHistoryService->create(new TaskHistoryDto([
+					'task'        => $oldTask,
+					'createdBy'   => $initiator,
+					'tagIds'      => $oldTagIds,
+					'observerIds' => $oldObserverIds
 				]));
+
+				foreach ($changedAttributes as $attribute => $event) {
+					$this->taskEventService->create(
+						$event,
+						$taskHistory
+					);
+				}
 			}
 
 			$tx->commit();
+
+			return $updatedTask;
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;

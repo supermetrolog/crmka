@@ -20,7 +20,6 @@ class TaskChangeStatusForm extends Form
 	public $comment;
 	public $status;
 	public $impossible_to;
-	public $changed_by_id;
 
 	public function rules(): array
 	{
@@ -28,7 +27,7 @@ class TaskChangeStatusForm extends Form
 			[['impossible_to'], 'safe'],
 			[['status'], 'required'],
 			[['comment'], 'string'],
-			[['status', 'changed_by_id'], 'integer'],
+			[['status'], 'integer'],
 			[['status'], 'in', 'range' => Task::getEditableStatuses()],
 		];
 	}
@@ -42,8 +41,7 @@ class TaskChangeStatusForm extends Form
 		return new ChangeTaskStatusDto([
 			'status'        => $this->status,
 			'impossible_to' => DateTimeHelper::tryMake($this->impossible_to),
-			'comment'       => $this->comment,
-			'changed_by_id' => $this->changed_by_id,
+			'comment'       => $this->comment
 		]);
 
 	}
