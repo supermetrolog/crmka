@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
+use app\models\ActiveQuery\TaskHistoryQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskTaskTagQuery;
 use yii\base\ErrorException;
@@ -34,6 +35,7 @@ use yii\db\ActiveQuery;
  * @property TaskComment       $lastComment
  * @property TaskObserver[]    $observers
  * @property TaskObserver      $targetUserObserver
+ * @property-read ?TaskHistory $lastHistory
  */
 class Task extends AR
 {
@@ -206,6 +208,12 @@ class Task extends AR
 		return $this->getObservers()->select('user_id')->column();
 	}
 
+	public function getLastHistory(): TaskHistoryQuery
+	{
+		/** @var TaskHistoryQuery */
+		return $this->hasOne(TaskHistory::class, ['task_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+	}
+
 	/**
 	 * @throws ErrorException
 	 */
@@ -239,5 +247,10 @@ class Task extends AR
 	public function canBeReassigned(): bool
 	{
 		return $this->status !== self::STATUS_DONE && !$this->isDeleted();
+	}
+
+	public function canBeRestored(): bool
+	{
+		return $this->isDeleted();
 	}
 }

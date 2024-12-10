@@ -10,8 +10,6 @@ use yii\base\BaseObject;
 
 class TaskHistoryDto extends BaseObject
 {
-	public Task  $task;
-	public User  $createdBy;
-	public array $tagIds      = [];
-	public array $observerIds = [];
+	public Task $task;
+	public User $createdBy;
 }

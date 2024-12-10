@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\repositories;
 
 use app\models\TaskHistory;
+use app\models\views\TaskHistoryView;
 
 class TaskHistoryRepository
 {
@@ -13,12 +14,12 @@ class TaskHistoryRepository
 		return TaskHistory::find()->byTaskId($taskId)->orderBy(['id' => SORT_DESC])->one();
 	}
 
-	/* @return TaskHistory[] */
-	public function findByTaskId(int $taskId): array
+	/* @return TaskHistoryView[] */
+	public function findViewsByTaskId(int $taskId): array
 	{
-		return TaskHistory::find()
-		                  ->byTaskId($taskId)
-		                  ->with(['user', 'createdByUser', 'events'])
-		                  ->all();
+		return TaskHistoryView::find()
+		                      ->byTaskId($taskId)
+		                      ->with(['user.userProfile', 'createdByUser.userProfile', 'events'])
+		                      ->all();
 	}
 }

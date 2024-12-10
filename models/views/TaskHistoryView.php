@@ -4,12 +4,17 @@ namespace app\models\views;
 
 use app\models\TaskEvent;
 use app\models\TaskHistory;
+use app\models\TaskTag;
+use app\models\User;
 
 /**
  * @property TaskEvent[] $events
  */
 class TaskHistoryView extends TaskHistory
 {
-	public array $tags      = [];
+	/** @var TaskTag[] */
+	public array $tags = [];
+
+	/** @var User[] */
 	public array $observers = [];
 }

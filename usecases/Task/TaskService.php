@@ -8,6 +8,7 @@ use app\dto\Task\ChangeTaskStatusDto;
 use app\dto\Task\UpdateTaskDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
 use app\helpers\ArrayHelper;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
@@ -18,6 +19,8 @@ use DateTimeInterface;
 use Exception;
 use Throwable;
 use UnexpectedValueException;
+use yii\base\ErrorException;
+use yii\base\InvalidCallException;
 use yii\db\StaleObjectException;
 
 class TaskService
@@ -44,13 +47,14 @@ class TaskService
 	{
 		$tx = $this->transactionBeginner->begin();
 
+		$startDate = DateTimeHelper::tryMake($dto->start);
+		$endDate   = DateTimeHelper::tryMake($dto->end);
+
 		try {
 			$task->load([
-				'user_id' => $dto->user->id,
 				'message' => $dto->message,
-				'status'  => $dto->status,
-				'start'   => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
-				'end'     => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null
+				'start'   => $startDate ? DateTimeHelper::format($startDate) : null,
+				'end'     => $endDate ? DateTimeHelper::format($endDate) : null
 			]);
 
 			$task->saveOrThrow();
@@ -82,7 +86,7 @@ class TaskService
 			$this->taskObserverService->create(new CreateTaskObserverDto([
 				'task_id'       => $task->id,
 				'user_id'       => $observerId,
-				'created_by_id' => $initiator,
+				'created_by_id' => $initiator->id,
 			]));
 		}
 
@@ -182,5 +186,18 @@ class TaskService
 	public function delete(Task $task): void
 	{
 		$task->delete();
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ErrorException
+	 */
+	public function restore(Task $task): void
+	{
+		if (!$task->canBeRestored()) {
+			throw new InvalidCallException("Task can't be restored");
+		}
+
+		$task->restore();
 	}
 }

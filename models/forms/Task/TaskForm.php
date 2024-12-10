@@ -111,8 +111,8 @@ class TaskForm extends Form
 			'user'          => User::find()->byId($this->user_id)->one(),
 			'message'       => $this->message,
 			'status'        => $this->status,
-			'start'         => DateTimeHelper::tryMake($this->start),
-			'end'           => DateTimeHelper::tryMake($this->end),
+			'start'         => $this->start,
+			'end'           => $this->end,
 			'tagIds'        => $this->tag_ids,
 			'observerIds'   => $this->observer_ids,
 			'created_by_id' => $this->created_by_id

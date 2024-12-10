@@ -17,14 +17,16 @@ use app\models\ActiveQuery\TaskHistoryQuery;
  */
 class TaskEvent extends AR
 {
+	public const EVENT_TYPE_CREATED               = 'created';
 	public const EVENT_TYPE_STATUS_CHANGED        = 'status_changed';
 	public const EVENT_TYPE_ASSIGNED              = 'assigned';
 	public const EVENT_TYPE_DESCRIPTION_CHANGED   = 'description_changed';
 	public const EVENT_TYPE_STARTING_DATE_CHANGED = 'starting_date_changed';
 	public const EVENT_TYPE_ENDING_DATE_CHANGED   = 'ending_date_changed';
-	public const EVENT_TYPE_IMPOSSIBLE_TO_CHANGED = 'impossible_to_changed';
 	public const EVENT_TYPE_TAGS_CHANGED          = 'tags_changed';
 	public const EVENT_TYPE_OBSERVERS_CHANGED     = 'observers_changed';
+	public const EVENT_TYPE_DELETED               = 'deleted';
+	public const EVENT_TYPE_RESTORED              = 'restored';
 
 	public static function tableName(): string
 	{

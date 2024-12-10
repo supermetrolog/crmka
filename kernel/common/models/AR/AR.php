@@ -158,6 +158,24 @@ class AR extends ActiveRecord
 	}
 
 	/**
+	 * @throws SaveModelException
+	 * @throws ErrorException
+	 */
+	public function restore(): void
+	{
+		if (!$this->useSoftDelete) {
+			throw new ErrorException('Model not use soft delete');
+		}
+
+		if (!$this->hasAttribute(self::SOFT_DELETE_ATTRIBUTE)) {
+			throw new ErrorException('Soft delete attribute (' . self::SOFT_DELETE_ATTRIBUTE . ') not exist');
+		}
+
+		$this->setAttribute(self::SOFT_DELETE_ATTRIBUTE, null);
+		$this->saveOrThrow();
+	}
+
+	/**
 	 * @return void
 	 * @throws ErrorException
 	 * @throws SaveModelException

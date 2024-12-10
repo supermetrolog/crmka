@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace app\usecases\Task;
 
+use app\components\EventManager;
 use app\dto\Task\TaskAssignDto;
-use app\dto\TaskHistory\TaskHistoryDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
+use app\events\Task\AssignTaskEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
-use app\models\TaskEvent;
-use app\usecases\TaskEvent\TaskEventService;
-use app\usecases\TaskHistory\TaskHistoryService;
 use app\usecases\TaskObserver\TaskObserverService;
 use Throwable;
 use yii\base\ErrorException;
@@ -22,22 +20,19 @@ class AssignTaskService
 	private TransactionBeginnerInterface $transactionBeginner;
 	private TaskService                  $taskService;
 	private TaskObserverService          $taskObserverService;
-	private TaskEventService             $taskEventService;
-	private TaskHistoryService           $taskHistoryService;
+	private EventManager                 $eventManager;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		TaskService $taskService,
 		TaskObserverService $taskObserverService,
-		TaskEventService $taskEventService,
-		TaskHistoryService $taskHistoryService
+		EventManager $eventManager
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
 		$this->taskService         = $taskService;
 		$this->taskObserverService = $taskObserverService;
-		$this->taskEventService    = $taskEventService;
-		$this->taskHistoryService  = $taskHistoryService;
+		$this->eventManager        = $eventManager;
 
 	}
 
@@ -59,10 +54,6 @@ class AssignTaskService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$oldTask        = clone $task;
-			$oldObserverIds = $task->getUserIdsInObservers();
-			$oldTagIds      = $task->getTagIds();
-
 			$task = $this->taskService->assign($task, $dto->user);
 
 			$this->taskObserverService->create(new CreateTaskObserverDto([
@@ -71,14 +62,7 @@ class AssignTaskService
 				'created_by_id' => $dto->assignedBy->id
 			]));
 
-			$taskHistory = $this->taskHistoryService->create(new TaskHistoryDto([
-				'task'        => $oldTask,
-				'createdBy'   => $dto->assignedBy,
-				'observerIds' => $oldObserverIds,
-				'tagIds'      => $oldTagIds
-			]));
-
-			$this->taskEventService->create(TaskEvent::EVENT_TYPE_ASSIGNED, $taskHistory);
+			$this->eventManager->trigger(new AssignTaskEvent($task, $dto->assignedBy));
 
 			$tx->commit();
 

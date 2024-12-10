@@ -207,6 +207,7 @@ return
 				'POST,OPTIONS <id>/read'          => 'read',
 				'POST,OPTIONS <id>/assign'        => 'assign',
 				'GET,OPTIONS <id>/history'        => 'history',
+				'PATCH,OPTIONS <id>/restore'      => 'restore',
 			],
 		],
 		[
