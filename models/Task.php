@@ -214,9 +214,6 @@ class Task extends AR
 		return $this->hasOne(TaskHistory::class, ['task_id' => 'id'])->orderBy(['id' => SORT_DESC]);
 	}
 
-	/**
-	 * @throws ErrorException
-	 */
 	public function getTargetUserObserver(): ActiveQuery
 	{
 		return $this->hasOne(TaskObserver::class, ['user_id' => 'user_id', 'task_id' => 'id']);

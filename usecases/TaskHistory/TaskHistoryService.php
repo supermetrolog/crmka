@@ -13,9 +13,7 @@ use app\models\TaskHistory;
 use app\models\TaskTag;
 use app\models\views\TaskHistoryView;
 use app\repositories\TaskHistoryRepository;
-use Throwable;
 use yii\base\ErrorException;
-use yii\db\StaleObjectException;
 use yii\helpers\Json;
 
 class TaskHistoryService
@@ -80,11 +78,11 @@ class TaskHistoryService
 	{
 		$histories = $this->repository->findViewsByTaskId($task->id);
 
-		return $this->injectRelatedDate($histories);
+		return $this->injectRelatedData($histories);
 	}
 
 
-	private function injectRelatedDate(array $histories): array
+	private function injectRelatedData(array $histories): array
 	{
 		if (ArrayHelper::empty($histories)) {
 			return [];
@@ -155,14 +153,5 @@ class TaskHistoryService
 			ArrayHelper::values($observerIds),
 			ArrayHelper::values($tagIds)
 		];
-	}
-
-	/**
-	 * @throws StaleObjectException
-	 * @throws Throwable
-	 */
-	public function delete(TaskHistory $task): void
-	{
-		$task->delete();
 	}
 }
