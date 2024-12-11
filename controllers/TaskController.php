@@ -7,6 +7,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Task\TaskAssignForm;
 use app\models\forms\Task\TaskChangeStatusForm;
 use app\models\forms\Task\TaskCommentForm;
 use app\models\forms\Task\TaskForm;
@@ -16,55 +17,74 @@ use app\repositories\TaskCommentRepository;
 use app\repositories\TaskObserverRepository;
 use app\repositories\TaskRepository;
 use app\resources\Task\TaskCommentResource;
+use app\resources\Task\TaskHistoryViewResource;
 use app\resources\Task\TaskRelationStatisticResource;
 use app\resources\Task\TaskResource;
 use app\resources\Task\TaskStatusStatisticResource;
 use app\resources\Task\TaskWithRelationResource;
+use app\usecases\Task\AssignTaskService;
 use app\usecases\Task\ChangeTaskStatusService;
 use app\usecases\Task\CreateTaskCommentService;
 use app\usecases\Task\CreateTaskService;
-use app\usecases\Task\TaskService;
+use app\usecases\Task\TaskStateService;
+use app\usecases\Task\UpdateTaskService;
+use app\usecases\TaskHistory\TaskHistoryService;
 use app\usecases\TaskObserver\TaskObserverService;
 use Exception;
 use Throwable;
 use yii\base\ErrorException;
+use yii\base\InvalidCallException;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class TaskController extends AppController
 {
-	private TaskService              $service;
 	private CreateTaskService        $createTaskService;
+	private UpdateTaskService        $updateTaskService;
+	private TaskStateService         $taskStateService;
+	private ChangeTaskStatusService  $changeTaskStatusService;
+	private AssignTaskService        $assignTaskService;
 	private TaskRepository           $repository;
 	private CreateTaskCommentService $createTaskCommentService;
 	private TaskCommentRepository    $taskCommentRepository;
 	private TaskObserverService      $taskObserverService;
 	private TaskObserverRepository   $taskObserverRepository;
-	private ChangeTaskStatusService  $changeTaskStatusService;
+	private TaskHistoryService       $taskHistoryService;
 
 	public function __construct(
 		$id,
 		$module,
-		TaskService $service,
 		CreateTaskService $createTaskService,
+		UpdateTaskService $updateTaskService,
+		TaskStateService $taskStateService,
+		ChangeTaskStatusService $changeTaskStatusService,
+		AssignTaskService $assignTaskService,
+		TaskRepository $repository,
 		CreateTaskCommentService $createTaskCommentService,
 		TaskCommentRepository $taskCommentRepository,
-		TaskRepository $repository,
-		TaskObserverRepository $taskObserverRepository,
 		TaskObserverService $taskObserverService,
-		ChangeTaskStatusService $changeTaskStatusService,
+		TaskObserverRepository $taskObserverRepository,
+		TaskHistoryService $taskHistoryService,
 		array $config = []
 	)
 	{
-		$this->service                  = $service;
-		$this->createTaskService        = $createTaskService;
+		$this->createTaskService       = $createTaskService;
+		$this->updateTaskService       = $updateTaskService;
+		$this->taskStateService        = $taskStateService;
+		$this->changeTaskStatusService = $changeTaskStatusService;
+		$this->assignTaskService       = $assignTaskService;
+
+		$this->repository = $repository;
+
 		$this->createTaskCommentService = $createTaskCommentService;
-		$this->repository               = $repository;
 		$this->taskCommentRepository    = $taskCommentRepository;
-		$this->changeTaskStatusService  = $changeTaskStatusService;
-		$this->taskObserverService      = $taskObserverService;
-		$this->taskObserverRepository   = $taskObserverRepository;
+
+		$this->taskObserverService    = $taskObserverService;
+		$this->taskObserverRepository = $taskObserverRepository;
+
+		$this->taskHistoryService = $taskHistoryService;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -84,14 +104,17 @@ class TaskController extends AppController
 		return TaskResource::fromDataProvider($dataProvider);
 	}
 
-	/**
-	 * @param int $id
-	 *
-	 * @return TaskWithRelationResource
-	 */
+
+	/* @throws ModelNotFoundException */
 	public function actionView(int $id): TaskWithRelationResource
 	{
-		return new TaskWithRelationResource($this->findModelById($id));
+		if ($this->user->identity->isAdministrator()) {
+			$model = $this->repository->findModelById($id, true);
+		} else {
+			$model = $this->repository->findModelById($id);
+		}
+
+		return new TaskWithRelationResource($model);
 	}
 
 	public function actionStatistic(): array
@@ -99,10 +122,8 @@ class TaskController extends AppController
 		return $this->repository->getStatusStatisticByUserId($this->request->get('user_id'));
 	}
 
-	/**
-	 * @throws ErrorException
-	 */
-	public function actionCounts()
+	/* @throws ErrorException */
+	public function actionCounts(): TaskStatusStatisticResource
 	{
 		$user_id       = $this->request->get('user_id');
 		$created_by_id = $this->request->get('created_by_id');
@@ -114,10 +135,8 @@ class TaskController extends AppController
 	}
 
 
-	/**
-	 * @throws ErrorException
-	 */
-	public function actionRelations()
+	/* @throws ErrorException */
+	public function actionRelations(): TaskRelationStatisticResource
 	{
 		$user_id = $this->request->get('user_id');
 
@@ -127,7 +146,6 @@ class TaskController extends AppController
 	}
 
 	/**
-	 * @return TaskResource
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 * @throws Throwable
@@ -151,7 +169,7 @@ class TaskController extends AppController
 	}
 
 	/**
-	 * @return array
+	 * @return TaskResource[]
 	 * @throws ErrorException
 	 * @throws SaveModelException
 	 * @throws Throwable
@@ -176,13 +194,10 @@ class TaskController extends AppController
 	}
 
 	/**
-	 * @param int $id
-	 *
-	 * @return TaskResource
+	 * @throws Throwable
+	 * @throws ValidateException
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
-	 * @throws ValidateException
-	 * @throws Exception
 	 */
 	public function actionUpdate(int $id): TaskResource
 	{
@@ -202,35 +217,32 @@ class TaskController extends AppController
 		$form->created_by_id = $model->created_by_id;
 		$form->validateOrThrow();
 
-		$model = $this->service->update($model, $form->getDto());
+		$model = $this->updateTaskService->update($model, $form->getDto(), $identity);
 
 		return new TaskResource($model);
 	}
 
 	/**
-	 * @param int $id
-	 *
-	 * @return array
-	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
-	 * @throws ValidateException
-	 * @throws Exception
+	 * @throws ModelNotFoundException
 	 * @throws Throwable
+	 * @throws ValidateException
 	 */
-	public function actionChangeStatus(int $id): array
+	public function actionChangeStatus(int $id): TaskWithRelationResource
 	{
 		$task = $this->findModelByIdAndCreatedByOrUserId($id);
 
 		$form = new TaskChangeStatusForm();
 		$form->load($this->request->post());
 
-		$form->changed_by_id = $this->user->id;
-
 		$form->validateOrThrow();
 
-		$this->changeTaskStatusService->changeStatus($task, $form->getDto());
+		$dto            = $form->getDto();
+		$dto->changedBy = $this->user->identity;
 
-		return TaskWithRelationResource::tryMake($task)->toArray();
+		$this->changeTaskStatusService->changeStatus($task, $dto);
+
+		return new TaskWithRelationResource($task);
 	}
 
 	/**
@@ -243,10 +255,12 @@ class TaskController extends AppController
 		$identity = $this->user->identity;
 
 		if ($identity->isAdministrator()) {
-			$this->service->delete($this->findModelById($id));
+			$model = $this->findModelById($id);
 		} else {
-			$this->service->delete($this->findModelByIdAndCreatedBy($id));
+			$model = $this->findModelByIdAndCreatedBy($id);
 		}
+
+		$this->taskStateService->delete($model, $this->user->identity);
 
 		return new SuccessResponse();
 	}
@@ -293,11 +307,62 @@ class TaskController extends AppController
 		return new SuccessResponse();
 	}
 
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws ValidateException
+	 * @throws Exception
+	 * @throws Throwable
+	 */
+	public function actionAssign(int $id): TaskResource
+	{
+		$task = $this->findModelById($id);
+
+		$form = new TaskAssignForm();
+
+		$form->load($this->request->post());
+		$form->assignedBy = $this->user->identity;
+
+		$form->validateOrThrow();
+
+		$dto = $form->getDto();
+
+		$model = $this->assignTaskService->assign($task, $dto);
+
+		return new TaskResource($model);
+	}
 
 	/**
-	 * @param int $id
-	 *
-	 * @return Task
+	 * @return TaskHistoryViewResource[]
+	 * @throws ModelNotFoundException
+	 */
+	public function actionHistory(int $id): array
+	{
+		$model = $this->findModelById($id);
+
+		$histories = $this->taskHistoryService->generateHistory($model);
+
+		return TaskHistoryViewResource::collection($histories);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 * @throws UnprocessableEntityHttpException
+	 */
+	public function actionRestore(int $id): TaskResource
+	{
+		try {
+			$model = $this->repository->findModelById($id, true);
+
+			$this->taskStateService->restore($model, $this->user->identity);
+
+			return new TaskResource($model);
+		} catch (InvalidCallException $e) {
+			throw new UnprocessableEntityHttpException("Задача #$id не может быть восстановлена");
+		}
+	}
+
+	/**
 	 * @throws ModelNotFoundException
 	 */
 	protected function findModelByIdAndCreatedBy(int $id): Task
@@ -306,9 +371,6 @@ class TaskController extends AppController
 	}
 
 	/**
-	 * @param int $id
-	 *
-	 * @return Task
 	 * @throws ModelNotFoundException
 	 */
 	protected function findModelByIdAndCreatedByOrUserId(int $id): Task

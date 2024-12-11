@@ -52,7 +52,7 @@ class TaskSearch extends Form
 		$query = Task::find()
 		             ->with(['user.userProfile', 'createdByUser.userProfile', 'tags', 'observers.user.userProfile'])
 		             ->joinWith(['tags', 'targetUserObserver tuo'])
-		             ->notDeleted();
+		             ->distinct();
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
@@ -96,9 +96,7 @@ class TaskSearch extends Form
 
 		if ($this->isFilterTrue($this->deleted)) {
 			$query->deleted();
-		}
-
-		if ($this->isFilterFalse($this->deleted)) {
+		} else {
 			$query->notDeleted();
 		}
 

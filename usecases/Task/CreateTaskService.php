@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace app\usecases\Task;
 
+use app\components\EventManager;
 use app\dto\Task\CreateTaskDto;
 use app\dto\Task\CreateTaskForUsersDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
+use app\events\Task\CreateTaskEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
+use app\repositories\UserRepository;
 use app\usecases\TaskObserver\TaskObserverService;
 use Throwable;
 
@@ -17,14 +20,20 @@ class CreateTaskService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
 	private TaskObserverService          $taskObserverService;
+	private EventManager                 $eventManager;
+	private UserRepository               $userRepository;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
-		TaskObserverService $taskObserverService
+		TaskObserverService $taskObserverService,
+		EventManager $eventManager,
+		UserRepository $userRepository
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
 		$this->taskObserverService = $taskObserverService;
+		$this->eventManager        = $eventManager;
+		$this->userRepository      = $userRepository;
 	}
 
 	/**
@@ -66,6 +75,9 @@ class CreateTaskService
 					'created_by_id' => $dto->created_by_id,
 				]));
 			}
+			
+			$createdBy = $this->userRepository->findOne($dto->created_by_id);
+			$this->eventManager->trigger(new CreateTaskEvent($task, $createdBy));
 
 			$tx->commit();
 

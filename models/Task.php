@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
+use app\models\ActiveQuery\TaskHistoryQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskTaskTagQuery;
 use yii\base\ErrorException;
@@ -34,6 +35,7 @@ use yii\db\ActiveQuery;
  * @property TaskComment       $lastComment
  * @property TaskObserver[]    $observers
  * @property TaskObserver      $targetUserObserver
+ * @property-read ?TaskHistory $lastHistory
  */
 class Task extends AR
 {
@@ -124,11 +126,19 @@ class Task extends AR
 	}
 
 	/**
-	 * @return ActiveQuery|TaskQuery
+	 * @return ActiveQuery
 	 */
 	public function getTags(): ActiveQuery
 	{
 		return $this->hasMany(TaskTag::class, ['id' => 'task_tag_id'])->via('taskTags');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getTagIds(): array
+	{
+		return $this->getTaskTags()->select('task_tag_id')->column();
 	}
 
 	/**
@@ -198,9 +208,12 @@ class Task extends AR
 		return $this->getObservers()->select('user_id')->column();
 	}
 
-	/**
-	 * @throws ErrorException
-	 */
+	public function getLastHistory(): TaskHistoryQuery
+	{
+		/** @var TaskHistoryQuery */
+		return $this->hasOne(TaskHistory::class, ['task_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+	}
+
 	public function getTargetUserObserver(): ActiveQuery
 	{
 		return $this->hasOne(TaskObserver::class, ['user_id' => 'user_id', 'task_id' => 'id']);
@@ -226,5 +239,15 @@ class Task extends AR
 		}
 
 		return $targetUserObserver->viewed_at;
+	}
+
+	public function canBeReassigned(): bool
+	{
+		return $this->status !== self::STATUS_DONE && !$this->isDeleted();
+	}
+
+	public function canBeRestored(): bool
+	{
+		return $this->isDeleted();
 	}
 }
