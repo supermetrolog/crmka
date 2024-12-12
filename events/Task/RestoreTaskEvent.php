@@ -2,6 +2,6 @@
 
 namespace app\events\Task;
 
-class RestoreTaskEvent extends TaskAbstractEvent
+class RestoreTaskEvent extends AbstractTaskEvent
 {
 }

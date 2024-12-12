@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
+use app\models\ActiveQuery\TaskCommentQuery;
 use app\models\ActiveQuery\TaskHistoryQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskTaskTagQuery;
@@ -13,38 +14,41 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "task".
  *
- * @property int               $id
- * @property int               $user_id
- * @property string            $message
- * @property int               $status
- * @property string|null       $start
- * @property string|null       $end
- * @property string            $created_by_type
- * @property int               $created_by_id
- * @property string            $created_at
- * @property string            $updated_at
- * @property string            $deleted_at
- * @property string|null       $impossible_to
+ * @property int                $id
+ * @property int                $user_id
+ * @property string             $message
+ * @property int                $status
+ * @property string|null        $start
+ * @property string|null        $end
+ * @property string             $created_by_type
+ * @property int                $created_by_id
+ * @property string             $created_at
+ * @property string             $updated_at
+ * @property string             $deleted_at
+ * @property string|null        $impossible_to
  *
- * @property User              $user
- * @property User              $createdByUser
- * @property TaskTag[]         $tags
- * @property User              $createdBy
- * @property ChatMemberMessage $chatMemberMessage
- * @property ChatMember        $chatMember
- * @property TaskComment       $lastComment
- * @property TaskObserver[]    $observers
- * @property TaskObserver      $targetUserObserver
- * @property-read ?TaskHistory $lastHistory
+ * @property User               $user
+ * @property User               $createdByUser
+ * @property TaskTag[]          $tags
+ * @property User               $createdBy
+ * @property ChatMemberMessage  $chatMemberMessage
+ * @property ChatMember         $chatMember
+ * @property TaskComment        $lastComment
+ * @property TaskObserver[]     $observers
+ * @property TaskObserver       $targetUserObserver
+ * @property-read ?TaskHistory  $lastHistory
+ * @property-read TaskComment[] $lastComments
  */
 class Task extends AR
 {
 	use ManyToManyTrait;
 
-	public const STATUS_CREATED    = 1;
-	public const STATUS_ACCEPTED   = 2;
-	public const STATUS_DONE       = 3;
-	public const STATUS_IMPOSSIBLE = 4;
+	public const LAST_COMMENTS_LIMIT = 5;
+	public const STATUS_CREATED      = 1;
+	public const STATUS_ACCEPTED     = 2;
+	public const STATUS_DONE         = 3;
+	public const STATUS_IMPOSSIBLE   = 4;
+
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -190,12 +194,28 @@ class Task extends AR
 
 	public function getLastComment(): ActiveQuery
 	{
-		return $this->hasOne(TaskComment::class, ['task_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+		/** @var TaskCommentQuery $query */
+		$query = $this->hasOne(TaskComment::class, ['task_id' => 'id']);
+
+		return $query->notDeleted()->orderBy(['id' => SORT_DESC]);
 	}
 
-	public function getComments(): ActiveQuery
+	public function getComments(): TaskCommentQuery
 	{
-		return $this->hasMany(TaskComment::class, ['task_id' => 'id']);
+		/** @var TaskCommentQuery $query */
+		$query = $this->hasMany(TaskComment::class, ['task_id' => 'id']);
+
+		return $query->notDeleted();
+	}
+
+	public function getLastComments(): TaskCommentQuery
+	{
+		return $this->getComments()->orderBy(['id' => SORT_DESC])->limit(self::LAST_COMMENTS_LIMIT);
+	}
+
+	public function getCommentsCount(): int
+	{
+		return $this->getComments()->count();
 	}
 
 	public function getObservers(): ActiveQuery
@@ -212,6 +232,11 @@ class Task extends AR
 	{
 		/** @var TaskHistoryQuery */
 		return $this->hasOne(TaskHistory::class, ['task_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+	}
+
+	public function getHistoriesCount(): int
+	{
+		return $this->hasMany(TaskHistory::class, ['task_id' => 'id'])->count();
 	}
 
 	public function getTargetUserObserver(): ActiveQuery

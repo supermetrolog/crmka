@@ -2,6 +2,6 @@
 
 namespace app\events\Task;
 
-class CreateTaskEvent extends TaskAbstractEvent
+class CreateTaskEvent extends AbstractTaskEvent
 {
 }

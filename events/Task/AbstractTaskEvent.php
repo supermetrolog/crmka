@@ -6,7 +6,7 @@ use app\events\AbstractEvent;
 use app\models\Task;
 use app\models\User;
 
-abstract class TaskAbstractEvent extends AbstractEvent
+abstract class AbstractTaskEvent extends AbstractEvent
 {
 	public Task $task;
 	public User $initiator;
