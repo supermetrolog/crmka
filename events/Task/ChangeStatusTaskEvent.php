@@ -2,6 +2,6 @@
 
 namespace app\events\Task;
 
-class ChangeStatusTaskEvent extends TaskAbstractEvent
+class ChangeStatusTaskEvent extends AbstractTaskEvent
 {
 }

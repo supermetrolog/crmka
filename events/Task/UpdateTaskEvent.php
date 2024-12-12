@@ -5,7 +5,7 @@ namespace app\events\Task;
 use app\models\Task;
 use app\models\User;
 
-class UpdateTaskEvent extends TaskAbstractEvent
+class UpdateTaskEvent extends AbstractTaskEvent
 {
 	/** @var string[] */
 	public array $eventTypes;
