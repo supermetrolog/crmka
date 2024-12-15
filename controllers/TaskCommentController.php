@@ -6,12 +6,15 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Task\TaskCommentForm;
 use app\models\search\TaskCommentSearch;
 use app\models\TaskComment;
 use app\resources\Task\TaskCommentResource;
 use app\usecases\Task\TaskCommentService;
+use Throwable;
 use yii\data\ActiveDataProvider;
+use yii\db\StaleObjectException;
 
 class TaskCommentController extends AppController
 {
@@ -74,6 +77,20 @@ class TaskCommentController extends AppController
 		$model = $this->service->update($model, $form->getDto());
 
 		return new TaskCommentResource($model);
+	}
+
+	/**
+	 * @throws Throwable
+	 * @throws ModelNotFoundException
+	 * @throws StaleObjectException
+	 */
+	public function actionDelete(int $id): SuccessResponse
+	{
+		$task = $this->findModelById($id);
+
+		$this->service->delete($task);
+
+		return new SuccessResponse('Комментарий удален');
 	}
 
 	/**

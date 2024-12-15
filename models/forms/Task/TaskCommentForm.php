@@ -8,7 +8,6 @@ use app\dto\Task\CreateTaskCommentDto;
 use app\dto\TaskComment\UpdateTaskCommentDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Task;
-use app\models\User;
 
 class TaskCommentForm extends Form
 {
@@ -23,7 +22,8 @@ class TaskCommentForm extends Form
 	{
 		return [
 			[['task_id', 'created_by_id'], 'integer'],
-			[['task_id', 'created_by_id', 'message'], 'required'],
+			[['message'], 'required'],
+			[['task_id', 'created_by_id'], 'required', 'on' => self::SCENARIO_CREATE],
 			[['message'], 'string', 'max' => 511],
 			[['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
 		];
@@ -53,9 +53,7 @@ class TaskCommentForm extends Form
 
 			default:
 				return new UpdateTaskCommentDto([
-					'message'   => $this->message,
-					'createdBy' => User::find()->byId($this->created_by_id)->one(),
-					'task'      => Task::find()->byId($this->task_id)->one()
+					'message' => $this->message
 				]);
 		}
 	}

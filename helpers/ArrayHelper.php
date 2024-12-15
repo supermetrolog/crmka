@@ -126,4 +126,13 @@ class ArrayHelper
 	{
 		return array_key_exists($needle, $array);
 	}
+
+	public static function hasEqualsValues(array $array1, array $array2): bool
+	{
+		if (self::length($array1) !== self::length($array2)) {
+			return false;
+		}
+
+		return self::empty(self::diff($array1, $array2));
+	}
 }

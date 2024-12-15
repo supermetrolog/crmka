@@ -27,17 +27,17 @@ class TaskRepository
 	}
 
 	/**
-	 * @param int $id
-	 *
-	 * @return Task
 	 * @throws ModelNotFoundException
 	 */
-	public function findModelById(int $id): Task
+	public function findModelById(int $id, bool $withDeleted = false): Task
 	{
-		return Task::find()
-		           ->byId($id)
-		           ->notDeleted()
-		           ->oneOrThrow();
+		$query = Task::find()->byId($id);
+
+		if (!$withDeleted) {
+			$query->notDeleted();
+		}
+
+		return $query->oneOrThrow();
 	}
 
 	/**

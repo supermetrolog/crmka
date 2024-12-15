@@ -7,7 +7,6 @@ namespace app\resources\Task;
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Task;
-use app\models\TaskComment;
 
 /**
  * Ресурс с описанием зависимости задачи (информаци о сообщении, о чате, в котором создана задача)
@@ -26,20 +25,11 @@ class TaskWithRelationResource extends JsonResource
 		return ArrayHelper::merge(
 			TaskResource::make($this->resource)->toArray(),
 			[
-				'related_by'   => TaskRelationResource::tryMake($this->resource)->toArray(),
-				'last_comment' => $this->getLastComment()
+				'related_by'      => TaskRelationResource::tryMakeArray($this->resource),
+				'last_comments'   => TaskCommentResource::collection($this->resource->lastComments),
+				'comments_count'  => $this->resource->getCommentsCount(),
+				'histories_count' => $this->resource->getHistoriesCount()
 			]
 		);
-	}
-
-	public function getLastComment(): ?array
-	{
-		$lastComment = $this->resource->lastComment;
-
-		if ($lastComment instanceof TaskComment) {
-			return TaskCommentResource::make($lastComment)->toArray();
-		}
-
-		return null;
 	}
 }
