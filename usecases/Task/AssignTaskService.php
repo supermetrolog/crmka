@@ -8,6 +8,7 @@ use app\components\EventManager;
 use app\dto\Task\TaskAssignDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
 use app\events\Task\AssignTaskEvent;
+use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
@@ -56,11 +57,15 @@ class AssignTaskService
 		try {
 			$task = $this->taskService->assign($task, $dto->user);
 
-			$this->taskObserverService->create(new CreateTaskObserverDto([
-				'task_id'       => $task->id,
-				'user_id'       => $dto->user->id,
-				'created_by_id' => $dto->assignedBy->id
-			]));
+			$currentObservedUsers = $task->getUserIdsInObservers();
+
+			if (!ArrayHelper::includes($currentObservedUsers, $dto->user->id, false)) {
+				$this->taskObserverService->create(new CreateTaskObserverDto([
+					'task_id'       => $task->id,
+					'user_id'       => $dto->user->id,
+					'created_by_id' => $dto->assignedBy->id
+				]));
+			}
 
 			$this->eventManager->trigger(new AssignTaskEvent($task, $dto->assignedBy));
 
