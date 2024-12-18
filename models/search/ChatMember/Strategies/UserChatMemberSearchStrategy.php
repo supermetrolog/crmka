@@ -2,11 +2,10 @@
 
 namespace app\models\search\ChatMember\Strategies;
 
-use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\helpers\ArrayHelper;
 use app\helpers\SQLHelper;
-use app\kernel\common\models\exceptions\ValidateException;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
+use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
@@ -14,7 +13,6 @@ use app\models\User;
 use app\models\UserProfile;
 use app\models\views\ChatMemberSearchView;
 use yii\base\ErrorException;
-use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 
 class UserChatMemberSearchStrategy extends AbstractChatMemberSearchStrategy
@@ -31,105 +29,63 @@ class UserChatMemberSearchStrategy extends AbstractChatMemberSearchStrategy
 		);
 	}
 
-	/**
-	 * @throws ValidateException
-	 * @throws ErrorException
-	 */
-	public function search(array $params): ActiveDataProvider
+	protected function createBaseQuery(): ChatMemberQuery
 	{
 		$messageQuery = ChatMemberMessage::find()
 		                                 ->select(['to_chat_member_id', 'chat_member_message_id' => 'MAX(id)'])
 		                                 ->notDeleted()
 		                                 ->groupBy(['to_chat_member_id']);
 
-		$query = ChatMemberSearchView::find()
-		                             ->select([
-			                             ChatMember::field('*'),
-			                             'last_call_rel_id'          => 'last_call_rel.id',
-			                             'is_linked'                 => $this->makeIsLinkedExpression(),
-			                             'unread_task_count'         => 'COUNT(DISTINCT t.id)',
-			                             'unread_notification_count' => 'COUNT(DISTINCT un.id)',
-			                             'unread_message_count'      => 'COUNT(DISTINCT m.id)',
-		                             ])
-		                             ->leftJoinLastCallRelation()
-		                             ->leftJoin(['t' => $this->makeTaskQuery()], [
-			                             't.to_chat_member_id' => ChatMember::xfield('id')
-		                             ])
-		                             ->leftJoin(['un' => $this->makeNotificationQuery()], [
-			                             'un.to_chat_member_id' => ChatMember::xfield('id')
-		                             ])
-		                             ->leftJoin(['m' => $this->makeMessageQuery()], [
-			                             'm.to_chat_member_id' => ChatMember::xfield('id')
-		                             ])
-		                             ->leftJoin(['cmm' => $messageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
-		                             ->joinWith(['user'])
-		                             ->with('user.userProfile')
-		                             ->with(['lastCall.user.userProfile'])
-		                             ->groupBy(ChatMember::field('id'));
+		return ChatMemberSearchView::find()
+		                           ->select([
+			                           ChatMember::field('*'),
+			                           'last_call_rel_id'          => 'last_call_rel.id',
+			                           'is_linked'                 => $this->makeIsLinkedExpression(),
+			                           'unread_task_count'         => 'COUNT(DISTINCT t.id)',
+			                           'unread_notification_count' => 'COUNT(DISTINCT un.id)',
+			                           'unread_message_count'      => 'COUNT(DISTINCT m.id)',
+		                           ])
+		                           ->leftJoinLastCallRelation()
+		                           ->leftJoin(['t' => $this->makeTaskQuery()], [
+			                           't.to_chat_member_id' => ChatMember::xfield('id')
+		                           ])
+		                           ->leftJoin(['un' => $this->makeNotificationQuery()], [
+			                           'un.to_chat_member_id' => ChatMember::xfield('id')
+		                           ])
+		                           ->leftJoin(['m' => $this->makeMessageQuery()], [
+			                           'm.to_chat_member_id' => ChatMember::xfield('id')
+		                           ])
+		                           ->leftJoin(['cmm' => $messageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
+		                           ->joinWith(['user'])
+		                           ->with('user.userProfile')
+		                           ->with(['lastCall.user.userProfile'])
+		                           ->groupBy(ChatMember::field('id'));
+	}
 
-		$this->load($params);
-		$this->validateOrThrow();
-
-		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
-			'sort'  => [
-				'enableMultiSort' => true,
-				'defaultOrder'    => [
-					'default' => SORT_DESC
-				],
-				'attributes'      => [
-					'task'         => [
-						'asc'  => ['t.id' => SORT_ASC],
-						'desc' => ['t.id' => SORT_DESC]
-					],
-					'notification' => [
-						'asc'  => ['un.id' => SORT_ASC],
-						'desc' => ['un.id' => SORT_DESC]
-					],
-					'message'      => [
-						'asc'  => [
-							'is_linked' => SORT_DESC,
-							IfExpressionBuilder::create()
-							                   ->condition('COUNT(DISTINCT m.id) > 0')
-							                   ->left('cmm.chat_member_message_id')
-							                   ->right('NULL')
-							                   ->beforeBuild(fn($expression) => "$expression ASC")
-							                   ->build()
-						],
-						'desc' => [
-							'is_linked' => SORT_DESC,
-							IfExpressionBuilder::create()
-							                   ->condition('COUNT(DISTINCT m.id) > 0')
-							                   ->left('cmm.chat_member_message_id')
-							                   ->right('NULL')
-							                   ->beforeBuild(fn($expression) => "$expression DESC")
-							                   ->build()
-						]
-					],
-					'default'      => [
-						'asc'  => [
-							'is_linked'                  => SORT_DESC,
-							'cmm.chat_member_message_id' => SORT_ASC,
-							ChatMember::field('id')      => SORT_ASC,
-						],
-						'desc' => [
-							'is_linked'                  => SORT_DESC,
-							'cmm.chat_member_message_id' => SORT_DESC,
-							ChatMember::field('id')      => SORT_ASC,
-						]
-					]
-				]
+	/**
+	 * @throws ErrorException
+	 */
+	protected function getDefaultSort(): array
+	{
+		return [
+			'asc'  => [
+				'is_linked'                  => SORT_DESC,
+				'cmm.chat_member_message_id' => SORT_ASC,
+				ChatMember::field('id')      => SORT_ASC,
+			],
+			'desc' => [
+				'is_linked'                  => SORT_DESC,
+				'cmm.chat_member_message_id' => SORT_DESC,
+				ChatMember::field('id')      => SORT_ASC,
 			]
-		]);
+		];
+	}
 
-		$query->andFilterWhere([
-			ChatMember::field('id')         => $this->id,
-			ChatMember::field('model_id')   => $this->model_id,
-			ChatMember::field('model_type') => $this->model_type,
-			ChatMember::field('created_at') => $this->created_at,
-			ChatMember::field('updated_at') => $this->updated_at
-		]);
-
+	/**
+	 * @throws ErrorException
+	 */
+	protected function applySpecificFilters(ChatMemberQuery $query, array $params): void
+	{
 		if (!empty($this->search)) {
 			$query->leftJoin(['user_profile' => UserProfile::tableName()], ['user_profile.user_id' => User::xfield('id')]);
 
@@ -147,8 +103,6 @@ class UserChatMemberSearchStrategy extends AbstractChatMemberSearchStrategy
 		$query->andFilterWhere([
 			User::field('status') => $this->status
 		]);
-
-		return $dataProvider;
 	}
 
 	private function makeIsLinkedExpression(): Expression
@@ -188,5 +142,14 @@ class UserChatMemberSearchStrategy extends AbstractChatMemberSearchStrategy
 		                        ])
 		                        ->andWhere(['views.chat_member_id' => null])
 		                        ->notDeleted();
+	}
+
+	protected function applySpecificQuery(ChatMemberQuery $query, array $params): void
+	{
+	}
+
+	protected function getSpecificSort(): array
+	{
+		return [];
 	}
 }
