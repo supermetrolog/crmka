@@ -4,6 +4,7 @@ namespace app\models\search;
 
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\ActiveQuery\TaskObserverQuery;
 use app\models\Task;
 use app\models\TaskObserver;
 use app\models\TaskTag;
@@ -25,6 +26,8 @@ class TaskSearch extends Form
 	public $multiple;
 	public $tag_ids;
 
+	public $observed;
+
 	public int $current_user_id;
 
 
@@ -32,7 +35,7 @@ class TaskSearch extends Form
 	{
 		return [
 			[['id', 'user_id', 'created_by_id', 'observer_id'], 'integer'],
-			[['deleted', 'expired', 'completed', 'multiple'], 'boolean'],
+			[['deleted', 'expired', 'completed', 'multiple', 'observed'], 'boolean'],
 			['status', 'each', 'rule' => ['integer']],
 			[['message', 'start', 'end', 'created_by_type'], 'safe'],
 			['tag_ids', 'each', 'rule' => [
@@ -142,19 +145,30 @@ class TaskSearch extends Form
 			                        [Task::getColumn('user_id') => $this->user_id],
 			                        [Task::getColumn('created_by_id') => $this->created_by_id],
 			                        [Task::getColumn('id') => $tasksWithObserver]]);
-
-			$query->andFilterWhere([
-				Task::getColumn('id')     => $this->id,
-				Task::getColumn('status') => $this->status
-			]);
 		} else {
-			$query->andFilterWhere([
-				Task::field('id')            => $this->id,
-				Task::field('user_id')       => $this->user_id,
-				Task::field('status')        => $this->status,
-				Task::field('created_by_id') => $this->created_by_id,
-			]);
+			if ($this->observer_id) {
+				$query->joinWith(['observers' => function (TaskObserverQuery $subquery) {
+					$subquery->andWhere([TaskObserver::field('user_id') => $this->observer_id]);
+
+					if ($this->isFilterFalse($this->observed)) {
+						$subquery->notViewed();
+					}
+				}]);
+
+				$query->andWhereNotNull(TaskObserver::field('id'));
+			} else {
+				$query->andFilterWhere([
+					Task::field('user_id')       => $this->user_id,
+					Task::field('created_by_id') => $this->created_by_id,
+				]);
+			}
 		}
+
+		$query->andFilterWhere([
+			Task::getColumn('id')     => $this->id,
+			Task::getColumn('status') => $this->status
+		]);
+
 
 		$query->andFilterWhere(['or',
 		                        ['like', Task::getColumn('message'), $this->message],

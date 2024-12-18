@@ -27,6 +27,7 @@ class TaskEvent extends AR
 	public const EVENT_TYPE_OBSERVERS_CHANGED     = 'observers_changed';
 	public const EVENT_TYPE_DELETED               = 'deleted';
 	public const EVENT_TYPE_RESTORED              = 'restored';
+	public const EVENT_TYPE_OBSERVED              = 'observed';
 
 	public static function tableName(): string
 	{

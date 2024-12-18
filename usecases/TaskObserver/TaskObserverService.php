@@ -59,6 +59,17 @@ class TaskObserverService
 	}
 
 	/**
+	 * @throws SaveModelException
+	 */
+	public function markAsNotObserved(TaskObserver $observer): TaskObserver
+	{
+		$observer->viewed_at = null;
+		$observer->saveOrThrow();
+
+		return $observer;
+	}
+
+	/**
 	 * @throws Throwable
 	 */
 	public function delete(TaskObserver $observer): void
