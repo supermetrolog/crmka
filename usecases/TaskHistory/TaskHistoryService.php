@@ -10,6 +10,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\oldDb\User;
 use app\models\Task;
 use app\models\TaskHistory;
+use app\models\TaskObserver;
 use app\models\TaskTag;
 use app\models\views\TaskHistoryView;
 use app\repositories\TaskHistoryRepository;
@@ -67,9 +68,21 @@ class TaskHistoryService
 	 */
 	private function generateTaskState(Task $task): string
 	{
+		$observers = $task->observers;
+
+		$userIdsInObservers = ArrayHelper::map($observers, static fn(TaskObserver $observer) => $observer->user_id);
+
+		$observedUserIds = ArrayHelper::values(
+			ArrayHelper::map(
+				ArrayHelper::filter($observers, static fn(TaskObserver $observer) => $observer->viewed_at !== null),
+				static fn(TaskObserver $observer) => $observer->user_id
+			)
+		);
+
 		return Json::encode([
 			'tag_ids'      => $task->getTagIds(),
-			'observer_ids' => $task->getUserIdsInObservers()
+			'observer_ids' => $userIdsInObservers,
+			'observed_ids' => $observedUserIds
 		]);
 	}
 

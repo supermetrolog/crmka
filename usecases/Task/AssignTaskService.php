@@ -59,7 +59,9 @@ class AssignTaskService
 
 			$currentObservedUsers = $task->getUserIdsInObservers();
 
-			if (!ArrayHelper::includes($currentObservedUsers, $dto->user->id, false)) {
+			if (ArrayHelper::includes($currentObservedUsers, $dto->user->id, false)) {
+				$this->taskObserverService->markAsNotObserved($task->targetUserObserver);
+			} else {
 				$this->taskObserverService->create(new CreateTaskObserverDto([
 					'task_id'       => $task->id,
 					'user_id'       => $dto->user->id,
