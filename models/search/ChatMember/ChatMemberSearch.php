@@ -27,7 +27,7 @@ class ChatMemberSearch extends BaseObject
 		$strategy->current_user_id        = $this->current_user_id;
 		$strategy->current_chat_member_id = $this->current_chat_member_id;
 
-		return $strategy->search($params, $this);
+		return $strategy->search($params);
 	}
 
 	private function determineType(array $params): ?string
