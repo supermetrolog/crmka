@@ -13,8 +13,9 @@ use app\models\forms\Call\CallForm;
 use app\models\forms\ChatMember\PinChatMemberMessageForm;
 use app\models\forms\ChatMember\StatisticChatMemberViewForm;
 use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
+use app\models\search\ChatMember\ChatMemberSearch;
+use app\models\search\ChatMember\ChatMemberSearchStrategyFactory;
 use app\models\search\ChatMemberMediaSearch;
-use app\models\search\ChatMemberSearch;
 use app\models\User;
 use app\models\views\ChatMemberSearchView;
 use app\repositories\ChatMemberRepository;
@@ -32,25 +33,23 @@ use yii\web\NotFoundHttpException;
 
 class ChatMemberController extends AppController
 {
-	private ChatMemberService    $service;
-	private ChatMemberRepository $repository;
+	private ChatMemberService               $service;
+	private ChatMemberRepository            $repository;
+	private ChatMemberSearchStrategyFactory $searchStrategyFactory;
 
-	public function __construct($id, $module, ChatMemberService $service, ChatMemberRepository $repository, array $config = [])
+	public function __construct($id, $module, ChatMemberService $service, ChatMemberRepository $repository, ChatMemberSearchStrategyFactory $searchStrategyFactory, array $config = [])
 	{
-		$this->service    = $service;
-		$this->repository = $repository;
+		$this->service               = $service;
+		$this->repository            = $repository;
+		$this->searchStrategyFactory = $searchStrategyFactory;
 		parent::__construct($id, $module, $config);
 	}
 
-	/**
-	 * @throws ValidateException
-	 * @throws ErrorException
-	 */
 	public function actionIndex(): ActiveDataProvider
 	{
 		// TODO: Сделать разные поиски для разны типов моделей так как они будут сильно отличаться!
 
-		$searchModel = new ChatMemberSearch();
+		$searchModel = new ChatMemberSearch($this->searchStrategyFactory);
 
 		$searchModel->current_chat_member_id = $this->user->identity->chatMember->id;
 		$searchModel->current_user_id        = $this->user->id;
