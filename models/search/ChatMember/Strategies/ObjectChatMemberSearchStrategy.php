@@ -4,6 +4,7 @@ namespace app\models\search\ChatMember\Strategies;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\helpers\ArrayHelper;
+use app\helpers\SQLHelper;
 use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ChatMember;
@@ -11,18 +12,21 @@ use app\models\Company;
 use app\models\ObjectChatMember;
 use app\models\Objects;
 use yii\base\ErrorException;
+use yii\db\Expression;
 
 class ObjectChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 {
 	public $object_id;
 	public $company_id;
+	public $type;
 
 	public function rules(): array
 	{
 		return ArrayHelper::merge(
 			parent::rules(),
 			[
-				[['object_id', 'company_id'], 'integer']
+				[['object_id', 'company_id'], 'integer'],
+				['type', 'string']
 			]
 		);
 	}
@@ -55,12 +59,27 @@ class ObjectChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 			]);
 		}
 
-		$query->orFilterWhere([Objects::field('company_id') => $this->company_id]);
-
 		$query->andFilterWhere([
 			ObjectChatMember::field('object_id') => $this->object_id,
-			'chm.id'                             => $this->consultant_ids
+			'chm.id'                             => $this->consultant_ids,
+			ObjectChatMember::field('type')      => $this->type,
+			Objects::field('company_id')         => $this->company_id
 		]);
+
+		if ($this->isFilterTrue($this->need_calling)) {
+			$interval = new Expression(SQLHelper::dateSub('NOW()', '3 MONTH'));
+
+			$query->andWhere([
+				'or',
+				['<', 'last_call_rel.created_at', $interval],
+				[
+					'and',
+					['last_call_rel.created_at' => null],
+					['<', SQLHelper::fromUnixTime(Objects::field('last_update')), $interval],
+				],
+				[]
+			]);
+		}
 	}
 
 	/**

@@ -56,7 +56,7 @@ class RequestChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 			]);
 		}
 
-		$query->orFilterWhere([Request::field('company_id') => $this->company_id]);
+		$query->andFilterWhere([Request::field('company_id') => $this->company_id]);
 	}
 
 	/**

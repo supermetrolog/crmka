@@ -3,11 +3,13 @@
 namespace app\models\search\ChatMember\Strategies;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
+use app\helpers\SQLHelper;
 use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ChatMember;
 use app\models\Company;
 use yii\base\ErrorException;
+use yii\db\Expression;
 
 class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 {
@@ -40,6 +42,21 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 		$query->andFilterWhere([
 			Company::field('consultant_id') => $this->consultant_ids
 		]);
+
+		if ($this->isFilterTrue($this->need_calling)) {
+			$interval = new Expression(SQLHelper::dateSub('NOW()', '3 MONTH'));
+
+			$query->andWhere([
+				'or',
+				['<', 'last_call_rel.created_at', $interval],
+				[
+					'and',
+					['last_call_rel.created_at' => null],
+					['<', Company::field('updated_at'), $interval]
+				],
+				[]
+			]);
+		}
 	}
 
 	/**

@@ -116,27 +116,10 @@ abstract class AbstractChatMemberSearchStrategy extends Form implements ChatMemb
 			ChatMember::field('created_at') => $this->created_at,
 			ChatMember::field('updated_at') => $this->updated_at
 		]);
-	}
 
-	/**
-	 * @return ChatMemberMessageQuery
-	 * @throws ErrorException
-	 */
-	protected function makeMessageQuery(): ChatMemberMessageQuery
-	{
-		$subQuery = ChatMemberMessageView::find()
-		                                 ->andWhere([ChatMemberMessageView::field('chat_member_id') => $this->current_chat_member_id]);
-
-		return ChatMemberMessage::find()
-		                        ->select([
-			                        'id'                => ChatMemberMessage::field('id'),
-			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
-		                        ])
-		                        ->leftJoin(['views' => $subQuery], [
-			                        'views.chat_member_message_id' => ChatMemberMessage::xfield('id'),
-		                        ])
-		                        ->andWhere(['views.chat_member_id' => null])
-		                        ->notDeleted();
+		if ($this->isFilterTrue($this->with_messages)) {
+			$query->andHaving(['and', 'unread_message_count > 0', ['is_linked' => true]]);
+		}
 	}
 
 	protected function createDataProvider(ChatMemberQuery $query): ActiveDataProvider
@@ -188,6 +171,28 @@ abstract class AbstractChatMemberSearchStrategy extends Form implements ChatMemb
 				'default'      => $this->getDefaultSort()
 			],
 			$this->getSpecificSort());
+	}
+
+	/**
+	 * @return ChatMemberMessageQuery
+	 * @throws ErrorException
+	 */
+	protected function makeMessageQuery(): ChatMemberMessageQuery
+	{
+		$subQuery = ChatMemberMessageView::find()
+		                                 ->andWhere([ChatMemberMessageView::field('chat_member_id') => $this->current_chat_member_id]);
+
+		return ChatMemberMessage::find()
+		                        ->select([
+			                        'id'                => ChatMemberMessage::field('id'),
+			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id'),
+		                        ])
+		                        ->leftJoin(['views' => $subQuery], [
+			                        'views.chat_member_message_id' => ChatMemberMessage::xfield('id'),
+		                        ])
+		                        ->andWhere(['views.chat_member_id' => null])
+		                        ->notDeleted()
+		                        ->distinct();
 	}
 
 	/**
