@@ -89,7 +89,7 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 			'call' => [
 				'asc'  => [
 					IfExpressionBuilder::create()
-					                   ->condition(Company::field('consultant_id') . ' = ' . $this->current_user_id)
+					                   ->condition(Company::field('consultant_id') . ' = :user_id', [':user_id' => $this->current_user_id])
 					                   ->left('1')
 					                   ->right('0')
 					                   ->beforeBuild(fn($expression) => "$expression DESC")
@@ -99,7 +99,7 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 				],
 				'desc' => [
 					IfExpressionBuilder::create()
-					                   ->condition(Company::field('consultant_id') . ' = ' . $this->current_user_id)
+					                   ->condition(Company::field('consultant_id') . ' = :user_id', [':user_id' => $this->current_user_id])
 					                   ->left('1')
 					                   ->right('0')
 					                   ->beforeBuild(fn($expression) => "$expression DESC")
