@@ -30,7 +30,7 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 	protected function applySpecificFilters(ChatMemberQuery $query, array $params): void
 	{
 		if (!empty($this->search)) {
-			$searchWords = StringHelper::explode(StringHelper::SYMBOL_SPACE, $this->search);
+			$searchWords = StringHelper::toWords($this->search);
 
 			$query->andFilterWhere([
 				'or',

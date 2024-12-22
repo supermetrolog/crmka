@@ -159,4 +159,10 @@ class StringHelper
 	{
 		return strtolower($string);
 	}
+
+	/** @return string[] */
+	public static function toWords(string $string): array
+	{
+		return self::explode(self::SYMBOL_SPACE, $string);
+	}
 }

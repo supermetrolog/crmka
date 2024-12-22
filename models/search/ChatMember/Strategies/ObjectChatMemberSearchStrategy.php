@@ -49,7 +49,7 @@ class ObjectChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 		if (!empty($this->search)) {
 			$query->leftJoin(['object_company' => Company::tableName()], ['object_company.id' => Objects::xfield('company_id')]);
 
-			$searchWords = StringHelper::explode(StringHelper::SYMBOL_SPACE, $this->search);
+			$searchWords = StringHelper::toWords($this->search);
 
 			$query->andFilterWhere([
 				'or',

@@ -47,7 +47,7 @@ class RequestChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 		if (!empty($this->search)) {
 			$query->leftJoin(['request_company' => Company::tableName()], ['request_company.id' => Request::xfield('company_id')]);
 
-			$searchWords = StringHelper::explode(StringHelper::SYMBOL_SPACE, $this->search);
+			$searchWords = StringHelper::toWords($this->search);
 
 			$query->andFilterWhere([
 				'or',
