@@ -308,7 +308,7 @@ class TaskController extends AppController
 	 * @throws Exception
 	 * @throws Throwable
 	 */
-	public function actionAssign(int $id): TaskResource
+	public function actionAssign(int $id): TaskWithRelationResource
 	{
 		$task = $this->findModelById($id);
 
@@ -323,7 +323,7 @@ class TaskController extends AppController
 
 		$model = $this->assignTaskService->assign($task, $dto);
 
-		return new TaskResource($model);
+		return new TaskWithRelationResource($model);
 	}
 
 	/**
