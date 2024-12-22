@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\usecases\Task;
 
 use app\components\EventManager;
+use app\dto\Task\CreateTaskCommentDto;
 use app\dto\Task\TaskAssignDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
 use app\events\Task\AssignTaskEvent;
@@ -22,19 +23,21 @@ class AssignTaskService
 	private TaskService                  $taskService;
 	private TaskObserverService          $taskObserverService;
 	private EventManager                 $eventManager;
+	private CreateTaskCommentService     $createTaskCommentService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		TaskService $taskService,
 		TaskObserverService $taskObserverService,
-		EventManager $eventManager
+		EventManager $eventManager,
+		CreateTaskCommentService $createTaskCommentService
 	)
 	{
-		$this->transactionBeginner = $transactionBeginner;
-		$this->taskService         = $taskService;
-		$this->taskObserverService = $taskObserverService;
-		$this->eventManager        = $eventManager;
-
+		$this->transactionBeginner      = $transactionBeginner;
+		$this->taskService              = $taskService;
+		$this->taskObserverService      = $taskObserverService;
+		$this->eventManager             = $eventManager;
+		$this->createTaskCommentService = $createTaskCommentService;
 	}
 
 	/**
@@ -56,6 +59,12 @@ class AssignTaskService
 
 		try {
 			$task = $this->taskService->assign($task, $dto->user);
+
+			$this->createTaskCommentService->create(new CreateTaskCommentDto([
+				'message'       => $dto->comment,
+				'created_by_id' => $dto->assignedBy->id,
+				'task_id'       => $task->id
+			]));
 
 			$currentObservedUsers = $task->getUserIdsInObservers();
 

@@ -13,5 +13,6 @@ class TaskAssignDto extends BaseObject
 	public User $user;
 
 	/** @var User|ChatMember */
-	public $assignedBy;
+	public        $assignedBy;
+	public string $comment;
 }
