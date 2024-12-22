@@ -2,8 +2,10 @@
 
 namespace app\models\search\ChatMember;
 
+use Exception;
 use yii\base\BaseObject;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper as YiiArrayHelper;
 
 class ChatMemberSearch extends BaseObject
 {
@@ -18,9 +20,12 @@ class ChatMemberSearch extends BaseObject
 		parent::__construct($config);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$type = $this->determineType($params);
+		$type = YiiArrayHelper::getValue($params, 'model_type');
 
 		$strategy = $this->factory->create($type);
 
@@ -28,14 +33,5 @@ class ChatMemberSearch extends BaseObject
 		$strategy->current_chat_member_id = $this->current_chat_member_id;
 
 		return $strategy->search($params);
-	}
-
-	private function determineType(array $params): ?string
-	{
-		if (isset($params['model_type'])) {
-			return $params['model_type'];
-		}
-
-		return null;
 	}
 }
