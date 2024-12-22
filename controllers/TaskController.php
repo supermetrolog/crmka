@@ -14,7 +14,6 @@ use app\models\forms\Task\TaskForm;
 use app\models\search\TaskSearch;
 use app\models\Task;
 use app\repositories\TaskCommentRepository;
-use app\repositories\TaskObserverRepository;
 use app\repositories\TaskRepository;
 use app\resources\Task\TaskCommentResource;
 use app\resources\Task\TaskHistoryViewResource;
@@ -26,10 +25,10 @@ use app\usecases\Task\AssignTaskService;
 use app\usecases\Task\ChangeTaskStatusService;
 use app\usecases\Task\CreateTaskCommentService;
 use app\usecases\Task\CreateTaskService;
+use app\usecases\Task\ObserveTaskService;
 use app\usecases\Task\TaskStateService;
 use app\usecases\Task\UpdateTaskService;
 use app\usecases\TaskHistory\TaskHistoryService;
-use app\usecases\TaskObserver\TaskObserverService;
 use Exception;
 use Throwable;
 use yii\base\ErrorException;
@@ -49,8 +48,7 @@ class TaskController extends AppController
 	private TaskRepository           $repository;
 	private CreateTaskCommentService $createTaskCommentService;
 	private TaskCommentRepository    $taskCommentRepository;
-	private TaskObserverService      $taskObserverService;
-	private TaskObserverRepository   $taskObserverRepository;
+	private ObserveTaskService       $observeTaskService;
 	private TaskHistoryService       $taskHistoryService;
 
 	public function __construct(
@@ -64,8 +62,7 @@ class TaskController extends AppController
 		TaskRepository $repository,
 		CreateTaskCommentService $createTaskCommentService,
 		TaskCommentRepository $taskCommentRepository,
-		TaskObserverService $taskObserverService,
-		TaskObserverRepository $taskObserverRepository,
+		ObserveTaskService $observeTaskService,
 		TaskHistoryService $taskHistoryService,
 		array $config = []
 	)
@@ -75,14 +72,12 @@ class TaskController extends AppController
 		$this->taskStateService        = $taskStateService;
 		$this->changeTaskStatusService = $changeTaskStatusService;
 		$this->assignTaskService       = $assignTaskService;
+		$this->observeTaskService      = $observeTaskService;
 
 		$this->repository = $repository;
 
 		$this->createTaskCommentService = $createTaskCommentService;
 		$this->taskCommentRepository    = $taskCommentRepository;
-
-		$this->taskObserverService    = $taskObserverService;
-		$this->taskObserverRepository = $taskObserverRepository;
 
 		$this->taskHistoryService = $taskHistoryService;
 
@@ -296,13 +291,13 @@ class TaskController extends AppController
 	/**
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function actionRead(int $id): SuccessResponse
 	{
-		$task     = $this->findModelById($id);
-		$observer = $this->taskObserverRepository->findOneByTaskIdAndUserId($task->id, $this->user->id);
+		$task = $this->findModelById($id);
 
-		$this->taskObserverService->observe($observer);
+		$this->observeTaskService->observe($task, $this->user->identity);
 
 		return new SuccessResponse();
 	}
@@ -313,7 +308,7 @@ class TaskController extends AppController
 	 * @throws Exception
 	 * @throws Throwable
 	 */
-	public function actionAssign(int $id): TaskResource
+	public function actionAssign(int $id): TaskWithRelationResource
 	{
 		$task = $this->findModelById($id);
 
@@ -328,7 +323,7 @@ class TaskController extends AppController
 
 		$model = $this->assignTaskService->assign($task, $dto);
 
-		return new TaskResource($model);
+		return new TaskWithRelationResource($model);
 	}
 
 	/**

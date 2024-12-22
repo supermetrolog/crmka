@@ -102,9 +102,9 @@ class ArrayHelper
 		return count($array);
 	}
 
-	public static function includes(array $array, $needle): bool
+	public static function includes(array $array, $needle, bool $strict = true): bool
 	{
-		return in_array($needle, $array, true);
+		return in_array($needle, $array, $strict);
 	}
 
 	/**

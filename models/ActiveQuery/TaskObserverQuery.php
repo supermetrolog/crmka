@@ -36,11 +36,11 @@ class TaskObserverQuery extends AQ
 
 	public function notViewed(): self
 	{
-		return $this->andWhereNull('viewed_at');
+		return $this->andWhereNull($this->field('viewed_at'));
 	}
 
 	public function viewed(): self
 	{
-		return $this->andWhereNotNull('viewed_at');
+		return $this->andWhereNotNull($this->field('viewed_at'));
 	}
 }
