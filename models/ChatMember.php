@@ -9,6 +9,7 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskQuery;
+use InvalidArgumentException;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
@@ -149,7 +150,18 @@ class ChatMember extends AR
 
 	public function getModel(): AR
 	{
-		return $this->company ?? $this->objectChatMember ?? $this->user ?? $this->request;
+		switch ($this->model_type) {
+			case Company::getMorphClass():
+				return $this->company;
+			case ObjectChatMember::getMorphClass():
+				return $this->objectChatMember;
+			case User::getMorphClass():
+				return $this->user;
+			case Request::getMorphClass():
+				return $this->request;
+			default:
+				throw new InvalidArgumentException("Unexpected ChatMember type: " . $this->model_type);
+		}
 	}
 
 	/**
