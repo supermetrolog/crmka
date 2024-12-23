@@ -58,7 +58,7 @@ class CreateSurveyChatMemberSystemMessage extends AbstractChatMemberSystemMessag
 				if ($answer->field->canBeConvertedToBool()) {
 					$shouldBeInserted = $answer->surveyQuestionAnswer->getMaybeBool();
 				} elseif ($answer->field->canBeConvertedToString()) {
-					$shouldBeInserted = StringHelper::isNotEmpty($answer->surveyQuestionAnswer->getString());
+					$shouldBeInserted = StringHelper::isNotEmpty($answer->surveyQuestionAnswer->getMaybeString());
 				}
 
 				if ($shouldBeInserted) {

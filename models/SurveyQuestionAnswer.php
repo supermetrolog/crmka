@@ -134,6 +134,15 @@ class SurveyQuestionAnswer extends AR
 		throw new QuestionAnswerConversionException('string');
 	}
 
+	public function getMaybeString(string $fallback = ''): string
+	{
+		try {
+			return $this->getString();
+		} catch (Throwable $e) {
+			return $fallback;
+		}
+	}
+
 
 	public static function find(): SurveyQuestionAnswerQuery
 	{
