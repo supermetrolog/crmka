@@ -2,6 +2,7 @@
 
 namespace app\components\ExpressionBuilder;
 
+use app\helpers\ArrayHelper;
 use Closure;
 use Stringable;
 use yii\db\Expression;
@@ -14,6 +15,7 @@ use yii\db\Expression;
 class ExpressionBuilder implements Stringable
 {
 	protected Closure $transformFn;
+	protected array   $params = [];
 
 	public function __construct()
 	{
@@ -32,6 +34,22 @@ class ExpressionBuilder implements Stringable
 		return new static(...$argv);
 	}
 
+	public function params(array $params): self
+	{
+		$this->params = $params;
+
+		return $this;
+	}
+
+	public function addParams(array $params): self
+	{
+		if (!empty($params)) {
+			$this->params = ArrayHelper::merge($this->params, $params);
+		}
+
+		return $this;
+	}
+
 	/**
 	 * Устанавливает функцию для обработки выражения перед созданием объекта `Expression`
 	 *
@@ -45,7 +63,7 @@ class ExpressionBuilder implements Stringable
 
 		return $this;
 	}
-	
+
 	public function __toString(): string
 	{
 		return ($this->transformFn)();
@@ -68,6 +86,6 @@ class ExpressionBuilder implements Stringable
 	 */
 	public function build(): Expression
 	{
-		return new Expression($this);
+		return new Expression($this, $this->params);
 	}
 }

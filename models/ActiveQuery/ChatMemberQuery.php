@@ -79,7 +79,7 @@ class ChatMemberQuery extends AQ
 	 */
 	public function needCalling(): self
 	{
-		$interval = new Expression(SQLHelper::dateSub('NOW()', '1 YEAR'));
+		$interval = new Expression(SQLHelper::dateSub('NOW()', '3 MONTH'));
 
 		return $this->andWhere([
 				'or',

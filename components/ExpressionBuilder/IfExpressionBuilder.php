@@ -41,14 +41,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 		parent::__construct();
 	}
 
-	/**
-	 * Устанавливает условие для оператора `IF`
-	 *
-	 * @param string $condition
-	 *
-	 * @return $this
-	 */
-	public function condition(string $condition): self
+	public function condition(string $condition, array $params = []): self
 	{
 		if (StringHelper::isEmpty($condition)) {
 			throw new InvalidValueException('Condition expression cannot be empty string');
@@ -56,7 +49,7 @@ class IfExpressionBuilder extends ExpressionBuilder
 
 		$this->condition = $condition;
 
-		return $this;
+		return $this->addParams($params);
 	}
 
 	/**

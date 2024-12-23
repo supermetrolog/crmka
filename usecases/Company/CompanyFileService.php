@@ -45,7 +45,7 @@ class CompanyFileService
 
 			$model = new CompanyFile([
 				'company_id' => $dto->company_id,
-				'name'       => $name,
+				'name'       => $dto->file->baseName,
 				'type'       => $dto->file->type,
 				'filename'   => $path,
 				'size'       => (string)$dto->file->size,
