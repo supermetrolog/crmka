@@ -212,7 +212,6 @@ class ChatMemberRepository
 
 			$query->andWhere([
 				'or',
-				['!=', 'chat_member_rel.model_type', User::getMorphClass()],
 				[ChatMemberMessage::field('to_chat_member_id') => $chat_member_ids],
 				['is not', 'replied_messages.id', null]
 			]);
