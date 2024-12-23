@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\repositories;
 
 use app\dto\ChatMemberView\StatisticChatMemberViewDto;
+use app\helpers\ArrayHelper;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
@@ -60,7 +61,7 @@ class ChatMemberRepository
 		                                          ->leftJoin(['notifications' => $this->makeNotificationQuery($dto->model_types)], [
 			                                          'notifications.user_id' => ChatMemberStatisticView::xfield('model_id')
 		                                          ])
-		                                          ->leftJoin(['messages' => $this->makeMessagesQuery($dto->model_types)], [
+		                                          ->leftJoin(['messages' => $this->makeMessagesQuery($dto->model_types, $dto->chat_member_ids)], [
 			                                          'messages.to_chat_member_id' => $lastEventQuery,
 		                                          ])
 		                                          ->leftJoin(['message_views' => ChatMemberMessageView::getTable()], [
@@ -181,22 +182,43 @@ class ChatMemberRepository
 
 	/**
 	 * @param string[] $model_types
+	 * @param int[]    $chat_member_ids
 	 *
 	 * @return ChatMemberMessageQuery
 	 * @throws ErrorException
 	 */
-	private function makeMessagesQuery(array $model_types): ChatMemberMessageQuery
+	private function makeMessagesQuery(array $model_types, array $chat_member_ids): ChatMemberMessageQuery
 	{
-		return ChatMemberMessage::find()
-		                        ->select([
-			                        'id'                => ChatMemberMessage::field('id'),
-			                        'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id')
-		                        ])
-		                        ->leftJoin(['chat_member_rel' => ChatMember::getTable()], [
-			                        'chat_member_rel.id' => ChatMemberMessage::xfield('to_chat_member_id')
-		                        ])
-		                        ->andWhere(['chat_member_rel.model_type' => $model_types])
-		                        ->notDeleted();
+		$query = ChatMemberMessage::find()
+		                          ->select([
+			                          'id'                => ChatMemberMessage::field('id'),
+			                          'to_chat_member_id' => ChatMemberMessage::field('to_chat_member_id')
+		                          ])
+		                          ->leftJoin(['chat_member_rel' => ChatMember::getTable()], [
+			                          'chat_member_rel.id' => ChatMemberMessage::xfield('to_chat_member_id')
+		                          ])
+		                          ->andWhere(['chat_member_rel.model_type' => $model_types])
+		                          ->notDeleted();
+
+		if (ArrayHelper::includes($model_types, User::getMorphClass())) {
+			$query->leftJoin(
+				['replied_messages' => ChatMemberMessage::tableName()],
+				[
+					'and',
+					['replied_messages.id' => ChatMemberMessage::xfield('reply_to_id')],
+					['replied_messages.from_chat_member_id' => $chat_member_ids],
+				]
+			);
+
+			$query->andWhere([
+				'or',
+				['!=', 'chat_member_rel.model_type', User::getMorphClass()],
+				[ChatMemberMessage::field('to_chat_member_id') => $chat_member_ids],
+				['is not', 'replied_messages.id', null]
+			]);
+		}
+
+		return $query;
 	}
 
 
