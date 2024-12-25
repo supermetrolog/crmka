@@ -87,4 +87,9 @@ class SQLHelper
 	{
 		return ['>', $field, new Expression('NOW()')];
 	}
+
+	public static function toQuotedMatchExpression(string $value): Expression
+	{
+		return new Expression("'%\"{$value}\"%'");
+	}
 }

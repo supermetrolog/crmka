@@ -135,4 +135,14 @@ class ArrayHelper
 
 		return self::empty(self::diff($array1, $array2));
 	}
+
+	public static function hasEvenLength(array $array): bool
+	{
+		return self::length($array) % 2 === 0;
+	}
+
+	public static function hasOddLength(array $array): bool
+	{
+		return self::length($array) % 2 === 1;
+	}
 }
