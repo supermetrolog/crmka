@@ -351,6 +351,12 @@ class OfferMixSearch extends Search
         return $value;
     }
 
+    /**
+     * Create polygon from string format to array. Combine coordinates to one polygon
+     *
+     * @example
+     * "41.00,41.01,42.02,42.03,43.00,43.03" => ["41.00 41.01", "42.02 42.03", "43.00 43.03"]
+     */
     public function normalizePolygon(): void
     {
         $polygon = $this->stringToArray($this->polygon);
@@ -366,6 +372,7 @@ class OfferMixSearch extends Search
             $coordinates[] = "$polygon[$i] {$polygon[$i + 1]}";
         }
 
+        // Add the first point to close the polygon
         $coordinates[] = $coordinates[0];
 
         $this->polygon = $coordinates;
@@ -1081,7 +1088,8 @@ class OfferMixSearch extends Search
             return;
         }
 
-        $coords           = implode(", ", $this->polygon);
+        $coords = StringHelper::join(StringHelper::SPACED_COMMA, $this->polygon);
+
         $polygonCondition = <<< EOF
                 ST_CONTAINS(
                 ST_GEOMFROMTEXT(
@@ -1092,6 +1100,7 @@ class OfferMixSearch extends Search
                         POINT(c_industry_offers_mix.latitude, c_industry_offers_mix.longitude)
                     )
             EOF;
+
         $query->andWhere(new Expression($polygonCondition));
     }
 
