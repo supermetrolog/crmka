@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace app\commands;
 
+use app\kernel\common\controller\ConsoleController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\miniModels\RequestObjectType;
 use app\models\oldDb\OfferMix;
 use app\models\Request;
 use yii\base\ErrorException;
-use yii\console\Controller;
-use yii\helpers\BaseConsole;
 
-class RequestPurposesFixController extends Controller
+class RequestPurposesFixController extends ConsoleController
 {
 	/**
 	 * @throws ErrorException
@@ -45,10 +44,10 @@ class RequestPurposesFixController extends Controller
 			}
 
 			if ($isUpdated) {
-				$this->stdout(sprintf('Updated purposes for request with ID: %d', $request->id) . PHP_EOL, BaseConsole::FG_CYAN);
+				$this->infof('Updated purposes for request with ID: %d', $request->id);
 			}
 		}
 
-		$this->stdout(sprintf('Updated %d requests', $totalCount) . PHP_EOL, BaseConsole::FG_CYAN);
+		$this->infof('Complete. Updated %d requests', $totalCount);
 	}
 }
