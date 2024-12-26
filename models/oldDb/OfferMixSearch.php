@@ -8,6 +8,7 @@ use app\helpers\ArrayHelper;
 use app\helpers\SQLHelper;
 use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
+use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\models\Company;
@@ -502,7 +503,7 @@ class OfferMixSearch extends Search
         $this->normalizePolygon();
         $this->normalizeGates();
 
-        $this->uniqueOffer = json_decode($this->uniqueOffer);
+        $this->uniqueOffer = Json::decode($this->uniqueOffer);
 
         $this->expand = $this->stringToArray($this->expand);
     }
@@ -527,13 +528,13 @@ class OfferMixSearch extends Search
 
         if (ArrayHelper::isArray($this->floor_types)) {
             foreach ($this->floor_types as $floor_type) {
-                $eb->addCondition(['like', 'floor_types', SQLHelper::toQuotedMatchExpression($floor_type)], 25, 0);
+                $eb->addCondition(['like', 'floor_types', $floor_type], 25, 0);
             }
         }
 
         if (ArrayHelper::isArray($this->gates)) {
             foreach ($this->gates as $gate) {
-                $eb->addCondition(['like', 'gates', SQLHelper::toQuotedMatchExpression($gate)], 35, 0);
+                $eb->addCondition(['like', 'gates', SQLHelper::toQuotedMatch($gate)], 35, 0);
             }
         }
 
@@ -560,7 +561,7 @@ class OfferMixSearch extends Search
      * @throws ValidationErrorHttpException
      * @throws ErrorException
      */
-    public function setFilters(ActiveQuery $query): void
+    public function setFilters(OfferMixQuery $query): void
     {
         $joinedDbName = Company::dbName();
 
@@ -942,11 +943,19 @@ class OfferMixSearch extends Search
         }
 
         if (ArrayHelper::isArray($this->gates) && ArrayHelper::notEmpty($this->gates)) {
-            $query->andFilterWhere(['or like', 'c_industry_offers_mix.gates', ArrayHelper::map($this->gates, static fn($gate) => SQLHelper::toQuotedMatchExpression($gate))]);
+            $query->addOrLikeSafetyConditions(
+                'c_industry_offers_mix.gates',
+                ArrayHelper::map($this->gates, static fn($gate) => SQLHelper::toQuotedMatch($gate)),
+                ':gate'
+            );
         }
 
         if (ArrayHelper::isArray($this->purposes) && ArrayHelper::notEmpty($this->purposes)) {
-            $query->andFilterWhere(['or like', 'c_industry_offers_mix.purposes', ArrayHelper::map($this->purposes, static fn($purpose) => SQLHelper::toQuotedMatchExpression($purpose))]);
+            $query->addOrLikeSafetyConditions(
+                'c_industry_offers_mix.purposes',
+                ArrayHelper::map($this->purposes, static fn($purpose) => SQLHelper::toQuotedMatch($purpose)),
+                ':purpose'
+            );
         }
 
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.object_type', $this->object_type]);
