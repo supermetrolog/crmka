@@ -102,9 +102,9 @@ class ArrayHelper
 		return count($array);
 	}
 
-	public static function includes(array $array, $needle): bool
+	public static function includes(array $array, $needle, bool $strict = true): bool
 	{
-		return in_array($needle, $array, true);
+		return in_array($needle, $array, $strict);
 	}
 
 	/**
@@ -134,5 +134,15 @@ class ArrayHelper
 		}
 
 		return self::empty(self::diff($array1, $array2));
+	}
+
+	public static function hasEvenLength(array $array): bool
+	{
+		return self::length($array) % 2 === 0;
+	}
+
+	public static function hasOddLength(array $array): bool
+	{
+		return self::length($array) % 2 === 1;
 	}
 }

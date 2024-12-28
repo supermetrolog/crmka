@@ -4,8 +4,11 @@ namespace app\models\oldDb;
 
 use app\components\ExpressionBuilder;
 use app\exceptions\ValidationErrorHttpException;
-use app\helpers\DbHelper;
+use app\helpers\ArrayHelper;
+use app\helpers\SQLHelper;
+use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
+use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\models\Company;
@@ -17,6 +20,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
+use yii\helpers\Json;
 
 /**
  * OfferMixSearch represents the model behind the search form of `app\models\oldDb\OfferMix`.
@@ -347,84 +351,70 @@ class OfferMixSearch extends Search
         }
         return $value;
     }
+
     /**
-     * @return void
+     * Create polygon from string format to array. Combine coordinates to one polygon
+     *
+     * @example
+     * "41.00,41.01,42.02,42.03,43.00,43.03" => ["41.00 41.01", "42.02 42.03", "43.00 43.03"]
      */
     public function normalizePolygon(): void
     {
         $polygon = $this->stringToArray($this->polygon);
-        if (!$polygon || !is_array($polygon) || count($polygon) % 2 !== 0) {
+
+        if (empty($polygon) || !ArrayHelper::isArray($polygon) || ArrayHelper::hasOddLength($polygon)) {
             return;
         }
-        $coordinates = [];
-        for ($i = 0; $i < count($polygon); $i = $i + 2) {
-            $coordinates[] = $polygon[$i] . ' ' . $polygon[$i + 1];
+
+        $coordinates    = [];
+        $polygonsLength = ArrayHelper::length($polygon);
+
+        for ($i = 0; $i < $polygonsLength; $i += 2) {
+            $coordinates[] = "$polygon[$i] {$polygon[$i + 1]}";
         }
+
+        // Add the first point to close the polygon
         $coordinates[] = $coordinates[0];
+
         $this->polygon = $coordinates;
     }
 
-    public function normalizeDirection()
+    public function normalizeDirection(): void
     {
-        $directions = $this->stringToArray($this->direction);
-        $array = [];
-        if (is_array($directions)) {
-            foreach ($directions as $direction) {
-                $array[] = OfferMix::normalizeDirections($direction);
-            }
-
-            $this->direction = $array;
+        if (ArrayHelper::isArray($this->direction)) {
+            $this->direction = ArrayHelper::map($this->direction, static fn($direction) => OfferMix::normalizeDirections($direction));
         }
     }
-    public function normalizeDistrict()
-    {
-        $districts = $this->stringToArray($this->district_moscow);
-        $array = [];
-        if (is_array($districts)) {
-            foreach ($districts as $district) {
-                $array[] = OfferMix::normalizeDistricts($district);
-            }
 
-            $this->district_moscow = $array;
+    public function normalizeDistrict(): void
+    {
+        if (ArrayHelper::isArray($this->direction)) {
+            $this->district_moscow = ArrayHelper::map($this->district_moscow, static fn($district) => OfferMix::normalizeDistricts($district));
         }
     }
-    public function normalizeClass()
-    {
-        $objectClasses = $this->stringToArray($this->class);
-        $array = [];
-        if (is_array($objectClasses)) {
-            foreach ($objectClasses as $objectClass) {
-                $array[] = OfferMix::normalizeObjectClasses($objectClass);
-            }
 
-            $this->class = $array;
+    public function normalizeClass(): void
+    {
+        if (ArrayHelper::isArray($this->class)) {
+            $this->class = ArrayHelper::map($this->class, static fn($class) => OfferMix::normalizeObjectClasses($class));
         }
     }
-    public function normalizeGates()
-    {
-        $gates = $this->stringToArray($this->gates);
-        $array = [];
-        if (is_array($gates)) {
-            foreach ($gates as $gate) {
-                $array[] = '"' . OfferMix::normalizeGateTypes($gate) . '"';
-            }
 
-            $this->gates = $array;
+    public function normalizeGates(): void
+    {
+        if (ArrayHelper::isArray($this->gates)) {
+            $this->gates = ArrayHelper::map($this->gates, static fn($gate) => OfferMix::normalizeGateTypes($gate));
         }
     }
-    public function normalizePurposes()
-    {
-        $purposes = $this->stringToArray($this->purposes);
-        $array = [];
-        if (is_array($purposes)) {
-            foreach ($purposes as $purpose) {
-                $array[] = '"' . OfferMix::normalizeObjectTypes($purpose) . '"';
-            }
 
-            $this->purposes = $array;
+    public function normalizeObjectType(): void
+    {
+        if (ArrayHelper::isArray($this->object_type)) {
+            $this->object_type = ArrayHelper::map($this->object_type, static fn($object_type) => OfferMix::normalizeObjectTypes($object_type));
         }
     }
-    public function normalizeGas()
+
+    public function normalizeGas(): void
     {
         if ($this->gas == 2) {
             $this->gas = [0, 2];
@@ -433,7 +423,8 @@ class OfferMixSearch extends Search
         //     $this->gas = [0, 1];
         // }
     }
-    public function normalizeSteam()
+
+    public function normalizeSteam(): void
     {
         if ($this->steam == 2) {
             $this->steam = [0, 2];
@@ -442,137 +433,159 @@ class OfferMixSearch extends Search
         //     $this->steam = [0, 1];
         // }
     }
-    public function normalizeSewageCentral()
+
+    public function normalizeSewageCentral(): void
     {
         if ($this->sewage_central == 2) {
             $this->sewage_central = [0, 2];
         }
     }
-    public function normalizeRacks()
+
+    public function normalizeRacks(): void
     {
         if ($this->racks == 2) {
             $this->racks = [0, 2];
         }
     }
-    public function normalizeRailway()
+
+    public function normalizeRailway(): void
     {
         if ($this->railway == 2) {
             $this->railway = [0, 2];
         }
     }
-    public function normalizeHasCranes()
+
+    public function normalizeHasCranes(): void
     {
         if ($this->has_cranes == 2) {
             $this->has_cranes = [0, 2];
         }
     }
-    public function normalizeHeated()
-    {
-        if ($this->heated === null) return;
 
-        $this->heated = [$this->heated, 0];
+    public function normalizeHeated(): void
+    {
+        if (!is_null($this->heated)) {
+            $this->heated = [$this->heated, 0];
+        }
     }
-    public function normalizeApproximateDistanceFromMKAD()
+
+    public function normalizeApproximateDistanceFromMKAD(): void
     {
         if ($this->approximateDistanceFromMKAD) {
             $this->approximateDistanceFromMKAD = floor(($this->approximateDistanceFromMKAD * self::APPROXIMATE_PERCENT_FOR_DISTANCE_FROM_MKAD / 100) + $this->approximateDistanceFromMKAD);
         }
     }
-    public function normalizeApproximateMaxPricePerFloor()
+
+    public function normalizeApproximateMaxPricePerFloor(): void
     {
         if ($this->approximateMaxPricePerFloor) {
             $this->approximateMaxPricePerFloor = floor(($this->approximateMaxPricePerFloor * self::APPROXIMATE_PERCENT_FOR_PRICE_PER_FLOOR / 100) + $this->approximateMaxPricePerFloor);
-            $this->rangeMaxPricePerFloor = $this->approximateMaxPricePerFloor;
+            $this->rangeMaxPricePerFloor       = $this->approximateMaxPricePerFloor;
         }
     }
-    public function normalizeProps()
+
+    public function normalizeProps(): void
     {
         $this->deal_type = OfferMix::normalizeDealType($this->deal_type);
-        $this->agent_id = OfferMix::normalizeAgentId($this->agent_id);
+        $this->agent_id  = OfferMix::normalizeAgentId($this->agent_id);
+
         $this->normalizeClass();
         $this->normalizeDirection();
         $this->normalizeDistrict();
-        $this->normalizeGates();
-        $this->normalizeGas();
         $this->normalizeSteam();
-        $this->normalizeSewageCentral();
+        $this->normalizeGas();
         $this->normalizeRacks();
+        $this->normalizeSewageCentral();
         $this->normalizeRailway();
         $this->normalizeHasCranes();
-        $this->normalizePurposes();
         $this->normalizeHeated();
         $this->normalizeApproximateDistanceFromMKAD();
         $this->normalizePolygon();
-        $this->region = $this->stringToArray($this->region);
-        $this->floor_types = $this->stringToArray($this->floor_types);
-        $this->type_id = $this->stringToArray($this->type_id);
-        $this->object_type = $this->stringToArray($this->object_type);
+        $this->normalizeGates();
+
+        $this->uniqueOffer = Json::decode($this->uniqueOffer);
+
         $this->expand = $this->stringToArray($this->expand);
-        $this->original_id = $this->stringToArray($this->original_id);
-        $this->complex_id = $this->stringToArray($this->complex_id);
-        $this->object_id = $this->stringToArray($this->object_id);
-        $this->uniqueOffer = json_decode($this->uniqueOffer);
     }
-    public function getRecommendedCondition()
+
+    public function getRecommendedCondition(): ExpressionBuilder
     {
         $eb = new ExpressionBuilder();
+
         $eb->addCondition(['>=', 'power_value', $this->rangeMinElectricity], 70, 0)
-            ->addCondition(['<=', 'from_mkad', $this->approximateDistanceFromMKAD], 40, 0)
-            ->addCondition(['IN', 'heated', $this->heated], 70, 0)
-            ->addCondition(['IN', 'has_cranes', $this->has_cranes], 70, 0)
-            ->addCondition(['IN', 'deal_type', $this->deal_type], 20, 0)
-            ->addCondition(['IN', 'floor_types', $this->floor_types], 25, 0)
-            ->addCondition(['IN', 'region', $this->region], 80, 0)
-            ->addCondition(['IN', 'status', $this->status], 80, 0)
-            ->addCondition(['IN', 'direction', $this->direction], 60, 0)
-            ->addCondition(['IN', 'district_moscow', $this->district_moscow], 60, 0)
-            ->addCondition(['<=', 'GREATEST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMaxCeilingHeight, false], 40, 0)
-            ->addCondition(['>=', 'LEAST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMinCeilingHeight, false], 40, 0)
-            ->addCondition(['>=', 'area_max', $this->rangeMinArea], 75, 0)
-            ->addCondition(['<=', 'area_min', $this->rangeMaxArea], 65, 0);
+           ->addCondition(['<=', 'from_mkad', $this->approximateDistanceFromMKAD], 40, 0)
+           ->addCondition(['IN', 'heated', $this->heated], 70, 0)
+           ->addCondition(['IN', 'has_cranes', $this->has_cranes], 70, 0)
+           ->addCondition(['IN', 'deal_type', $this->deal_type], 20, 0)
+           ->addCondition(['IN', 'region', $this->region], 80, 0)
+           ->addCondition(['IN', 'status', $this->status], 80, 0)
+           ->addCondition(['IN', 'direction', $this->direction], 60, 0)
+           ->addCondition(['IN', 'district_moscow', $this->district_moscow], 60, 0)
+           ->addCondition(['<=', 'GREATEST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMaxCeilingHeight, false], 40, 0)
+           ->addCondition(['>=', 'LEAST(c_industry_offers_mix.ceiling_height_min, c_industry_offers_mix.ceiling_height_max)', $this->rangeMinCeilingHeight, false], 40, 0)
+           ->addCondition(['>=', 'area_max', $this->rangeMinArea], 75, 0)
+           ->addCondition(['<=', 'area_min', $this->rangeMaxArea], 65, 0);
 
-
-        if ($this->gates && is_array($this->gates)) {
-            foreach ($this->gates as $gate) {
-                $eb->addCondition(['like', 'gates', new Expression("'%\"{$gate}\"%'")], 35, 0);
+        if (ArrayHelper::isArray($this->floor_types)) {
+            foreach ($this->floor_types as $floor_type) {
+                $eb->addCondition(['like', 'floor_types', $floor_type], 25, 0);
             }
         }
+
+        if (ArrayHelper::isArray($this->gates)) {
+            foreach ($this->gates as $gate) {
+                $eb->addCondition(['like', 'gates', SQLHelper::toQuotedMatch($gate)], 35, 0);
+            }
+        }
+
         if ($this->deal_type == OfferMix::DEAL_TYPE_RENT || $this->deal_type == OfferMix::DEAL_TYPE_SUBLEASE) {
             $eb->addCondition(['<=', 'GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max )', $this->pricePerFloor, false], 50, 0);
         } elseif ($this->deal_type == OfferMix::DEAL_TYPE_SALE) {
             $eb->addCondition(['<=', 'price_sale_max', $this->pricePerFloor], 50, 0);
         }
+
         $eb->addTablePrefix(OfferMix::tableName());
+
         return $eb;
     }
+
     public function getRecommendedOrderExpression($sort)
     {
         $eb = $this->getRecommendedCondition();
         $eb->prepareToEnd($sort);
+
         return $eb->getConditionExpression();
     }
 
-    public function setFilters(ActiveQuery $query): void
+    /**
+     * @throws ValidationErrorHttpException
+     * @throws ErrorException
+     */
+    public function setFilters(OfferMixQuery $query): void
     {
-        $joinedDbName = DbHelper::getDsnAttribute('dbname', Company::getDb()->dsn);
+        $joinedDbName = Company::dbName();
 
         if ($this->withoutOffersFromQuery) {
-            $withoutQuery = json_decode($this->withoutOffersFromQuery, true);
-            if (array_key_exists('withoutOffersFromQuery', $withoutQuery)) {
+            $withoutQuery = Json::decode($this->withoutOffersFromQuery);
+
+            if (ArrayHelper::keyExists($withoutQuery, 'withoutOffersFromQuery')) {
                 throw new ValidationErrorHttpException("infinite cycle");
             }
-            $searchModel = new self();
-            $dp = $searchModel->search($withoutQuery);
+
+            $searchModel              = new self();
+            $dp                       = $searchModel->search($withoutQuery);
             $dp->pagination->pageSize = 0;
-            $models = $dp->getModels();
-            $ids = array_map(function ($elem) {
-                return $elem->id;
-            }, $models);
+            $models                   = $dp->getModels();
+
+            $ids = ArrayHelper::map($models, static fn($elem) => $elem->id);
+
             $query->andFilterWhere(['not in', 'c_industry_offers_mix.id', $ids]);
         }
 
         if (!$this->noWith) {
-            $query->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails', 'company.mainContact.phones', 'comments', 'contact.emails', 'contact.phones']);
+            $query->with(['object', 'miniOffersMix', 'generalOffersMix.offer', 'offer', 'company.mainContact.emails']);
+            $query->with(['company.mainContact.phones', 'comments', 'contact.emails', 'contact.phones']);
+
             if ($this->timeline_id) {
                 $query->with(['comments' => function ($query) use ($joinedDbName) {
                     return $query->from("$joinedDbName.timeline_step_object_comment")->where(["$joinedDbName.timeline_step_object_comment.timeline_id" => $this->timeline_id]);
@@ -582,23 +595,25 @@ class OfferMixSearch extends Search
             }
         }
 
-        if ($this->region_neardy) {
-            $near_mo = Region::find()->distinct()->joinWith(['locations'])->where(['l_locations.near_mo' => $this->region_neardy])->andWhere(['!=', 'l_locations.region', 6])->asArray()->all();
-            $region_ids = array_map(function ($elem) {
-                return $elem['id'];
-            }, $near_mo);
-            if ($region_ids && $this->region) {
-                if (is_array($this->region)) {
-                    $this->region = array_merge($this->region, $region_ids);
-                } else {
-                    $this->region = array_merge([$this->region], $region_ids);
-                }
+        if ($this->region_neardy && $this->region) {
+            $nearMORegions = Region::find()->distinct()
+                                   ->joinWith(['locations'])
+                                   ->where(['l_locations.near_mo' => $this->region_neardy])
+                                   ->andWhere(['!=', 'l_locations.region', 6])
+                                   ->asArray()->all();
+
+            $regionIds = ArrayHelper::map($nearMORegions, static fn($elem) => $elem['id']);
+
+            if (ArrayHelper::notEmpty($regionIds)) {
+                $this->region = ArrayHelper::merge(ArrayHelper::toArray($this->region), $regionIds);
             }
         }
 
         if ($this->all) {
+            $words = StringHelper::toWords($this->all);
+
             $searchArray = ['and'];
-            $words = explode(" ", $this->all);
+
             foreach ($words as $word) {
                 $searchArray[] = [
                     'or',
@@ -613,30 +628,38 @@ class OfferMixSearch extends Search
                     ['like', 'c_industry_offers_mix.address', $word]
                 ];
             }
+
             $query->orFilterWhere($searchArray);
         }
 
         if ($this->recommended_sort) {
-            if ($expression = $this->getRecommendedOrderExpression('DESC')) {
+            $expression = $this->getRecommendedOrderExpression('DESC');
+
+            if ($expression) {
                 $query->orderBy($expression);
                 $query->andFilterWhere(['>=', $this->getRecommendedCondition()->getConditionExpression(), self::MIN_RECOMMENDED_WEIGHT_SUM]);
                 $query->andFilterWhere([
                     'c_industry_offers_mix.deleted' => 0,
                     'c_industry_offers_mix.type_id' => [1, 2],
                 ]);
+
                 return;
             }
         }
+
         // для релевантности
         if ($this->all) {
+            $words = StringHelper::toWords($this->all);
+
             $rangingQueryExp = "";
-            $words = explode(" ", $this->all);
-            $addressWeight = 30;
+            $addressWeight   = 30;
+
             foreach ($words as $key => $word) {
                 if ($key > 0) {
                     $rangingQueryExp .= "+";
-                    $addressWeight += 20;
+                    $addressWeight   += 20;
                 }
+
                 $rangingQueryExp .= "(
                     IF (`c_industry_offers_mix`.`object_id` LIKE '%{$word}%', 90, 0) 
                     + IF (`c_industry_offers_mix`.`object_id` = '{$word}', 420, 0) 
@@ -650,265 +673,267 @@ class OfferMixSearch extends Search
                     + IF (`c_industry_offers_mix`.`address` LIKE '%{$word}%', $addressWeight, 0) 
                 )";
             }
+
             $rangingQueryExp .= " DESC";
+
             $query->orderBy(new Expression($rangingQueryExp));
         }
 
 
         // grid filtering conditions
         $query->andFilterWhere([
-//            ObjectsBlock::tableName() . '.ad_avito' => $this->ad_avito,
-'c_industry_offers_mix.id'                           => $this->id,
-'c_industry_offers_mix.original_id'                  => $this->original_id,
-'c_industry_offers_mix.type_id'                      => $this->type_id,
-'c_industry_offers_mix.deal_type'                    => $this->deal_type,
-// 'c_industry_offers_mix.status' => $this->status,
-'c_industry_offers_mix.object_id'                    => $this->object_id,
-'c_industry_offers_mix.complex_id'                   => $this->complex_id,
-'c_industry_offers_mix.parent_id'                    => $this->parent_id,
-'c_industry_offers_mix.company_id'                   => $this->company_id,
-'c_industry_offers_mix.contact_id'                   => $this->contact_id,
-'c_industry_offers_mix.year_built'                   => $this->year_built,
-'c_industry_offers_mix.agent_id'                     => $this->agent_id,
-'c_industry_offers_mix.agent_visited'                => $this->agent_visited,
-'c_industry_offers_mix.is_land'                      => $this->is_land,
-'c_industry_offers_mix.land_width'                   => $this->land_width,
-'c_industry_offers_mix.land_length'                  => $this->land_length,
-'c_industry_offers_mix.land_use_restrictions'        => $this->land_use_restrictions,
-'c_industry_offers_mix.latitude'                     => $this->latitude,
-'c_industry_offers_mix.longitude'                    => $this->longitude,
-'c_industry_offers_mix.from_mkad'                    => $this->from_mkad,
-'c_industry_offers_mix.cian_region'                  => $this->cian_region,
-'c_industry_offers_mix.outside_mkad'                 => $this->outside_mkad,
-'c_industry_offers_mix.near_mo'                      => $this->near_mo,
-'c_industry_offers_mix.from_metro_value'             => $this->from_metro_value,
-'c_industry_offers_mix.from_metro'                   => $this->from_metro,
-'c_industry_offers_mix.from_station_value'           => $this->from_station_value,
-'c_industry_offers_mix.from_station'                 => $this->from_station,
-'c_industry_offers_mix.blocks_amount'                => $this->blocks_amount,
-'c_industry_offers_mix.last_update'                  => $this->last_update,
-'c_industry_offers_mix.commission_client'            => $this->commission_client,
-'c_industry_offers_mix.commission_owner'             => $this->commission_owner,
-'c_industry_offers_mix.deposit'                      => $this->deposit,
-'c_industry_offers_mix.pledge'                       => $this->pledge,
-'c_industry_offers_mix.area_building'                => $this->area_building,
-'c_industry_offers_mix.area_floor_full'              => $this->area_floor_full,
-'c_industry_offers_mix.area_mezzanine_full'          => $this->area_mezzanine_full,
-'c_industry_offers_mix.area_office_full'             => $this->area_office_full,
-'c_industry_offers_mix.area_min'                     => $this->area_min,
-'c_industry_offers_mix.area_max'                     => $this->area_max,
-'c_industry_offers_mix.area_floor_min'               => $this->area_floor_min,
-'c_industry_offers_mix.area_floor_max'               => $this->area_floor_max,
-'c_industry_offers_mix.area_mezzanine_min'           => $this->area_mezzanine_min,
-'c_industry_offers_mix.area_mezzanine_max'           => $this->area_mezzanine_max,
-'c_industry_offers_mix.area_mezzanine_add'           => $this->area_mezzanine_add,
-'c_industry_offers_mix.area_office_min'              => $this->area_office_min,
-'c_industry_offers_mix.area_office_max'              => $this->area_office_max,
-'c_industry_offers_mix.area_office_add'              => $this->area_office_add,
-'c_industry_offers_mix.area_tech_min'                => $this->area_tech_min,
-'c_industry_offers_mix.area_tech_max'                => $this->area_tech_max,
-'c_industry_offers_mix.area_field_min'               => $this->area_field_min,
-'c_industry_offers_mix.area_field_max'               => $this->area_field_max,
-'c_industry_offers_mix.pallet_place_min'             => $this->pallet_place_min,
-'c_industry_offers_mix.pallet_place_max'             => $this->pallet_place_max,
-'c_industry_offers_mix.cells_place_min'              => $this->cells_place_min,
-'c_industry_offers_mix.cells_place_max'              => $this->cells_place_max,
-'c_industry_offers_mix.inc_electricity'              => $this->inc_electricity,
-'c_industry_offers_mix.inc_heating'                  => $this->inc_heating,
-'c_industry_offers_mix.inc_water'                    => $this->inc_water,
-'c_industry_offers_mix.price_opex_inc'               => $this->price_opex_inc,
-'c_industry_offers_mix.price_opex'                   => $this->price_opex,
-'c_industry_offers_mix.price_opex_min'               => $this->price_opex_min,
-'c_industry_offers_mix.price_opex_max'               => $this->price_opex_max,
-'c_industry_offers_mix.price_public_services_inc'    => $this->price_public_services_inc,
-'c_industry_offers_mix.price_public_services'        => $this->price_public_services,
-'c_industry_offers_mix.public_services'              => $this->public_services,
-'c_industry_offers_mix.price_public_services_min'    => $this->price_public_services_min,
-'c_industry_offers_mix.price_public_services_max'    => $this->price_public_services_max,
-'c_industry_offers_mix.price_floor_min'              => $this->price_floor_min,
-'c_industry_offers_mix.price_floor_max'              => $this->price_floor_max,
-'c_industry_offers_mix.price_floor_min_month'        => $this->price_floor_min_month,
-'c_industry_offers_mix.price_floor_max_month'        => $this->price_floor_max_month,
-'c_industry_offers_mix.price_min_month_all'          => $this->price_min_month_all,
-'c_industry_offers_mix.price_max_month_all'          => $this->price_max_month_all,
-'c_industry_offers_mix.price_floor_100_min'          => $this->price_floor_100_min,
-'c_industry_offers_mix.price_floor_100_max'          => $this->price_floor_100_max,
-'c_industry_offers_mix.price_mezzanine_min'          => $this->price_mezzanine_min,
-'c_industry_offers_mix.price_mezzanine_max'          => $this->price_mezzanine_max,
-'c_industry_offers_mix.price_office_min'             => $this->price_office_min,
-'c_industry_offers_mix.price_office_max'             => $this->price_office_max,
-'c_industry_offers_mix.price_sale_min'               => $this->price_sale_min,
-'c_industry_offers_mix.price_sale_max'               => $this->price_sale_max,
-'c_industry_offers_mix.price_safe_pallet_min'        => $this->price_safe_pallet_min,
-'c_industry_offers_mix.price_safe_pallet_max'        => $this->price_safe_pallet_max,
-'c_industry_offers_mix.price_safe_volume_min'        => $this->price_safe_volume_min,
-'c_industry_offers_mix.price_safe_volume_max'        => $this->price_safe_volume_max,
-'c_industry_offers_mix.price_safe_floor_min'         => $this->price_safe_floor_min,
-'c_industry_offers_mix.price_safe_floor_max'         => $this->price_safe_floor_max,
-'c_industry_offers_mix.price_safe_calc_min'          => $this->price_safe_calc_min,
-'c_industry_offers_mix.price_safe_calc_max'          => $this->price_safe_calc_max,
-'c_industry_offers_mix.price_safe_calc_month_min'    => $this->price_safe_calc_month_min,
-'c_industry_offers_mix.price_safe_calc_month_max'    => $this->price_safe_calc_month_max,
-'c_industry_offers_mix.price_sale_min_all'           => $this->price_sale_min_all,
-'c_industry_offers_mix.price_sale_max_all'           => $this->price_sale_max_all,
-'c_industry_offers_mix.ceiling_height_min'           => $this->ceiling_height_min,
-'c_industry_offers_mix.ceiling_height_max'           => $this->ceiling_height_max,
-'c_industry_offers_mix.temperature_min'              => $this->temperature_min,
-'c_industry_offers_mix.temperature_max'              => $this->temperature_max,
-'c_industry_offers_mix.load_floor_min'               => $this->load_floor_min,
-'c_industry_offers_mix.load_floor_max'               => $this->load_floor_max,
-'c_industry_offers_mix.load_mezzanine_min'           => $this->load_mezzanine_min,
-'c_industry_offers_mix.load_mezzanine_max'           => $this->load_mezzanine_max,
-'c_industry_offers_mix.prepay'                       => $this->prepay,
-'c_industry_offers_mix.floor_min'                    => $this->floor_min,
-'c_industry_offers_mix.floor_max'                    => $this->floor_max,
-'c_industry_offers_mix.self_leveling'                => $this->self_leveling,
-'c_industry_offers_mix.heated'                       => $this->heated,
-'c_industry_offers_mix.elevators_min'                => $this->elevators_min,
-'c_industry_offers_mix.elevators_max'                => $this->elevators_max,
-'c_industry_offers_mix.elevators_num'                => $this->elevators_num,
-'c_industry_offers_mix.has_cranes'                   => $this->has_cranes,
-'c_industry_offers_mix.cranes_min'                   => $this->cranes_min,
-'c_industry_offers_mix.cranes_max'                   => $this->cranes_max,
-'c_industry_offers_mix.cranes_num'                   => $this->cranes_num,
-'c_industry_offers_mix.cranes_railway_min'           => $this->cranes_railway_min,
-'c_industry_offers_mix.cranes_railway_max'           => $this->cranes_railway_max,
-'c_industry_offers_mix.cranes_railway_num'           => $this->cranes_railway_num,
-'c_industry_offers_mix.cranes_gantry_min'            => $this->cranes_gantry_min,
-'c_industry_offers_mix.cranes_gantry_max'            => $this->cranes_gantry_max,
-'c_industry_offers_mix.cranes_gantry_num'            => $this->cranes_gantry_num,
-'c_industry_offers_mix.cranes_overhead_min'          => $this->cranes_overhead_min,
-'c_industry_offers_mix.cranes_overhead_max'          => $this->cranes_overhead_max,
-'c_industry_offers_mix.cranes_overhead_num'          => $this->cranes_overhead_num,
-'c_industry_offers_mix.cranes_cathead_min'           => $this->cranes_cathead_min,
-'c_industry_offers_mix.cranes_cathead_max'           => $this->cranes_cathead_max,
-'c_industry_offers_mix.cranes_cathead_num'           => $this->cranes_cathead_num,
-'c_industry_offers_mix.telphers_min'                 => $this->telphers_min,
-'c_industry_offers_mix.telphers_max'                 => $this->telphers_max,
-'c_industry_offers_mix.telphers_num'                 => $this->telphers_num,
-'c_industry_offers_mix.railway'                      => $this->railway,
-'c_industry_offers_mix.railway_value'                => $this->railway_value,
-'c_industry_offers_mix.power'                        => $this->power,
-'c_industry_offers_mix.power_value'                  => $this->power_value,
-'c_industry_offers_mix.steam'                        => $this->steam,
-'c_industry_offers_mix.steam_value'                  => $this->steam_value,
-'c_industry_offers_mix.gas'                          => $this->gas,
-'c_industry_offers_mix.gas_value'                    => $this->gas_value,
-'c_industry_offers_mix.phone'                        => $this->phone,
-'c_industry_offers_mix.water_value'                  => $this->water_value,
-// 'c_industry_offers_mix.sewage_central' => $this->sewage_central,
-'c_industry_offers_mix.sewage_central_value'         => $this->sewage_central_value,
-'c_industry_offers_mix.sewage_rain'                  => $this->sewage_rain,
-'c_industry_offers_mix.firefighting'                 => $this->firefighting,
-'c_industry_offers_mix.video_control'                => $this->video_control,
-'c_industry_offers_mix.access_control'               => $this->access_control,
-'c_industry_offers_mix.security_alert'               => $this->security_alert,
-'c_industry_offers_mix.fire_alert'                   => $this->fire_alert,
-'c_industry_offers_mix.smoke_exhaust'                => $this->smoke_exhaust,
-'c_industry_offers_mix.canteen'                      => $this->canteen,
-'c_industry_offers_mix.hostel'                       => $this->hostel,
-'c_industry_offers_mix.racks'                        => $this->racks,
-'c_industry_offers_mix.warehouse_equipment'          => $this->warehouse_equipment,
-'c_industry_offers_mix.charging_room'                => $this->charging_room,
-'c_industry_offers_mix.cross_docking'                => $this->cross_docking,
-'c_industry_offers_mix.cranes_runways'               => $this->cranes_runways,
-'c_industry_offers_mix.parking_car'                  => $this->parking_car,
-'c_industry_offers_mix.parking_lorry'                => $this->parking_lorry,
-'c_industry_offers_mix.parking_truck'                => $this->parking_truck,
-'c_industry_offers_mix.built_to_suit'                => $this->built_to_suit,
-'c_industry_offers_mix.built_to_suit_time'           => $this->built_to_suit_time,
-'c_industry_offers_mix.built_to_suit_plan'           => $this->built_to_suit_plan,
-'c_industry_offers_mix.rent_business'                => $this->rent_business,
-'c_industry_offers_mix.rent_business_fill'           => $this->rent_business_fill,
-'c_industry_offers_mix.rent_business_price'          => $this->rent_business_price,
-'c_industry_offers_mix.rent_business_long_contracts' => $this->rent_business_long_contracts,
-'c_industry_offers_mix.rent_business_last_repair'    => $this->rent_business_last_repair,
-'c_industry_offers_mix.rent_business_payback'        => $this->rent_business_payback,
-'c_industry_offers_mix.rent_business_income'         => $this->rent_business_income,
-'c_industry_offers_mix.rent_business_profit'         => $this->rent_business_profit,
-'c_industry_offers_mix.sale_company'                 => $this->sale_company,
-'c_industry_offers_mix.holidays'                     => $this->holidays,
-'c_industry_offers_mix.ad_realtor'                   => $this->ad_realtor,
-'c_industry_offers_mix.ad_cian'                      => $this->ad_cian,
-'c_industry_offers_mix.ad_cian_top3'                 => $this->ad_cian_top3,
-'c_industry_offers_mix.ad_cian_premium'              => $this->ad_cian_premium,
-'c_industry_offers_mix.ad_cian_hl'                   => $this->ad_cian_hl,
-'c_industry_offers_mix.ad_yandex'                    => $this->ad_yandex,
-'c_industry_offers_mix.ad_avito'                     => $this->ad_avito,
-'c_industry_offers_mix.is_fake'                      => $this->is_fake,
-'c_industry_offers_mix.ad_yandex_raise'              => $this->ad_yandex_raise,
-'c_industry_offers_mix.ad_yandex_promotion'          => $this->ad_yandex_promotion,
-'c_industry_offers_mix.ad_yandex_premium'            => $this->ad_yandex_premium,
-'c_industry_offers_mix.ad_arendator'                 => $this->ad_arendator,
-'c_industry_offers_mix.ad_free'                      => $this->ad_free,
-'c_industry_offers_mix.ad_special'                   => $this->ad_special,
-'c_industry_offers_mix.deleted'                      => 0,
-'c_industry_offers_mix.test_only'                    => $this->test_only,
-'c_industry_offers_mix.is_exclusive'                 => $this->is_exclusive,
-'c_industry_offers_mix.deal_id'                      => $this->deal_id,
-'c_industry_offers_mix.hide_from_market'             => $this->hide_from_market,
-'c_industry_offers_mix.region'                       => $this->region,
-// 'c_industry_offers_mix.direction' => $this->direction,
-'c_industry_offers_mix.district'                     => $this->district,
-// 'c_industry_offers_mix.district_moscow' => $this->district_moscow,
-'c_industry_offers_mix.class'                        => $this->class
-		]);
+            //            ObjectsBlock::tableName() . '.ad_avito' => $this->ad_avito,
+            'c_industry_offers_mix.id'                           => $this->id,
+            'c_industry_offers_mix.original_id'                  => $this->original_id,
+            'c_industry_offers_mix.type_id'                      => $this->type_id,
+            'c_industry_offers_mix.deal_type'                    => $this->deal_type,
+            // 'c_industry_offers_mix.status' => $this->status,
+            'c_industry_offers_mix.object_id'                    => $this->object_id,
+            'c_industry_offers_mix.complex_id'                   => $this->complex_id,
+            'c_industry_offers_mix.parent_id'                    => $this->parent_id,
+            'c_industry_offers_mix.company_id'                   => $this->company_id,
+            'c_industry_offers_mix.contact_id'                   => $this->contact_id,
+            'c_industry_offers_mix.year_built'                   => $this->year_built,
+            'c_industry_offers_mix.agent_id'                     => $this->agent_id,
+            'c_industry_offers_mix.agent_visited'                => $this->agent_visited,
+            'c_industry_offers_mix.is_land'                      => $this->is_land,
+            'c_industry_offers_mix.land_width'                   => $this->land_width,
+            'c_industry_offers_mix.land_length'                  => $this->land_length,
+            'c_industry_offers_mix.land_use_restrictions'        => $this->land_use_restrictions,
+            'c_industry_offers_mix.latitude'                     => $this->latitude,
+            'c_industry_offers_mix.longitude'                    => $this->longitude,
+            'c_industry_offers_mix.from_mkad'                    => $this->from_mkad,
+            'c_industry_offers_mix.cian_region'                  => $this->cian_region,
+            'c_industry_offers_mix.outside_mkad'                 => $this->outside_mkad,
+            'c_industry_offers_mix.near_mo'                      => $this->near_mo,
+            'c_industry_offers_mix.from_metro_value'             => $this->from_metro_value,
+            'c_industry_offers_mix.from_metro'                   => $this->from_metro,
+            'c_industry_offers_mix.from_station_value'           => $this->from_station_value,
+            'c_industry_offers_mix.from_station'                 => $this->from_station,
+            'c_industry_offers_mix.blocks_amount'                => $this->blocks_amount,
+            'c_industry_offers_mix.last_update'                  => $this->last_update,
+            'c_industry_offers_mix.commission_client'            => $this->commission_client,
+            'c_industry_offers_mix.commission_owner'             => $this->commission_owner,
+            'c_industry_offers_mix.deposit'                      => $this->deposit,
+            'c_industry_offers_mix.pledge'                       => $this->pledge,
+            'c_industry_offers_mix.area_building'                => $this->area_building,
+            'c_industry_offers_mix.area_floor_full'              => $this->area_floor_full,
+            'c_industry_offers_mix.area_mezzanine_full'          => $this->area_mezzanine_full,
+            'c_industry_offers_mix.area_office_full'             => $this->area_office_full,
+            'c_industry_offers_mix.area_min'                     => $this->area_min,
+            'c_industry_offers_mix.area_max'                     => $this->area_max,
+            'c_industry_offers_mix.area_floor_min'               => $this->area_floor_min,
+            'c_industry_offers_mix.area_floor_max'               => $this->area_floor_max,
+            'c_industry_offers_mix.area_mezzanine_min'           => $this->area_mezzanine_min,
+            'c_industry_offers_mix.area_mezzanine_max'           => $this->area_mezzanine_max,
+            'c_industry_offers_mix.area_mezzanine_add'           => $this->area_mezzanine_add,
+            'c_industry_offers_mix.area_office_min'              => $this->area_office_min,
+            'c_industry_offers_mix.area_office_max'              => $this->area_office_max,
+            'c_industry_offers_mix.area_office_add'              => $this->area_office_add,
+            'c_industry_offers_mix.area_tech_min'                => $this->area_tech_min,
+            'c_industry_offers_mix.area_tech_max'                => $this->area_tech_max,
+            'c_industry_offers_mix.area_field_min'               => $this->area_field_min,
+            'c_industry_offers_mix.area_field_max'               => $this->area_field_max,
+            'c_industry_offers_mix.pallet_place_min'             => $this->pallet_place_min,
+            'c_industry_offers_mix.pallet_place_max'             => $this->pallet_place_max,
+            'c_industry_offers_mix.cells_place_min'              => $this->cells_place_min,
+            'c_industry_offers_mix.cells_place_max'              => $this->cells_place_max,
+            'c_industry_offers_mix.inc_electricity'              => $this->inc_electricity,
+            'c_industry_offers_mix.inc_heating'                  => $this->inc_heating,
+            'c_industry_offers_mix.inc_water'                    => $this->inc_water,
+            'c_industry_offers_mix.price_opex_inc'               => $this->price_opex_inc,
+            'c_industry_offers_mix.price_opex'                   => $this->price_opex,
+            'c_industry_offers_mix.price_opex_min'               => $this->price_opex_min,
+            'c_industry_offers_mix.price_opex_max'               => $this->price_opex_max,
+            'c_industry_offers_mix.price_public_services_inc'    => $this->price_public_services_inc,
+            'c_industry_offers_mix.price_public_services'        => $this->price_public_services,
+            'c_industry_offers_mix.public_services'              => $this->public_services,
+            'c_industry_offers_mix.price_public_services_min'    => $this->price_public_services_min,
+            'c_industry_offers_mix.price_public_services_max'    => $this->price_public_services_max,
+            'c_industry_offers_mix.price_floor_min'              => $this->price_floor_min,
+            'c_industry_offers_mix.price_floor_max'              => $this->price_floor_max,
+            'c_industry_offers_mix.price_floor_min_month'        => $this->price_floor_min_month,
+            'c_industry_offers_mix.price_floor_max_month'        => $this->price_floor_max_month,
+            'c_industry_offers_mix.price_min_month_all'          => $this->price_min_month_all,
+            'c_industry_offers_mix.price_max_month_all'          => $this->price_max_month_all,
+            'c_industry_offers_mix.price_floor_100_min'          => $this->price_floor_100_min,
+            'c_industry_offers_mix.price_floor_100_max'          => $this->price_floor_100_max,
+            'c_industry_offers_mix.price_mezzanine_min'          => $this->price_mezzanine_min,
+            'c_industry_offers_mix.price_mezzanine_max'          => $this->price_mezzanine_max,
+            'c_industry_offers_mix.price_office_min'             => $this->price_office_min,
+            'c_industry_offers_mix.price_office_max'             => $this->price_office_max,
+            'c_industry_offers_mix.price_sale_min'               => $this->price_sale_min,
+            'c_industry_offers_mix.price_sale_max'               => $this->price_sale_max,
+            'c_industry_offers_mix.price_safe_pallet_min'        => $this->price_safe_pallet_min,
+            'c_industry_offers_mix.price_safe_pallet_max'        => $this->price_safe_pallet_max,
+            'c_industry_offers_mix.price_safe_volume_min'        => $this->price_safe_volume_min,
+            'c_industry_offers_mix.price_safe_volume_max'        => $this->price_safe_volume_max,
+            'c_industry_offers_mix.price_safe_floor_min'         => $this->price_safe_floor_min,
+            'c_industry_offers_mix.price_safe_floor_max'         => $this->price_safe_floor_max,
+            'c_industry_offers_mix.price_safe_calc_min'          => $this->price_safe_calc_min,
+            'c_industry_offers_mix.price_safe_calc_max'          => $this->price_safe_calc_max,
+            'c_industry_offers_mix.price_safe_calc_month_min'    => $this->price_safe_calc_month_min,
+            'c_industry_offers_mix.price_safe_calc_month_max'    => $this->price_safe_calc_month_max,
+            'c_industry_offers_mix.price_sale_min_all'           => $this->price_sale_min_all,
+            'c_industry_offers_mix.price_sale_max_all'           => $this->price_sale_max_all,
+            'c_industry_offers_mix.ceiling_height_min'           => $this->ceiling_height_min,
+            'c_industry_offers_mix.ceiling_height_max'           => $this->ceiling_height_max,
+            'c_industry_offers_mix.temperature_min'              => $this->temperature_min,
+            'c_industry_offers_mix.temperature_max'              => $this->temperature_max,
+            'c_industry_offers_mix.load_floor_min'               => $this->load_floor_min,
+            'c_industry_offers_mix.load_floor_max'               => $this->load_floor_max,
+            'c_industry_offers_mix.load_mezzanine_min'           => $this->load_mezzanine_min,
+            'c_industry_offers_mix.load_mezzanine_max'           => $this->load_mezzanine_max,
+            'c_industry_offers_mix.prepay'                       => $this->prepay,
+            'c_industry_offers_mix.floor_min'                    => $this->floor_min,
+            'c_industry_offers_mix.floor_max'                    => $this->floor_max,
+            'c_industry_offers_mix.self_leveling'                => $this->self_leveling,
+            'c_industry_offers_mix.heated'                       => $this->heated,
+            'c_industry_offers_mix.elevators_min'                => $this->elevators_min,
+            'c_industry_offers_mix.elevators_max'                => $this->elevators_max,
+            'c_industry_offers_mix.elevators_num'                => $this->elevators_num,
+            'c_industry_offers_mix.has_cranes'                   => $this->has_cranes,
+            'c_industry_offers_mix.cranes_min'                   => $this->cranes_min,
+            'c_industry_offers_mix.cranes_max'                   => $this->cranes_max,
+            'c_industry_offers_mix.cranes_num'                   => $this->cranes_num,
+            'c_industry_offers_mix.cranes_railway_min'           => $this->cranes_railway_min,
+            'c_industry_offers_mix.cranes_railway_max'           => $this->cranes_railway_max,
+            'c_industry_offers_mix.cranes_railway_num'           => $this->cranes_railway_num,
+            'c_industry_offers_mix.cranes_gantry_min'            => $this->cranes_gantry_min,
+            'c_industry_offers_mix.cranes_gantry_max'            => $this->cranes_gantry_max,
+            'c_industry_offers_mix.cranes_gantry_num'            => $this->cranes_gantry_num,
+            'c_industry_offers_mix.cranes_overhead_min'          => $this->cranes_overhead_min,
+            'c_industry_offers_mix.cranes_overhead_max'          => $this->cranes_overhead_max,
+            'c_industry_offers_mix.cranes_overhead_num'          => $this->cranes_overhead_num,
+            'c_industry_offers_mix.cranes_cathead_min'           => $this->cranes_cathead_min,
+            'c_industry_offers_mix.cranes_cathead_max'           => $this->cranes_cathead_max,
+            'c_industry_offers_mix.cranes_cathead_num'           => $this->cranes_cathead_num,
+            'c_industry_offers_mix.telphers_min'                 => $this->telphers_min,
+            'c_industry_offers_mix.telphers_max'                 => $this->telphers_max,
+            'c_industry_offers_mix.telphers_num'                 => $this->telphers_num,
+            'c_industry_offers_mix.railway'                      => $this->railway,
+            'c_industry_offers_mix.railway_value'                => $this->railway_value,
+            'c_industry_offers_mix.power'                        => $this->power,
+            'c_industry_offers_mix.power_value'                  => $this->power_value,
+            'c_industry_offers_mix.steam'                        => $this->steam,
+            'c_industry_offers_mix.steam_value'                  => $this->steam_value,
+            'c_industry_offers_mix.gas'                          => $this->gas,
+            'c_industry_offers_mix.gas_value'                    => $this->gas_value,
+            'c_industry_offers_mix.phone'                        => $this->phone,
+            'c_industry_offers_mix.water_value'                  => $this->water_value,
+            // 'c_industry_offers_mix.sewage_central' => $this->sewage_central,
+            'c_industry_offers_mix.sewage_central_value'         => $this->sewage_central_value,
+            'c_industry_offers_mix.sewage_rain'                  => $this->sewage_rain,
+            'c_industry_offers_mix.firefighting'                 => $this->firefighting,
+            'c_industry_offers_mix.video_control'                => $this->video_control,
+            'c_industry_offers_mix.access_control'               => $this->access_control,
+            'c_industry_offers_mix.security_alert'               => $this->security_alert,
+            'c_industry_offers_mix.fire_alert'                   => $this->fire_alert,
+            'c_industry_offers_mix.smoke_exhaust'                => $this->smoke_exhaust,
+            'c_industry_offers_mix.canteen'                      => $this->canteen,
+            'c_industry_offers_mix.hostel'                       => $this->hostel,
+            'c_industry_offers_mix.racks'                        => $this->racks,
+            'c_industry_offers_mix.warehouse_equipment'          => $this->warehouse_equipment,
+            'c_industry_offers_mix.charging_room'                => $this->charging_room,
+            'c_industry_offers_mix.cross_docking'                => $this->cross_docking,
+            'c_industry_offers_mix.cranes_runways'               => $this->cranes_runways,
+            'c_industry_offers_mix.parking_car'                  => $this->parking_car,
+            'c_industry_offers_mix.parking_lorry'                => $this->parking_lorry,
+            'c_industry_offers_mix.parking_truck'                => $this->parking_truck,
+            'c_industry_offers_mix.built_to_suit'                => $this->built_to_suit,
+            'c_industry_offers_mix.built_to_suit_time'           => $this->built_to_suit_time,
+            'c_industry_offers_mix.built_to_suit_plan'           => $this->built_to_suit_plan,
+            'c_industry_offers_mix.rent_business'                => $this->rent_business,
+            'c_industry_offers_mix.rent_business_fill'           => $this->rent_business_fill,
+            'c_industry_offers_mix.rent_business_price'          => $this->rent_business_price,
+            'c_industry_offers_mix.rent_business_long_contracts' => $this->rent_business_long_contracts,
+            'c_industry_offers_mix.rent_business_last_repair'    => $this->rent_business_last_repair,
+            'c_industry_offers_mix.rent_business_payback'        => $this->rent_business_payback,
+            'c_industry_offers_mix.rent_business_income'         => $this->rent_business_income,
+            'c_industry_offers_mix.rent_business_profit'         => $this->rent_business_profit,
+            'c_industry_offers_mix.sale_company'                 => $this->sale_company,
+            'c_industry_offers_mix.holidays'                     => $this->holidays,
+            'c_industry_offers_mix.ad_realtor'                   => $this->ad_realtor,
+            'c_industry_offers_mix.ad_cian'                      => $this->ad_cian,
+            'c_industry_offers_mix.ad_cian_top3'                 => $this->ad_cian_top3,
+            'c_industry_offers_mix.ad_cian_premium'              => $this->ad_cian_premium,
+            'c_industry_offers_mix.ad_cian_hl'                   => $this->ad_cian_hl,
+            'c_industry_offers_mix.ad_yandex'                    => $this->ad_yandex,
+            'c_industry_offers_mix.ad_avito'                     => $this->ad_avito,
+            'c_industry_offers_mix.is_fake'                      => $this->is_fake,
+            'c_industry_offers_mix.ad_yandex_raise'              => $this->ad_yandex_raise,
+            'c_industry_offers_mix.ad_yandex_promotion'          => $this->ad_yandex_promotion,
+            'c_industry_offers_mix.ad_yandex_premium'            => $this->ad_yandex_premium,
+            'c_industry_offers_mix.ad_arendator'                 => $this->ad_arendator,
+            'c_industry_offers_mix.ad_free'                      => $this->ad_free,
+            'c_industry_offers_mix.ad_special'                   => $this->ad_special,
+            'c_industry_offers_mix.deleted'                      => 0,
+            'c_industry_offers_mix.test_only'                    => $this->test_only,
+            'c_industry_offers_mix.is_exclusive'                 => $this->is_exclusive,
+            'c_industry_offers_mix.deal_id'                      => $this->deal_id,
+            'c_industry_offers_mix.hide_from_market'             => $this->hide_from_market,
+            'c_industry_offers_mix.region'                       => $this->region,
+            'c_industry_offers_mix.district'                     => $this->district,
+            'c_industry_offers_mix.class'                        => $this->class
+            // 'c_industry_offers_mix.direction' => $this->direction,
+            // 'c_industry_offers_mix.district_moscow' => $this->district_moscow,
+        ]);
 
         $query->andFilterWhere(['like', 'visual_id', $this->visual_id])
-            ->andFilterWhere(['like', 'deal_type_name', $this->deal_type_name])
-            ->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'purposes_furl', $this->purposes_furl])
-            ->andFilterWhere(['like', 'object_type_name', $this->object_type_name])
-            ->andFilterWhere(['like', 'agent_name', $this->agent_name])
-            ->andFilterWhere(['like', 'landscape_type', $this->landscape_type])
-            ->andFilterWhere(['like', 'address', $this->address])
-            ->andFilterWhere(['like', 'class_name', $this->class_name])
-            ->andFilterWhere(['like', 'region_name', $this->region_name])
-            ->andFilterWhere(['like', 'town', $this->town])
-            ->andFilterWhere(['like', 'town_name', $this->town_name])
-            ->andFilterWhere(['like', 'district_name', $this->district_name])
-            ->andFilterWhere(['like', 'district_moscow_name', $this->district_moscow_name])
-            ->andFilterWhere(['like', 'direction_name', $this->direction_name])
-            ->andFilterWhere(['like', 'highway', $this->highway])
-            ->andFilterWhere(['like', 'highway_name', $this->highway_name])
-            ->andFilterWhere(['like', 'highway_moscow', $this->highway_moscow])
-            ->andFilterWhere(['like', 'highway_moscow_name', $this->highway_moscow_name])
-            ->andFilterWhere(['like', 'metro', $this->metro])
-            ->andFilterWhere(['like', 'metro_name', $this->metro_name])
-            ->andFilterWhere(['like', 'railway_station', $this->railway_station])
-            ->andFilterWhere(['like', 'blocks', $this->blocks])
-            ->andFilterWhere(['like', 'photos', $this->photos])
-            ->andFilterWhere(['like', 'videos', $this->videos])
-            ->andFilterWhere(['like', 'thumbs', $this->thumbs])
-            ->andFilterWhere(['like', 'tax_form', $this->tax_form])
-            ->andFilterWhere(['like', 'safe_type', $this->safe_type])
-            ->andFilterWhere(['like', 'safe_type_furl', $this->safe_type_furl])
-            ->andFilterWhere(['like', 'floor_type', $this->floor_type])
-            ->andFilterWhere(['like', 'gate_type', $this->gate_type])
-            ->andFilterWhere(['like', 'gate_num', $this->gate_num])
-            ->andFilterWhere(['like', 'column_grid', $this->column_grid])
-            ->andFilterWhere(['like', 'internet', $this->internet])
-            ->andFilterWhere(['like', 'heating', $this->heating])
-            ->andFilterWhere(['like', 'facing', $this->facing])
-            ->andFilterWhere(['like', 'ventilation', $this->ventilation])
-            ->andFilterWhere(['like', 'guard', $this->guard])
-            ->andFilterWhere(['like', 'firefighting_name', $this->firefighting_name])
-            ->andFilterWhere(['like', 'cadastral_number', $this->cadastral_number])
-            ->andFilterWhere(['like', 'cadastral_number_land', $this->cadastral_number_land])
-            ->andFilterWhere(['like', 'field_allow_usage', $this->field_allow_usage])
-            ->andFilterWhere(['like', 'available_from', $this->available_from])
-            ->andFilterWhere(['like', 'own_type', $this->own_type])
-            ->andFilterWhere(['like', 'own_type_land', $this->own_type_land])
-            ->andFilterWhere(['like', 'land_category', $this->land_category])
-            ->andFilterWhere(['like', 'entry_territory', $this->entry_territory])
-            ->andFilterWhere(['like', 'parking_car_value', $this->parking_car_value])
-            ->andFilterWhere(['like', 'parking_lorry_value', $this->parking_lorry_value])
-            ->andFilterWhere(['like', 'parking_truck_value', $this->parking_truck_value])
-            ->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['<=', 'from_mkad', $this->approximateDistanceFromMKAD])
-            ->andFilterWhere(['<=', 'from_mkad', $this->rangeMaxDistanceFromMKAD])
-            ->andFilterWhere(['>=', 'power_value', $this->rangeMinElectricity])
-            ->andFilterWhere(['<=', 'power_value', $this->rangeMaxElectricity]);
+              ->andFilterWhere(['like', 'deal_type_name', $this->deal_type_name])
+              ->andFilterWhere(['like', 'title', $this->title])
+              ->andFilterWhere(['like', 'purposes_furl', $this->purposes_furl])
+              ->andFilterWhere(['like', 'object_type_name', $this->object_type_name])
+              ->andFilterWhere(['like', 'agent_name', $this->agent_name])
+              ->andFilterWhere(['like', 'landscape_type', $this->landscape_type])
+              ->andFilterWhere(['like', 'address', $this->address])
+              ->andFilterWhere(['like', 'class_name', $this->class_name])
+              ->andFilterWhere(['like', 'region_name', $this->region_name])
+              ->andFilterWhere(['like', 'town', $this->town])
+              ->andFilterWhere(['like', 'town_name', $this->town_name])
+              ->andFilterWhere(['like', 'district_name', $this->district_name])
+              ->andFilterWhere(['like', 'district_moscow_name', $this->district_moscow_name])
+              ->andFilterWhere(['like', 'direction_name', $this->direction_name])
+              ->andFilterWhere(['like', 'highway', $this->highway])
+              ->andFilterWhere(['like', 'highway_name', $this->highway_name])
+              ->andFilterWhere(['like', 'highway_moscow', $this->highway_moscow])
+              ->andFilterWhere(['like', 'highway_moscow_name', $this->highway_moscow_name])
+              ->andFilterWhere(['like', 'metro', $this->metro])
+              ->andFilterWhere(['like', 'metro_name', $this->metro_name])
+              ->andFilterWhere(['like', 'railway_station', $this->railway_station])
+              ->andFilterWhere(['like', 'blocks', $this->blocks])
+              ->andFilterWhere(['like', 'photos', $this->photos])
+              ->andFilterWhere(['like', 'videos', $this->videos])
+              ->andFilterWhere(['like', 'thumbs', $this->thumbs])
+              ->andFilterWhere(['like', 'tax_form', $this->tax_form])
+              ->andFilterWhere(['like', 'safe_type', $this->safe_type])
+              ->andFilterWhere(['like', 'safe_type_furl', $this->safe_type_furl])
+              ->andFilterWhere(['like', 'floor_type', $this->floor_type])
+              ->andFilterWhere(['like', 'gate_type', $this->gate_type])
+              ->andFilterWhere(['like', 'gate_num', $this->gate_num])
+              ->andFilterWhere(['like', 'column_grid', $this->column_grid])
+              ->andFilterWhere(['like', 'internet', $this->internet])
+              ->andFilterWhere(['like', 'heating', $this->heating])
+              ->andFilterWhere(['like', 'facing', $this->facing])
+              ->andFilterWhere(['like', 'ventilation', $this->ventilation])
+              ->andFilterWhere(['like', 'guard', $this->guard])
+              ->andFilterWhere(['like', 'firefighting_name', $this->firefighting_name])
+              ->andFilterWhere(['like', 'cadastral_number', $this->cadastral_number])
+              ->andFilterWhere(['like', 'cadastral_number_land', $this->cadastral_number_land])
+              ->andFilterWhere(['like', 'field_allow_usage', $this->field_allow_usage])
+              ->andFilterWhere(['like', 'available_from', $this->available_from])
+              ->andFilterWhere(['like', 'own_type', $this->own_type])
+              ->andFilterWhere(['like', 'own_type_land', $this->own_type_land])
+              ->andFilterWhere(['like', 'land_category', $this->land_category])
+              ->andFilterWhere(['like', 'entry_territory', $this->entry_territory])
+              ->andFilterWhere(['like', 'parking_car_value', $this->parking_car_value])
+              ->andFilterWhere(['like', 'parking_lorry_value', $this->parking_lorry_value])
+              ->andFilterWhere(['like', 'parking_truck_value', $this->parking_truck_value])
+              ->andFilterWhere(['like', 'description', $this->description])
+              ->andFilterWhere(['<=', 'from_mkad', $this->approximateDistanceFromMKAD])
+              ->andFilterWhere(['<=', 'from_mkad', $this->rangeMaxDistanceFromMKAD])
+              ->andFilterWhere(['>=', 'power_value', $this->rangeMinElectricity])
+              ->andFilterWhere(['<=', 'power_value', $this->rangeMaxElectricity]);
 
 
         if ($this->deal_type == OfferMix::DEAL_TYPE_RENT || $this->deal_type == OfferMix::DEAL_TYPE_SUBLEASE) {
@@ -916,12 +941,25 @@ class OfferMixSearch extends Search
         } elseif ($this->deal_type == OfferMix::DEAL_TYPE_SALE) {
             $query->andFilterWhere(['<=', 'c_industry_offers_mix.price_sale_max', $this->pricePerFloor]);
         }
-        $query->andFilterWhere(['or like', 'c_industry_offers_mix.gates', $this->gates]);
-        $query->andFilterWhere(['or like', 'c_industry_offers_mix.purposes', $this->purposes]);
+
+        if (ArrayHelper::isArray($this->gates) && ArrayHelper::notEmpty($this->gates)) {
+            $query->addOrLikeSafetyConditions(
+                'c_industry_offers_mix.gates',
+                ArrayHelper::map($this->gates, static fn($gate) => SQLHelper::toQuotedMatch($gate)),
+                ':gate'
+            );
+        }
+
+        if (ArrayHelper::isArray($this->purposes) && ArrayHelper::notEmpty($this->purposes)) {
+            $query->addOrLikeSafetyConditions(
+                'c_industry_offers_mix.purposes',
+                ArrayHelper::map($this->purposes, static fn($purpose) => SQLHelper::toQuotedMatch($purpose)),
+                ':purpose'
+            );
+        }
+
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.object_type', $this->object_type]);
         $query->andFilterWhere(['or like', 'c_industry_offers_mix.floor_types', $this->floor_types]);
-        $query->andFilterWhere(['or like', 'c_industry_offers_mix.floor_types', $this->floor_types]);
-
 
         if ($this->sewage_central !== null) {
             $query->andFilterWhere(['in', new Expression("
@@ -939,12 +977,12 @@ class OfferMixSearch extends Search
         ]);
 
 
-
         $query->andFilterWhere([
             'or',
             ['=', 'c_industry_offers_mix.floor_min', $this->firstFloorOnly],
             ['=', 'c_industry_offers_mix.floor_max', $this->firstFloorOnly]
         ]);
+
         $query->andFilterWhere([
             'and',
             ['<=', 'LEAST(c_industry_offers_mix.area_max, c_industry_offers_mix.area_min)', $this->rangeMaxArea],
@@ -969,36 +1007,36 @@ class OfferMixSearch extends Search
             $query->groupBy($this->getField('object_id'));
         }
 
-        $rent_price_least = "IF(
+        $rent_price_least    = "IF(
             LEAST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max) 
             IS NULL,
              0,
               LEAST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max)
               )";
         $rent_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max) IS NULL, 0, GREATEST(c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max))";
-        $sale_price_least = "IF(LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
+        $sale_price_least    = "IF(LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
         $sale_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min) IS NULL, 0, GREATEST(c_industry_offers_mix.price_sale_max, c_industry_offers_mix.price_sale_min))";
-        $rs_price_least = "IF(LEAST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min))";
-        $rs_price_greatest = "IF(GREATEST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min) IS NULL, 0, GREATEST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min))";
+        $rs_price_least      = "IF(LEAST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min) IS NULL, 0, LEAST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min))";
+        $rs_price_greatest   = "IF(GREATEST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min) IS NULL, 0, GREATEST(c_industry_offers_mix.price_safe_pallet_max, c_industry_offers_mix.price_safe_pallet_min))";
 
         $query->andFilterWhere([
             'and',
             [
                 '<=',
                 new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT
-                    . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-                    . "  THEN $rent_price_least WHEN c_industry_offers_mix.deal_type = "
-                    . OfferMix::DEAL_TYPE_SALE
-                    . " THEN $sale_price_least ELSE $rs_price_least END"),
+                               . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+                               . "  THEN $rent_price_least WHEN c_industry_offers_mix.deal_type = "
+                               . OfferMix::DEAL_TYPE_SALE
+                               . " THEN $sale_price_least ELSE $rs_price_least END"),
                 $this->rangeMaxPricePerFloor
             ],
             [
                 '>=',
                 new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT
-                    . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
-                    . "  THEN $rent_price_greatest WHEN c_industry_offers_mix.deal_type = "
-                    . OfferMix::DEAL_TYPE_SALE
-                    . " THEN $sale_price_greatest ELSE $rs_price_greatest END"),
+                               . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SUBLEASE
+                               . "  THEN $rent_price_greatest WHEN c_industry_offers_mix.deal_type = "
+                               . OfferMix::DEAL_TYPE_SALE
+                               . " THEN $sale_price_greatest ELSE $rs_price_greatest END"),
                 $this->rangeMinPricePerFloor
             ],
         ]);
@@ -1020,12 +1058,15 @@ class OfferMixSearch extends Search
                 ")]
             );
         }
+
         if ($this->status == 3) {
             $query->andFilterWhere(['c_industry_offers_mix.status' => [1, 2]]);
         }
+
         if ($this->status == 1) {
             $query->andFilterWhere(['c_industry_offers_mix.status' => $this->status]);
         }
+
         if ($this->status == 2) {
             $query->andFilterWhere(
                 ['=', 'c_industry_offers_mix.status', new Expression("
@@ -1047,6 +1088,7 @@ class OfferMixSearch extends Search
 
     /**
      * @param ActiveQuery $query
+     *
      * @return void
      */
     public function setPolygonFilter(ActiveQuery $query): void
@@ -1055,7 +1097,8 @@ class OfferMixSearch extends Search
             return;
         }
 
-        $coords = implode(", ", $this->polygon);
+        $coords = StringHelper::join(StringHelper::SPACED_COMMA, $this->polygon);
+
         $polygonCondition = <<< EOF
                 ST_CONTAINS(
                 ST_GEOMFROMTEXT(
@@ -1066,6 +1109,7 @@ class OfferMixSearch extends Search
                         POINT(c_industry_offers_mix.latitude, c_industry_offers_mix.longitude)
                     )
             EOF;
+
         $query->andWhere(new Expression($polygonCondition));
     }
 

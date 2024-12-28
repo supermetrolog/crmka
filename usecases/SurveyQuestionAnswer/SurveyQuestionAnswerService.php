@@ -22,7 +22,7 @@ class SurveyQuestionAnswerService
 		$model = new SurveyQuestionAnswer([
 			'question_answer_id' => $dto->question_answer_id,
 			'survey_id'          => $dto->survey_id,
-			'value'              => Json::encode($dto->value),
+			'value'              => !empty($dto->value) ? Json::encode($dto->value) : null,
 		]);
 
 		$model->saveOrThrow();
@@ -38,7 +38,7 @@ class SurveyQuestionAnswerService
 		$model->load([
 			'question_answer_id' => $dto->question_answer_id,
 			'survey_id'          => $dto->survey_id,
-			'value'              => Json::encode($dto->value),
+			'value'              => !empty($dto->value) ? Json::encode($dto->value) : null,
 		]);
 
 		$model->saveOrThrow();

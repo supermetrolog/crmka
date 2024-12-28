@@ -346,6 +346,7 @@ class OfferMix extends AR
 		'340' => 73,
 		'341' => 74,
 		'342' => 75,
+		'343' => 76,
 	];
 
 	public ?int $last_call_rel_id = null;
@@ -1058,9 +1059,10 @@ class OfferMix extends AR
 
 	public static function normalizeObjectTypes($data)
 	{
-		if ($data == null) {
+		if ($data === null) {
 			return;
 		}
+
 		$array = [
 			0  => 1,
 			1  => 3,
@@ -1094,6 +1096,8 @@ class OfferMix extends AR
 			29 => 31,
 			30 => 32,
 			31 => 33,
+			32 => 32,
+			33 => 33
 		];
 
 		return $array[$data];

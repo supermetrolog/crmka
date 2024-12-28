@@ -17,7 +17,7 @@ class UserForm extends Form
 
 	public string  $username;
 	public ?string $email;
-	public string  $email_username;
+	public         $email_username;
 	public ?string $email_password = null;
 	public int     $role;
 	public ?string $password       = null;
