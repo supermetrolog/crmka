@@ -388,7 +388,7 @@ class OfferMixSearch extends Search
 
     public function normalizeDistrict(): void
     {
-        if (ArrayHelper::isArray($this->direction)) {
+        if (ArrayHelper::isArray($this->district_moscow)) {
             $this->district_moscow = ArrayHelper::map($this->district_moscow, static fn($district) => OfferMix::normalizeDistricts($district));
         }
     }
