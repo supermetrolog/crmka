@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\models\ActiveQuery;
 
-use app\helpers\StringHelper;
 use app\models\OfferMix;
 use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix as OfferMixOld;
@@ -101,22 +100,5 @@ class OfferMixQuery extends oldDb\OfferMixQuery
 		$this->joinWith(['block']);
 
 		return $this->andWhere([ObjectsBlock::tableName() . '.ad_avito' => 1]);
-	}
-
-	/** @param string[]|number[] $values */
-	public function addOrLikeSafetyConditions(string $column, array $values, string $paramKey): self
-	{
-		$conditions = [];
-		$params     = [];
-
-		foreach ($values as $index => $value) {
-			$paramName          = $paramKey . $index;
-			$conditions[]       = "$column LIKE $paramName";
-			$params[$paramName] = $value;
-		}
-
-		$condition = StringHelper::join(' OR ', ...$conditions);
-
-		return $this->andWhere($condition, $params);
 	}
 }
