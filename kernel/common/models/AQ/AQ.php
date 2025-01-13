@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\kernel\common\models\AQ;
 
+use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use yii\db\ActiveQuery;
@@ -112,5 +113,22 @@ class AQ extends ActiveQuery
 	public function andWhereNotIn(string $column, array $value): self
 	{
 		return $this->andWhere(['NOT IN', $column, $value]);
+	}
+
+	/** @param string[]|number[] $values */
+	public function addOrLikeSafetyConditions(string $column, array $values, string $paramKey): self
+	{
+		$conditions = [];
+		$params     = [];
+
+		foreach ($values as $index => $value) {
+			$paramName          = $paramKey . $index;
+			$conditions[]       = "$column LIKE $paramName";
+			$params[$paramName] = $value;
+		}
+
+		$condition = StringHelper::join(' OR ', ...$conditions);
+
+		return $this->andWhere($condition, $params);
 	}
 }
