@@ -11,7 +11,6 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Company;
-use app\models\ObjectChatMember;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
@@ -42,7 +41,7 @@ class CompanyWantsToBuyOrBuildEffectStrategy extends AbstractEffectStrategy
 
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->getMaybeBool() && $survey->chatMember->model_type === ObjectChatMember::getMorphClass();
+		return $answer->surveyQuestionAnswer->getMaybeBool();
 	}
 
 	/**
