@@ -12,252 +12,277 @@ use yii\helpers\ArrayHelper;
 
 class DataMapper
 {
-    /**
-     * @param OfferInterface $offer
-     * @return array[]
-     */
-    public function getImages(OfferInterface $offer): array
-    {
-        $images = [];
-        $count = 0;
-        foreach ($offer->getImages() as $image) {
-            if ($count >= AvitoFeedGenerator::MAX_IMAGES_COUNT) {
-                break;
-            }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return array[]
+	 */
+	public function getImages(OfferInterface $offer): array
+	{
+		$images = [];
+		$count  = 0;
+		foreach ($offer->getImages() as $image) {
+			if ($count >= AvitoFeedGenerator::MAX_IMAGES_COUNT) {
+				break;
+			}
 
-            $count++;
+			$count++;
 
-            $images[] = [
-                'tag' => 'Image',
-                'value' => '',
-                'attributes' => [
-                    'url' => Yii::$app->params['url']['objects'] . $image
-                ]
-            ];
-        }
+			$images[] = [
+				'tag'        => 'Image',
+				'value'      => '',
+				'attributes' => [
+					'url' => Yii::$app->params['url']['objects'] . $image
+				]
+			];
+		}
 
-        return $images;
-    }
+		return $images;
+	}
 
-    /**
-     * @param OfferInterface $offer
-     * @return string
-     */
-    public function getLeaseDeposit(OfferInterface $offer): string
-    {
-        if (!$offer->hasDeposit()) {
-            return AvitoValue::LEASE_DEPOSIT_NO_DEPOSIT;
-        }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string
+	 */
+	public function getLeaseDeposit(OfferInterface $offer): string
+	{
+		if (!$offer->hasDeposit()) {
+			return AvitoValue::LEASE_DEPOSIT_NO_DEPOSIT;
+		}
 
-        $deposit = $offer->getDepositMonth();
+		$deposit = $offer->getDepositMonth();
 
-        if ($deposit < 1) {
-            return AvitoValue::LEASE_DEPOSIT_NO_DEPOSIT;
-        } else if ($deposit < 2) {
-            return 1;
-        } else if ($deposit < 3) {
-            return 2;
-        } else {
-            return 3;
-        }
-    }
+		if ($deposit < 1) {
+			return AvitoValue::LEASE_DEPOSIT_NO_DEPOSIT;
+		} else {
+			if ($deposit < 2) {
+				return 1;
+			} else {
+				if ($deposit < 3) {
+					return 2;
+				} else {
+					return 3;
+				}
+			}
+		}
+	}
 
-    /**
-     * @throws ErrorException
-     */
-    public function getRentalType(OfferInterface $offer): string
-    {
-        if ($offer->isRentType()) {
-            return AvitoValue::RENTAL_TYPE_DIRECT;
-        }
+	/**
+	 * @throws ErrorException
+	 */
+	public function getRentalType(OfferInterface $offer): string
+	{
+		if ($offer->isRentType()) {
+			return AvitoValue::RENTAL_TYPE_DIRECT;
+		}
 
-        if ($offer->isSubleaseType()) {
-            return AvitoValue::RENTAL_TYPE_SUBLEASE;
-        }
+		if ($offer->isSubleaseType()) {
+			return AvitoValue::RENTAL_TYPE_SUBLEASE;
+		}
 
-        throw new ErrorException('Offer is not rental type');
-    }
+		throw new ErrorException('Offer is not rental type');
+	}
 
 
-    /**
-     * @param OfferInterface $offer
-     * @return string
-     */
-    public function getObjectType(OfferInterface $offer): string
-    {
-        if ($offer->isLand()) {
-            return AvitoValue::OBJECT_TYPE_LAND_INDUSTRIAL;
-        }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string
+	 */
+	public function getObjectType(OfferInterface $offer): string
+	{
+		if ($offer->isLand()) {
+			return AvitoValue::OBJECT_TYPE_LAND_INDUSTRIAL;
+		}
 
-        if ($offer->isProduction()) {
-            return AvitoValue::OBJECT_TYPE_PRODUCTION;
-        }
+		if ($offer->isWarehouse()) {
+			return AvitoValue::OBJECT_TYPE_WAREHOUSE;
+		}
 
-        return AvitoValue::OBJECT_TYPE_WAREHOUSE;
-    }
+		if ($offer->isProduction()) {
+			return AvitoValue::OBJECT_TYPE_PRODUCTION;
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return string
-     */
-    public function getCategory(OfferInterface $offer): string
-    {
-        if ($offer->isLand()) {
-            return AvitoValue::CATEGORY_LAND;
-        }
+		return AvitoValue::OBJECT_TYPE_WAREHOUSE;
+	}
 
-        return AvitoValue::CATEGORY_COMMERCIAL_OBJECT;
-    }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string
+	 */
+	public function getCategory(OfferInterface $offer): string
+	{
+		if ($offer->isLand()) {
+			return AvitoValue::CATEGORY_LAND;
+		}
 
-    /**
-     * @param array $options
-     * @param $key
-     * @return mixed
-     */
-    private function getValueOrThrow(array $options, $key)
-    {
-        if (ArrayHelper::keyExists($key, $options)) {
-            return $options[$key];
-        }
+		return AvitoValue::CATEGORY_COMMERCIAL_OBJECT;
+	}
 
-        throw new InvalidArgumentException("Key: $key not exists in array");
-    }
+	/**
+	 * @param array $options
+	 * @param       $key
+	 *
+	 * @return mixed
+	 */
+	private function getValueOrThrow(array $options, $key)
+	{
+		if (ArrayHelper::keyExists($key, $options)) {
+			return $options[$key];
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return string|null
-     */
-    public function getRentalHolidays(OfferInterface $offer): ?string
-    {
-        if ($offer->hasRentalHolidays()) {
-            return AvitoValue::RENTAL_HOLIDAYS_HAS;
-        }
+		throw new InvalidArgumentException("Key: $key not exists in array");
+	}
 
-        return null;
-    }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string|null
+	 */
+	public function getRentalHolidays(OfferInterface $offer): ?string
+	{
+		if ($offer->hasRentalHolidays()) {
+			return AvitoValue::RENTAL_HOLIDAYS_HAS;
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return string
-     */
-    public function getFloor(OfferInterface $offer): string
-    {
-        if ($offer->getFloorMax() < 0) {
-            return AvitoValue::FLOOR_BASEMENT;
-        }
+		return null;
+	}
 
-        return $offer->getFloorMax();
-    }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string
+	 */
+	public function getFloor(OfferInterface $offer): string
+	{
+		if ($offer->getFloorMax() < 0) {
+			return AvitoValue::FLOOR_BASEMENT;
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return array[]|null
-     */
-    public function getFloorAdditionally(OfferInterface $offer): ?array
-    {
-        if (!$offer->hasSeveralFloors()) {
-            return null;
-        }
+		return $offer->getFloorMax();
+	}
 
-        return [[
-            'tag' => 'Option',
-            'value' => AvitoValue::SEVERAL_FLOORS
-        ]];
-    }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return array[]|null
+	 */
+	public function getFloorAdditionally(OfferInterface $offer): ?array
+	{
+		if (!$offer->hasSeveralFloors()) {
+			return null;
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return string
-     */
-    public function getHeating(OfferInterface $offer): string
-    {
-        if (!$offer->hasHeating()) {
-            return AvitoValue::HEATING_HAS_NOT;
-        }
+		return [[
+			        'tag'   => 'Option',
+			        'value' => AvitoValue::SEVERAL_FLOORS
+		        ]];
+	}
 
-        switch ($offer->getHeatingType()) {
-            case OfferInterface::HEATING_AUTO: return AvitoValue::HEATING_AUTO;
-            case OfferInterface::HEATING_CENTRAL: return AvitoValue::HEATING_CENTRAL;
-            default: return AvitoValue::HEATING_HAS_NOT;
-        }
-    }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string
+	 */
+	public function getHeating(OfferInterface $offer): string
+	{
+		if (!$offer->hasHeating()) {
+			return AvitoValue::HEATING_HAS_NOT;
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return string|null
-     */
-    public function getBuildingClass(OfferInterface $offer): ?string
-    {
-        if (in_array($offer->getClass(), [AvitoValue::BUILDING_CLASS_A, AvitoValue::BUILDING_CLASS_B, AvitoValue::BUILDING_CLASS_C, AvitoValue::BUILDING_CLASS_D])) {
-            return $offer->getClass();
-        }
+		switch ($offer->getHeatingType()) {
+			case OfferInterface::HEATING_AUTO:
+				return AvitoValue::HEATING_AUTO;
+			case OfferInterface::HEATING_CENTRAL:
+				return AvitoValue::HEATING_CENTRAL;
+			default:
+				return AvitoValue::HEATING_HAS_NOT;
+		}
+	}
 
-        return null;
-    }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string|null
+	 */
+	public function getBuildingClass(OfferInterface $offer): ?string
+	{
+		if (in_array($offer->getClass(), [AvitoValue::BUILDING_CLASS_A, AvitoValue::BUILDING_CLASS_B, AvitoValue::BUILDING_CLASS_C, AvitoValue::BUILDING_CLASS_D])) {
+			return $offer->getClass();
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return array|null
-     */
-    public function getLeasePriceOptions(OfferInterface $offer): ?array
-    {
-        $res = [];
+		return null;
+	}
 
-        if ($offer->isIncludePublicService()) {
-            $res[] = [
-                'tag' => 'Option',
-                'value' => AvitoValue::LEASE_PRICE_OPTION_PUBLIC_SERVICES_INCLUDED
-            ];
-        }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return array|null
+	 */
+	public function getLeasePriceOptions(OfferInterface $offer): ?array
+	{
+		$res = [];
 
-        if ($offer->isIncludeOPEX()) {
-            $res[] = [
-                'tag' => 'Option',
-                'value' => AvitoValue::LEASE_PRICE_OPTION_OPEX_INCLUDED
-            ];
-        }
+		if ($offer->isIncludePublicService()) {
+			$res[] = [
+				'tag'   => 'Option',
+				'value' => AvitoValue::LEASE_PRICE_OPTION_PUBLIC_SERVICES_INCLUDED
+			];
+		}
 
-        return $res;
-    }
+		if ($offer->isIncludeOPEX()) {
+			$res[] = [
+				'tag'   => 'Option',
+				'value' => AvitoValue::LEASE_PRICE_OPTION_OPEX_INCLUDED
+			];
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return string|null
-     */
-    public function getSquareAdditionally(OfferInterface $offer): ?string
-    {
-        if ($offer->isSolid()) {
-            return null;
-        }
+		return $res;
+	}
 
-        return AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING;
-    }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string|null
+	 */
+	public function getSquareAdditionally(OfferInterface $offer): ?string
+	{
+		if ($offer->isSolid()) {
+			return null;
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return string
-     */
-    public function getOperationType(OfferInterface $offer): string
-    {
-        if ($offer->isRentType() || $offer->isSubleaseType()) {
-            return AvitoValue::OPERATION_TYPE_RENT;
-        }
+		return AvitoValue::SQUARE_ADDITIONAL_POSSIBLE_CUTTING;
+	}
 
-        return AvitoValue::OPERATION_TYPE_SALE;
-    }
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return string
+	 */
+	public function getOperationType(OfferInterface $offer): string
+	{
+		if ($offer->isRentType() || $offer->isSubleaseType()) {
+			return AvitoValue::OPERATION_TYPE_RENT;
+		}
 
-    /**
-     * @param OfferInterface $offer
-     * @return float
-     */
-    public function getPrice(OfferInterface $offer): float
-    {
+		return AvitoValue::OPERATION_TYPE_SALE;
+	}
+
+	/**
+	 * @param OfferInterface $offer
+	 *
+	 * @return float
+	 */
+	public function getPrice(OfferInterface $offer): float
+	{
 		$priceForAllArea = $offer->getMaxPrice() * $offer->getMaxArea();
 
-        if ($offer->isRentType() || $offer->isSubleaseType()) {
-            return $priceForAllArea / 12;
-        }
+		if ($offer->isRentType() || $offer->isSubleaseType()) {
+			return $priceForAllArea / 12;
+		}
 
-        return $priceForAllArea;
-    }
+		return $priceForAllArea;
+	}
 }
