@@ -137,14 +137,14 @@ class TaskFavoriteService
 		$transaction = $this->transactionBeginner->begin();
 
 		try {
+			if (!$this->isCorrectOrder($dto->prev_id, $dto->next_id)) {
+				throw new InvalidArgumentException('Incorrect next and prev positions');
+			}
+
 			$positionModel = $this->taskFavoriteRepository->findOneOrThrow($id);
 
 			$nextCurrentPositionModel = $this->taskFavoriteRepository->findByPrevId($positionModel->id);
 			$this->updateNextModelLink($nextCurrentPositionModel, $positionModel->prev_id);
-
-			if (!$this->isCorrectOrder($dto->prev_id, $dto->next_id)) {
-				throw new InvalidArgumentException('Incorrect next and prev positions');
-			}
 
 			$this->updatePositionModelLink($positionModel, $dto);
 

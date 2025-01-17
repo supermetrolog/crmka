@@ -38,7 +38,7 @@ class TaskFavorite extends AR
 			[['created_at', 'deleted_at'], 'safe'],
 			[['task_id'], 'exist', 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
 			[['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-			[['prev_id'], 'exist', 'targetClass' => TaskFavorite::class, 'targetAttribute' => ['prev_id' => 'id']]
+			[['prev_id'], 'exist', 'targetClass' => TaskFavorite::class, 'targetAttribute' => ['prev_id' => 'id'], 'filter' => ['deleted_at' => null]],
 		];
 	}
 

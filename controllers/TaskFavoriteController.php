@@ -11,7 +11,7 @@ use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\TaskFavorite\TaskFavoriteChangePositionForm;
 use app\models\forms\TaskFavorite\TaskFavoriteForm;
-use app\resources\TaskFavoriteResource\TaskFavoriteResource;
+use app\resources\TaskFavorite\TaskFavoriteResource;
 use app\usecases\TaskFavorite\TaskFavoriteService;
 use Exception;
 use Throwable;

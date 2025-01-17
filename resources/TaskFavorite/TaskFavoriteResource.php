@@ -1,6 +1,6 @@
 <?php
 
-namespace app\resources\TaskFavoriteResource;
+namespace app\resources\TaskFavorite;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\TaskFavorite;

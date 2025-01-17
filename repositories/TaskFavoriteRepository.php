@@ -41,6 +41,12 @@ class TaskFavoriteRepository
 	 */
 	public function findAllByUserId(int $userId): array
 	{
-		return TaskFavorite::find()->notDeleted()->byUserId($userId)->all();
+		return TaskFavorite::find()->with([
+			'task.user.userProfile',
+			'task.tags',
+			'task.createdByUser.userProfile',
+			'task.observers.user.userProfile',
+			'task.targetUserObserver'
+		])->notDeleted()->byUserId($userId)->all();
 	}
 }

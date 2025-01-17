@@ -21,9 +21,9 @@ class TaskFavoriteChangePositionForm extends Form
 	{
 		return [
 			[['prev_id', 'next_id'], 'integer'],
-			[['prev_id'], 'compare', 'compareAttribute' => 'next_id', '!='],
-			[['prev_id'], 'exist', 'targetClass' => TaskFavorite::class, 'targetAttribute' => ['prev_id' => 'id']],
-			[['next_id'], 'exist', 'targetClass' => TaskFavorite::class, 'targetAttribute' => ['next_id' => 'id']],
+			[['prev_id'], 'compare', 'compareAttribute' => 'next_id', 'operator' => '!='],
+			[['prev_id'], 'exist', 'targetClass' => TaskFavorite::class, 'targetAttribute' => ['prev_id' => 'id'], 'filter' => ['deleted_at' => null]],
+			[['next_id'], 'exist', 'targetClass' => TaskFavorite::class, 'targetAttribute' => ['next_id' => 'id'], 'filter' => ['deleted_at' => null]],
 		];
 	}
 
