@@ -128,6 +128,8 @@ class TaskFavoriteService
 	}
 
 	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
 	public function changePosition(int $id, TaskFavoriteChangePositionDto $dto): void
@@ -141,7 +143,7 @@ class TaskFavoriteService
 			$this->updateNextModelLink($nextCurrentPositionModel, $positionModel->prev_id);
 
 			if (!$this->isCorrectOrder($dto->prev_id, $dto->next_id)) {
-				throw new InvalidArgumentException();
+				throw new InvalidArgumentException('Incorrect next and prev positions');
 			}
 
 			$this->updatePositionModelLink($positionModel, $dto);

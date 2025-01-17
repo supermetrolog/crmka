@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\exceptions\services\TaskFavoriteAlreadyExistsException;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
@@ -14,6 +15,7 @@ use app\resources\TaskFavoriteResource\TaskFavoriteResource;
 use app\usecases\TaskFavorite\TaskFavoriteService;
 use Exception;
 use Throwable;
+use yii\base\InvalidArgumentException;
 use yii\db\StaleObjectException;
 
 class TaskFavoriteController extends AppController
@@ -63,7 +65,7 @@ class TaskFavoriteController extends AppController
 
 			return new TaskFavoriteResource($model);
 		} catch (TaskFavoriteAlreadyExistsException $e) {
-			return new ErrorResponse("Задача уже добавлена в избранные.");
+			return $this->errorf('Задача #%s уже добавлена в избранные.', [$form->task_id]);
 		}
 	}
 
@@ -80,25 +82,32 @@ class TaskFavoriteController extends AppController
 
 			$this->service->delete($model);
 
-			return new SuccessResponse("Задача была успешна удалена из избранных.");
+			return $this->successf('Задача #%s была успешна удалена из избранных.', [$model->task_id]);
 		} catch (ModelNotFoundException $e) {
-			return new ErrorResponse("Задача не является избранной.");
+			return $this->error('Задача не является избранной.');
 		}
 	}
 
 	/**
+	 * @return ErrorResponse|SuccessResponse
 	 * @throws Throwable
 	 * @throws ValidateException
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
 	 */
-	public function actionChangePosition(int $id): SuccessResponse
+	public function actionChangePosition(int $id)
 	{
 		$form = new TaskFavoriteChangePositionForm();
 		$form->load($this->request->post());
 
 		$form->validateOrThrow();
 
-		$this->service->changePosition($id, $form->getDto());
+		try {
+			$this->service->changePosition($id, $form->getDto());
+		} catch (InvalidArgumentException $th) {
+			return $this->error('Передана некорректная позиция для сортировки.');
+		}
 
-		return new SuccessResponse();
+		return $this->success();
 	}
 }

@@ -6,6 +6,8 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\resources\JsonResource;
+use app\kernel\web\http\responses\ErrorResponse;
+use app\kernel\web\http\responses\SuccessResponse;
 use Yii;
 use yii\base\InvalidRouteException;
 use yii\filters\auth\HttpBearerAuth;
@@ -110,5 +112,30 @@ class AppController extends Controller
 		});
 
 		return parent::beforeAction($action);
+	}
+
+
+	public function success(?string $message = null, int $code = 200): SuccessResponse
+	{
+		$this->response->setStatusCode($code);
+
+		return new SuccessResponse($message);
+	}
+
+	public function successf(string $pattern, array $params, int $code = 200): SuccessResponse
+	{
+		return $this->success(sprintf($pattern, ...$params), $code);
+	}
+
+	public function error(?string $message = null, int $code = 400): ErrorResponse
+	{
+		$this->response->setStatusCode($code);
+
+		return new ErrorResponse($message);
+	}
+
+	public function errorf(string $pattern, array $params, int $code = 400): ErrorResponse
+	{
+		return $this->error(sprintf($pattern, ...$params), $code);
 	}
 }
