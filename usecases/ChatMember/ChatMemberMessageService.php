@@ -104,6 +104,7 @@ class ChatMemberMessageService
 			$message->from_chat_member_id = $dto->from->id;
 			$message->to_chat_member_id   = $dto->to->id;
 			$message->message             = $dto->message;
+			$message->template            = $dto->template;
 
 			if ($dto->replyTo !== null) {
 				$message->reply_to_id = $dto->replyTo->id;
@@ -496,7 +497,8 @@ class ChatMemberMessageService
 			'message'    => $dto->message,
 			'contactIds' => $dto->contactIds,
 			'tagIds'     => $dto->tagIds,
-			'surveyIds'  => $dto->surveyIds
+			'surveyIds'  => $dto->surveyIds,
+			'template'   => $dto->template
 		]);
 
 		return $this->create($chatMemberMessageDto);

@@ -22,7 +22,7 @@ class SurveyQuestionAnswerService
 		$model = new SurveyQuestionAnswer([
 			'question_answer_id' => $dto->question_answer_id,
 			'survey_id'          => $dto->survey_id,
-			'value'              => !empty($dto->value) ? Json::encode($dto->value) : null,
+			'value'              => !is_null($dto->value) ? Json::encode($dto->value) : null,
 		]);
 
 		$model->saveOrThrow();

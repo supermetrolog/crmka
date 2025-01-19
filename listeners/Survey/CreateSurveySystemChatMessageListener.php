@@ -55,6 +55,7 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 				'to'         => $chatMember,
 				'surveyIds'  => [$survey->id],
 				'contactIds' => [$survey->contact_id],
+				'template'   => ChatMemberMessage::SURVEY_TEMPLATE
 			]);
 
 			$message = $this->chatMemberMessageService->createSystemMessage($dto);
