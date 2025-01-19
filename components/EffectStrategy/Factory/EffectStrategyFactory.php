@@ -6,6 +6,7 @@ namespace app\components\EffectStrategy\Factory;
 use app\components\EffectStrategy\EffectStrategyInterface;
 use app\components\EffectStrategy\Strategies\CompaniesOnObjectIdentifiedEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyHasNewRequestEffectStrategy;
+use app\components\EffectStrategy\Strategies\CompanyHasSubleaseOrStorageEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyPlannedDevelopEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyWantsToBuyOrBuildEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyWantsToBuyOrSellEquipmentEffectStrategy;
@@ -30,7 +31,8 @@ class EffectStrategyFactory implements EffectStrategyFactoryInterface
 		EffectKind::COMPANY_HAS_NEW_REQUEST                => CompanyHasNewRequestEffectStrategy::class,
 		EffectKind::COMPANY_WANTS_TO_BUY_OR_SELL_EQUIPMENT => CompanyWantsToBuyOrSellEquipmentEffectStrategy::class,
 		EffectKind::OBJECT_HAS_EQUIPMENT_FOR_SALE          => ObjectHasEquipmentForSaleEffectStrategy::class,
-		EffectKind::OBJECT_HAS_FREE_AREA                   => ObjectHasFreeAreaEffectStrategy::class
+		EffectKind::OBJECT_HAS_FREE_AREA                   => ObjectHasFreeAreaEffectStrategy::class,
+		EffectKind::COMPANY_HAS_SUBLEASE_OR_STORAGE        => CompanyHasSubleaseOrStorageEffectStrategy::class
 	];
 
 	public function hasStrategy(string $effectKind): bool
