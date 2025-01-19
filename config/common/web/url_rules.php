@@ -422,4 +422,15 @@ return
 				'DELETE,OPTIONS <id>' => 'delete',
 			],
 		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'task-favorite',
+			'except'        => [],
+			'extraPatterns' => [
+				'GET,OPTIONS'                       => 'index',
+				'POST,OPTIONS'                      => 'create',
+				'DELETE,OPTIONS <id>'               => 'delete',
+				'POST,OPTIONS <id>/change-position' => 'change-position',
+			],
+		],
 	];

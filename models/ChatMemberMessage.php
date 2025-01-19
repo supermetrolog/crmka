@@ -26,6 +26,7 @@ use yii\db\ActiveQuery;
  * @property int|null                $from_chat_member_id
  * @property int|null                $reply_to_id
  * @property string|null             $message
+ * @property ?string                 $template
  * @property string                  $created_at
  * @property string                  $updated_at
  * @property string                  $deleted_at
@@ -41,10 +42,13 @@ use yii\db\ActiveQuery;
  * @property Media[]                 $files
  * @property ChatMemberMessageView[] $views
  * @property ChatMemberMessage       $replyTo
+ * @property Survey[]                $surveys
  */
 class ChatMemberMessage extends AR
 {
 	public const DEFAULT_MEDIA_CATEGORY = 'chat_member_message';
+
+	public const SURVEY_TEMPLATE = 'survey';
 
 	protected bool $useSoftCreate = true;
 	protected bool $useSoftUpdate = true;
@@ -62,7 +66,7 @@ class ChatMemberMessage extends AR
 		return [
 			[['to_chat_member_id'], 'required'],
 			[['to_chat_member_id', 'from_chat_member_id'], 'integer'],
-			[['message'], 'string'],
+			[['message', 'template'], 'string'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['from_chat_member_id'], 'exist', 'skipOnError' => true, 'targetClass' => ChatMember::className(), 'targetAttribute' => ['from_chat_member_id' => 'id']],
 			[['to_chat_member_id'], 'exist', 'skipOnError' => true, 'targetClass' => ChatMember::className(), 'targetAttribute' => ['to_chat_member_id' => 'id']],
@@ -76,6 +80,7 @@ class ChatMemberMessage extends AR
 			'to_chat_member_id'   => 'To Chat Member ID',
 			'from_chat_member_id' => 'From Chat Member ID',
 			'message'             => 'Message',
+			'template'            => 'Template',
 			'created_at'          => 'Created At',
 			'updated_at'          => 'Updated At',
 		];

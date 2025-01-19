@@ -31,21 +31,23 @@ class ChatMemberMessageResource extends JsonResource
 			'to_chat_member_id'   => $this->resource->to_chat_member_id,
 			'reply_to_id'         => $this->resource->reply_to_id,
 			'message'             => $this->resource->message,
+			'template'            => $this->resource->template,
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
 			'deleted_at'          => $this->resource->deleted_at,
 			'is_viewed'           => $this->resource->is_viewed,
 			'is_system'           => $this->resource->isSystem(),
-			'from'                => ChatMemberShortResource::make($this->resource->fromChatMember)->toArray(),
-			'tasks'               => TaskResource::collection($this->resource->tasks),
-			'alerts'              => AlertResource::collection($this->resource->alerts),
-			'reminders'           => ReminderResource::collection($this->resource->reminders),
-			'contacts'            => ContactShortResource::collection($this->resource->contacts),
-			'notifications'       => UserNotificationResource::collection($this->resource->notifications),
-			'tags'                => ChatMemberMessageTagResource::collection($this->resource->tags),
-			'files'               => MediaResource::collection($this->resource->files),
-			'reply_to'            => ChatMemberMessageShortResource::tryMakeArray($this->resource->replyTo),
-			'surveys'             => ChatMemberMessageSurveyResource::collection($this->resource->surveys)
+
+			'from'          => ChatMemberShortResource::make($this->resource->fromChatMember)->toArray(),
+			'tasks'         => TaskResource::collection($this->resource->tasks),
+			'alerts'        => AlertResource::collection($this->resource->alerts),
+			'reminders'     => ReminderResource::collection($this->resource->reminders),
+			'contacts'      => ContactShortResource::collection($this->resource->contacts),
+			'notifications' => UserNotificationResource::collection($this->resource->notifications),
+			'tags'          => ChatMemberMessageTagResource::collection($this->resource->tags),
+			'files'         => MediaResource::collection($this->resource->files),
+			'reply_to'      => ChatMemberMessageShortResource::tryMakeArray($this->resource->replyTo),
+			'surveys'       => ChatMemberMessageSurveyResource::collection($this->resource->surveys)
 		];
 	}
 }
