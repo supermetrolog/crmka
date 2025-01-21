@@ -2,9 +2,9 @@
 
 namespace app\components\EffectStrategy\Strategies;
 
-use app\builders\Task\TaskBuilderFactory;
 use app\components\EffectStrategy\AbstractEffectStrategy;
-use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
+use app\components\EffectStrategy\Service\CreateEffectSystemMessageService;
+use app\components\EffectStrategy\Service\CreateEffectTaskService;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
@@ -13,28 +13,26 @@ use app\models\Company;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
-use app\models\User;
 use app\services\ChatMemberSystemMessage\RequestsNoLongerRelevantChatMemberSystemMessage;
-use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 
 class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 {
 	private const TASK_MESSAGE_TEXT = '%s (#%s) - устарели запросы, необходимо отправить их в пассив.';
 
-	private ChatMemberMessageService     $chatMemberMessageService;
-	private TransactionBeginnerInterface $transactionBeginner;
-	private TaskBuilderFactory           $taskBuilderFactory;
+	private TransactionBeginnerInterface     $transactionBeginner;
+	private CreateEffectTaskService          $effectTaskService;
+	private CreateEffectSystemMessageService $effectSystemMessageService;
 
 	public function __construct(
-		ChatMemberMessageService $chatMemberMessageService,
 		TransactionBeginnerInterface $transactionBeginner,
-		TaskBuilderFactory $taskBuilderFactory
+		CreateEffectTaskService $effectTaskService,
+		CreateEffectSystemMessageService $effectSystemMessageService
 	)
 	{
-		$this->chatMemberMessageService = $chatMemberMessageService;
-		$this->transactionBeginner      = $transactionBeginner;
-		$this->taskBuilderFactory       = $taskBuilderFactory;
+		$this->transactionBeginner        = $transactionBeginner;
+		$this->effectTaskService          = $effectTaskService;
+		$this->effectSystemMessageService = $effectSystemMessageService;
 	}
 
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
@@ -66,7 +64,12 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 				$this->sendSystemMessageIntoCompany($chatMember, $survey);
 			}
 
-			$this->createTaskForMessage($surveyChatMemberMessage, $survey->user, $chatMemberModel);
+			$this->effectTaskService->createTaskForMessage(
+				$surveyChatMemberMessage,
+				$survey->user,
+				$surveyQuestionAnswer,
+				$this->getTaskMessage($chatMemberModel)
+			);
 
 			$tx->commit();
 		} catch (Throwable $th) {
@@ -83,28 +86,6 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 	{
 		$message = RequestsNoLongerRelevantChatMemberSystemMessage::create()->toMessage();
 
-		$dto = new CreateChatMemberSystemMessageDto([
-			'message'    => $message,
-			'to'         => $chatMember,
-			'surveyIds'  => [$survey->id],
-			'contactIds' => [$survey->contact_id],
-		]);
-
-		$this->chatMemberMessageService->createSystemMessage($dto);
-	}
-
-	/**
-	 * @throws SaveModelException
-	 * @throws Throwable
-	 */
-	private function createTaskForMessage(ChatMemberMessage $message, User $user, Company $company): void
-	{
-		$dto = $this->taskBuilderFactory
-			->createEffectBuilder()
-			->setMessage($this->getTaskMessage($company))
-			->setCreatedBy($user)
-			->build();
-
-		$this->chatMemberMessageService->createTask($message, $dto);
+		$this->effectSystemMessageService->createSystemMessage($chatMember, $survey, $message);
 	}
 }

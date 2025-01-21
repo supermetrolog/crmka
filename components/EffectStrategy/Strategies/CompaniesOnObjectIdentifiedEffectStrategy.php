@@ -3,36 +3,33 @@
 namespace app\components\EffectStrategy\Strategies;
 
 use app\components\EffectStrategy\AbstractEffectStrategy;
-use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
+use app\components\EffectStrategy\Service\CreateEffectSystemMessageService;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
-use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\repositories\ChatMemberRepository;
 use app\services\ChatMemberSystemMessage\CompanyOnObjectChatMemberSystemMessage;
-use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 use yii\base\Exception;
 
 class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 {
-	private ChatMemberMessageService     $chatMemberMessageService;
-	private TransactionBeginnerInterface $transactionBeginner;
-	private ChatMemberRepository         $chatMemberRepository;
+	private CreateEffectSystemMessageService $effectSystemMessageService;
+	private TransactionBeginnerInterface     $transactionBeginner;
+	private ChatMemberRepository             $chatMemberRepository;
 
 	public function __construct(
-		ChatMemberMessageService $chatMemberMessageService,
+		CreateEffectSystemMessageService $effectSystemMessageService,
 		TransactionBeginnerInterface $transactionBeginner,
 		ChatMemberRepository $chatMemberRepository
 	)
 	{
-		$this->chatMemberMessageService = $chatMemberMessageService;
-		$this->transactionBeginner      = $transactionBeginner;
-		$this->chatMemberRepository     = $chatMemberRepository;
+		$this->effectSystemMessageService = $effectSystemMessageService;
+		$this->transactionBeginner        = $transactionBeginner;
+		$this->chatMemberRepository       = $chatMemberRepository;
 	}
 
 	/**
@@ -68,7 +65,7 @@ class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 				                                                 ->setArea($area)
 				                                                 ->toMessage();
 
-				$this->sendSystemMessage($companyChatMember, $message, $survey);
+				$this->effectSystemMessageService->createSystemMessage($companyChatMember, $survey, $message);
 			}
 
 			$tx->commit();
@@ -76,21 +73,6 @@ class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 			$tx->rollback();
 			throw $th;
 		}
-	}
-
-	/**
-	 * @throws SaveModelException
-	 * @throws Throwable
-	 */
-	private function sendSystemMessage(ChatMember $chatMember, string $message, Survey $survey): void
-	{
-		$dto = new CreateChatMemberSystemMessageDto([
-			'message'   => $message,
-			'to'        => $chatMember,
-			'surveyIds' => [$survey->id]
-		]);
-
-		$this->chatMemberMessageService->createSystemMessage($dto);
 	}
 }
 
