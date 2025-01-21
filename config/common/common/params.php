@@ -9,7 +9,7 @@ $ftpOptionsForBackupsLoad = [
 	'password' => $secrets['ftp_options_for_backups_load']['password'], // required
 ];
 
-$common_thisHost = "http://crmka/";
+$common_thisHost = "http://crmka_nginx/";
 
 return [
 	'company_phone'  => '+7 (495) 150-03-23',
