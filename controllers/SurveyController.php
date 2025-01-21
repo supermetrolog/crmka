@@ -72,8 +72,14 @@ class SurveyController extends AppController
 			        ->joinWith([
 				        'answers.surveyQuestionAnswer' => function (ActiveQuery $query) use ($id) {
 					        $query->where([SurveyQuestionAnswer::field('survey_id') => $id]);
+					        $query->with(['tasks.user.userProfile',
+					                      'tasks.tags',
+					                      'tasks.createdByUser.userProfile',
+					                      'tasks.observers.user.userProfile',
+					                      'tasks.targetUserObserver']);
 				        }
-			        ])->all(),
+			        ])
+			        ->all(),
 		);
 	}
 

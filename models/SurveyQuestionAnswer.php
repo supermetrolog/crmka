@@ -7,9 +7,12 @@ use app\helpers\TypeConverterHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\FieldQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
+use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
+use app\models\ActiveQuery\TaskQuery;
 use Throwable;
+use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
@@ -17,14 +20,16 @@ use yii\helpers\Json;
 /**
  * This is the model class for table "survey_question_answer".
  *
- * @property int            $id
- * @property int            $survey_id
- * @property int            $question_answer_id
- * @property string|null    $value
+ * @property int             $id
+ * @property int             $survey_id
+ * @property int             $question_answer_id
+ * @property string|null     $value
  *
- * @property QuestionAnswer $questionAnswer
- * @property Survey         $survey
- * @property-read Field     $field
+ * @property QuestionAnswer  $questionAnswer
+ * @property Survey          $survey
+ * @property-read Field      $field
+ * @property-read Task[]     $tasks
+ * @property-read Relation[] $relationSecond
  */
 class SurveyQuestionAnswer extends AR
 {
@@ -74,6 +79,25 @@ class SurveyQuestionAnswer extends AR
 	{
 		/** @var FieldQuery */
 		return $this->hasOne(Field::class, ['id' => 'field_id'])->via('questionAnswer');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getRelationSecond(): RelationQuery
+	{
+		/** @var RelationQuery */
+		return $this->morphHasMany(Relation::class, 'id', 'second');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getTasks(): TaskQuery
+	{
+		/** @var TaskQuery */
+		return $this->morphHasManyVia(Task::class, 'id', 'first')
+		            ->via('relationSecond');
 	}
 
 	protected function toBool(): bool

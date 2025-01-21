@@ -6,6 +6,8 @@ namespace app\resources\Survey;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\SurveyQuestionAnswer;
+use app\resources\Task\TaskResource;
+use yii\helpers\Json;
 
 class SurveyQuestionAnswerResource extends JsonResource
 {
@@ -22,7 +24,9 @@ class SurveyQuestionAnswerResource extends JsonResource
 			'id'                 => $this->resource->id,
 			'question_answer_id' => $this->resource->question_answer_id,
 			'survey_id'          => $this->resource->survey_id,
-			'value'              => json_decode($this->resource->value),
+			'value'              => Json::decode($this->resource->value),
+
+			'tasks' => TaskResource::collection($this->resource->tasks)
 		];
 	}
 }
