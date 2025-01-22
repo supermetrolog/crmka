@@ -31,12 +31,14 @@ class ChatMemberMessageForm extends Form
 	public $survey_ids    = [];
 
 	public $files = [];
+	public $template;
 
 	public function rules(): array
 	{
 		return [
 			[['from_chat_member_id', 'to_chat_member_id'], 'required'],
 			[['from_chat_member_id', 'to_chat_member_id', 'reply_to_id'], 'integer'],
+			[['template'], 'string', 'max' => 32],
 			[['message'], 'string', 'max' => 2048],
 			[['from_chat_member_id'], 'exist', 'targetClass' => ChatMember::class, 'targetAttribute' => ['from_chat_member_id' => 'id']],
 			[['to_chat_member_id'], 'exist', 'targetClass' => ChatMember::class, 'targetAttribute' => ['to_chat_member_id' => 'id']],
@@ -87,7 +89,7 @@ class ChatMemberMessageForm extends Form
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common, 'from_chat_member_id', 'to_chat_member_id', 'reply_to_id'],
+			self::SCENARIO_CREATE => [...$common, 'from_chat_member_id', 'to_chat_member_id', 'reply_to_id', 'template'],
 			self::SCENARIO_UPDATE => [...$common, 'current_files'],
 		];
 	}
@@ -105,7 +107,8 @@ class ChatMemberMessageForm extends Form
 				'contactIds' => $this->contact_ids,
 				'tagIds'     => $this->tag_ids,
 				'replyTo'    => $this->getReplyTo(),
-				'surveyIds'  => $this->survey_ids
+				'surveyIds'  => $this->survey_ids,
+				'template'   => $this->template
 			]);
 		}
 

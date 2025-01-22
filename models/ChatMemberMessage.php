@@ -48,7 +48,9 @@ class ChatMemberMessage extends AR
 {
 	public const DEFAULT_MEDIA_CATEGORY = 'chat_member_message';
 
-	public const SURVEY_TEMPLATE = 'survey';
+	public const SURVEY_TEMPLATE              = 'survey';
+	public const UNAVAILABLE_CONTACT_TEMPLATE = 'unavailable_contact';
+	public const UNAVAILABLE_SURVEY_TEMPLATE  = 'unavailable_survey';
 
 	protected bool $useSoftCreate = true;
 	protected bool $useSoftUpdate = true;
