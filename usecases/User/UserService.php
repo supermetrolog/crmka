@@ -11,9 +11,11 @@ use app\dto\User\UserActivityDto;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\UploadFile;
 use app\models\User;
+use app\repositories\UserRepository;
 use Throwable;
 use yii\base\Security;
 use yii\db\ActiveRecord;
@@ -26,13 +28,15 @@ class UserService
 	private UserAccessTokenService       $accessTokenService;
 	private UserActivityService          $userActivityService;
 	private Security                     $security;
+	private UserRepository               $repository;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		UserProfileService $userProfileService,
 		UserAccessTokenService $accessTokenService,
 		UserActivityService $userActivityService,
-		Security $security
+		Security $security,
+		UserRepository $repository
 	)
 	{
 		$this->security            = $security;
@@ -40,6 +44,15 @@ class UserService
 		$this->userProfileService  = $userProfileService;
 		$this->accessTokenService  = $accessTokenService;
 		$this->userActivityService = $userActivityService;
+		$this->repository          = $repository;
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function getByUsername(string $username): User
+	{
+		return $this->repository->getByUsernameOrThrow($username);
 	}
 
 	/**
@@ -191,7 +204,7 @@ class UserService
 			$model->updateAttributes(['last_seen' => DateTimeHelper::nowf()]);
 
 			$this->userActivityService->track($userActivityDto);
-			
+
 			$tx->commit();
 		} catch (Throwable $th) {
 			$tx->rollBack();

@@ -11,12 +11,12 @@ class UserRepository
 {
 	public function getOnlineCount(): int
 	{
-		return (int)User::find()->online()->count();
+		return (int)User::find()->notDeleted()->online()->count();
 	}
 
 	public function getModerator(): ?User
 	{
-		return User::find()->byRole(User::ROLE_MODERATOR)->one();
+		return User::find()->byRole(User::ROLE_MODERATOR)->notDeleted()->one();
 	}
 
 	/**
@@ -25,7 +25,7 @@ class UserRepository
 	public function getModeratorOrThrow(): ?User
 	{
 		try {
-			return User::find()->byRole(User::ROLE_MODERATOR)->oneOrThrow();
+			return User::find()->byRole(User::ROLE_MODERATOR)->notDeleted()->oneOrThrow();
 		} catch (ModelNotFoundException $e) {
 			throw new ModelNotFoundException('Moderator not found');
 		}
@@ -34,5 +34,13 @@ class UserRepository
 	public function findOne(int $id): ?User
 	{
 		return User::find()->byId($id)->one();
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function getByUsernameOrThrow(string $username): User
+	{
+		return User::find()->byUsername($username)->notDeleted()->oneOrThrow();
 	}
 }

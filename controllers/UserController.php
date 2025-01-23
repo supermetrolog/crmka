@@ -6,6 +6,7 @@ use app\dto\Auth\AuthUserAgentDto;
 use app\dto\User\UserActivityDto;
 use app\exceptions\InvalidBearerTokenException;
 use app\exceptions\InvalidPasswordException;
+use app\exceptions\services\UserHasInactiveStatusException;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\TokenHelper;
 use app\kernel\common\controller\AppController;
@@ -171,7 +172,6 @@ class UserController extends AppController
 		return UserResource::make($user)->toArray();
 	}
 
-
 	/**
 	 * @throws ForbiddenHttpException
 	 * @throws ModelNotFoundException
@@ -205,19 +205,25 @@ class UserController extends AppController
 	public function actionLogin(): array
 	{
 		$form = new LoginForm($this->authService);
+
 		$form->load($this->request->post());
 
-		try {
-			$form->validateOrThrow();
+		$form->validateOrThrow();
 
-			$authDto = $this->authService->login($form->getDto(), new AuthUserAgentDto([
-				'agent' => $this->request->getUserAgent(),
-				'ip'    => $this->request->getUserIP(),
-			]));
+		try {
+			$authDto = $this->authService->login(
+				$form->getDto(),
+				new AuthUserAgentDto([
+					'agent' => $this->request->getUserAgent(),
+					'ip'    => $this->request->getUserIP(),
+				])
+			);
 
 			return AuthLoginResource::make($authDto)->toArray();
 		} catch (ModelNotFoundException|InvalidPasswordException $e) {
 			throw new NotFoundHttpException('Неправильный логин или пароль.');
+		} catch (UserHasInactiveStatusException $e) {
+			throw new NotFoundHttpException('Пользователь занесен в архив.');
 		}
 	}
 

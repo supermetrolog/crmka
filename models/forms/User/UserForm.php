@@ -15,20 +15,20 @@ class UserForm extends Form
 	public const SCENARIO_CREATE = 'scenario_create';
 	public const SCENARIO_UPDATE = 'scenario_update';
 
-	public string  $username;
-	public ?string $email;
-	public         $email_username;
-	public ?string $email_password = null;
-	public int     $role;
-	public ?string $password       = null;
+	public $username;
+	public $email;
+	public $email_username;
+	public $email_password;
+	public $role;
+	public $password;
 
 	public function rules(): array
 	{
 		return [
 			[['username', 'role'], 'required'],
 			['password', 'required', 'on' => self::SCENARIO_CREATE],
-			['password', 'string', 'min' => 4],
-			['username', 'string', 'min' => 4],
+			['password', 'string', 'min' => 8],
+			['username', 'string', 'min' => 4, 'max' => 32],
 			[['email', 'email_password', 'email_username'], 'string', 'max' => 255],
 			['username', 'validateUsername'],
 			['role', 'integer'],
@@ -53,6 +53,18 @@ class UserForm extends Form
 		}
 	}
 
+	public function attributeLabels(): array
+	{
+		return [
+			'username'       => 'Логин',
+			'password'       => 'Пароль',
+			'role'           => 'Роль',
+			'email'          => 'Email',
+			'email_username' => 'Логин от почты',
+			'email_password' => 'Пароль от почты'
+		];
+	}
+
 	public function scenarios(): array
 	{
 		$common = [
@@ -65,7 +77,7 @@ class UserForm extends Form
 
 		return [
 			self::SCENARIO_CREATE => [...$common, 'username'],
-			self::SCENARIO_UPDATE => [...$common],
+			self::SCENARIO_UPDATE => $common,
 		];
 	}
 
