@@ -82,4 +82,14 @@ class UserQuery extends AQ
 				DateTimeHelper::unix() - User::ACTIVITY_TIMEOUT]
 		);
 	}
+
+	public function byStatus(string $status): self
+	{
+		return $this->andWhere([$this->field('status') => $status]);
+	}
+
+	public function notDeleted(): self
+	{
+		return $this->andWhere(['!=', $this->field('status'), User::STATUS_DELETED]);
+	}
 }

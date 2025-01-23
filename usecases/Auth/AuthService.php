@@ -8,6 +8,7 @@ use app\dto\Auth\AuthUserAgentDto;
 use app\dto\User\UserAccessTokenDto;
 use app\dto\User\UserActivityDto;
 use app\exceptions\InvalidPasswordException;
+use app\exceptions\services\UserHasInactiveStatusException;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
 use app\helpers\StringHelper;
@@ -52,11 +53,15 @@ class AuthService
 	 * @throws Exception
 	 * @throws InvalidPasswordException
 	 * @throws ModelNotFoundException
-	 * @throws SaveModelException
+	 * @throws SaveModelException|Throwable
 	 */
 	public function login(AuthLoginDto $dto, AuthUserAgentDto $userAgentDto): AuthResultDto
 	{
-		$user = User::find()->byUsername($dto->username)->oneOrThrow();
+		$user = $this->userService->getByUsername($dto->username);
+
+		if ($user->isInactive()) {
+			throw new UserHasInactiveStatusException();
+		}
 
 		if (!$this->validatePassword($user, $dto->password)) {
 			throw new InvalidPasswordException();
@@ -66,6 +71,7 @@ class AuthService
 
 		try {
 			$userAccessToken = $this->generateAccessToken($user, $userAgentDto);
+
 			$this->userService->updateActivity($user, new UserActivityDto([
 				'user_id'    => $user->id,
 				'ip'         => $userAgentDto->ip,

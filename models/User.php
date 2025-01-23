@@ -213,7 +213,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	 */
 	public static function findIdentityByAccessToken($token, $type = null)
 	{
-		return self::find()->byAccessToken($token)->one();
+		return self::find()->byStatus(self::STATUS_ACTIVE)->byAccessToken($token)->one();
 	}
 
 	/**
@@ -292,5 +292,20 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 		}
 
 		return (DateTimeHelper::unix() - DateTimeHelper::makeUnix($this->last_seen)) <= self::ACTIVITY_TIMEOUT;
+	}
+
+	public function isActive(): bool
+	{
+		return $this->status === self::STATUS_ACTIVE;
+	}
+
+	public function isInactive(): bool
+	{
+		return $this->status === self::STATUS_INACTIVE;
+	}
+
+	public function isDeleted(): bool
+	{
+		return $this->status === self::STATUS_DELETED;
 	}
 }
