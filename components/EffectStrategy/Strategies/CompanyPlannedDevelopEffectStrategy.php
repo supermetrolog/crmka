@@ -3,7 +3,7 @@
 namespace app\components\EffectStrategy\Strategies;
 
 use app\components\EffectStrategy\AbstractEffectStrategy;
-use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
+use app\components\EffectStrategy\Service\CreateEffectSystemMessageService;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
@@ -13,18 +13,17 @@ use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\services\ChatMemberSystemMessage\CompanyPlannedDevelopChatMemberSystemMessage;
-use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 
 class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
 {
-	private ChatMemberMessageService $chatMemberMessageService;
+	private CreateEffectSystemMessageService $effectSystemMessageService;
 
 	public function __construct(
-		ChatMemberMessageService $chatMemberMessageService
+		CreateEffectSystemMessageService $effectSystemMessageService
 	)
 	{
-		$this->chatMemberMessageService = $chatMemberMessageService;
+		$this->effectSystemMessageService = $effectSystemMessageService;
 	}
 
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
@@ -56,13 +55,6 @@ class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
 		                                                       ->setSurveyId($survey->id)
 		                                                       ->toMessage();
 
-		$dto = new CreateChatMemberSystemMessageDto([
-			'message'    => $message,
-			'to'         => $chatMember,
-			'surveyIds'  => [$survey->id],
-			'contactIds' => [$survey->contact_id],
-		]);
-
-		$this->chatMemberMessageService->createSystemMessage($dto);
+		$this->effectSystemMessageService->createSystemMessage($chatMember, $survey, $message);
 	}
 }

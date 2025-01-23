@@ -19,13 +19,14 @@ class TaskBuilder
 	protected bool $assignedToCreatedBy = false;
 	protected int  $status              = Task::STATUS_CREATED;
 
-	protected ?User              $user        = null;
-	protected                    $createdBy   = null;
-	protected ?string            $message     = null;
+	protected ?User              $user                   = null;
+	protected                    $createdBy              = null;
+	protected ?string            $message                = null;
 	protected DateTimeInterface  $start;
-	protected ?DateTimeInterface $end         = null;
-	protected array              $tagIds      = [];
-	protected array              $observerIds = [];
+	protected ?DateTimeInterface $end                    = null;
+	protected array              $tagIds                 = [];
+	protected array              $observerIds            = [];
+	protected ?int               $surveyQuestionAnswerId = null;
 
 	protected UserRepository $userRepository;
 
@@ -190,6 +191,18 @@ class TaskBuilder
 		return $this;
 	}
 
+	public function setSurveyQuestionAnswerId(int $surveyQuestionAnswerId): self
+	{
+		$this->surveyQuestionAnswerId = $surveyQuestionAnswerId;
+
+		return $this;
+	}
+
+	public function getSurveyQuestionAnswerId(): ?int
+	{
+		return $this->surveyQuestionAnswerId;
+	}
+
 	public function validateOrThrow(): void
 	{
 		if (is_null($this->duration) && is_null($this->end)) {
@@ -218,15 +231,16 @@ class TaskBuilder
 		$this->validateOrThrow();
 
 		return new CreateTaskDto([
-			'user'            => $this->getUser(),
-			'message'         => $this->message,
-			'status'          => $this->getStatus(),
-			'start'           => $this->getStart(),
-			'end'             => $this->getEnd(),
-			'created_by_id'   => $this->getCreatedById(),
-			'created_by_type' => $this->getCreatedByType(),
-			'tagIds'          => $this->tagIds,
-			'observerIds'     => $this->observerIds,
+			'user'                   => $this->getUser(),
+			'message'                => $this->message,
+			'status'                 => $this->getStatus(),
+			'start'                  => $this->getStart(),
+			'end'                    => $this->getEnd(),
+			'created_by_id'          => $this->getCreatedById(),
+			'created_by_type'        => $this->getCreatedByType(),
+			'tagIds'                 => $this->tagIds,
+			'observerIds'            => $this->observerIds,
+			'surveyQuestionAnswerId' => $this->getSurveyQuestionAnswerId()
 		]);
 	}
 }

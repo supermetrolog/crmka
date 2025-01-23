@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace app\usecases\Task;
 
 use app\components\EventManager;
+use app\dto\Relation\CreateRelationDto;
 use app\dto\Task\CreateTaskDto;
 use app\dto\Task\CreateTaskForUsersDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
 use app\events\Task\CreateTaskEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\models\SurveyQuestionAnswer;
 use app\models\Task;
 use app\repositories\UserRepository;
+use app\usecases\Relation\RelationService;
 use app\usecases\TaskObserver\TaskObserverService;
 use Throwable;
 
@@ -22,18 +25,21 @@ class CreateTaskService
 	private TaskObserverService          $taskObserverService;
 	private EventManager                 $eventManager;
 	private UserRepository               $userRepository;
+	private RelationService              $relationService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		TaskObserverService $taskObserverService,
 		EventManager $eventManager,
-		UserRepository $userRepository
+		UserRepository $userRepository,
+		RelationService $relationService
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
 		$this->taskObserverService = $taskObserverService;
 		$this->eventManager        = $eventManager;
 		$this->userRepository      = $userRepository;
+		$this->relationService     = $relationService;
 	}
 
 	/**
@@ -58,6 +64,10 @@ class CreateTaskService
 			$task->saveOrThrow();
 			$task->linkManyToManyRelations('tags', $dto->tagIds);
 
+			if (!is_null($dto->surveyQuestionAnswerId)) {
+				$this->linkRelation($task, SurveyQuestionAnswer::getMorphClass(), $dto->surveyQuestionAnswerId);
+			}
+
 			$observer = $this->taskObserverService->create(new CreateTaskObserverDto([
 				'task_id'       => $task->id,
 				'user_id'       => $dto->user->id,
@@ -75,7 +85,7 @@ class CreateTaskService
 					'created_by_id' => $dto->created_by_id,
 				]));
 			}
-			
+
 			$createdBy = $this->userRepository->findOne($dto->created_by_id);
 			$this->eventManager->trigger(new CreateTaskEvent($task, $createdBy));
 
@@ -86,6 +96,21 @@ class CreateTaskService
 			$tx->rollback();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @param string|int $relationId
+	 *
+	 * @throws SaveModelException
+	 */
+	private function linkRelation(Task $task, string $relationType, $relationId): void
+	{
+		$this->relationService->create(new CreateRelationDto([
+			'first_type'  => $task::getMorphClass(),
+			'first_id'    => $task->id,
+			'second_type' => $relationType,
+			'second_id'   => $relationId,
+		]));
 	}
 
 	/**
