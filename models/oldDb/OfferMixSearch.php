@@ -8,7 +8,6 @@ use app\helpers\ArrayHelper;
 use app\helpers\SQLHelper;
 use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
-use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\models\Company;
@@ -388,7 +387,7 @@ class OfferMixSearch extends Search
 
     public function normalizeDistrict(): void
     {
-        if (ArrayHelper::isArray($this->direction)) {
+        if (ArrayHelper::isArray($this->district_moscow)) {
             $this->district_moscow = ArrayHelper::map($this->district_moscow, static fn($district) => OfferMix::normalizeDistricts($district));
         }
     }
@@ -561,7 +560,7 @@ class OfferMixSearch extends Search
      * @throws ValidationErrorHttpException
      * @throws ErrorException
      */
-    public function setFilters(OfferMixQuery $query): void
+    public function setFilters($query): void
     {
         $joinedDbName = Company::dbName();
 
@@ -1097,7 +1096,7 @@ class OfferMixSearch extends Search
             return;
         }
 
-        $coords = StringHelper::join(StringHelper::SPACED_COMMA, $this->polygon);
+        $coords = StringHelper::join(StringHelper::SPACED_COMMA, ...$this->polygon);
 
         $polygonCondition = <<< EOF
                 ST_CONTAINS(

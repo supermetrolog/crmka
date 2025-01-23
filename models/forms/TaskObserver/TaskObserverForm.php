@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\models\forms\TaskObserver;
 
-use app\dto\TaskTag\CreateTaskObserverDto;
+use app\dto\TaskObserver\CreateTaskObserverDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Task;
 use app\models\User;
