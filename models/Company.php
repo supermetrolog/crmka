@@ -222,6 +222,19 @@ class Company extends AR
 		return StringHelper::trim($name);
 	}
 
+	public function getName(): string
+	{
+		if ($this->nameRu) {
+			return $this->nameRu;
+		}
+
+		if ($this->nameEng) {
+			return $this->nameEng;
+		}
+
+		return $this->nameBrand;
+	}
+
 	public function fields(): array
 	{
 		$fields = parent::fields();

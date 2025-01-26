@@ -6,8 +6,10 @@ namespace app\kernel\common\actions;
 
 use yii\helpers\BaseConsole;
 
-class Action extends \yii\base\Action
+abstract class Action extends \yii\base\Action
 {
+	abstract public function run(): void;
+
 	public function info(string $message): void
 	{
 		$this->controller->stdout($message . PHP_EOL, BaseConsole::FG_CYAN);

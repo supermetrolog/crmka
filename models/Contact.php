@@ -291,4 +291,31 @@ class Contact extends AR
 	{
 		return new ContactQuery(get_called_class());
 	}
+
+	public function getFirstWebsite(): ?Website
+	{
+		if ($this->websites) {
+			return $this->websites[0];
+		}
+
+		return null;
+	}
+
+	public function getFirstEmail(): ?Email
+	{
+		if ($this->emails) {
+			return $this->emails[0];
+		}
+
+		return null;
+	}
+
+	public function getFirstPhone(): ?Phone
+	{
+		if ($this->phones) {
+			return $this->phones[0];
+		}
+
+		return null;
+	}
 }
