@@ -10,6 +10,8 @@ use yii\base\BaseObject;
 
 class CreateCallDto extends BaseObject
 {
-	public User     $user;
-	public ?Contact $contact;
+	public User    $user;
+	public Contact $contact;
+	public int     $type;
+	public int     $status;
 }
