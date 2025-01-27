@@ -230,6 +230,7 @@ return
 			'extraPatterns' => [
 				'POST,OPTIONS'                          => 'create',
 				'POST,OPTIONS with-task'                => 'create-with-task',
+				'POST,OPTIONS with-tasks'               => 'create-with-tasks',
 				'PUT,OPTIONS <id>'                      => 'update',
 				'DELETE,OPTIONS <id>'                   => 'delete',
 				'POST,OPTIONS create-task/<id>'         => 'create-task',

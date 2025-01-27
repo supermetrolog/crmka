@@ -285,6 +285,33 @@ class ChatMemberMessageService
 	}
 
 	/**
+	 * @param CreateTaskDto[] $createTaskDtos
+	 *
+	 * @throws SaveModelException
+	 * @throws Exception
+	 * @throws Throwable
+	 */
+	public function createWithTasks(CreateChatMemberMessageDto $createChatMemberMessageDto, array $createTaskDtos = []): ChatMemberMessage
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$message = $this->create($createChatMemberMessageDto);
+
+			foreach ($createTaskDtos as $createTaskDto) {
+				$this->createTask($message, $createTaskDto);
+			}
+
+			$tx->commit();
+
+			return $message;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
 	 * @throws SaveModelException
 	 * @throws Exception
 	 * @throws Throwable
