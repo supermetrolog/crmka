@@ -31,12 +31,13 @@ class TaskForm extends Form
 	public $end;
 	public $tag_ids      = [];
 	public $observer_ids = [];
+	public $survey_id;
 
 	public function rules(): array
 	{
 		return [
 			[['user_id', 'message', 'status', 'created_by_type', 'created_by_id', 'user_ids'], 'required'],
-			[['user_id', 'status', 'created_by_id'], 'integer'],
+			[['user_id', 'status', 'created_by_id', 'survey_id'], 'integer'],
 			[['message'], 'string'],
 			[['start', 'end'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
@@ -67,8 +68,8 @@ class TaskForm extends Form
 		];
 
 		return [
-			self::SCENARIO_CREATE           => [...$common, 'created_by_id', 'created_by_type', 'user_id'],
-			self::SCENARIO_CREATE_FOR_USERS => [...$common, 'created_by_id', 'created_by_type', 'user_ids'],
+			self::SCENARIO_CREATE           => [...$common, 'created_by_id', 'created_by_type', 'user_id', 'survey_id'],
+			self::SCENARIO_CREATE_FOR_USERS => [...$common, 'created_by_id', 'created_by_type', 'user_ids', 'survey_id'],
 			self::SCENARIO_UPDATE           => [...$common, 'user_id'],
 		];
 	}
@@ -89,7 +90,8 @@ class TaskForm extends Form
 				'created_by_type' => $this->created_by_type,
 				'created_by_id'   => $this->created_by_id,
 				'tagIds'          => $this->tag_ids,
-				'observerIds'     => $this->observer_ids
+				'observerIds'     => $this->observer_ids,
+				'surveyId'        => $this->survey_id
 			]);
 		}
 
@@ -103,7 +105,8 @@ class TaskForm extends Form
 				'created_by_type' => $this->created_by_type,
 				'created_by_id'   => $this->created_by_id,
 				'tagIds'          => $this->tag_ids,
-				'observerIds'     => $this->observer_ids
+				'observerIds'     => $this->observer_ids,
+				'surveyId'        => $this->survey_id
 			]);
 		}
 

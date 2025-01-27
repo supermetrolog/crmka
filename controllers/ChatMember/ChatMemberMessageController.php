@@ -240,6 +240,38 @@ class ChatMemberMessageController extends AppController
 	}
 
 	/**
+	 * @return TaskResource[]
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 * @throws Throwable
+	 */
+	public function actionCreateTasks(int $id): array
+	{
+		$message = $this->findModel($id, false);
+
+		$taskDtos = [];
+
+		foreach ($this->request->post('tasks') ?? [] as $taskData) {
+			$taskForm = new TaskForm();
+
+			$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
+
+			$taskForm->load($taskData);
+
+			$taskForm->created_by_id   = $this->user->id;
+			$taskForm->created_by_type = $this->user->identity::getMorphClass();
+
+			$taskForm->validateOrThrow();
+
+			$taskDtos[] = $taskForm->getDto();
+		}
+
+		$tasks = $this->service->createTasks($message, $taskDtos);
+
+		return TaskResource::collection($tasks);
+	}
+
+	/**
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 * @throws Throwable
@@ -336,7 +368,7 @@ class ChatMemberMessageController extends AppController
 	/**
 	 * @throws NotFoundHttpException
 	 */
-	protected function findModel(int $id, bool $checkOwner = true): ?ChatMemberMessage
+	protected function findModel(int $id, bool $checkOwner = true): ChatMemberMessage
 	{
 		$query = ChatMemberMessage::find()
 		                          ->with(['fromChatMember'])

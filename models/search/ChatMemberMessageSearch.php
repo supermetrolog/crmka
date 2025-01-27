@@ -107,7 +107,7 @@ class ChatMemberMessageSearch extends Form
 
 		if (!empty($this->survey_id)) {
 			$query->joinWith(['surveys surveys' => function (SurveyQuery $subQuery) {
-				$subQuery->byId($this->survey_id);
+				$subQuery->andWhere(['surveys.id' => $this->survey_id]);
 			}])->andWhere(['surveys.id' => $this->survey_id]);
 		}
 

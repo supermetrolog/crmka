@@ -31,6 +31,7 @@ class Call extends \app\kernel\common\models\AR\AR
 	public const STATUS_NOT_AVAILABLE = 3; // не доступен
 	public const STATUS_REJECTED      = 4; // отклонен
 	public const STATUS_ANGRY         = 5;
+	public const STATUS_BLOCKED       = 6; // заблокирован
 
 	public const TYPE_OUTGOING = 0;
 	public const TYPE_INCOMING = 1;
@@ -43,7 +44,8 @@ class Call extends \app\kernel\common\models\AR\AR
 			self::STATUS_BUSY,
 			self::STATUS_NOT_AVAILABLE,
 			self::STATUS_REJECTED,
-			self::STATUS_ANGRY
+			self::STATUS_ANGRY,
+			self::STATUS_BLOCKED
 		];
 	}
 
@@ -78,6 +80,8 @@ class Call extends \app\kernel\common\models\AR\AR
 			'id'         => 'ID',
 			'user_id'    => 'User ID',
 			'contact_id' => 'Contact ID',
+			'type'       => 'Type',
+			'status'     => 'Status',
 			'created_at' => 'Created At',
 			'updated_at' => 'Updated At',
 		];

@@ -234,6 +234,7 @@ return
 				'PUT,OPTIONS <id>'                      => 'update',
 				'DELETE,OPTIONS <id>'                   => 'delete',
 				'POST,OPTIONS create-task/<id>'         => 'create-task',
+				'POST,OPTIONS create-tasks/<id>'        => 'create-tasks',
 				'POST,OPTIONS create-alert/<id>'        => 'create-alert',
 				'POST,OPTIONS create-reminder/<id>'     => 'create-reminder',
 				'POST,OPTIONS create-notification/<id>' => 'create-notification',
