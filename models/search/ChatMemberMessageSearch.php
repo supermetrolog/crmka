@@ -5,6 +5,7 @@ namespace app\models\search;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use yii\base\ErrorException;
@@ -15,6 +16,7 @@ class ChatMemberMessageSearch extends Form
 {
 	public $id;
 	public $to_chat_member_id;
+	public $from_chat_member_id;
 	public $message;
 	public $created_at;
 	public $updated_at;
@@ -22,6 +24,7 @@ class ChatMemberMessageSearch extends Form
 	public $id_less_then;
 
 	public $current_chat_member_id;
+	public $survey_id;
 
 	private const UNREAD_LIMIT     = 30;
 	private const MAX_UNREAD_COUNT = 25;
@@ -30,7 +33,7 @@ class ChatMemberMessageSearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['id', 'to_chat_member_id', 'id_less_then'], 'integer'],
+			[['id', 'to_chat_member_id', 'id_less_then', 'survey_id', 'from_chat_member_id'], 'integer'],
 			[['message', 'created_at', 'updated_at'], 'safe'],
 		];
 	}
@@ -91,15 +94,22 @@ class ChatMemberMessageSearch extends Form
 		]);
 
 		$query->andFilterWhere([
-			ChatMemberMessage::field('id')                => $this->id,
-			ChatMemberMessage::field('to_chat_member_id') => $this->to_chat_member_id,
-			ChatMemberMessage::field('created_at')        => $this->created_at,
-			ChatMemberMessage::field('updated_at')        => $this->updated_at,
+			ChatMemberMessage::field('id')                  => $this->id,
+			ChatMemberMessage::field('to_chat_member_id')   => $this->to_chat_member_id,
+			ChatMemberMessage::field('from_chat_member_id') => $this->from_chat_member_id,
+			ChatMemberMessage::field('created_at')          => $this->created_at,
+			ChatMemberMessage::field('updated_at')          => $this->updated_at
 		]);
 
 		$query->andFilterWhere(['<', ChatMemberMessage::field('id'), $this->id_less_then]);
 
 		$query->andFilterWhere(['like', ChatMemberMessage::field('message'), $this->message]);
+
+		if (!empty($this->survey_id)) {
+			$query->joinWith(['surveys surveys' => function (SurveyQuery $subQuery) {
+				$subQuery->andWhere(['surveys.id' => $this->survey_id]);
+			}])->andWhere(['surveys.id' => $this->survey_id]);
+		}
 
 		return $dataProvider;
 	}

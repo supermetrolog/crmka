@@ -3,15 +3,14 @@
 namespace app\controllers;
 
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Survey\SurveyForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
-use app\models\Question;
 use app\models\search\SurveySearch;
 use app\models\Survey;
-use app\models\SurveyQuestionAnswer;
 use app\repositories\SurveyRepository;
 use app\resources\Survey\SurveyResource;
 use app\resources\Survey\SurveyShortResource;
@@ -19,7 +18,6 @@ use app\resources\Survey\SurveyWithQuestionsResource;
 use app\usecases\Survey\SurveyService;
 use Throwable;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 
@@ -62,25 +60,14 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @throws NotFoundHttpException
+	 * @throws ModelNotFoundException
 	 */
 	public function actionViewWithQuestions(int $id): SurveyWithQuestionsResource
 	{
-		return new SurveyWithQuestionsResource(
-			$this->findModel($id),
-			Question::find()
-			        ->joinWith([
-				        'answers.surveyQuestionAnswer' => function (ActiveQuery $query) use ($id) {
-					        $query->where([SurveyQuestionAnswer::field('survey_id') => $id]);
-					        $query->with(['tasks.user.userProfile',
-					                      'tasks.tags',
-					                      'tasks.createdByUser.userProfile',
-					                      'tasks.observers.user.userProfile',
-					                      'tasks.targetUserObserver']);
-				        }
-			        ])
-			        ->all(),
-		);
+		$survey    = $this->service->getByIdWithRelationsOrThrow($id);
+		$questions = $this->service->getQuestionsWithAnswersBySurveyId($id);
+
+		return new SurveyWithQuestionsResource($survey, $questions);
 	}
 
 	/**

@@ -17,7 +17,9 @@ class CreateCallService
 	{
 		$model = new Call([
 			'user_id'    => $dto->user->id,
-			'contact_id' => !!$dto->contact ? $dto->contact->id : null,
+			'contact_id' => $dto->contact->id,
+			'type'       => $dto->type,
+			'status'     => $dto->status
 		]);
 
 		$model->saveOrThrow();

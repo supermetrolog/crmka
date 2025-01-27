@@ -22,7 +22,9 @@ use app\resources\Task\TaskResource;
 use app\resources\UserNotificationResource;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
+use yii\db\Exception;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
@@ -45,6 +47,7 @@ class ChatMemberMessageController extends AppController
 
 	/**
 	 * @throws ValidateException
+	 * @throws ErrorException
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
@@ -173,6 +176,46 @@ class ChatMemberMessageController extends AppController
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Exception
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionCreateWithTasks(): ChatMemberMessageResource
+	{
+		$chatMemberMessageForm = new ChatMemberMessageForm();
+
+		$chatMemberMessageForm->setScenario(ChatMemberMessageForm::SCENARIO_CREATE);
+
+		$chatMemberMessageForm->load($this->request->post());
+
+		$chatMemberMessageForm->from_chat_member_id = $this->user->identity->chatMember->id;
+
+		$chatMemberMessageForm->validateOrThrow();
+
+		$taskDtos = [];
+
+		foreach ($this->request->post('tasks') ?? [] as $taskData) {
+			$taskForm = new TaskForm();
+
+			$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
+
+			$taskForm->load($taskData);
+
+			$taskForm->created_by_id   = $this->user->id;
+			$taskForm->created_by_type = $this->user->identity::getMorphClass();
+
+			$taskForm->validateOrThrow();
+
+			$taskDtos[] = $taskForm->getDto();
+		}
+
+		$model = $this->service->createWithTasks($chatMemberMessageForm->getDto(), $taskDtos);
+
+		return ChatMemberMessageResource::make($model);
+	}
+
+	/**
+	 * @throws SaveModelException
 	 * @throws ValidateException
 	 * @throws Throwable
 	 */
@@ -194,6 +237,38 @@ class ChatMemberMessageController extends AppController
 		$task = $this->service->createTask($message, $taskForm->getDto());
 
 		return TaskResource::make($task);
+	}
+
+	/**
+	 * @return TaskResource[]
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 * @throws Throwable
+	 */
+	public function actionCreateTasks(int $id): array
+	{
+		$message = $this->findModel($id, false);
+
+		$taskDtos = [];
+
+		foreach ($this->request->post('tasks') ?? [] as $taskData) {
+			$taskForm = new TaskForm();
+
+			$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
+
+			$taskForm->load($taskData);
+
+			$taskForm->created_by_id   = $this->user->id;
+			$taskForm->created_by_type = $this->user->identity::getMorphClass();
+
+			$taskForm->validateOrThrow();
+
+			$taskDtos[] = $taskForm->getDto();
+		}
+
+		$tasks = $this->service->createTasks($message, $taskDtos);
+
+		return TaskResource::collection($tasks);
 	}
 
 	/**
@@ -293,7 +368,7 @@ class ChatMemberMessageController extends AppController
 	/**
 	 * @throws NotFoundHttpException
 	 */
-	protected function findModel(int $id, bool $checkOwner = true): ?ChatMemberMessage
+	protected function findModel(int $id, bool $checkOwner = true): ChatMemberMessage
 	{
 		$query = ChatMemberMessage::find()
 		                          ->with(['fromChatMember'])

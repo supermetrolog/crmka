@@ -5,8 +5,11 @@ namespace app\models;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\QuestionQuery;
+use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
+use app\models\ActiveQuery\TaskQuery;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
@@ -25,6 +28,7 @@ use yii\db\ActiveQuery;
  * @property-read QuestionAnswer[]       $questionAnswers
  * @property-read Question[]             $questions
  * @property-read ChatMember             $chatMember
+ * @property-read Task[]                 $tasks
  */
 class Survey extends AR
 {
@@ -98,6 +102,26 @@ class Survey extends AR
 	{
 		/** @var QuestionQuery */
 		return $this->hasMany(Question::class, ['id' => 'question_id'])->via('questionAnswers');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getRelationSecond(): RelationQuery
+	{
+		/** @var RelationQuery */
+		return $this->morphHasMany(Relation::class, 'id', 'second');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getTasks(): TaskQuery
+	{
+		/** @var TaskQuery */
+		return $this->morphHasManyVia(Task::class, 'id', 'first')
+		            ->andOnCondition([Task::field('deleted_at') => null])
+		            ->via('relationSecond');
 	}
 
 	public static function find(): SurveyQuery

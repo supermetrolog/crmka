@@ -5,6 +5,8 @@ namespace app\components\EffectStrategy\Strategies;
 use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\components\EffectStrategy\Service\CreateEffectSystemMessageService;
 use app\components\EffectStrategy\Service\CreateEffectTaskService;
+use app\helpers\ArrayHelper;
+use app\helpers\StringHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMember;
@@ -15,10 +17,11 @@ use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\services\ChatMemberSystemMessage\RequestsNoLongerRelevantChatMemberSystemMessage;
 use Throwable;
+use yii\base\Exception;
 
 class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = '%s (#%s) - устарели запросы, необходимо отправить их в пассив.';
+	private const TASK_MESSAGE_TEXT = '%s (#%s) - устарели запросы %s, необходимо отправить их в пассив.';
 
 	private TransactionBeginnerInterface     $transactionBeginner;
 	private CreateEffectTaskService          $effectTaskService;
@@ -35,14 +38,32 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 		$this->effectSystemMessageService = $effectSystemMessageService;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->getMaybeBool();
+		$jsonData = $answer->surveyQuestionAnswer->getJSON();
+
+		return isset($jsonData['archived']) && ArrayHelper::isArray($jsonData['archived']) && ArrayHelper::notEmpty($jsonData['archived']);
 	}
 
-	protected function getTaskMessage(Company $company): string
+	/**
+	 * @param int[] $requestIds
+	 */
+	protected function getTaskMessage(Company $company, array $requestIds): string
 	{
-		return sprintf(self::TASK_MESSAGE_TEXT, $company->getFullName(), $company->id);
+		return sprintf(
+			self::TASK_MESSAGE_TEXT,
+			$company->getFullName(),
+			$company->id,
+			StringHelper::join(
+				StringHelper::SPACED_COMMA,
+				...ArrayHelper::map($requestIds, static function (int $id): string {
+				return "#$id";
+			})
+			)
+		);
 	}
 
 	/**
@@ -54,6 +75,8 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 		$tx = $this->transactionBeginner->begin();
 
 		try {
+			$archivedRequests = $surveyQuestionAnswer->getJSON()['archived'];
+
 			$chatMember      = $survey->chatMember;
 			$chatMemberModel = $chatMember->model;
 
@@ -61,14 +84,14 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 				$chatMemberModel = $chatMemberModel->company;
 				$chatMember      = $chatMemberModel->chatMember;
 
-				$this->sendSystemMessageIntoCompany($chatMember, $survey);
+				$this->sendSystemMessageIntoCompany($chatMember, $survey, $archivedRequests);
 			}
 
 			$this->effectTaskService->createTaskForMessage(
 				$surveyChatMemberMessage,
 				$survey->user,
 				$surveyQuestionAnswer,
-				$this->getTaskMessage($chatMemberModel)
+				$this->getTaskMessage($chatMemberModel, $archivedRequests)
 			);
 
 			$tx->commit();
@@ -79,12 +102,14 @@ class RequestsNoLongerRelevantEffectStrategy extends AbstractEffectStrategy
 	}
 
 	/**
+	 * @param int[] $archivedRequests
+	 *
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey): void
+	private function sendSystemMessageIntoCompany(ChatMember $chatMember, Survey $survey, array $archivedRequests): void
 	{
-		$message = RequestsNoLongerRelevantChatMemberSystemMessage::create()->toMessage();
+		$message = RequestsNoLongerRelevantChatMemberSystemMessage::create()->setRequestIds($archivedRequests)->toMessage();
 
 		$this->effectSystemMessageService->createSystemMessage($chatMember, $survey, $message);
 	}

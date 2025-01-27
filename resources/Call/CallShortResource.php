@@ -21,6 +21,9 @@ class CallShortResource extends JsonResource
 		return [
 			'id'         => $this->resource->id,
 			'user_id'    => $this->resource->user_id,
+			'type'       => $this->resource->type,
+			'status'     => $this->resource->status,
+			'contact_id' => $this->resource->contact_id,
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,
 			'deleted_at' => $this->resource->deleted_at

@@ -160,14 +160,13 @@ class ChatMemberController extends AppController
 	}
 
 	/**
-	 * @param int $id
-	 *
-	 * @return CallResource
 	 * @throws ValidateException
 	 * @throws Throwable
 	 */
 	public function actionCalled(int $id): CallResource
 	{
+		// TODO: Добавить комментарий к звонку, который будет автоматически крепиться к контакту (либо RelationService, либо отдельная таблица)
+
 		$form = new CallForm();
 
 		$form->setScenario(CallForm::SCENARIO_CREATE);

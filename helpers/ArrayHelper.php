@@ -145,4 +145,25 @@ class ArrayHelper
 	{
 		return self::length($array) % 2 === 1;
 	}
+
+	/**
+	 * @param int|string $key
+	 */
+	public static function column(array $array, $key): array
+	{
+		return array_column($array, $key);
+	}
+
+	public static function unique(array $array): array
+	{
+		return array_unique($array);
+	}
+
+	/**
+	 * @param int|string $key
+	 */
+	public static function uniqueByKey(array $array, $key): array
+	{
+		return self::unique(self::column($array, $key));
+	}
 }
