@@ -114,18 +114,19 @@ class UserController extends AppController
 		$form->load($this->request->post());
 
 		$userProfileData = $this->request->post('userProfile');
-
 		$userProfileForm->load($userProfileData);
-		$userProfileForm->emails = ArrayHelper::getValue($userProfileData, 'emails', []);
-		$userProfileForm->phones = ArrayHelper::getValue($userProfileData, 'phones', []);
 
 		$form->validateOrThrow();
 		$userProfileForm->validateOrThrow();
 
+		$userProfileDto         = $userProfileForm->getDto();
+		$userProfileDto->emails = ArrayHelper::getValue($userProfileData, 'emails', []);
+		$userProfileDto->phones = ArrayHelper::getValue($userProfileData, 'phones', []);
+
 		$uploadFileModel        = new UploadFile();
 		$uploadFileModel->files = UploadedFile::getInstancesByName('files');
 
-		$user = $this->userService->create($form->getDto(), $userProfileForm->getDto(), $uploadFileModel);
+		$user = $this->userService->create($form->getDto(), $userProfileDto, $uploadFileModel);
 
 		return UserResource::tryMakeArray($user);
 	}
@@ -150,10 +151,7 @@ class UserController extends AppController
 		$form->load($this->request->post());
 
 		$userProfileData = $this->request->post('userProfile');
-
 		$userProfileForm->load($userProfileData);
-		$userProfileForm->emails = ArrayHelper::getValue($userProfileData, 'emails', []);
-		$userProfileForm->phones = ArrayHelper::getValue($userProfileData, 'phones', []);
 
 		$isAdministrator = $this->user->identity->isAdministrator();
 
@@ -164,10 +162,14 @@ class UserController extends AppController
 		$form->validateOrThrow();
 		$userProfileForm->validateOrThrow();
 
+		$userProfileDto         = $userProfileForm->getDto();
+		$userProfileDto->emails = ArrayHelper::getValue($userProfileData, 'emails', []);
+		$userProfileDto->phones = ArrayHelper::getValue($userProfileData, 'phones', []);
+
 		$uploadFileModel        = new UploadFile();
 		$uploadFileModel->files = UploadedFile::getInstancesByName('files');
 
-		$user = $this->userService->update($model, $form->getDto(), $userProfileForm->getDto(), $uploadFileModel);
+		$user = $this->userService->update($model, $form->getDto(), $userProfileDto, $uploadFileModel);
 
 		return UserResource::make($user)->toArray();
 	}

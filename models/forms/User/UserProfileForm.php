@@ -13,12 +13,10 @@ class UserProfileForm extends Form
 {
 	public ?int $id = null;
 
-	public string  $first_name;
-	public string  $middle_name;
-	public ?string $last_name = null;
-	public ?string $caller_id = null;
-	public array   $phones    = [];
-	public array   $emails    = [];
+	public $first_name;
+	public $middle_name;
+	public $last_name;
+	public $caller_id;
 
 	public function rules(): array
 	{
@@ -45,9 +43,7 @@ class UserProfileForm extends Form
 			'first_name'  => $this->first_name,
 			'middle_name' => $this->middle_name,
 			'last_name'   => $this->last_name,
-			'caller_id'   => $this->caller_id,
-			'phones'      => $this->phones,
-			'emails'      => $this->emails
+			'caller_id'   => $this->caller_id
 		]);
 	}
 }
