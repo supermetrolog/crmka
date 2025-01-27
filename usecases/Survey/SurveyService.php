@@ -10,11 +10,14 @@ use app\dto\Survey\UpdateSurveyDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
 use app\events\Survey\CreateSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\models\Question;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\usecases\SurveyQuestionAnswer\SurveyQuestionAnswerService;
 use Throwable;
+use yii\db\ActiveQuery;
 use yii\db\StaleObjectException;
 
 class SurveyService
@@ -32,6 +35,40 @@ class SurveyService
 		$this->transactionBeginner         = $transactionBeginner;
 		$this->surveyQuestionAnswerService = $surveyQuestionAnswerService;
 		$this->eventManager                = $eventManager;
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function getByIdWithRelationsOrThrow(int $id): Survey
+	{
+		return Survey::find()
+		             ->byId($id)
+		             ->with(['tasks.user.userProfile',
+		                     'tasks.tags',
+		                     'tasks.createdByUser.userProfile',
+		                     'tasks.observers.user.userProfile',
+		                     'tasks.targetUserObserver'])
+		             ->oneOrThrow();
+	}
+
+	/**
+	 * @return Question[]
+	 */
+	public function getQuestionsWithAnswersBySurveyId(int $surveyId): array
+	{
+		return Question::find()
+		               ->joinWith([
+			               'answers.surveyQuestionAnswer' => function (ActiveQuery $query) use ($surveyId) {
+				               $query->where([SurveyQuestionAnswer::field('survey_id') => $surveyId]);
+				               $query->with(['tasks.user.userProfile',
+				                             'tasks.tags',
+				                             'tasks.createdByUser.userProfile',
+				                             'tasks.observers.user.userProfile',
+				                             'tasks.targetUserObserver']);
+			               }
+		               ])
+		               ->all();
 	}
 
 	/**

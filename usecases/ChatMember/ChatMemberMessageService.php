@@ -17,6 +17,7 @@ use app\dto\Notification\CreateNotificationDto;
 use app\dto\Relation\CreateRelationDto;
 use app\dto\Reminder\CreateReminderDto;
 use app\dto\Task\CreateTaskDto;
+use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -285,6 +286,33 @@ class ChatMemberMessageService
 	}
 
 	/**
+	 * @param CreateTaskDto[] $createTaskDtos
+	 *
+	 * @throws SaveModelException
+	 * @throws Exception
+	 * @throws Throwable
+	 */
+	public function createWithTasks(CreateChatMemberMessageDto $createChatMemberMessageDto, array $createTaskDtos = []): ChatMemberMessage
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$message = $this->create($createChatMemberMessageDto);
+
+			foreach ($createTaskDtos as $createTaskDto) {
+				$this->createTask($message, $createTaskDto);
+			}
+
+			$tx->commit();
+
+			return $message;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
 	 * @throws SaveModelException
 	 * @throws Exception
 	 * @throws Throwable
@@ -307,6 +335,48 @@ class ChatMemberMessageService
 			$tx->commit();
 
 			return $task;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @param CreateTaskDto[] $createTaskDtos
+	 *
+	 * @return Task[]
+	 * @throws SaveModelException
+	 * @throws Exception
+	 * @throws Throwable
+	 */
+	public function createTasks(ChatMemberMessage $message, array $createTaskDtos): array
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$tasks = [];
+
+			foreach ($createTaskDtos as $dto) {
+				$task = $this->createTaskService->create($dto);
+
+				$this->linkRelation($message, Task::getMorphClass(), $task->id);
+
+				if ($task->user_id !== $task->created_by_id) {
+					$this->markMessageAsUnreadForChatMember($message, User::getMorphClass(), $task->user_id);
+				}
+
+				$tasks[] = $task;
+			}
+
+			$uniqueUserIds = ArrayHelper::uniqueByKey($tasks, 'user_id');
+
+			foreach ($uniqueUserIds as $userId) {
+				$this->markChatAsLatestForModel($message->to_chat_member_id, User::getMorphClass(), $userId);
+			}
+
+			$tx->commit();
+
+			return $tasks;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;

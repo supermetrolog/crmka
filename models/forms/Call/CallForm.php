@@ -6,10 +6,9 @@ namespace app\models\forms\Call;
 
 use app\dto\Call\CreateCallDto;
 use app\dto\Call\UpdateCallDto;
-use app\helpers\DateTimeHelper;
 use app\kernel\common\models\Form\Form;
+use app\models\Call;
 use app\models\Contact;
-use app\models\Reminder;
 use app\models\User;
 use Exception;
 
@@ -20,12 +19,16 @@ class CallForm extends Form
 
 	public $user_id;
 	public $contact_id;
+	public $status;
+	public $type;
 
 	public function rules(): array
 	{
 		return [
-			[['user_id'], 'required'],
-			[['user_id', 'contact_id'], 'integer'],
+			[['user_id', 'contact_id', 'status', 'type'], 'required'],
+			[['user_id', 'contact_id', 'status', 'type'], 'integer'],
+			['status', 'in', 'range' => Call::getStatuses()],
+			['type', 'in', 'range' => Call::getTypes()],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
 		];
@@ -34,13 +37,24 @@ class CallForm extends Form
 	public function scenarios(): array
 	{
 		$common = [
-			'user_id',
 			'contact_id',
+			'status',
+			'type',
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common],
-			self::SCENARIO_UPDATE => [...$common],
+			self::SCENARIO_CREATE => [...$common, 'user_id'],
+			self::SCENARIO_UPDATE => $common,
+		];
+	}
+
+	public function attributeLabels(): array
+	{
+		return [
+			'user_id'    => 'ID сотрудника',
+			'contact_id' => 'ID контакта',
+			'type'       => 'Тип звонка',
+			'status'     => 'Статус звонка'
 		];
 	}
 
@@ -55,12 +69,15 @@ class CallForm extends Form
 				return new CreateCallDto([
 					'user'    => User::find()->byId($this->user_id)->one(),
 					'contact' => Contact::find()->byId($this->contact_id)->one(),
+					'type'    => $this->type,
+					'status'  => $this->status
 				]);
 
 			default:
 				return new UpdateCallDto([
-					'user'    => User::find()->byId($this->user_id)->one(),
 					'contact' => Contact::find()->byId($this->contact_id)->one(),
+					'type'    => $this->type,
+					'status'  => $this->status
 				]);
 		}
 	}

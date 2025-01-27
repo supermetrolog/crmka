@@ -10,6 +10,7 @@ use app\models\Survey;
 use app\resources\Contact\ContactResource;
 use app\resources\QuestionAnswerResource;
 use app\resources\QuestionResource;
+use app\resources\Task\TaskResource;
 use app\resources\User\UserResource;
 
 class SurveyWithQuestionsResource extends JsonResource
@@ -42,6 +43,7 @@ class SurveyWithQuestionsResource extends JsonResource
 
 			'user'    => UserResource::make($this->resource->user)->toArray(),
 			'contact' => ContactResource::make($this->resource->contact)->toArray(),
+			'tasks'   => TaskResource::collection($this->resource->tasks),
 
 			'questions' => $this->getQuestions(),
 		];

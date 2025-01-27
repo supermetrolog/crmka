@@ -20,4 +20,5 @@ class CreateTaskDto extends BaseObject
 	public array              $tagIds;
 	public array              $observerIds;
 	public ?int               $surveyQuestionAnswerId = null;
+	public ?int               $surveyId               = null;
 }

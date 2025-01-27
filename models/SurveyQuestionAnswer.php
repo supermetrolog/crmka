@@ -97,6 +97,7 @@ class SurveyQuestionAnswer extends AR
 	{
 		/** @var TaskQuery */
 		return $this->morphHasManyVia(Task::class, 'id', 'first')
+		            ->andOnCondition([Task::field('deleted_at') => null])
 		            ->via('relationSecond');
 	}
 

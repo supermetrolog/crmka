@@ -114,12 +114,13 @@ class ChatMemberMessage extends AR
 	}
 
 	/**
-	 * @return ActiveQuery|TaskQuery
 	 * @throws ErrorException
 	 */
 	public function getTasks(): TaskQuery
 	{
+		/** @var TaskQuery */
 		return $this->morphHasManyVia(Task::class, 'id', 'second')
+		            ->andOnCondition([Task::field('deleted_at') => null])
 		            ->via('relationFirst');
 	}
 

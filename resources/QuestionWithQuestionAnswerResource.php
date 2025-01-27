@@ -34,7 +34,7 @@ class QuestionWithQuestionAnswerResource extends JsonResource
 		$answers = [];
 
 		foreach ($this->resource->answers as $answer) {
-			$answers[$answer->category][] = $answer;
+			$answers[$answer->category][] = QuestionAnswerResource::tryMakeArray($answer);
 		}
 
 		return $answers;

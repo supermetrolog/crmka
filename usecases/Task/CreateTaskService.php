@@ -12,6 +12,7 @@ use app\dto\TaskObserver\CreateTaskObserverDto;
 use app\events\Task\CreateTaskEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\models\Task;
 use app\repositories\UserRepository;
@@ -66,6 +67,10 @@ class CreateTaskService
 
 			if (!is_null($dto->surveyQuestionAnswerId)) {
 				$this->linkRelation($task, SurveyQuestionAnswer::getMorphClass(), $dto->surveyQuestionAnswerId);
+			}
+
+			if (!is_null($dto->surveyId)) {
+				$this->linkRelation($task, Survey::getMorphClass(), $dto->surveyId);
 			}
 
 			$observer = $this->taskObserverService->create(new CreateTaskObserverDto([
