@@ -29,15 +29,28 @@ class TaskRepository
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	public function findModelById(int $id, bool $withDeleted = false): Task
+	public function findModelByIdAndCreatedByWithDeleted(int $id, int $createdById, string $createdByType): Task
 	{
-		$query = Task::find()->byId($id);
+		return Task::find()
+		           ->byId($id)
+		           ->byMorph($createdById, $createdByType)
+		           ->oneOrThrow();
+	}
 
-		if (!$withDeleted) {
-			$query->notDeleted();
-		}
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function findModelById(int $id): Task
+	{
+		return Task::find()->byId($id)->notDeleted()->oneOrThrow();
+	}
 
-		return $query->oneOrThrow();
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function findModelByIdWithDeleted(int $id): Task
+	{
+		return Task::find()->byId($id)->oneOrThrow();
 	}
 
 	/**
