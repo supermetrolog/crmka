@@ -25,6 +25,7 @@ use app\models\Productrange;
 use app\models\User;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
+use InvalidArgumentException;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
@@ -350,5 +351,20 @@ class CompanyService
 			$tx->rollBack();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function changeStatus(Company $company, int $status): Company
+	{
+		if (!ArrayHelper::includes(Company::getStatuses(), $status)) {
+			throw new InvalidArgumentException('Invalid company status');
+		}
+
+		$company->status = $status;
+		$company->saveOrThrow();
+
+		return $company;
 	}
 }

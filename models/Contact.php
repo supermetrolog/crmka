@@ -287,6 +287,26 @@ class Contact extends AR
 		return $this->hasMany(Contact::class, ['company_id' => 'company_id'])->andWhere(['!=', 'id', $this->id]);
 	}
 
+	public function isGeneralType(): bool
+	{
+		return $this->type === self::GENERAL_CONTACT_TYPE;
+	}
+
+	public function isDefaultType(): bool
+	{
+		return $this->type === self::DEFAULT_CONTACT_TYPE;
+	}
+
+	public function isActive(): bool
+	{
+		return $this->status === self::STATUS_ACTIVE;
+	}
+
+	public function isPassive(): bool
+	{
+		return $this->status === self::STATUS_PASSIVE;
+	}
+
 	public static function find(): ContactQuery
 	{
 		return new ContactQuery(get_called_class());

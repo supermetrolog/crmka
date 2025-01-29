@@ -262,7 +262,7 @@ class CompanyController extends AppController
 			                          'contacts_count' => 'COUNT(DISTINCT contact.id)'
 		                          ])
 		                          ->byId($id)
-		                          ->joinWith(['requests', 'contacts', 'objects'])
+		                          ->joinWith(['requests', 'activeContacts', 'objects'])
 		                          ->with(['productRanges',
 		                                  'categories',
 		                                  'companyGroup',
@@ -272,7 +272,7 @@ class CompanyController extends AppController
 		                                  'dealsRequestEmpty.offer.generalOffersMix',
 		                                  'dealsRequestEmpty.competitor',
 		                                  'consultant.userProfile',
-		                                  'contacts' => function ($query) {
+		                                  'activeContacts' => function ($query) {
 			                                  $query->with(['phones', 'emails', 'contactComments', 'websites']);
 		                                  }])
 		                          ->oneOrThrow();

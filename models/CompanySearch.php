@@ -69,7 +69,7 @@ class CompanySearch extends Form
 			                          'requests_count' => 'COUNT(DISTINCT request.id)',
 			                          'contacts_count' => 'COUNT(DISTINCT contact.id)'
 		                          ])
-		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects'])
+		                          ->joinWith(['requests', 'categories', 'activeContacts.phones', 'objects'])
 		                          ->with([
 			                          'requests' => function ($query) {
 				                          $query->with(['timelines' => function (TimelineQuery $query) {

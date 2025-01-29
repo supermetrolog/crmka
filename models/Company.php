@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\helpers\ArrayHelper;
 use app\helpers\StringHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
@@ -77,6 +78,7 @@ use yii\db\Expression;
  * @property-read CompanyFile[]         $files
  * @property-read Contact               $generalContact
  * @property-read ChatMember            $chatMember
+ * @property-read Contact[]             $activeContacts
  */
 class Company extends AR
 {
@@ -90,6 +92,19 @@ class Company extends AR
 		4 => 'АО',
 		5 => 'ИП',
 	];
+
+	public const STATUS_PASSIVE                 = 0;
+	public const STATUS_ACTIVE                  = 1;
+	public const STATUS_WITHOUT_ACTIVE_CONTACTS = 2;
+
+	public static function getStatuses(): array
+	{
+		return [
+			self::STATUS_PASSIVE,
+			self::STATUS_ACTIVE,
+			self::STATUS_WITHOUT_ACTIVE_CONTACTS
+		];
+	}
 
 	public const LOGO_MEDIA_CATEGORY = 'company_logo';
 	public const FILE_MEDIA_CATEGORY = 'company_file';
@@ -240,7 +255,7 @@ class Company extends AR
 	{
 		$extraFields = parent::extraFields();
 
-		$extraFields['contacts_count'] = fn() => (int)$this->getContacts()->count();
+		$extraFields['contacts_count'] = fn() => (int)$this->getActiveContacts()->count();
 		$extraFields['requests_count'] = fn() => (int)$this->getRequests()->count();
 		$extraFields['objects_count']  = fn() => (int)$this->getObjects()->count();
 
@@ -301,6 +316,19 @@ class Company extends AR
 	public function getContacts(): ActiveQuery
 	{
 		return $this->hasMany(Contact::class, ['company_id' => 'id']);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getActiveContacts(): ContactQuery
+	{
+		/** @var ContactQuery */
+		return $this->hasMany(Contact::class, ['company_id' => 'id'])
+		            ->andOnCondition([
+			            Contact::field('status') => Contact::STATUS_ACTIVE,
+			            Contact::field('type')   => Contact::DEFAULT_CONTACT_TYPE
+		            ]);
 	}
 
 	/**
@@ -420,6 +448,26 @@ class Company extends AR
 	public function getChatMember(): ChatMemberQuery
 	{
 		return $this->morphHasOne(ChatMember::class);
+	}
+
+	public function hasActiveContacts(): bool
+	{
+		return ArrayHelper::notEmpty($this->activeContacts);
+	}
+
+	public function isWithoutActiveContacts(): bool
+	{
+		return $this->status === self::STATUS_WITHOUT_ACTIVE_CONTACTS;
+	}
+
+	public function isActive(): bool
+	{
+		return $this->status === self::STATUS_ACTIVE;
+	}
+
+	public function isPassive(): bool
+	{
+		return $this->status === self::STATUS_PASSIVE;
 	}
 
 	/**

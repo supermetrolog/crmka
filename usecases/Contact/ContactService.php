@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace app\usecases\Contact;
 
+use app\components\EventManager;
 use app\dto\Contact\CreateContactDto;
 use app\dto\Contact\UpdateContactDto;
+use app\events\Contact\CreateContactEvent;
+use app\events\Contact\UpdateContactEvent;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -21,12 +24,15 @@ use yii\db\StaleObjectException;
 class ContactService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
+	private EventManager                 $eventManager;
 
 	public function __construct(
-		TransactionBeginnerInterface $transactionBeginner
+		TransactionBeginnerInterface $transactionBeginner,
+		EventManager $eventManager
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
+		$this->eventManager        = $eventManager;
 	}
 
 	/**
@@ -71,6 +77,8 @@ class ContactService
 			if ($dto->isMain) {
 				$this->setMainContact($model);
 			}
+
+			$this->eventManager->trigger(new CreateContactEvent($model));
 
 			$tx->commit();
 
@@ -161,6 +169,8 @@ class ContactService
 			if ($dto->isMain && !$isMainContact) {
 				$this->setMainContact($model);
 			}
+
+			$this->eventManager->trigger(new UpdateContactEvent($model));
 
 			$tx->commit();
 
