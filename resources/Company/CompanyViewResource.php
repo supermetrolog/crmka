@@ -29,17 +29,18 @@ class CompanyViewResource extends JsonResource
 		return ArrayHelper::merge(
 			CompanyBaseResource::make($this->resource)->toArray(),
 			[
-				'contacts'          => ContactResource::collection($this->resource->contacts),
-				'categories'        => CompanyCategoryResource::collection($this->resource->categories),
-				'productRanges'     => CompanyProductRangeResource::collection($this->resource->productRanges),
-				'companyGroup'      => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
-				'files'             => CompanyFileResource::collection($this->resource->files),
-				'logo'              => MediaShortResource::tryMakeArray($this->resource->logo),
-				'consultant'        => UserShortResource::tryMakeArray($this->resource->consultant),
-				'dealsRequestEmpty' => $this->resource->dealsRequestEmpty,
-				'objects_count'     => $this->resource->objects_count,
-				'requests_count'    => $this->resource->requests_count,
-				'contacts_count'    => $this->resource->contacts_count,
+				'contacts'              => ContactResource::collection($this->resource->contacts),
+				'categories'            => CompanyCategoryResource::collection($this->resource->categories),
+				'productRanges'         => CompanyProductRangeResource::collection($this->resource->productRanges),
+				'companyGroup'          => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
+				'files'                 => CompanyFileResource::collection($this->resource->files),
+				'logo'                  => MediaShortResource::tryMakeArray($this->resource->logo),
+				'consultant'            => UserShortResource::tryMakeArray($this->resource->consultant),
+				'dealsRequestEmpty'     => $this->resource->dealsRequestEmpty,
+				'objects_count'         => $this->resource->objects_count,
+				'requests_count'        => $this->resource->requests_count,
+				'contacts_count'        => $this->resource->contacts_count,
+				'active_contacts_count' => $this->resource->active_contacts_count
 			]
 		);
 	}
