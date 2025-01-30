@@ -26,6 +26,7 @@ class ChatMemberMessageShortResource extends JsonResource
 			'from_chat_member_id' => $this->resource->from_chat_member_id,
 			'to_chat_member_id'   => $this->resource->to_chat_member_id,
 			'message'             => $this->resource->message,
+			'template'            => $this->resource->template,
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
 			'deleted_at'          => $this->resource->deleted_at,
@@ -34,6 +35,7 @@ class ChatMemberMessageShortResource extends JsonResource
 			'contacts'            => ContactShortResource::collection($this->resource->contacts),
 			'tags'                => ChatMemberMessageTagResource::collection($this->resource->tags),
 			'files'               => MediaResource::collection($this->resource->files),
+			'surveys'             => ChatMemberMessageSurveyResource::collection($this->resource->surveys)
 		];
 	}
 }
