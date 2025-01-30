@@ -65,9 +65,10 @@ class CompanySearch extends Form
 		$query = CompanySearchView::find()
 		                          ->select([
 			                          Company::field('*'),
-			                          'objects_count'  => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
-			                          'requests_count' => 'COUNT(DISTINCT request.id)',
-			                          'contacts_count' => 'COUNT(DISTINCT contact.id)'
+			                          'objects_count'         => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
+			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
+			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
+			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
 		                          ])
 		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects'])
 		                          ->with([

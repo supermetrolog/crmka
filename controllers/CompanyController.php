@@ -257,9 +257,10 @@ class CompanyController extends AppController
 		$model = CompanySearchView::find()
 		                          ->select([
 			                          Company::field('*'),
-			                          'objects_count'  => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
-			                          'requests_count' => 'COUNT(DISTINCT request.id)',
-			                          'contacts_count' => 'COUNT(DISTINCT contact.id)'
+			                          'objects_count'         => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
+			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
+			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
+			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
 		                          ])
 		                          ->byId($id)
 		                          ->joinWith(['requests', 'contacts', 'objects'])
