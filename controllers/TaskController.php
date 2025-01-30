@@ -6,6 +6,7 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Task\TaskAssignForm;
 use app\models\forms\Task\TaskChangeStatusForm;
@@ -104,7 +105,7 @@ class TaskController extends AppController
 	public function actionView(int $id): TaskWithRelationResource
 	{
 		if ($this->user->identity->isAdministrator()) {
-			$model = $this->repository->findModelById($id, true);
+			$model = $this->repository->findModelByIdWithDeleted($id);
 		} else {
 			$model = $this->repository->findModelById($id);
 		}
@@ -199,7 +200,7 @@ class TaskController extends AppController
 		$identity = $this->user->identity;
 
 		if ($identity->isAdministrator()) {
-			$model = $this->findModelById($id);
+			$model = $this->repository->findModelByIdWithDeleted($id);
 		} else {
 			$model = $this->findModelByIdAndCreatedByOrUserId($id);
 		}
@@ -225,7 +226,13 @@ class TaskController extends AppController
 	 */
 	public function actionChangeStatus(int $id): TaskWithRelationResource
 	{
-		$task = $this->findModelByIdAndCreatedByOrUserId($id);
+		$identity = $this->user->identity;
+
+		if ($identity->isAdministrator()) {
+			$task = $this->repository->findModelByIdWithDeleted($id);
+		} else {
+			$task = $this->findModelByIdAndCreatedByOrUserId($id);
+		}
 
 		$form = new TaskChangeStatusForm();
 		$form->load($this->request->post());
@@ -250,14 +257,14 @@ class TaskController extends AppController
 		$identity = $this->user->identity;
 
 		if ($identity->isAdministrator()) {
-			$model = $this->findModelById($id);
+			$model = $this->repository->findModelById($id);
 		} else {
 			$model = $this->findModelByIdAndCreatedBy($id);
 		}
 
 		$this->taskStateService->delete($model, $this->user->identity);
 
-		return new SuccessResponse();
+		return $this->success('Задача успешно удалена');
 	}
 
 	public function actionComments(int $id): array
@@ -273,12 +280,14 @@ class TaskController extends AppController
 	 */
 	public function actionCreateComment(int $id): TaskCommentResource
 	{
+		$task = $this->repository->findModelById($id);
+
 		$form = new TaskCommentForm();
 
 		$form->setScenario(TaskCommentForm::SCENARIO_CREATE);
 
 		$form->load($this->request->post());
-		$form->task_id       = $id;
+		$form->task_id       = $task->id;
 		$form->created_by_id = $this->user->id;
 
 		$form->validateOrThrow();
@@ -295,22 +304,23 @@ class TaskController extends AppController
 	 */
 	public function actionRead(int $id): SuccessResponse
 	{
-		$task = $this->findModelById($id);
+		$task = $this->repository->findModelByIdWithDeleted($id);
 
 		$this->observeTaskService->observe($task, $this->user->identity);
 
-		return new SuccessResponse();
+		return $this->success();
 	}
 
 	/**
+	 * @return TaskWithRelationResource|ErrorResponse
 	 * @throws ModelNotFoundException
 	 * @throws ValidateException
 	 * @throws Exception
 	 * @throws Throwable
 	 */
-	public function actionAssign(int $id): TaskWithRelationResource
+	public function actionAssign(int $id)
 	{
-		$task = $this->findModelById($id);
+		$task = $this->repository->findModelById($id);
 
 		$form = new TaskAssignForm();
 
@@ -321,9 +331,13 @@ class TaskController extends AppController
 
 		$dto = $form->getDto();
 
-		$model = $this->assignTaskService->assign($task, $dto);
+		try {
+			$model = $this->assignTaskService->assign($task, $dto);
 
-		return new TaskWithRelationResource($model);
+			return new TaskWithRelationResource($model);
+		} catch (ErrorException $e) {
+			return $this->errorf('Задача #%s не может быть переназначена', [$id]);
+		}
 	}
 
 	/**
@@ -332,7 +346,13 @@ class TaskController extends AppController
 	 */
 	public function actionHistory(int $id): array
 	{
-		$model = $this->findModelById($id);
+		$identity = $this->user->identity;
+
+		if ($identity->isAdministrator()) {
+			$model = $this->repository->findModelByIdWithDeleted($id);
+		} else {
+			$model = $this->repository->findModelById($id);
+		}
 
 		$histories = $this->taskHistoryService->generateHistory($model);
 
@@ -340,20 +360,27 @@ class TaskController extends AppController
 	}
 
 	/**
+	 * @return TaskResource|ErrorResponse
 	 * @throws ModelNotFoundException
 	 * @throws Throwable
 	 * @throws UnprocessableEntityHttpException
 	 */
-	public function actionRestore(int $id): TaskResource
+	public function actionRestore(int $id)
 	{
-		try {
-			$model = $this->repository->findModelById($id, true);
+		$identity = $this->user->identity;
 
-			$this->taskStateService->restore($model, $this->user->identity);
+		if ($identity->isAdministrator()) {
+			$model = $this->repository->findModelByIdWithDeleted($id);
+		} else {
+			$model = $this->findModelByIdAndCreatedByWithDeleted($id);
+		}
+
+		try {
+			$this->taskStateService->restore($model, $identity);
 
 			return new TaskResource($model);
 		} catch (InvalidCallException $e) {
-			throw new UnprocessableEntityHttpException("Задача #$id не может быть восстановлена");
+			return $this->errorf('Задача #%s не может быть восстановлена', [$id]);
 		}
 	}
 
@@ -368,16 +395,16 @@ class TaskController extends AppController
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	protected function findModelByIdAndCreatedByOrUserId(int $id): Task
+	protected function findModelByIdAndCreatedByWithDeleted(int $id): Task
 	{
-		return $this->repository->findModelByIdAndCreatedByOrUserId($id, $this->user->id, $this->user->identity::getMorphClass());
+		return $this->repository->findModelByIdAndCreatedByWithDeleted($id, $this->user->id, $this->user->identity::getMorphClass());
 	}
 
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	protected function findModelById(int $id): Task
+	protected function findModelByIdAndCreatedByOrUserId(int $id): Task
 	{
-		return $this->repository->findModelById($id);
+		return $this->repository->findModelByIdAndCreatedByOrUserId($id, $this->user->id, $this->user->identity::getMorphClass());
 	}
 }

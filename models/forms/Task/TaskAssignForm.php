@@ -25,6 +25,14 @@ class TaskAssignForm extends Form
 		];
 	}
 
+	public function attributeLabels(): array
+	{
+		return [
+			'user_id' => 'ID пользователя',
+			'comment' => 'Комментарий'
+		];
+	}
+
 	/**
 	 * @throws Exception
 	 */

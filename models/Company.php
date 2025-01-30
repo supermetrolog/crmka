@@ -240,9 +240,10 @@ class Company extends AR
 	{
 		$extraFields = parent::extraFields();
 
-		$extraFields['contacts_count'] = fn() => (int)$this->getContacts()->count();
-		$extraFields['requests_count'] = fn() => (int)$this->getRequests()->count();
-		$extraFields['objects_count']  = fn() => (int)$this->getObjects()->count();
+		$extraFields['contacts_count']        = fn() => (int)$this->getContacts()->count();
+		$extraFields['active_contacts_count'] = fn() => (int)$this->getActiveContacts()->count();
+		$extraFields['requests_count']        = fn() => (int)$this->getRequests()->count();
+		$extraFields['objects_count']         = fn() => (int)$this->getObjects()->count();
 
 		$extraFields['offers_count'] = function ($efields) {
 			$offers = $efields->getOffers()->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => 2])->all();
@@ -294,13 +295,21 @@ class Company extends AR
 	}
 
 	/**
-	 * Gets query for [[Contacts]].
-	 *
-	 * @return ActiveQuery
+	 * @throws ErrorException
 	 */
 	public function getContacts(): ActiveQuery
 	{
-		return $this->hasMany(Contact::class, ['company_id' => 'id']);
+		return $this->hasMany(Contact::class, ['company_id' => 'id'])
+		            ->andOnCondition([Contact::field('type') => Contact::DEFAULT_CONTACT_TYPE]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getActiveContacts(): ContactQuery
+	{
+		/** @var ContactQuery */
+		return $this->getContacts()->andOnCondition([Contact::field('status') => Contact::STATUS_ACTIVE]);
 	}
 
 	/**
