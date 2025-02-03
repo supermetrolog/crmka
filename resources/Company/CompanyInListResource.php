@@ -6,6 +6,7 @@ namespace app\resources\Company;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Company;
+use app\resources\Call\CallShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Company\Category\CompanyCategoryResource;
 use app\resources\Company\Contact\CompanyContactResource;
@@ -62,6 +63,8 @@ class CompanyInListResource extends JsonResource
 
 			'objects'  => CompanyObjectResource::collection($this->resource->objects),
 			'requests' => CompanyRequestResource::collection($this->resource->requests),
+
+			'last_call' => CallShortResource::tryMakeArray($this->resource->lastCall),
 
 			'objects_count'         => $this->resource->objects_count,
 			'requests_count'        => $this->resource->requests_count,

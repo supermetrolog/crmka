@@ -65,12 +65,15 @@ class CompanySearch extends Form
 		$query = CompanySearchView::find()
 		                          ->select([
 			                          Company::field('*'),
+			                          'last_call_rel_id'      => 'last_call_rel.id',
 			                          'objects_count'         => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
 			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
 			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
 			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
 		                          ])
 		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects'])
+		                          ->joinWith(['chatMember cm'])
+		                          ->leftJoinLastCallRelation()
 		                          ->with([
 			                          'requests' => function ($query) {
 				                          $query->with(['timelines' => function (TimelineQuery $query) {
@@ -85,7 +88,8 @@ class CompanySearch extends Form
 			                          'mainContact.phones',
 			                          'categories',
 			                          'objects.offerMix.generalOffersMix',
-			                          'objects.objectFloors'
+			                          'objects.objectFloors',
+			                          'lastCall'
 		                          ])->groupBy(Company::field('id'));
 
 		$dataProvider = new ActiveDataProvider([
