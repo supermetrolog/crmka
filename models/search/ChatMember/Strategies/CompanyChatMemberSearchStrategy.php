@@ -109,8 +109,7 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 					                   ->right('0')
 					                   ->beforeBuild(fn($expression) => "$expression DESC")
 					                   ->build(),
-					'last_call_rel.created_at'   => SORT_ASC,
-					Company::field('updated_at') => SORT_ASC
+					'COALESCE(last_call_rel.created_at, company.updated_at, company.created_at)' => SORT_ASC
 				],
 				'desc' => [
 					IfExpressionBuilder::create()
@@ -119,8 +118,7 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 					                   ->right('0')
 					                   ->beforeBuild(fn($expression) => "$expression DESC")
 					                   ->build(),
-					'last_call_rel.created_at'   => SORT_DESC,
-					Company::field('updated_at') => SORT_DESC
+					'COALESCE(last_call_rel.created_at, company.updated_at, company.created_at)' => SORT_DESC
 				]
 			]
 		];
