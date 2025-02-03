@@ -3,9 +3,11 @@
 namespace app\models\search\ChatMember\Strategies;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
+use app\helpers\ArrayHelper;
 use app\helpers\SQLHelper;
 use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\Category;
 use app\models\ChatMember;
 use app\models\Company;
 use yii\base\ErrorException;
@@ -13,9 +15,21 @@ use yii\db\Expression;
 
 class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 {
+	public $categories;
+
+	public function rules(): array
+	{
+		return ArrayHelper::merge(
+			parent::rules(),
+			[
+				[['categories'], 'each', 'rule' => ['integer']]
+			]
+		);
+	}
+
 	protected function applySpecificQuery(ChatMemberQuery $query, array $params): void
 	{
-		$query->joinWith(['company'])
+		$query->joinWith(['company.categories'])
 		      ->with([
 			      'company.logo',
 			      'company.categories',
@@ -40,7 +54,8 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 		}
 
 		$query->andFilterWhere([
-			Company::field('consultant_id') => $this->consultant_ids
+			Company::field('consultant_id') => $this->consultant_ids,
+			Category::field('category')     => $this->categories,
 		]);
 
 		if ($this->isFilterTrue($this->need_calling)) {
