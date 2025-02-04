@@ -7,15 +7,12 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
-use app\models\Company;
 use app\models\CompanySearch;
 use app\models\forms\Company\CompanyContactsForm;
 use app\models\forms\Company\CompanyForm;
 use app\models\forms\Company\CompanyLogoForm;
 use app\models\forms\Company\CompanyMediaForm;
 use app\models\forms\Company\CompanyMiniModelsForm;
-use app\models\Objects;
-use app\models\views\CompanySearchView;
 use app\repositories\CompanyRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
@@ -83,7 +80,7 @@ class CompanyController extends AppController
 	 */
 	public function actionView($id): CompanyViewResource
 	{
-		$model = $this->findModel($id);
+		$model = $this->companyRepository->findModelByIdWithRelations($id);
 
 		return new CompanyViewResource($model);
 	}
@@ -136,18 +133,15 @@ class CompanyController extends AppController
 	}
 
 	/**
-	 * @param $id
-	 *
-	 * @return CompanyViewResource
 	 * @throws ErrorException
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 * @throws ValidateException
 	 */
-	public function actionUpdate($id): CompanyViewResource
+	public function actionUpdate($id): CreatedCompanyResource
 	{
-		$company = $this->findModel($id);
+		$company = $this->companyRepository->findModelById($id);
 
 		$form = new CompanyForm();
 
@@ -185,7 +179,7 @@ class CompanyController extends AppController
 			$companyMediaForm->getDto()
 		);
 
-		return new CompanyViewResource($company);
+		return new CreatedCompanyResource($company);
 	}
 
 	/**
@@ -214,7 +208,7 @@ class CompanyController extends AppController
 	 */
 	public function actionDeleteLogo($id): SuccessResponse
 	{
-		$company = $this->findModel($id);
+		$company = $this->companyRepository->findModelById($id);
 		$this->companyService->deleteLogo($company);
 
 		return new SuccessResponse('Логотип компании удален');
@@ -229,7 +223,7 @@ class CompanyController extends AppController
 	 */
 	public function actionUpdateLogo($id): MediaShortResource
 	{
-		$company = $this->findModel($id);
+		$company = $this->companyRepository->findModelById($id);
 
 		$form = new CompanyLogoForm();
 
@@ -242,42 +236,5 @@ class CompanyController extends AppController
 		$updatedLogo = $this->companyService->updateLogo($company, $form->logo);
 
 		return new MediaShortResource($updatedLogo);
-	}
-
-	/**
-	 * @param       $id
-	 *
-	 * @return Company
-	 * @throws ErrorException
-	 * @throws ModelNotFoundException
-	 */
-	protected function findModel($id): Company
-	{
-		/** @var CompanySearchView $model */
-		$model = CompanySearchView::find()
-		                          ->select([
-			                          Company::field('*'),
-			                          'objects_count'         => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
-			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
-			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
-			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
-		                          ])
-		                          ->byId($id)
-		                          ->joinWith(['requests', 'contacts', 'objects'])
-		                          ->with(['productRanges',
-		                                  'categories',
-		                                  'companyGroup',
-		                                  'deals',
-		                                  'files',
-		                                  'dealsRequestEmpty.consultant.userProfile',
-		                                  'dealsRequestEmpty.offer.generalOffersMix',
-		                                  'dealsRequestEmpty.competitor',
-		                                  'consultant.userProfile',
-		                                  'contacts' => function ($query) {
-			                                  $query->with(['phones', 'emails', 'contactComments', 'websites']);
-		                                  }])
-		                          ->oneOrThrow();
-
-		return $model;
 	}
 }

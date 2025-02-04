@@ -82,7 +82,7 @@ class TaskForm extends Form
 	{
 		if ($this->getScenario() === self::SCENARIO_CREATE) {
 			return new CreateTaskDto([
-				'user'            => User::find()->byId($this->user_id)->one(),
+				'user'            => User::find()->byId((int)$this->user_id)->one(),
 				'message'         => $this->message,
 				'status'          => Task::STATUS_CREATED,
 				'start'           => DateTimeHelper::tryMake($this->start),
@@ -111,7 +111,7 @@ class TaskForm extends Form
 		}
 
 		return new UpdateTaskDto([
-			'user'          => User::find()->byId($this->user_id)->one(),
+			'user'          => User::find()->byId((int)$this->user_id)->one(),
 			'message'       => $this->message,
 			'status'        => $this->status,
 			'start'         => $this->start,

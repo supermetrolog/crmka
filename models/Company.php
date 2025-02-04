@@ -4,12 +4,14 @@ namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\helpers\StringHelper;
-use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
+use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\miniModels\CompanyFile;
 use Yii;
@@ -77,6 +79,7 @@ use yii\db\Expression;
  * @property-read CompanyFile[]         $files
  * @property-read Contact               $generalContact
  * @property-read ChatMember            $chatMember
+ * @property-read ?Call                 $lastCall
  */
 class Company extends AR
 {
@@ -432,10 +435,29 @@ class Company extends AR
 	}
 
 	/**
-	 * @return AQ
+	 * @throws ErrorException
 	 */
-	public static function find(): AQ
+	public function getLastCallRelationFirst(): RelationQuery
 	{
-		return new AQ(static::class);
+		/** @var RelationQuery */
+		return $this->hasOne(Relation::class, [
+			'id' => 'last_call_rel_id'
+		])->from([Relation::tableName() => Relation::getTable()]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getLastCall(): CallQuery
+	{
+		/** @var CallQuery */
+		return $this->morphHasOneVia(Call::class, 'id', 'second')
+		            ->via('lastCallRelationFirst');
+	}
+
+
+	public static function find(): CompanyQuery
+	{
+		return new CompanyQuery(static::class);
 	}
 }
