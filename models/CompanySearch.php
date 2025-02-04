@@ -134,15 +134,16 @@ class CompanySearch extends Form
 							                      ->values(0, 2, 1)
 							                      ->beforeBuild(fn($expression) => "$expression ASC")
 							                      ->build(),
+							"COALESCE(last_call_rel.created_at, company.updated_at, company.created_at)" => SORT_ASC,
 							IfExpressionBuilder::create()
 							                   ->condition(Request::field('related_updated_at'))
 							                   ->left(Request::field('related_updated_at'))
 							                   ->right(Request::field('created_at'))
 							                   ->beforeBuild(fn($expression) => "$expression ASC")
 							                   ->build(),
-							Request::field('created_at') => SORT_ASC,
-							Request::field('updated_at') => SORT_ASC,
-							Company::field('created_at') => SORT_ASC
+							Request::field('created_at')                                                 => SORT_ASC,
+							Request::field('updated_at')                                                 => SORT_ASC,
+							Company::field('created_at')                                                 => SORT_ASC
 						],
 						'desc'    => [
 							IfExpressionBuilder::create()
@@ -156,15 +157,16 @@ class CompanySearch extends Form
 							                      ->values(0, 2, 1)
 							                      ->beforeBuild(fn($expression) => "$expression DESC")
 							                      ->build(),
+							"COALESCE(last_call_rel.created_at, company.updated_at, company.created_at)" => SORT_DESC,
 							IfExpressionBuilder::create()
 							                   ->condition(Request::field('related_updated_at'))
 							                   ->left(Request::field('related_updated_at'))
 							                   ->right(Request::field('created_at'))
 							                   ->beforeBuild(fn($expression) => "$expression DESC")
 							                   ->build(),
-							Request::field('created_at') => SORT_DESC,
-							Request::field('updated_at') => SORT_DESC,
-							Company::field('created_at') => SORT_DESC
+							Request::field('created_at')                                                 => SORT_DESC,
+							Request::field('updated_at')                                                 => SORT_DESC,
+							Company::field('created_at')                                                 => SORT_DESC
 						],
 						'default' => SORT_DESC
 					],
