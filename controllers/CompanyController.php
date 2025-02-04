@@ -133,16 +133,13 @@ class CompanyController extends AppController
 	}
 
 	/**
-	 * @param $id
-	 *
-	 * @return CompanyViewResource
 	 * @throws ErrorException
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 * @throws ValidateException
 	 */
-	public function actionUpdate($id): CompanyViewResource
+	public function actionUpdate($id): CreatedCompanyResource
 	{
 		$company = $this->companyRepository->findModelById($id);
 
@@ -182,7 +179,7 @@ class CompanyController extends AppController
 			$companyMediaForm->getDto()
 		);
 
-		return new CompanyViewResource($company);
+		return new CreatedCompanyResource($company);
 	}
 
 	/**
