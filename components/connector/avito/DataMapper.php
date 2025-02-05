@@ -188,6 +188,10 @@ class DataMapper
 	 */
 	public function getHeating(OfferInterface $offer): string
 	{
+		if (!$offer->hasHeating()) {
+			return AvitoValue::HEATING_HAS_NOT;
+		}
+
 		switch ($offer->getHeatingType()) {
 			case OfferInterface::HEATING_AUTO:
 				return AvitoValue::HEATING_AUTO;

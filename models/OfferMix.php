@@ -339,6 +339,14 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function hasHeating(): bool
+	{
+		return $this->heated === 1;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getHeatingType(): int
