@@ -106,10 +106,9 @@ interface OfferInterface
 	 */
 	function getImages(): array;
 
-	/**
-	 * @return float
-	 */
 	function getCeilingHeightMin(): float;
+	
+	function getCeilingHeightMax(): float;
 
 	/**
 	 * @return float

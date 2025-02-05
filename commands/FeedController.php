@@ -4,6 +4,7 @@ namespace app\commands;
 
 use app\components\avito\AvitoFeedGenerator;
 use app\components\connector\avito\AvitoConnector;
+use app\components\interfaces\OfferInterface;
 use app\models\OfferMix;
 use DateTime;
 use DOMException;
@@ -37,6 +38,7 @@ class FeedController extends Controller
             return;
         }
 
+		/** @var OfferInterface[]|OfferMix[] $models */
         $models = OfferMix::find()
             ->distinct()
             ->notDelete()
@@ -44,7 +46,7 @@ class FeedController extends Controller
             ->adAvito()
             ->blockType()
             ->notResponseStorageDealType()
-            ->with(['block', 'offer', 'object'])
+            ->with(['block', 'offer', 'object', 'complex'])
             ->all();
 
         $this->stdout("COUNT: " . count($models) . "\n");
