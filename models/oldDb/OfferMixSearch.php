@@ -1380,12 +1380,12 @@ class OfferMixSearch extends Search
 					],
 					'default'      => [
 						'asc'  => [
-							$this->getField('last_update') => SORT_ASC,
-							'c_industry_offers_mix.status' => SORT_ASC,
+							"COALESCE(last_call_rel.created_at, {$this->getField('last_update')})" => SORT_ASC,
+							'c_industry_offers_mix.status'                                         => SORT_ASC,
 						],
 						'desc' => [
-							$this->getField('last_update') => SORT_DESC,
-							'c_industry_offers_mix.status' => SORT_DESC,
+							"COALESCE(last_call_rel.created_at, {$this->getField('last_update')})" => SORT_DESC,
+							'c_industry_offers_mix.status'                                         => SORT_DESC,
 						],
 					]
 				]

@@ -34,7 +34,11 @@ class EffectSearch extends Form
 		$query = Effect::find();
 
 		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
+			'query'      => $query,
+			'pagination' => [
+				'defaultPageSize' => 20,
+				'pageSizeLimit'   => [0, 50],
+			]
 		]);
 
 		$this->load($params);

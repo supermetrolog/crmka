@@ -4,8 +4,8 @@ namespace app\models\search;
 
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
-use yii\data\ActiveDataProvider;
 use app\models\Field;
+use yii\data\ActiveDataProvider;
 
 class FieldSearch extends Form
 {
@@ -33,7 +33,11 @@ class FieldSearch extends Form
 		$query = Field::find();
 
 		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
+			'query'      => $query,
+			'pagination' => [
+				'defaultPageSize' => 20,
+				'pageSizeLimit'   => [0, 50],
+			]
 		]);
 
 		$this->load($params);
