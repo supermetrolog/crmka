@@ -29,6 +29,7 @@ use yii\db\ActiveQuery;
  * @property Field                $field
  * @property SurveyQuestionAnswer $surveyQuestionAnswer
  * @property-read Effect[]        $effects
+ * @property-read Question        $question
  */
 class QuestionAnswer extends AR
 {

@@ -11,8 +11,10 @@ use app\models\QuestionAnswer;
 use app\models\search\QuestionAnswerSearch;
 use app\repositories\QuestionAnswerRepository;
 use app\resources\QuestionAnswerResource;
+use app\resources\QuestionAnswerWithQuestionResource;
 use app\usecases\QuestionAnswer\QuestionAnswerService;
 use Throwable;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\Exception;
 use yii\db\StaleObjectException;
@@ -39,6 +41,7 @@ class QuestionAnswerController extends AppController
 
 	/**
 	 * @throws ValidateException
+	 * @throws ErrorException
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
@@ -46,6 +49,21 @@ class QuestionAnswerController extends AppController
 		$dataProvider = $searchModel->search($this->request->get());
 
 		return QuestionAnswerResource::fromDataProvider($dataProvider);
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws ErrorException
+	 */
+	public function actionWithQuestions(): ActiveDataProvider
+	{
+		$searchModel = new QuestionAnswerSearch();
+
+		$searchModel->withQuestions = true;
+
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return QuestionAnswerWithQuestionResource::fromDataProvider($dataProvider);
 	}
 
 	/**

@@ -4,7 +4,9 @@ namespace app\models\search;
 
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\Question;
 use app\models\QuestionAnswer;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 
 class QuestionAnswerSearch extends Form
@@ -16,25 +18,42 @@ class QuestionAnswerSearch extends Form
 	public $value;
 	public $deleted;
 
+	public $search;
+	public $has_effects = false;
+
+
+	public $withQuestions = false;
+
 	public function rules(): array
 	{
 		return [
 			[['id', 'question_id', 'field_id'], 'integer'],
 			['category', 'in', 'range' => QuestionAnswer::getCategories()],
-			[['category', 'value'], 'safe'],
-			[['deleted'], 'boolean'],
+			[['category', 'value', 'search'], 'safe'],
+			[['deleted', 'withQuestions', 'has_effects'], 'boolean'],
 		];
 	}
 
 	/**
 	 * @throws ValidateException
+	 * @throws ErrorException
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = QuestionAnswer::find()->with('effects');
+		$query = QuestionAnswer::find();
 
 		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
+			'query'      => $query,
+			'pagination' => [
+				'defaultPageSize' => 20,
+				'pageSizeLimit'   => [0, 50],
+			],
+			'sort'       => [
+				'defaultOrder' => [
+					'id' => SORT_DESC
+				],
+				'attributes'   => ['id', 'created_at', 'updated_at', 'question_id'],
+			]
 		]);
 
 		$this->load($params);
@@ -56,6 +75,28 @@ class QuestionAnswerSearch extends Form
 
 		if ($this->isFilterFalse($this->deleted)) {
 			$query->notDeleted();
+		}
+
+		if ($this->isFilterTrue($this->has_effects)) {
+			$query->innerJoinWith(['effects']);
+		} else {
+			$query->with(['effects']);
+		}
+
+		if ($this->isFilterTrue($this->withQuestions)) {
+			$query->with(['question']);
+		}
+
+		if (!empty($this->search)) {
+			$query->joinWith(['question']);
+
+			$query->andFilterWhere([
+				'or',
+				['like', QuestionAnswer::field('value'), $this->search],
+				['like', QuestionAnswer::field('id'), $this->search],
+				['like', Question::field('text'), $this->search],
+				['like', Question::field('id'), $this->search],
+			]);
 		}
 
 		return $dataProvider;

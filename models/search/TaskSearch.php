@@ -156,12 +156,12 @@ class TaskSearch extends Form
 				}]);
 
 				$query->andWhereNotNull(TaskObserver::field('id'));
-			} else {
-				$query->andFilterWhere([
-					Task::field('user_id')       => $this->user_id,
-					Task::field('created_by_id') => $this->created_by_id,
-				]);
 			}
+
+			$query->andFilterWhere([
+				Task::field('user_id')       => $this->user_id,
+				Task::field('created_by_id') => $this->created_by_id,
+			]);
 		}
 
 		$query->andFilterWhere([
