@@ -22,7 +22,7 @@ class QuestionAnswerSearch extends Form
 	public $has_effects = false;
 
 
-	public $withQuestions = false;
+	public $with_questions = false;
 
 	public function rules(): array
 	{
@@ -30,7 +30,7 @@ class QuestionAnswerSearch extends Form
 			[['id', 'question_id', 'field_id'], 'integer'],
 			['category', 'in', 'range' => QuestionAnswer::getCategories()],
 			[['category', 'value', 'search'], 'safe'],
-			[['deleted', 'withQuestions', 'has_effects'], 'boolean'],
+			[['deleted', 'has_effects'], 'boolean'],
 		];
 	}
 
@@ -83,7 +83,7 @@ class QuestionAnswerSearch extends Form
 			$query->with(['effects']);
 		}
 
-		if ($this->isFilterTrue($this->withQuestions)) {
+		if ($this->isFilterTrue($this->with_questions)) {
 			$query->with(['question']);
 		}
 

@@ -59,7 +59,7 @@ class QuestionAnswerController extends AppController
 	{
 		$searchModel = new QuestionAnswerSearch();
 
-		$searchModel->withQuestions = true;
+		$searchModel->with_questions = true;
 
 		$dataProvider = $searchModel->search($this->request->get());
 
