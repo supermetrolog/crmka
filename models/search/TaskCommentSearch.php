@@ -10,10 +10,8 @@ use yii\data\ActiveDataProvider;
 
 class TaskCommentSearch extends Form
 {
-	public $id;
 	public $created_by_id;
 	public $task_id;
-	public $user_id;
 
 	public $id_less_then;
 
@@ -23,7 +21,7 @@ class TaskCommentSearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['id', 'user_id', 'task_id', 'created_by_id', 'id_less_then'], 'integer'],
+			[['task_id', 'created_by_id', 'id_less_then'], 'integer'],
 			['limit', 'integer', 'max' => 100, 'min' => 5]
 		];
 	}
@@ -48,10 +46,8 @@ class TaskCommentSearch extends Form
 		$this->validateOrThrow();
 
 		$query->andFilterWhere([
-			'id'            => $this->id,
 			'task_id'       => $this->task_id,
-			'created_by_id' => $this->created_by_id,
-			'user_id'       => $this->user_id
+			'created_by_id' => $this->created_by_id
 		]);
 
 		$query->andFilterWhere(['<', TaskComment::field('id'), $this->id_less_then]);
