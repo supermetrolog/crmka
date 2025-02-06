@@ -16,6 +16,17 @@ use yii\db\ActiveQuery;
  */
 class Category extends AR
 {
+	public const CATEGORY_CLIENT = 0;
+
+	private const CATEGORY_NAMES = [
+		self::CATEGORY_CLIENT => 'Клиент',
+	];
+
+	public static function getCategoryName(int $category): string
+	{
+		return self::CATEGORY_NAMES[$category] ?? '';
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

@@ -166,4 +166,43 @@ class ArrayHelper
 	{
 		return self::unique(self::column($array, $key));
 	}
+
+	/**
+	 * @param int[] $array
+	 *
+	 * @return int[]
+	 */
+	public static function toDistributedValue(array $array, int $value): array
+	{
+		/** @var int[] $result */
+		$result = [...$array];
+		$size   = self::length($array);
+
+		for ($i = 0; $i < $size; $i++) {
+			if ($i < ($size - 1)) {
+				$gap    = $result[$i + 1] - $result[$i];
+				$needed = ($i + 1) * $gap;
+			} else {
+				$needed = $value + 1;
+			}
+
+			if ($value >= $needed) {
+				for ($j = 0; $j < $i + 1; $j++) {
+					$result[$j] += $gap;
+				}
+
+				$value -= $needed;
+			} else {
+				$gap = $value / ($i + 1);
+
+				for ($j = 0; $j < $i + 1; $j++) {
+					$result[$j] += $gap;
+				}
+
+				break;
+			}
+		}
+
+		return $result;
+	}
 }
