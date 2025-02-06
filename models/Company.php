@@ -417,12 +417,13 @@ class Company extends AR
 		return $this->logo ? $this->logo->src : null;
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function getGeneralContact(): ContactQuery
 	{
-		/** @var ContactQuery $query */
-		$query = $this->hasOne(Contact::class, ['company_id' => 'id']);
-
-		return $query->general();
+		/** @var ContactQuery */
+		return $this->hasOne(Contact::class, ['company_id' => 'id'])->andOnCondition([Contact::field('type') => Contact::GENERAL_CONTACT_TYPE]);
 	}
 
 	/**

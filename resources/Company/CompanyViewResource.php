@@ -10,6 +10,7 @@ use app\models\Company;
 use app\resources\Call\CallResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Company\Category\CompanyCategoryResource;
+use app\resources\Company\Contact\CompanyGeneralContactResource;
 use app\resources\Company\File\CompanyFileResource;
 use app\resources\Company\Group\CompanyGroupResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
@@ -31,6 +32,7 @@ class CompanyViewResource extends JsonResource
 			CompanyBaseResource::make($this->resource)->toArray(),
 			[
 				'contacts'              => ContactResource::collection($this->resource->contacts),
+				'generalContact'        => CompanyGeneralContactResource::tryMakeArray($this->resource->generalContact),
 				'categories'            => CompanyCategoryResource::collection($this->resource->categories),
 				'productRanges'         => CompanyProductRangeResource::collection($this->resource->productRanges),
 				'companyGroup'          => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
