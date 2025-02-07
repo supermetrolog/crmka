@@ -134,7 +134,7 @@ class AvitoConnector
             new AvitoObject(AvitoParam::SQUARE, $offer->getMaxArea()),
             new AvitoObject(AvitoParam::SQUARE_ADDITIONALLY, $this->dataMapper->getSquareAdditionally($offer)),
 //            new AvitoObject(AvitoParam::PRICE_TYPE, AvitoValue::PRICE_TYPE_PER_MONTH_PER_SQUARE_METER), // TODO: fix
-            new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMin()),
+            new AvitoObject(AvitoParam::CEILING_HEIGHT, $offer->getCeilingHeightMax()),
             new AvitoObject(AvitoParam::HEATING,  $this->dataMapper->getHeating($offer)),
             new AvitoObject(AvitoParam::BUILDING_CLASS, $this->dataMapper->getBuildingClass($offer)),
             new AvitoObject(AvitoParam::LEASE_PRICE_OPTIONS, $this->dataMapper->getLeasePriceOptions($offer)),
