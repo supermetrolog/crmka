@@ -150,7 +150,7 @@ class SurveyQuestionAnswer extends AR
 	/**
 	 * @throws Exception
 	 */
-	public function getString(): string
+	public function getString(): ?string
 	{
 		if ($this->field->canBeConvertedToString()) {
 			return $this->value;
