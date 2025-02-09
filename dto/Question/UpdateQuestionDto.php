@@ -10,4 +10,5 @@ class UpdateQuestionDto extends BaseObject
 {
 	public string  $text;
 	public ?string $group;
+	public ?string $template;
 }
