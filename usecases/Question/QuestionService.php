@@ -35,8 +35,9 @@ class QuestionService
 	public function create(CreateQuestionDto $dto): Question
 	{
 		$model = new Question([
-			'text'  => $dto->text,
-			'group' => $dto->group
+			'text'     => $dto->text,
+			'group'    => $dto->group,
+			'template' => $dto->template
 		]);
 
 		$model->saveOrThrow();
@@ -45,7 +46,7 @@ class QuestionService
 	}
 
 	/**
-	 * @throws SaveModelException
+	 * @throws SaveModelException|Throwable
 	 */
 	public function createWithQuestionAnswer(CreateQuestionDto $dto, CreateQuestionAnswerDto $answerDto): Question
 	{
@@ -93,8 +94,9 @@ class QuestionService
 	public function update(Question $model, UpdateQuestionDto $dto): Question
 	{
 		$model->load([
-			'text'  => $dto->text,
-			'group' => $dto->group
+			'text'     => $dto->text,
+			'group'    => $dto->group,
+			'template' => $dto->template
 		]);
 
 		$model->saveOrThrow();

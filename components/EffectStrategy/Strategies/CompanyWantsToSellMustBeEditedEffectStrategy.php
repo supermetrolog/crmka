@@ -4,18 +4,19 @@ namespace app\components\EffectStrategy\Strategies;
 
 use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\components\EffectStrategy\Service\CreateEffectTaskService;
+use app\enum\EffectKind;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
-use app\models\Company;
 use app\models\ObjectChatMember;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
+use Exception;
 use Throwable;
 
-class CompanyWantsToSellEffectStrategy extends AbstractEffectStrategy
+class CompanyWantsToSellMustBeEditedEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = '%s (#%s) хочет продать объект, нужно создать или обновить предложение.';
+	private const TASK_MESSAGE_TEXT = '%s (#%s) хочет продать объект #%s, %s.';
 
 	private CreateEffectTaskService $effectTaskService;
 
@@ -35,18 +36,36 @@ class CompanyWantsToSellEffectStrategy extends AbstractEffectStrategy
 	 */
 	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
-		$company = $survey->chatMember->model->company;
-
 		$this->effectTaskService->createTaskForMessage(
 			$surveyChatMemberMessage,
 			$survey->user,
 			$surveyQuestionAnswer,
-			$this->getTaskMessage($company)
+			$this->getTaskMessage($survey)
 		);
 	}
 
-	public function getTaskMessage(Company $company): string
+	/**
+	 * @throws Exception
+	 */
+	public function getTaskMessage(Survey $survey): string
 	{
-		return sprintf(self::TASK_MESSAGE_TEXT, $company->getFullName(), $company->id);
+		$company = $survey->chatMember->model->company;
+
+		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::COMPANY_WANTS_TO_SELL_MUST_BE_EDITED_DESCRIPTION);
+
+		if ($surveyQuestionAnswerDescription) {
+			$description = $surveyQuestionAnswerDescription->getString() ?? 'подробности в опроснике';
+		} else {
+			$description = 'подробности в опроснике';
+		}
+
+
+		return sprintf(
+			self::TASK_MESSAGE_TEXT,
+			$company->getFullName(),
+			$company->id,
+			$survey->chatMember->model->object_id,
+			$description
+		);
 	}
 }
