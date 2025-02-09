@@ -856,7 +856,7 @@ class OfferMix extends AR
 			return $this->calcPriceGeneralForRent($fields);
 		};
 		$fields['last_call']              = function ($fields) {
-			return empty($fields->lastCall) ? null : $fields->lastCall->created_at;
+			return $fields->lastCall;
 		};
 
 		return $fields;
