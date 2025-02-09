@@ -12,9 +12,9 @@ use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use Throwable;
 
-class ObjectHasFreeAreaEffectStrategy extends AbstractEffectStrategy
+class ObjectFreeAreaMustBeDeletedEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = 'Объект %s - есть свободная площадь в аренду, нужно обработать.';
+	private const TASK_MESSAGE_TEXT = 'Объект #%s, текущие свободные площади неактуальны, убрать в пассив.';
 
 	private CreateEffectTaskService $effectTaskService;
 
