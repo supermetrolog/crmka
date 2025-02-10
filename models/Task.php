@@ -251,6 +251,14 @@ class Task extends AR
 		return $this->getObservers()->select('user_id')->column();
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFileIds(): array
+	{
+		return $this->getFiles()->select('id')->column();
+	}
+
 	public function getLastHistory(): TaskHistoryQuery
 	{
 		/** @var TaskHistoryQuery */

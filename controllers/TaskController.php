@@ -422,7 +422,7 @@ class TaskController extends AppController
 
 		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK);
 
-		$this->taskService->createFiles($task, $mediaForm->getDtos());
+		$this->taskService->createFilesWithEvent($task, $mediaForm->getDtos(), $this->user->identity);
 
 		return MediaResource::collection($task->files);
 	}
@@ -447,7 +447,7 @@ class TaskController extends AppController
 		$mediaForm->validateOrThrow();
 
 		try {
-			$this->taskService->deleteFiles($task, $mediaForm->getDtos());
+			$this->taskService->deleteFiles($task, $mediaForm->getDtos(), $this->user->identity);
 
 			return MediaResource::collection($task->files);
 		} catch (RelationNotExistsException $e) {

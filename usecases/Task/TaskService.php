@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace app\usecases\Task;
 
+use app\components\EventManager;
 use app\dto\Media\CreateMediaDto;
 use app\dto\Media\DeleteMediaDto;
 use app\dto\Relation\CreateRelationDto;
 use app\dto\Task\ChangeTaskStatusDto;
 use app\dto\Task\UpdateTaskDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
+use app\events\Task\CreateFileTaskEvent;
+use app\events\Task\DeleteFileTaskEvent;
 use app\exceptions\services\RelationNotExistsException;
 use app\helpers\ArrayHelper;
 use app\helpers\DateTimeHelper;
@@ -39,13 +42,15 @@ class TaskService
 	private RelationService              $relationService;
 	private MediaService                 $mediaService;
 	private CreateMediaService           $createMediaService;
+	private EventManager                 $eventManager;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		TaskObserverService $taskObserverService,
 		RelationService $relationService,
 		MediaService $mediaService,
-		CreateMediaService $createMediaService
+		CreateMediaService $createMediaService,
+		EventManager $eventManager
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
@@ -53,6 +58,7 @@ class TaskService
 		$this->relationService     = $relationService;
 		$this->mediaService        = $mediaService;
 		$this->createMediaService  = $createMediaService;
+		$this->eventManager        = $eventManager;
 	}
 
 	/**
@@ -231,6 +237,7 @@ class TaskService
 
 		try {
 			$medias = [];
+
 			foreach ($mediaDtos as $mediaDto) {
 				$media    = $this->createMediaService->create($mediaDto);
 				$medias[] = $media;
@@ -248,12 +255,36 @@ class TaskService
 	}
 
 	/**
+	 * @param CreateMediaDto[] $mediaDtos
+	 *
+	 * @return Media[]
+	 * @throws Throwable
+	 */
+	public function createFilesWithEvent(Task $task, array $mediaDtos, User $initiator): array
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$files = $this->createFiles($task, $mediaDtos);
+
+			$this->eventManager->trigger(new CreateFileTaskEvent($task, $initiator));
+
+			$tx->commit();
+
+			return $files;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
 	 * @param DeleteMediaDto[] $dtos
 	 *
 	 * @throws Throwable
 	 * @throws StaleObjectException
 	 */
-	public function deleteFiles(Task $task, array $dtos): void
+	public function deleteFiles(Task $task, array $dtos, User $initiator): void
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -269,6 +300,8 @@ class TaskService
 
 				$this->mediaService->delete($media);
 			}
+
+			$this->eventManager->trigger(new DeleteFileTaskEvent($task, $initiator));
 
 			$tx->commit();
 		} catch (Throwable $th) {

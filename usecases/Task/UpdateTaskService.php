@@ -51,7 +51,7 @@ class UpdateTaskService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$changedAttributes = $this->trackChanges($task, $dto);
+			$changedAttributes = $this->trackChanges($task, $dto, $mediaDtos);
 
 			$this->taskService->update($task, $dto, $initiator, $mediaDtos);
 
@@ -69,9 +69,11 @@ class UpdateTaskService
 	}
 
 	/**
+	 * @param CreateMediaDto[] $mediaDtos
+	 *
 	 * @throws ErrorException
 	 */
-	private function trackChanges(Task $task, UpdateTaskDto $dto): array
+	private function trackChanges(Task $task, UpdateTaskDto $dto, array $mediaDtos): array
 	{
 		$changedAttributes = $this->trackPrimitiveChanges($task, $dto);
 
@@ -81,6 +83,10 @@ class UpdateTaskService
 
 		if ($this->hasObserverChanges($task, $dto->observerIds)) {
 			$changedAttributes[] = TaskEvent::EVENT_TYPE_OBSERVERS_CHANGED;
+		}
+
+		if ($this->hasFilesChanges($task, $dto->currentFiles, $mediaDtos)) {
+			$changedAttributes[] = TaskEvent::EVENT_TYPE_FILES_CHANGED;
 		}
 
 		return $changedAttributes;
@@ -123,5 +129,22 @@ class UpdateTaskService
 		$oldObserverIds = $task->getUserIdsInObservers();
 
 		return !ArrayHelper::hasEqualsValues($oldObserverIds, $observerIds);
+	}
+
+	/**
+	 * @param int[]            $currentFileIds
+	 * @param CreateMediaDto[] $newMediaDtos
+	 *
+	 * @throws ErrorException
+	 */
+	private function hasFilesChanges(Task $task, array $currentFileIds, array $newMediaDtos): bool
+	{
+		if (ArrayHelper::notEmpty($newMediaDtos)) {
+			return true;
+		}
+
+		$oldFileIds = $task->getFileIds();
+
+		return !ArrayHelper::hasEqualsValues($oldFileIds, $currentFileIds);
 	}
 }
