@@ -7,6 +7,7 @@ namespace app\resources\Task;
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Task;
+use yii\base\ErrorException;
 
 /**
  * Ресурс с описанием зависимости задачи (информаци о сообщении, о чате, в котором создана задача)
@@ -20,6 +21,9 @@ class TaskWithRelationResource extends JsonResource
 		$this->resource = $resource;
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function toArray(): array
 	{
 		return ArrayHelper::merge(
@@ -28,7 +32,8 @@ class TaskWithRelationResource extends JsonResource
 				'related_by'      => TaskRelationResource::tryMakeArray($this->resource),
 				'last_comments'   => TaskCommentResource::collection($this->resource->lastComments),
 				'comments_count'  => $this->resource->getCommentsCount(),
-				'histories_count' => $this->resource->getHistoriesCount()
+				'histories_count' => $this->resource->getHistoriesCount(),
+				'files_count'     => $this->resource->getFilesCount()
 			]
 		);
 	}

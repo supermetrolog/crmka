@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\usecases\Task;
 
 use app\components\EventManager;
+use app\dto\Media\CreateMediaDto;
 use app\dto\Task\UpdateTaskDto;
 use app\events\Task\UpdateTaskEvent;
 use app\helpers\ArrayHelper;
@@ -40,17 +41,19 @@ class UpdateTaskService
 	}
 
 	/**
+	 * @param CreateMediaDto[] $mediaDtos
+	 *
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function update(Task $task, UpdateTaskDto $dto, User $initiator): Task
+	public function update(Task $task, UpdateTaskDto $dto, User $initiator, array $mediaDtos = []): Task
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
 			$changedAttributes = $this->trackChanges($task, $dto);
 
-			$this->taskService->update($task, $dto, $initiator);
+			$this->taskService->update($task, $dto, $initiator, $mediaDtos);
 
 			if (ArrayHelper::notEmpty($changedAttributes)) {
 				$this->eventManager->trigger(new UpdateTaskEvent($task, $initiator, $changedAttributes));

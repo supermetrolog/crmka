@@ -2,20 +2,24 @@
 
 namespace app\controllers;
 
+use app\exceptions\services\RelationNotExistsException;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Media\MediaForm;
 use app\models\forms\Task\TaskAssignForm;
 use app\models\forms\Task\TaskChangeStatusForm;
 use app\models\forms\Task\TaskCommentForm;
 use app\models\forms\Task\TaskForm;
+use app\models\Media;
 use app\models\search\TaskSearch;
 use app\models\Task;
 use app\repositories\TaskCommentRepository;
 use app\repositories\TaskRepository;
+use app\resources\Media\MediaResource;
 use app\resources\Task\TaskCommentResource;
 use app\resources\Task\TaskHistoryViewResource;
 use app\resources\Task\TaskRelationStatisticResource;
@@ -27,6 +31,7 @@ use app\usecases\Task\ChangeTaskStatusService;
 use app\usecases\Task\CreateTaskCommentService;
 use app\usecases\Task\CreateTaskService;
 use app\usecases\Task\ObserveTaskService;
+use app\usecases\Task\TaskService;
 use app\usecases\Task\TaskStateService;
 use app\usecases\Task\UpdateTaskService;
 use app\usecases\TaskHistory\TaskHistoryService;
@@ -38,6 +43,7 @@ use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 use yii\web\UnprocessableEntityHttpException;
+use yii\web\UploadedFile;
 
 class TaskController extends AppController
 {
@@ -51,6 +57,7 @@ class TaskController extends AppController
 	private TaskCommentRepository    $taskCommentRepository;
 	private ObserveTaskService       $observeTaskService;
 	private TaskHistoryService       $taskHistoryService;
+	private TaskService              $taskService;
 
 	public function __construct(
 		$id,
@@ -65,6 +72,7 @@ class TaskController extends AppController
 		TaskCommentRepository $taskCommentRepository,
 		ObserveTaskService $observeTaskService,
 		TaskHistoryService $taskHistoryService,
+		TaskService $taskService,
 		array $config = []
 	)
 	{
@@ -81,6 +89,8 @@ class TaskController extends AppController
 		$this->taskCommentRepository    = $taskCommentRepository;
 
 		$this->taskHistoryService = $taskHistoryService;
+
+		$this->taskService = $taskService;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -159,7 +169,9 @@ class TaskController extends AppController
 
 		$form->validateOrThrow();
 
-		$model = $this->createTaskService->create($form->getDto());
+		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK);
+
+		$model = $this->createTaskService->create($form->getDto(), $mediaForm->getDtos());
 
 		return new TaskResource($model);
 	}
@@ -195,7 +207,7 @@ class TaskController extends AppController
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 */
-	public function actionUpdate(int $id): TaskResource
+	public function actionUpdate(int $id): TaskWithRelationResource
 	{
 		$identity = $this->user->identity;
 
@@ -213,9 +225,11 @@ class TaskController extends AppController
 		$form->created_by_id = $model->created_by_id;
 		$form->validateOrThrow();
 
-		$model = $this->updateTaskService->update($model, $form->getDto(), $identity);
+		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK);
 
-		return new TaskResource($model);
+		$model = $this->updateTaskService->update($model, $form->getDto(), $identity, $mediaForm->getDtos());
+
+		return new TaskWithRelationResource($model);
 	}
 
 	/**
@@ -280,19 +294,20 @@ class TaskController extends AppController
 	 */
 	public function actionCreateComment(int $id): TaskCommentResource
 	{
-		$task = $this->repository->findModelById($id);
-
 		$form = new TaskCommentForm();
 
 		$form->setScenario(TaskCommentForm::SCENARIO_CREATE);
 
 		$form->load($this->request->post());
-		$form->task_id       = $task->id;
+		$form->task_id       = $id;
 		$form->created_by_id = $this->user->id;
 
+		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK_COMMENT);
+
+		$form->files = $mediaForm->files;
 		$form->validateOrThrow();
 
-		$model = $this->createTaskCommentService->create($form->getDto());
+		$model = $this->createTaskCommentService->create($form->getDto(), $mediaForm->getDtos());
 
 		return new TaskCommentResource($model);
 	}
@@ -384,6 +399,63 @@ class TaskController extends AppController
 		}
 	}
 
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionFiles(int $id): array
+	{
+		$task = $this->repository->findModelById($id);
+
+		return MediaResource::collection($task->files);
+	}
+
+	/**
+	 * @return MediaResource[]
+	 * @throws ValidateException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 */
+	public function actionCreateFiles(int $id): array
+	{
+		$task = $this->repository->findModelById($id);
+
+		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK);
+
+		$this->taskService->createFiles($task, $mediaForm->getDtos());
+
+		return MediaResource::collection($task->files);
+	}
+
+	/**
+	 * @return MediaResource[]|ErrorResponse
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws StaleObjectException
+	 */
+	public function actionDeleteFiles(int $id)
+	{
+		$task = $this->repository->findModelById($id);
+
+		$mediaForm = new MediaForm();
+
+		$mediaForm->setScenario(MediaForm::SCENARIO_DELETE);
+
+		$mediaForm->load($this->request->post());
+
+		$mediaForm->validateOrThrow();
+
+		try {
+			$this->taskService->deleteFiles($task, $mediaForm->getDtos());
+
+			return MediaResource::collection($task->files);
+		} catch (RelationNotExistsException $e) {
+			return $this->errorf("Файл %s не связан с данной задачей", $e->data);
+		}
+	}
+
+
 	/**
 	 * @throws ModelNotFoundException
 	 */
@@ -406,5 +478,25 @@ class TaskController extends AppController
 	protected function findModelByIdAndCreatedByOrUserId(int $id): Task
 	{
 		return $this->repository->findModelByIdAndCreatedByOrUserId($id, $this->user->id, $this->user->identity::getMorphClass());
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeMediaForm(string $category, string $name = 'files'): MediaForm
+	{
+		$form = new MediaForm();
+
+		$form->setScenario(MediaForm::SCENARIO_CREATE);
+
+		$form->category   = $category;
+		$form->model_id   = $this->user->id;
+		$form->model_type = $this->user->identity::getMorphClass();
+
+		$form->files = UploadedFile::getInstancesByName($name);
+
+		$form->validateOrThrow();
+
+		return $form;
 	}
 }

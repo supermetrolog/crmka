@@ -9,4 +9,5 @@ use yii\base\BaseObject;
 class UpdateTaskCommentDto extends BaseObject
 {
 	public string $message;
+	public array  $currentFiles;
 }

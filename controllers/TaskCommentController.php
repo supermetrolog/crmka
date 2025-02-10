@@ -7,7 +7,9 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Media\MediaForm;
 use app\models\forms\Task\TaskCommentForm;
+use app\models\Media;
 use app\models\search\TaskCommentSearch;
 use app\models\TaskComment;
 use app\resources\Task\TaskCommentResource;
@@ -15,6 +17,7 @@ use app\usecases\Task\TaskCommentService;
 use Throwable;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
+use yii\web\UploadedFile;
 
 class TaskCommentController extends AppController
 {
@@ -59,6 +62,7 @@ class TaskCommentController extends AppController
 	 * @param int $id
 	 *
 	 * @return TaskCommentResource
+	 * @throws Throwable
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws ValidateException
@@ -72,9 +76,13 @@ class TaskCommentController extends AppController
 		$form->setScenario(TaskCommentForm::SCENARIO_UPDATE);
 
 		$form->load($this->request->post());
+
+		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK_COMMENT);
+
+		$form->files = $mediaForm->files;
 		$form->validateOrThrow();
 
-		$model = $this->service->update($model, $form->getDto());
+		$model = $this->service->update($model, $form->getDto(), $mediaForm->getDtos());
 
 		return new TaskCommentResource($model);
 	}
@@ -103,5 +111,25 @@ class TaskCommentController extends AppController
 		}
 
 		throw new ModelNotFoundException('TaskComment not found');
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeMediaForm(string $category, string $name = 'files'): MediaForm
+	{
+		$form = new MediaForm();
+
+		$form->setScenario(MediaForm::SCENARIO_CREATE);
+
+		$form->category   = $category;
+		$form->model_id   = $this->user->id;
+		$form->model_type = $this->user->identity::getMorphClass();
+
+		$form->files = UploadedFile::getInstancesByName($name);
+
+		$form->validateOrThrow();
+
+		return $form;
 	}
 }
