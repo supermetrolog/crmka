@@ -67,7 +67,7 @@ class RelationService
 		}
 	}
 
-	public function checkIfExists(CreateRelationDto $dto): bool
+	public function checkRelationExists(CreateRelationDto $dto): bool
 	{
 		return Relation::find()
 		               ->byFirst($dto->first_id, $dto->first_type)
@@ -75,7 +75,7 @@ class RelationService
 		               ->exists();
 	}
 
-	public function checkIfExistsByModels(AR $firstModel, AR $secondModel): bool
+	public function checkRelationExistsByModels(AR $firstModel, AR $secondModel): bool
 	{
 		return Relation::find()
 		               ->byFirst($firstModel->id, $firstModel::getMorphClass())

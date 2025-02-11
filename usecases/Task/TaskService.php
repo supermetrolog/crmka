@@ -292,7 +292,7 @@ class TaskService
 			foreach ($dtos as $dto) {
 				$media = $this->mediaService->getById($dto->mediaId);
 
-				$relationIsExists = $this->relationService->checkIfExistsByModels($task, $media);
+				$relationIsExists = $this->relationService->checkRelationExistsByModels($task, $media);
 
 				if (!$relationIsExists) {
 					throw new RelationNotExistsException($task::getMorphClass(), Media::getMorphClass(), [$media->original_name]);

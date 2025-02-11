@@ -9,6 +9,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Media\DeleteMediaForm;
 use app\models\forms\Media\MediaForm;
 use app\models\forms\Task\TaskAssignForm;
 use app\models\forms\Task\TaskChangeStatusForm;
@@ -438,9 +439,7 @@ class TaskController extends AppController
 	{
 		$task = $this->repository->findModelById($id);
 
-		$mediaForm = new MediaForm();
-
-		$mediaForm->setScenario(MediaForm::SCENARIO_DELETE);
+		$mediaForm = new DeleteMediaForm();
 
 		$mediaForm->load($this->request->post());
 
@@ -486,8 +485,6 @@ class TaskController extends AppController
 	private function makeMediaForm(string $category, string $name = 'files'): MediaForm
 	{
 		$form = new MediaForm();
-
-		$form->setScenario(MediaForm::SCENARIO_CREATE);
 
 		$form->category   = $category;
 		$form->model_id   = $this->user->id;

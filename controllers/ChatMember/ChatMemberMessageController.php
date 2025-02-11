@@ -341,8 +341,6 @@ class ChatMemberMessageController extends AppController
 	{
 		$form = new MediaForm();
 
-		$form->setScenario(MediaForm::SCENARIO_CREATE);
-
 		$form->category   = $category;
 		$form->model_id   = $this->user->id;
 		$form->model_type = $this->user->identity::getMorphClass();
