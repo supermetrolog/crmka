@@ -194,7 +194,7 @@ class ChatMemberMessageController extends AppController
 
 		$taskDtos = [];
 
-		foreach ($this->request->post('tasks') ?? [] as $taskData) {
+		foreach ($this->request->post('tasks', []) as $taskData) {
 			$taskForm = new TaskForm();
 
 			$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
@@ -251,7 +251,7 @@ class ChatMemberMessageController extends AppController
 
 		$taskDtos = [];
 
-		foreach ($this->request->post('tasks') ?? [] as $taskData) {
+		foreach ($this->request->post('tasks', []) as $taskData) {
 			$taskForm = new TaskForm();
 
 			$taskForm->setScenario(TaskForm::SCENARIO_CREATE);

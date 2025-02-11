@@ -100,7 +100,7 @@ class SurveyController extends AppController
 
 		$answerDtos = [];
 
-		foreach ($this->request->post('question_answers') ?? [] as $questionAnswer) {
+		foreach ($this->request->post('question_answers', []) as $questionAnswer) {
 			$surveyQuestionAnswerForm = $this->makeQuestionAnswerForm($questionAnswer);
 			$answerDtos[]             = $surveyQuestionAnswerForm->getDto();
 		}
@@ -155,7 +155,7 @@ class SurveyController extends AppController
 
 		$answerDtos = [];
 
-		foreach ($this->request->post('question_answers') ?? [] as $questionAnswer) {
+		foreach ($this->request->post('question_answers', []) as $questionAnswer) {
 			$form         = $this->makeQuestionAnswerForm($questionAnswer);
 			$answerDtos[] = $form->getDto();
 		}
