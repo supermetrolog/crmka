@@ -4,6 +4,8 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
+use app\models\ActiveQuery\MediaQuery;
+use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskCommentQuery;
 use app\models\ActiveQuery\TaskHistoryQuery;
 use app\models\ActiveQuery\TaskQuery;
@@ -38,6 +40,7 @@ use yii\db\ActiveQuery;
  * @property TaskObserver       $targetUserObserver
  * @property-read ?TaskHistory  $lastHistory
  * @property-read TaskComment[] $lastComments
+ * @property Media[]            $files
  */
 class Task extends AR
 {
@@ -165,6 +168,26 @@ class Task extends AR
 	}
 
 	/**
+	 * @throws ErrorException
+	 */
+	public function getRelationFirstMany(): RelationQuery
+	{
+		/** @var RelationQuery */
+		return $this->morphHasMany(Relation::class, 'id', 'first');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFiles(): MediaQuery
+	{
+		/**@var MediaQuery */
+		return $this->morphHasManyVia(Media::class, 'id', 'second')
+		            ->andOnCondition([Media::field('deleted_at') => null])
+		            ->via('relationFirstMany');
+	}
+
+	/**
 	 * @return ActiveQuery
 	 * @throws ErrorException
 	 */
@@ -228,6 +251,14 @@ class Task extends AR
 		return $this->getObservers()->select('user_id')->column();
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFileIds(): array
+	{
+		return $this->getFiles()->select('id')->column();
+	}
+
 	public function getLastHistory(): TaskHistoryQuery
 	{
 		/** @var TaskHistoryQuery */
@@ -274,5 +305,13 @@ class Task extends AR
 	public function canBeRestored(): bool
 	{
 		return $this->isDeleted();
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFilesCount(): int
+	{
+		return $this->getFiles()->count();
 	}
 }

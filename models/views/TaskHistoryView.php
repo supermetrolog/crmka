@@ -2,6 +2,7 @@
 
 namespace app\models\views;
 
+use app\models\Media;
 use app\models\TaskEvent;
 use app\models\TaskHistory;
 use app\models\TaskTag;
@@ -17,4 +18,7 @@ class TaskHistoryView extends TaskHistory
 
 	/** @var User[] */
 	public array $observers = [];
+
+	/** @var Media[] */
+	public array $files = [];
 }

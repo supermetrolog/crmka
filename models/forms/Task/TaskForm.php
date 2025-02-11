@@ -9,6 +9,7 @@ use app\dto\Task\CreateTaskForUsersDto;
 use app\dto\Task\UpdateTaskDto;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\models\Form\Form;
+use app\models\Media;
 use app\models\Task;
 use app\models\TaskTag;
 use app\models\User;
@@ -21,7 +22,7 @@ class TaskForm extends Form
 	public const SCENARIO_CREATE           = 'scenario_create';
 	public const SCENARIO_UPDATE           = 'scenario_update';
 
-	public $user_ids     = [];
+	public $user_ids      = [];
 	public $user_id;
 	public $created_by_type;
 	public $created_by_id;
@@ -29,9 +30,10 @@ class TaskForm extends Form
 	public $status;
 	public $start;
 	public $end;
-	public $tag_ids      = [];
-	public $observer_ids = [];
+	public $tag_ids       = [];
+	public $observer_ids  = [];
 	public $survey_id;
+	public $current_files = [];
 
 	public function rules(): array
 	{
@@ -52,7 +54,12 @@ class TaskForm extends Form
 				'exist',
 				'targetClass'     => TaskTag::class,
 				'targetAttribute' => ['tag_ids' => 'id'],
-			]]
+			]],
+			['current_files', 'each', 'rule' => [
+				'exist',
+				'targetClass'     => Media::class,
+				'targetAttribute' => ['current_files' => 'id']
+			]],
 		];
 	}
 
@@ -70,7 +77,7 @@ class TaskForm extends Form
 		return [
 			self::SCENARIO_CREATE           => [...$common, 'created_by_id', 'created_by_type', 'user_id', 'survey_id'],
 			self::SCENARIO_CREATE_FOR_USERS => [...$common, 'created_by_id', 'created_by_type', 'user_ids', 'survey_id'],
-			self::SCENARIO_UPDATE           => [...$common, 'user_id'],
+			self::SCENARIO_UPDATE           => [...$common, 'user_id', 'current_files'],
 		];
 	}
 
@@ -118,7 +125,8 @@ class TaskForm extends Form
 			'end'           => $this->end,
 			'tagIds'        => $this->tag_ids,
 			'observerIds'   => $this->observer_ids,
-			'created_by_id' => $this->created_by_id
+			'created_by_id' => $this->created_by_id,
+			'currentFiles'  => $this->current_files
 		]);
 	}
 }

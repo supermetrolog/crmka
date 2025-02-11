@@ -208,6 +208,9 @@ return
 				'POST,OPTIONS <id>/assign'        => 'assign',
 				'GET,OPTIONS <id>/history'        => 'history',
 				'PATCH,OPTIONS <id>/restore'      => 'restore',
+				'GET,OPTIONS <id>/files'          => 'files',
+				'POST,OPTIONS <id>/files'         => 'create-files',
+				'DELETE,OPTIONS <id>/files'       => 'delete-files'
 			],
 		],
 		[

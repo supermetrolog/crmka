@@ -6,7 +6,9 @@ namespace app\models\forms\Task;
 
 use app\dto\Task\CreateTaskCommentDto;
 use app\dto\TaskComment\UpdateTaskCommentDto;
+use app\helpers\validators\AnyValidator;
 use app\kernel\common\models\Form\Form;
+use app\models\Media;
 use app\models\Task;
 
 class TaskCommentForm extends Form
@@ -18,26 +20,40 @@ class TaskCommentForm extends Form
 	public $created_by_id;
 	public $message;
 
+	public $files         = [];
+	public $current_files = [];
+
 	public function rules(): array
 	{
 		return [
 			[['task_id', 'created_by_id'], 'integer'],
-			[['message'], 'required'],
 			[['task_id', 'created_by_id'], 'required', 'on' => self::SCENARIO_CREATE],
 			[['message'], 'string', 'max' => 511],
 			[['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
+			[
+				['message', 'files', 'current_files'],
+				AnyValidator::class,
+				'message' => 'Сообщение или список файлов должны быть заполнены',
+				'rule'    => 'required',
+			],
+			['current_files', 'each', 'rule' => [
+				'exist',
+				'targetClass'     => Media::class,
+				'targetAttribute' => ['current_files' => 'id'],
+			]],
 		];
 	}
 
 	public function scenarios(): array
 	{
 		$common = [
-			'message'
+			'message',
+			'files'
 		];
 
 		return [
 			self::SCENARIO_CREATE => [...$common, 'task_id', 'created_by_id'],
-			self::SCENARIO_UPDATE => [...$common],
+			self::SCENARIO_UPDATE => [...$common, 'current_files'],
 		];
 	}
 
@@ -53,7 +69,8 @@ class TaskCommentForm extends Form
 
 			default:
 				return new UpdateTaskCommentDto([
-					'message' => $this->message
+					'message'      => $this->message,
+					'currentFiles' => $this->current_files
 				]);
 		}
 	}

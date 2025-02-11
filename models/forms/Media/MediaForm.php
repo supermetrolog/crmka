@@ -24,10 +24,13 @@ class MediaForm extends Form
 		return [
 			[['category', 'model_type', 'model_id'], 'required'],
 			[['files'], 'each', 'rule' => ['file'], 'skipOnEmpty' => true],
-			['file', 'file', 'skipOnEmpty' => true],
+			['file', 'file', 'skipOnEmpty' => true]
 		];
 	}
 
+	/**
+	 * @return CreateMediaDto[]
+	 */
 	public function getDtos(): array
 	{
 		$dtos = [];

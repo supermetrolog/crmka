@@ -7,6 +7,7 @@ namespace app\resources\Task;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\TaskComment;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\Media\MediaResource;
 
 class TaskCommentResource extends JsonResource
 {
@@ -26,7 +27,8 @@ class TaskCommentResource extends JsonResource
 			'updated_at'    => $this->resource->updated_at,
 			'deleted_at'    => $this->resource->deleted_at,
 			'created_by_id' => $this->resource->created_by_id,
-			'created_by'    => UserShortResource::tryMake($this->resource->createdBy)->toArray()
+			'created_by'    => UserShortResource::tryMakeArray($this->resource->createdBy),
+			'files'         => MediaResource::collection($this->resource->files)
 		];
 	}
 }
