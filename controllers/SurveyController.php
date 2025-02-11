@@ -10,27 +10,35 @@ use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Survey\SurveyForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
 use app\models\search\SurveySearch;
+use app\repositories\QuestionRepository;
+use app\repositories\SurveyRepository;
 use app\resources\Survey\SurveyResource;
 use app\resources\Survey\SurveyShortResource;
 use app\resources\Survey\SurveyWithQuestionsResource;
 use app\usecases\Survey\SurveyService;
+use Exception;
 use Throwable;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
-use yii\web\NotFoundHttpException;
 
 class SurveyController extends AppController
 {
-	private SurveyService $service;
+	private SurveyService      $service;
+	private SurveyRepository   $repository;
+	private QuestionRepository $questionRepository;
 
 	public function __construct(
 		$id,
 		$module,
 		SurveyService $service,
+		SurveyRepository $repository,
+		QuestionRepository $questionRepository,
 		array $config = []
 	)
 	{
-		$this->service = $service;
+		$this->service            = $service;
+		$this->repository         = $repository;
+		$this->questionRepository = $questionRepository;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -51,7 +59,7 @@ class SurveyController extends AppController
 	 */
 	public function actionView(int $id): SurveyResource
 	{
-		$model = $this->service->getByIdOrThrow($id);
+		$model = $this->repository->findOneOrThrow($id);
 
 		return new SurveyResource($model);
 	}
@@ -61,8 +69,8 @@ class SurveyController extends AppController
 	 */
 	public function actionViewWithQuestions(int $id): SurveyWithQuestionsResource
 	{
-		$survey    = $this->service->getByIdWithRelationsOrThrow($id);
-		$questions = $this->service->getQuestionsWithAnswersBySurveyId($id);
+		$survey    = $this->repository->findOneByIdWithRelationsOrThrow($id);
+		$questions = $this->questionRepository->findAllBySurveyIdWithAnswers($id);
 
 		return new SurveyWithQuestionsResource($survey, $questions);
 	}
@@ -90,7 +98,8 @@ class SurveyController extends AppController
 
 	/**
 	 * @return SurveyShortResource
-	 * @throws \Exception
+	 * @throws Throwable
+	 * @throws Exception
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
@@ -121,15 +130,14 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @return SurveyShortResource
-	 * @throws \Exception
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws Exception
 	 */
 	public function actionUpdate(int $id): SurveyShortResource
 	{
-		$model = $this->service->getByIdOrThrow($id);
+		$model = $this->repository->findOneOrThrow($id);
 
 		$form = new SurveyForm();
 
@@ -144,14 +152,14 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @throws \Exception
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
-	 * @throws ValidateException|Throwable
+	 * @throws Throwable
+	 * @throws ValidateException
 	 */
 	public function actionUpdateWithSurveyQuestionAnswer(int $id): SurveyWithQuestionsResource
 	{
-		$survey = $this->service->getByIdOrThrow($id);
+		$survey = $this->repository->findOneOrThrow($id);
 
 		$answerDtos = [];
 
@@ -161,19 +169,19 @@ class SurveyController extends AppController
 		}
 
 		$survey    = $this->service->updateWithQuestionAnswer($survey, $answerDtos);
-		$questions = $this->service->getQuestionsWithAnswersBySurveyId($survey->id);
+		$questions = $this->questionRepository->findAllBySurveyIdWithAnswers($survey->id);
 
 		return new SurveyWithQuestionsResource($survey, $questions);
 	}
 
 	/**
-	 * @throws Throwable
+	 * @throws ModelNotFoundException
 	 * @throws StaleObjectException
-	 * @throws NotFoundHttpException
+	 * @throws Throwable
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$model = $this->service->getByIdOrThrow($id);
+		$model = $this->repository->findOneOrThrow($id);
 
 		$this->service->delete($model);
 
