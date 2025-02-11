@@ -21,6 +21,7 @@ use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\Alert;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
@@ -572,5 +573,24 @@ class ChatMemberMessageService
 		]);
 
 		return $this->create($chatMemberMessageDto);
+	}
+
+	public function getSystemMessageBySurveyIdAndTemplateAndChatMemberId(int $survey_id, string $template, int $to_chat_member_id): ?ChatMemberMessage
+	{
+		$chatMember = $this->chatMemberRepository->getSystemChatMember();
+
+		if (!$chatMember) {
+			return null;
+		}
+
+		return ChatMemberMessage::find()
+		                        ->notDeleted()
+		                        ->byFromChatMemberId($chatMember->id)
+		                        ->byToChatMemberId($to_chat_member_id)
+		                        ->byTemplate($template)
+		                        ->innerJoinWith(['surveys' => function (SurveyQuery $query) use ($survey_id) {
+			                        $query->byId($survey_id);
+		                        }])
+		                        ->one();
 	}
 }
