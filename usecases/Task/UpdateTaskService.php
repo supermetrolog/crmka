@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\usecases\Task;
 
 use app\components\EventManager;
+use app\dto\Media\CreateMediaDto;
 use app\dto\Task\UpdateTaskDto;
 use app\events\Task\UpdateTaskEvent;
 use app\helpers\ArrayHelper;
@@ -40,17 +41,19 @@ class UpdateTaskService
 	}
 
 	/**
+	 * @param CreateMediaDto[] $mediaDtos
+	 *
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function update(Task $task, UpdateTaskDto $dto, User $initiator): Task
+	public function update(Task $task, UpdateTaskDto $dto, User $initiator, array $mediaDtos = []): Task
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$changedAttributes = $this->trackChanges($task, $dto);
+			$changedAttributes = $this->trackChanges($task, $dto, $mediaDtos);
 
-			$this->taskService->update($task, $dto, $initiator);
+			$this->taskService->update($task, $dto, $initiator, $mediaDtos);
 
 			if (ArrayHelper::notEmpty($changedAttributes)) {
 				$this->eventManager->trigger(new UpdateTaskEvent($task, $initiator, $changedAttributes));
@@ -66,9 +69,11 @@ class UpdateTaskService
 	}
 
 	/**
+	 * @param CreateMediaDto[] $mediaDtos
+	 *
 	 * @throws ErrorException
 	 */
-	private function trackChanges(Task $task, UpdateTaskDto $dto): array
+	private function trackChanges(Task $task, UpdateTaskDto $dto, array $mediaDtos): array
 	{
 		$changedAttributes = $this->trackPrimitiveChanges($task, $dto);
 
@@ -78,6 +83,10 @@ class UpdateTaskService
 
 		if ($this->hasObserverChanges($task, $dto->observerIds)) {
 			$changedAttributes[] = TaskEvent::EVENT_TYPE_OBSERVERS_CHANGED;
+		}
+
+		if ($this->hasFilesChanges($task, $dto->currentFiles, $mediaDtos)) {
+			$changedAttributes[] = TaskEvent::EVENT_TYPE_FILES_CHANGED;
 		}
 
 		return $changedAttributes;
@@ -120,5 +129,22 @@ class UpdateTaskService
 		$oldObserverIds = $task->getUserIdsInObservers();
 
 		return !ArrayHelper::hasEqualsValues($oldObserverIds, $observerIds);
+	}
+
+	/**
+	 * @param int[]            $currentFileIds
+	 * @param CreateMediaDto[] $newMediaDtos
+	 *
+	 * @throws ErrorException
+	 */
+	private function hasFilesChanges(Task $task, array $currentFileIds, array $newMediaDtos): bool
+	{
+		if (ArrayHelper::notEmpty($newMediaDtos)) {
+			return true;
+		}
+
+		$oldFileIds = $task->getFileIds();
+
+		return !ArrayHelper::hasEqualsValues($oldFileIds, $currentFileIds);
 	}
 }

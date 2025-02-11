@@ -6,6 +6,7 @@ namespace app\usecases\Relation;
 
 use app\dto\Relation\CreateRelationDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\Relation;
@@ -64,6 +65,22 @@ class RelationService
 			$tx->rollback();
 			throw $th;
 		}
+	}
+
+	public function checkRelationExists(CreateRelationDto $dto): bool
+	{
+		return Relation::find()
+		               ->byFirst($dto->first_id, $dto->first_type)
+		               ->bySecond($dto->second_id, $dto->second_type)
+		               ->exists();
+	}
+
+	public function checkRelationExistsByModels(AR $firstModel, AR $secondModel): bool
+	{
+		return Relation::find()
+		               ->byFirst($firstModel->id, $firstModel::getMorphClass())
+		               ->bySecond($secondModel->id, $secondModel::getMorphClass())
+		               ->exists();
 	}
 
 	/**

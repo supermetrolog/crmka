@@ -10,18 +10,15 @@ use yii\data\ActiveDataProvider;
 
 class TaskCommentSearch extends Form
 {
-	public $id;
-	public $created_by_id;
 	public $task_id;
-	public $user_id;
+	public $created_by_id;
 
 	public $id_less_then;
-
 
 	public function rules(): array
 	{
 		return [
-			[['id', 'user_id', 'task_id', 'created_by_id', 'id_less_then'], 'integer']
+			[['task_id', 'created_by_id', 'id_less_then'], 'integer'],
 		];
 	}
 
@@ -31,7 +28,7 @@ class TaskCommentSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = TaskComment::find()->with('createdBy.userProfile')
+		$query = TaskComment::find()->with(['createdBy.userProfile', 'files'])
 		                    ->notDeleted()
 		                    ->limit(10)
 		                    ->orderBy([TaskComment::field('id') => SORT_DESC]);
@@ -45,10 +42,8 @@ class TaskCommentSearch extends Form
 		$this->validateOrThrow();
 
 		$query->andFilterWhere([
-			'id'            => $this->id,
-			'task_id'       => $this->task_id,
-			'created_by_id' => $this->created_by_id,
-			'user_id'       => $this->user_id
+			TaskComment::field('task_id')       => $this->task_id,
+			TaskComment::field('created_by_id') => $this->created_by_id,
 		]);
 
 		$query->andFilterWhere(['<', TaskComment::field('id'), $this->id_less_then]);
