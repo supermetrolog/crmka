@@ -17,4 +17,5 @@ class UpdateTaskDto extends BaseObject
 	public ?string $end   = null;
 	public array   $tagIds;
 	public array   $observerIds;
+	public array   $currentFiles;
 }

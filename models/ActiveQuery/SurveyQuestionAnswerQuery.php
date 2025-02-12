@@ -47,4 +47,12 @@ class SurveyQuestionAnswerQuery extends AQ
 	{
 		return $this->andWhere([SurveyQuestionAnswer::field('survey_id') => $surveyId]);
 	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function byQuestionAnswerId(int $questionAnswerId): SurveyQuestionAnswerQuery
+	{
+		return $this->andWhere([SurveyQuestionAnswer::field('question_answer_id') => $questionAnswerId]);
+	}
 }

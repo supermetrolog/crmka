@@ -7,6 +7,7 @@ namespace app\resources\Task;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\views\TaskHistoryView;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\Media\MediaResource;
 
 class TaskHistoryViewResource extends JsonResource
 {
@@ -32,6 +33,7 @@ class TaskHistoryViewResource extends JsonResource
 				'user'          => UserShortResource::make($this->resource->user)->toArray(),
 				'tags'          => TaskTagResource::collection($this->resource->tags),
 				'observers'     => UserShortResource::collection($this->resource->observers),
+				'files'         => MediaResource::collection($this->resource->files)
 			],
 			'prev_id'    => $this->resource->prev_id,
 			'task_id'    => $this->resource->task_id,

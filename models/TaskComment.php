@@ -3,7 +3,10 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\MediaQuery;
+use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskCommentQuery;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
@@ -18,6 +21,7 @@ use yii\db\ActiveQuery;
  * @property ?string $deleted_at
  *
  * @property User    $createdBy
+ * @property Media[] $files
  */
 class TaskComment extends AR
 {
@@ -32,7 +36,7 @@ class TaskComment extends AR
 	public function rules(): array
 	{
 		return [
-			[['message', 'created_by_id', 'task_id'], 'required'],
+			[['created_by_id', 'task_id'], 'required'],
 			[['created_by_id', 'task_id'], 'integer'],
 			[['message'], 'string'],
 			[['created_at', 'updated_at'], 'safe'],
@@ -61,6 +65,26 @@ class TaskComment extends AR
 	public function getTask(): ActiveQuery
 	{
 		return $this->hasOne(Task::class, ['id' => 'task_id']);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getRelationFirstMany(): RelationQuery
+	{
+		/** @var RelationQuery */
+		return $this->morphHasMany(Relation::class, 'id', 'first');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFiles(): MediaQuery
+	{
+		/**@var MediaQuery */
+		return $this->morphHasManyVia(Media::class, 'id', 'second')
+		            ->andOnCondition([Media::field('deleted_at') => null])
+		            ->via('relationFirstMany');
 	}
 
 	public static function find(): TaskCommentQuery

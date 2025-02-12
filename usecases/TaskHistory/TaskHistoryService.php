@@ -7,6 +7,7 @@ namespace app\usecases\TaskHistory;
 use app\dto\TaskHistory\TaskHistoryDto;
 use app\helpers\ArrayHelper;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\models\Media;
 use app\models\oldDb\User;
 use app\models\Task;
 use app\models\TaskHistory;
@@ -79,10 +80,13 @@ class TaskHistoryService
 			)
 		);
 
+		$fileIds = ArrayHelper::map($task->files, static fn($file) => $file->id);
+
 		return Json::encode([
 			'tag_ids'      => $task->getTagIds(),
 			'observer_ids' => $userIdsInObservers,
-			'observed_ids' => $observedUserIds
+			'observed_ids' => $observedUserIds,
+			'file_ids'     => $fileIds
 		]);
 	}
 
@@ -101,34 +105,37 @@ class TaskHistoryService
 			return [];
 		}
 
-		[$observerIds, $tagIds] = $this->collectRelatedIds($histories);
+		[$observerIds, $tagIds, $fileIds] = $this->collectRelatedIds($histories);
 
 		$observers = $this->dataProvider->getUsers($observerIds);
 		$tags      = $this->dataProvider->getTags($tagIds);
+		$files     = $this->dataProvider->getMedias($fileIds);
 
 		return ArrayHelper::map(
 			$histories,
-			fn(TaskHistoryView $history) => $this->injectIntoView($history, $observers, $tags)
+			fn(TaskHistoryView $history) => $this->injectIntoView($history, $observers, $tags, $files)
 		);
 	}
 
 	/**
 	 * @param User[]    $observers
 	 * @param TaskTag[] $tags
+	 * @param Media[]   $files
 	 */
-	private function injectIntoView(TaskHistoryView $historyView, array $observers, array $tags): TaskHistoryView
+	private function injectIntoView(TaskHistoryView $historyView, array $observers, array $tags, array $files): TaskHistoryView
 	{
 		$state = $historyView->getJsonState();
 
 		$historyView->observers = $this->mapRelatedData($state['observer_ids'] ?? [], $observers);
 		$historyView->tags      = $this->mapRelatedData($state['tag_ids'] ?? [], $tags);
+		$historyView->files     = $this->mapRelatedData($state['file_ids'] ?? [], $files);
 
 		return $historyView;
 	}
 
 	/**
-	 * @param int[]            $ids
-	 * @param (TaskTag|User)[] $items
+	 * @param int[]                  $ids
+	 * @param (TaskTag|User|Media)[] $items
 	 */
 	private function mapRelatedData(array $ids, array $items): array
 	{
@@ -145,6 +152,7 @@ class TaskHistoryService
 	{
 		$observerIds = [];
 		$tagIds      = [];
+		$fileIds     = [];
 
 		foreach ($histories as $history) {
 			$state = $history->getJsonState();
@@ -160,11 +168,18 @@ class TaskHistoryService
 					$tagIds[$tagId] = $tagId;
 				}
 			}
+
+			if (ArrayHelper::keyExists($state, 'file_ids') && ArrayHelper::notEmpty($state['file_ids'])) {
+				foreach ($state['file_ids'] as $fileId) {
+					$fileIds[$fileId] = $fileId;
+				}
+			}
 		}
 
 		return [
 			ArrayHelper::values($observerIds),
-			ArrayHelper::values($tagIds)
+			ArrayHelper::values($tagIds),
+			ArrayHelper::values($fileIds)
 		];
 	}
 }

@@ -10,32 +10,35 @@ use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Survey\SurveyForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
 use app\models\search\SurveySearch;
-use app\models\Survey;
+use app\repositories\QuestionRepository;
 use app\repositories\SurveyRepository;
 use app\resources\Survey\SurveyResource;
 use app\resources\Survey\SurveyShortResource;
 use app\resources\Survey\SurveyWithQuestionsResource;
 use app\usecases\Survey\SurveyService;
+use Exception;
 use Throwable;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
-use yii\web\NotFoundHttpException;
 
 class SurveyController extends AppController
 {
-	private SurveyService    $service;
-	private SurveyRepository $repository;
+	private SurveyService      $service;
+	private SurveyRepository   $repository;
+	private QuestionRepository $questionRepository;
 
 	public function __construct(
 		$id,
 		$module,
 		SurveyService $service,
 		SurveyRepository $repository,
+		QuestionRepository $questionRepository,
 		array $config = []
 	)
 	{
-		$this->service    = $service;
-		$this->repository = $repository;
+		$this->service            = $service;
+		$this->repository         = $repository;
+		$this->questionRepository = $questionRepository;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -52,11 +55,13 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @throws NotFoundHttpException
+	 * @throws ModelNotFoundException
 	 */
 	public function actionView(int $id): SurveyResource
 	{
-		return new SurveyResource($this->findModel($id));
+		$model = $this->repository->findOneOrThrow($id);
+
+		return new SurveyResource($model);
 	}
 
 	/**
@@ -64,14 +69,15 @@ class SurveyController extends AppController
 	 */
 	public function actionViewWithQuestions(int $id): SurveyWithQuestionsResource
 	{
-		$survey    = $this->service->getByIdWithRelationsOrThrow($id);
-		$questions = $this->service->getQuestionsWithAnswersBySurveyId($id);
+		$survey    = $this->repository->findOneByIdWithRelationsOrThrow($id);
+		$questions = $this->questionRepository->findAllBySurveyIdWithAnswers($id);
 
 		return new SurveyWithQuestionsResource($survey, $questions);
 	}
 
 	/**
 	 * @return SurveyShortResource
+	 * @throws \Exception
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
@@ -92,6 +98,8 @@ class SurveyController extends AppController
 
 	/**
 	 * @return SurveyShortResource
+	 * @throws Throwable
+	 * @throws Exception
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
@@ -101,16 +109,9 @@ class SurveyController extends AppController
 
 		$answerDtos = [];
 
-		foreach ($this->request->post('question_answers') ?? [] as $questionAnswer) {
-			$surveyQuestionAnswerForm = new SurveyQuestionAnswerForm();
-
-			$surveyQuestionAnswerForm->setScenario(SurveyQuestionAnswerForm::SCENARIO_CREATE_WITH_SURVEY);
-
-			$surveyQuestionAnswerForm->load($questionAnswer);
-
-			$surveyQuestionAnswerForm->validateOrThrow();
-
-			$answerDtos[] = $surveyQuestionAnswerForm->getDto();
+		foreach ($this->request->post('question_answers', []) as $questionAnswer) {
+			$surveyQuestionAnswerForm = $this->makeQuestionAnswerForm($questionAnswer);
+			$answerDtos[]             = $surveyQuestionAnswerForm->getDto();
 		}
 
 		// Create Survey
@@ -129,16 +130,14 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @param int $id
-	 *
-	 * @return SurveyShortResource
-	 * @throws NotFoundHttpException
+	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws Exception
 	 */
 	public function actionUpdate(int $id): SurveyShortResource
 	{
-		$model = $this->findModel($id);
+		$model = $this->repository->findOneOrThrow($id);
 
 		$form = new SurveyForm();
 
@@ -153,26 +152,55 @@ class SurveyController extends AppController
 	}
 
 	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
 	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionUpdateWithSurveyQuestionAnswer(int $id): SurveyWithQuestionsResource
+	{
+		$survey = $this->repository->findOneOrThrow($id);
+
+		$answerDtos = [];
+
+		foreach ($this->request->post('question_answers', []) as $questionAnswer) {
+			$form         = $this->makeQuestionAnswerForm($questionAnswer);
+			$answerDtos[] = $form->getDto();
+		}
+
+		$survey    = $this->service->updateWithQuestionAnswer($survey, $answerDtos);
+		$questions = $this->questionRepository->findAllBySurveyIdWithAnswers($survey->id);
+
+		return new SurveyWithQuestionsResource($survey, $questions);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
 	 * @throws StaleObjectException
-	 * @throws NotFoundHttpException
+	 * @throws Throwable
 	 */
 	public function actionDelete(int $id): SuccessResponse
 	{
-		$this->service->delete($this->findModel($id));
+		$model = $this->repository->findOneOrThrow($id);
+
+		$this->service->delete($model);
 
 		return new SuccessResponse();
 	}
 
 	/**
-	 * @throws NotFoundHttpException
+	 * @throws ValidateException
 	 */
-	protected function findModel(int $id): ?Survey
+	private function makeQuestionAnswerForm(array $formData): SurveyQuestionAnswerForm
 	{
-		if (($model = Survey::findOne($id)) !== null) {
-			return $model;
-		}
+		$form = new SurveyQuestionAnswerForm();
 
-		throw new NotFoundHttpException('The requested page does not exist.');
+		$form->setScenario(SurveyQuestionAnswerForm::SCENARIO_CREATE_WITH_SURVEY);
+
+		$form->load($formData);
+
+		$form->validateOrThrow();
+
+		return $form;
 	}
 }

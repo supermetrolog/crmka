@@ -14,6 +14,7 @@ use app\models\forms\Media\MediaForm;
 use app\models\forms\Notification\NotificationForm;
 use app\models\forms\Reminder\ReminderForm;
 use app\models\forms\Task\TaskForm;
+use app\models\Media;
 use app\models\search\ChatMemberMessageSearch;
 use app\resources\AlertResource;
 use app\resources\ChatMemberMessage\ChatMemberMessageResource;
@@ -76,17 +77,10 @@ class ChatMemberMessageController extends AppController
 
 		$form->from_chat_member_id = $this->user->identity->chatMember->id;
 
-		$mediaForm = new MediaForm();
-
-		$mediaForm->category   = ChatMemberMessage::DEFAULT_MEDIA_CATEGORY;
-		$mediaForm->model_id   = $this->user->id;
-		$mediaForm->model_type = $this->user->identity::getMorphClass();
-
-		$mediaForm->files = UploadedFile::getInstancesByName('files');
-
-		$mediaForm->validateOrThrow();
+		$mediaForm = $this->makeMediaForm(Media::CATEGORY_CHAT_MEMBER_MESSAGE);
 
 		$form->files = $mediaForm->files;
+
 		$form->validateOrThrow();
 
 		$model = $this->service->create($form->getDto(), $mediaForm->getDtos());
@@ -113,15 +107,7 @@ class ChatMemberMessageController extends AppController
 
 		$form->load($this->request->post());
 
-		$mediaForm = new MediaForm();
-
-		$mediaForm->category   = ChatMemberMessage::DEFAULT_MEDIA_CATEGORY;
-		$mediaForm->model_id   = $this->user->id;
-		$mediaForm->model_type = $this->user->identity::getMorphClass();
-
-		$mediaForm->files = UploadedFile::getInstancesByName('files');
-
-		$mediaForm->validateOrThrow();
+		$mediaForm = $this->makeMediaForm(Media::CATEGORY_CHAT_MEMBER_MESSAGE);
 
 		$form->files = $mediaForm->files;
 		$form->validateOrThrow();
@@ -148,17 +134,6 @@ class ChatMemberMessageController extends AppController
 	 */
 	public function actionCreateWithTask(): ChatMemberMessageResource
 	{
-		$taskForm = new TaskForm();
-
-		$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
-
-		$taskForm->load($this->request->post('task'));
-
-		$taskForm->created_by_id   = $this->user->id;
-		$taskForm->created_by_type = $this->user->identity::getMorphClass();
-
-		$taskForm->validateOrThrow();
-
 		$chatMemberMessageForm = new ChatMemberMessageForm();
 
 		$chatMemberMessageForm->setScenario(ChatMemberMessageForm::SCENARIO_CREATE);
@@ -168,6 +143,8 @@ class ChatMemberMessageController extends AppController
 		$chatMemberMessageForm->from_chat_member_id = $this->user->identity->chatMember->id;
 
 		$chatMemberMessageForm->validateOrThrow();
+
+		$taskForm = $this->makeTaskForm($this->request->post('task'));
 
 		$model = $this->service->createWithTask($chatMemberMessageForm->getDto(), $taskForm->getDto());
 
@@ -194,18 +171,8 @@ class ChatMemberMessageController extends AppController
 
 		$taskDtos = [];
 
-		foreach ($this->request->post('tasks') ?? [] as $taskData) {
-			$taskForm = new TaskForm();
-
-			$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
-
-			$taskForm->load($taskData);
-
-			$taskForm->created_by_id   = $this->user->id;
-			$taskForm->created_by_type = $this->user->identity::getMorphClass();
-
-			$taskForm->validateOrThrow();
-
+		foreach ($this->request->post('tasks', []) as $taskData) {
+			$taskForm   = $this->makeTaskForm($taskData);
 			$taskDtos[] = $taskForm->getDto();
 		}
 
@@ -223,18 +190,10 @@ class ChatMemberMessageController extends AppController
 	{
 		$message = $this->findModel($id, false);
 
-		$taskForm = new TaskForm();
+		$taskForm  = $this->makeTaskForm($this->request->post());
+		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK);
 
-		$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
-
-		$taskForm->load($this->request->post());
-
-		$taskForm->created_by_id   = $this->user->id;
-		$taskForm->created_by_type = $this->user->identity::getMorphClass();
-
-		$taskForm->validateOrThrow();
-
-		$task = $this->service->createTask($message, $taskForm->getDto());
+		$task = $this->service->createTask($message, $taskForm->getDto(), $mediaForm->getDtos());
 
 		return TaskResource::make($task);
 	}
@@ -251,18 +210,8 @@ class ChatMemberMessageController extends AppController
 
 		$taskDtos = [];
 
-		foreach ($this->request->post('tasks') ?? [] as $taskData) {
-			$taskForm = new TaskForm();
-
-			$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
-
-			$taskForm->load($taskData);
-
-			$taskForm->created_by_id   = $this->user->id;
-			$taskForm->created_by_type = $this->user->identity::getMorphClass();
-
-			$taskForm->validateOrThrow();
-
+		foreach ($this->request->post('tasks', []) as $taskData) {
+			$taskForm   = $this->makeTaskForm($taskData);
 			$taskDtos[] = $taskForm->getDto();
 		}
 
@@ -384,5 +333,43 @@ class ChatMemberMessageController extends AppController
 		}
 
 		throw new NotFoundHttpException('The requested model does not exist.');
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeMediaForm(string $category, string $name = 'files'): MediaForm
+	{
+		$form = new MediaForm();
+
+		$form->category   = $category;
+		$form->model_id   = $this->user->id;
+		$form->model_type = $this->user->identity::getMorphClass();
+
+		$form->files = UploadedFile::getInstancesByName($name);
+
+		$form->validateOrThrow();
+
+		return $form;
+	}
+
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeTaskForm(array $taskData): TaskForm
+	{
+		$taskForm = new TaskForm();
+
+		$taskForm->setScenario(TaskForm::SCENARIO_CREATE);
+
+		$taskForm->load($taskData);
+
+		$taskForm->created_by_id   = $this->user->id;
+		$taskForm->created_by_type = $this->user->identity::getMorphClass();
+
+		$taskForm->validateOrThrow();
+
+		return $taskForm;
 	}
 }

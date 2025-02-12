@@ -9,11 +9,20 @@ use app\dto\SurveyQuestionAnswer\UpdateSurveyQuestionAnswerDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\SurveyQuestionAnswer;
 use Throwable;
+use yii\base\ErrorException;
 use yii\db\StaleObjectException;
 use yii\helpers\Json;
 
 class SurveyQuestionAnswerService
 {
+	/**
+	 * @throws ErrorException
+	 */
+	public function getBySurveyIdAndQuestionAnswerId(int $surveyId, int $questionAnswerId): ?SurveyQuestionAnswer
+	{
+		return SurveyQuestionAnswer::find()->bySurveyId($surveyId)->byQuestionAnswerId($questionAnswerId)->one();
+	}
+
 	/**
 	 * @throws SaveModelException
 	 */
@@ -38,7 +47,7 @@ class SurveyQuestionAnswerService
 		$model->load([
 			'question_answer_id' => $dto->question_answer_id,
 			'survey_id'          => $dto->survey_id,
-			'value'              => !empty($dto->value) ? Json::encode($dto->value) : null,
+			'value'              => !is_null($dto->value) ? Json::encode($dto->value) : null,
 		]);
 
 		$model->saveOrThrow();
