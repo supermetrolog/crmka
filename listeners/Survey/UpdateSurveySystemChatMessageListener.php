@@ -12,6 +12,7 @@ use app\models\ChatMemberMessage;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\usecases\ChatMember\ChatMemberMessageService;
+use app\usecases\Task\TaskService;
 use Throwable;
 use yii\base\ErrorException;
 use yii\base\Event;
@@ -24,12 +25,19 @@ class UpdateSurveySystemChatMessageListener implements EventListenerInterface
 	private ChatMemberMessageService     $chatMemberMessageService;
 	private EffectStrategyFactory        $effectStrategyFactory;
 	private TransactionBeginnerInterface $transactionBeginner;
+	private TaskService                  $taskService;
 
-	public function __construct(ChatMemberMessageService $chatMemberMessageService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
+	public function __construct(
+		ChatMemberMessageService $chatMemberMessageService,
+		EffectStrategyFactory $effectStrategyFactory,
+		TransactionBeginnerInterface $transactionBeginner,
+		TaskService $taskService
+	)
 	{
 		$this->chatMemberMessageService = $chatMemberMessageService;
 		$this->effectStrategyFactory    = $effectStrategyFactory;
 		$this->transactionBeginner      = $transactionBeginner;
+		$this->taskService              = $taskService;
 	}
 
 	/**
@@ -61,6 +69,7 @@ class UpdateSurveySystemChatMessageListener implements EventListenerInterface
 	 */
 	public function handleEffects(Survey $survey, ChatMemberMessage $message): void
 	{
+		/** @var QuestionAnswer[] $questionAnswers */
 		$questionAnswers = $survey->getQuestionAnswers()
 		                          ->with(['effects', 'surveyQuestionAnswer' => function (SurveyQuestionAnswerQuery $query) use ($survey) {
 			                          $query->bySurveyId($survey->id);
@@ -71,8 +80,14 @@ class UpdateSurveySystemChatMessageListener implements EventListenerInterface
 
 		try {
 			foreach ($questionAnswers as $answer) {
+				$tasks = $answer->surveyQuestionAnswer->tasks;
+
+				foreach ($tasks as $task) {
+					$this->taskService->delete($task);
+				}
+
 				foreach ($answer->effects as $effect) {
-					if ($this->effectStrategyFactory->hasStrategy($effect->kind) && $this->checkIfAnswerMustBeHandled($answer)) {
+					if ($this->effectStrategyFactory->hasStrategy($effect->kind)) {
 						$this->effectStrategyFactory->createStrategy($effect->kind)
 						                            ->handle($survey, $answer, $message);
 					}
@@ -84,13 +99,5 @@ class UpdateSurveySystemChatMessageListener implements EventListenerInterface
 			$tx->rollBack();
 			throw $th;
 		}
-	}
-
-	/**
-	 * @throws ErrorException
-	 */
-	private function checkIfAnswerMustBeHandled(QuestionAnswer $questionAnswer): bool
-	{
-		return !$questionAnswer->surveyQuestionAnswer->getTasks()->exists();
 	}
 }
