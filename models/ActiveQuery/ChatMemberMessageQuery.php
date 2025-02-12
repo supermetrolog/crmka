@@ -33,8 +33,18 @@ class ChatMemberMessageQuery extends AQ
 		return $this->andWhere([$this->field('from_chat_member_id') => $id]);
 	}
 
+	public function byToChatMemberId(int $id): self
+	{
+		return $this->andWhere([$this->field('to_chat_member_id') => $id]);
+	}
+
 	public function notDeleted(): self
 	{
 		return $this->andWhereNull($this->field('deleted_at'));
+	}
+
+	public function byTemplate(string $template): self
+	{
+		return $this->andWhere([$this->field('template') => $template]);
 	}
 }

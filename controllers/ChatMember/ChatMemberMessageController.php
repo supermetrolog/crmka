@@ -135,6 +135,7 @@ class ChatMemberMessageController extends AppController
 	public function actionCreateWithTask(): ChatMemberMessageResource
 	{
 		$chatMemberMessageForm = new ChatMemberMessageForm();
+
 		$chatMemberMessageForm->setScenario(ChatMemberMessageForm::SCENARIO_CREATE);
 
 		$chatMemberMessageForm->load($this->request->post());
@@ -170,7 +171,7 @@ class ChatMemberMessageController extends AppController
 
 		$taskDtos = [];
 
-		foreach ($this->request->post('tasks') ?? [] as $taskData) {
+		foreach ($this->request->post('tasks', []) as $taskData) {
 			$taskForm   = $this->makeTaskForm($taskData);
 			$taskDtos[] = $taskForm->getDto();
 		}
@@ -209,7 +210,7 @@ class ChatMemberMessageController extends AppController
 
 		$taskDtos = [];
 
-		foreach ($this->request->post('tasks') ?? [] as $taskData) {
+		foreach ($this->request->post('tasks', []) as $taskData) {
 			$taskForm   = $this->makeTaskForm($taskData);
 			$taskDtos[] = $taskForm->getDto();
 		}
