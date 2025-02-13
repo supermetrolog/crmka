@@ -168,9 +168,11 @@ class ArrayHelper
 	}
 
 	/**
+	 * Accepts sorted array of integers and distributes value to all of them starting from left to right
+	 *
 	 * @param int[] $array
 	 *
-	 * @return int[]
+	 * @return int[] Distributed array
 	 */
 	public static function toDistributedValue(array $array, int $value): array
 	{
@@ -193,10 +195,15 @@ class ArrayHelper
 
 				$value -= $needed;
 			} else {
-				$gap = $value / ($i + 1);
+				$gap      = floor($value / ($i + 1));
+				$leftover = $value % ($i + 1);
 
 				for ($j = 0; $j < $i + 1; $j++) {
 					$result[$j] += $gap;
+
+					if ($j < $leftover) {
+						$result[$j]++;
+					}
 				}
 
 				break;
