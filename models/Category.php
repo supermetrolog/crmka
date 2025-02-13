@@ -16,15 +16,25 @@ use yii\db\ActiveQuery;
  */
 class Category extends AR
 {
-	public const CATEGORY_CLIENT = 0;
+	public const CATEGORY_CLIENT       = 0;
+	public const CATEGORY_INTERMEDIARY = 1;
+	public const CATEGORY_MONITORING   = 2;
+	public const CATEGORY_OWNER        = 3;
+	public const CATEGORY_APPRAISER    = 4;
+	public const CATEGORY_CONTRACTOR   = 5;
 
 	private const CATEGORY_NAMES = [
-		self::CATEGORY_CLIENT => 'Клиент',
+		self::CATEGORY_CLIENT       => 'Клиент',
+		self::CATEGORY_INTERMEDIARY => 'Посредник',
+		self::CATEGORY_MONITORING   => 'Мониторинг',
+		self::CATEGORY_OWNER        => 'Собственник',
+		self::CATEGORY_APPRAISER    => 'Оценщик',
+		self::CATEGORY_CONTRACTOR   => 'Подрядчик',
 	];
 
 	public static function getCategoryName(int $category): string
 	{
-		return self::CATEGORY_NAMES[$category] ?? '';
+		return self::CATEGORY_NAMES[$category] ?? "Категория №$category";
 	}
 
 	/**

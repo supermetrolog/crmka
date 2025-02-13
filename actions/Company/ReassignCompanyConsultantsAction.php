@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\actions\Company;
 
 use app\helpers\ArrayHelper;
+use app\helpers\StringHelper;
 use app\kernel\common\actions\Action;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
@@ -23,7 +24,6 @@ use yii\helpers\BaseConsole;
 
 /**
  * This action is used to assign companies with selected category and active requests and with archived consultants to active consultants.
- *
  */
 class ReassignCompanyConsultantsAction extends Action
 {
@@ -39,7 +39,10 @@ class ReassignCompanyConsultantsAction extends Action
 	];
 
 	// Company category can be changed if needed
-	private const COMPANY_CATEGORY = Category::CATEGORY_CLIENT;
+	private const COMPANY_CATEGORIES = [
+		Category::CATEGORY_CLIENT,
+		Category::CATEGORY_OWNER,
+	];
 
 	private UserRepository               $userRepository;
 	private TransactionBeginnerInterface $transactionBeginner;
@@ -66,29 +69,43 @@ class ReassignCompanyConsultantsAction extends Action
 	public function run(): void
 	{
 		$this->info('Start reassigning companies to consultants...');
-		$this->commentf('Company filters: category = "%s", Active Requests Count > 0', Category::getCategoryName(self::COMPANY_CATEGORY));
+		$this->printCompanyFilters();
 		$this->delimiter();
 
-		$companiesCountToAssign = (int)$this->createCompaniesQuery()->count();
+		$companiesCountToAssign = (int)$this->createNotAssignedCompaniesQuery()->count();
 
 		if ($companiesCountToAssign > 0) {
-			$this->infof('Companies count to assign: %d', $companiesCountToAssign);
+			$this->infof('Not assigned companies count with selected filters: %d', $companiesCountToAssign);
 			$this->delimiter();
 
-			$this->assignCompaniesToConsultants($companiesCountToAssign);
+			$this->distributeCompaniesToActiveConsultants($companiesCountToAssign, self::ACTIVE_CONSULTANT_USERNAMES);
 		} else {
 			$this->infof('No companies to assign, skipping...');
 		}
 	}
 
+	private function printCompanyFilters(): void
+	{
+		$this->commentf(
+			'Company filters: category = "%s", Active Requests Count > 0',
+			StringHelper::join(
+				StringHelper::SPACED_COMMA,
+				...ArrayHelper::map(
+				self::COMPANY_CATEGORIES,
+				static fn(int $category) => Category::getCategoryName($category)))
+		);
+	}
+
 	/**
+	 * @param string[] $activeConsultantUsernames
+	 *
 	 * @throws ErrorException
 	 * @throws Throwable
 	 */
-	private function assignCompaniesToConsultants(int $companiesCountToAssign): void
+	private function distributeCompaniesToActiveConsultants(int $companiesCountToAssign, array $activeConsultantUsernames): void
 	{
 		try {
-			[$processedConsultants, $processedConsultantsCompaniesCounts] = $this->getProcessedConsultants();
+			$consultantsWhoNeedProcessing = $this->findConsultantsWhoNeedProcessing($activeConsultantUsernames);
 		} catch (ModelNotFoundException $th) {
 			$this->warning('Assigning companies to consultants canceled: ' . $th->getMessage());
 
@@ -97,17 +114,22 @@ class ReassignCompanyConsultantsAction extends Action
 
 		$this->delimiter();
 
-		$distributedCompanies      = ArrayHelper::toDistributedValue(ArrayHelper::values($processedConsultantsCompaniesCounts), $companiesCountToAssign);
-		$processedConsultantsCount = ArrayHelper::length($processedConsultants);
+		$distributedCompanies = ArrayHelper::toDistributedValue(
+			ArrayHelper::column($consultantsWhoNeedProcessing, 'companiesCount'),
+			$companiesCountToAssign
+		);
 
-		$this->infof('Assigning companies to %d active consultants...', $processedConsultantsCount);
+		$consultantsWhoNeedProcessingCount = ArrayHelper::length($consultantsWhoNeedProcessing);
+
+		$this->infof('Assigning %d companies to %d active consultants...', $companiesCountToAssign, $consultantsWhoNeedProcessingCount);
 
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			for ($currentConsultantKey = 0; $currentConsultantKey < $processedConsultantsCount; $currentConsultantKey++) {
-				$consultant                = $processedConsultants[$currentConsultantKey];
-				$consultantCompaniesCount  = $processedConsultantsCompaniesCounts[$consultant->id];
+			for ($currentConsultantKey = 0; $currentConsultantKey < $consultantsWhoNeedProcessingCount; $currentConsultantKey++) {
+				$consultant               = $consultantsWhoNeedProcessing[$currentConsultantKey]->consultant;
+				$consultantCompaniesCount = $consultantsWhoNeedProcessing[$currentConsultantKey]->companiesCount;
+
 				$distributedCompaniesCount = $distributedCompanies[$currentConsultantKey];
 
 				if ($consultantCompaniesCount !== $distributedCompaniesCount) {
@@ -115,7 +137,7 @@ class ReassignCompanyConsultantsAction extends Action
 
 					$this->assignCompaniesToConsultant(
 						$consultant,
-						(int)$neededCompaniesCount,
+						$neededCompaniesCount,
 						$consultantCompaniesCount
 					);
 				}
@@ -135,29 +157,29 @@ class ReassignCompanyConsultantsAction extends Action
 	}
 
 	/**
-	 * @return array{User[], int[]}
+	 * @param string[] $consultantUsernames
+	 *
+	 * @return ProcessingConsultantDto[]
 	 * @throws ModelNotFoundException
 	 * @throws ErrorException
 	 */
-	private function getProcessedConsultants(): array
+	private function findConsultantsWhoNeedProcessing(array $consultantUsernames): array
 	{
 		$this->info('Current statistics:');
 
 		$averageCompaniesCountPerConsultant = $this->getAverageCompaniesCountPerConsultant();
 
 		$this->commentf('Average companies count per active consultant: %d', $averageCompaniesCountPerConsultant);
-		$this->commentf('Finding consultants with less companies than average: %d', $averageCompaniesCountPerConsultant);
+		$this->delimiter();
+		$this->info('Finding consultants with less companies than average...');
 
-		$consultants             = [];
-		$consultantsCompaniesMap = [];
+		$consultantsWithCompaniesCount = [];
 
-		$totalCompaniesCount = 0;
-
-		foreach (self::ACTIVE_CONSULTANT_USERNAMES as $activeConsultantUsername) {
-			$consultant = $this->userRepository->getByUsername($activeConsultantUsername);
+		foreach ($consultantUsernames as $username) {
+			$consultant = $this->userRepository->getByUsername($username);
 
 			if (is_null($consultant)) {
-				$this->warning('No consultant found with username: ' . $activeConsultantUsername);
+				$this->warning('No consultant found with username: ' . $username);
 
 				$confirmed = $this->confirm('Continue assign companies to consultants?');
 
@@ -165,14 +187,16 @@ class ReassignCompanyConsultantsAction extends Action
 					continue;
 				}
 
-				throw new ModelNotFoundException(sprintf('No consultant found with username "%s" ', $activeConsultantUsername));
+				throw new ModelNotFoundException(sprintf('No consultant found with username "%s" ', $username));
 			}
 
-			$companiesCount = (int)$this->createCompaniesQueryByConsultantId($consultant->id)->count();
+			$companiesCount = $this->getConsultantCompaniesCount($consultant);
 
 			if ($companiesCount < $averageCompaniesCountPerConsultant) {
-				$consultants[]                            = $consultant;
-				$consultantsCompaniesMap[$consultant->id] = $companiesCount;
+				$consultantsWithCompaniesCount[] = new ProcessingConsultantDto([
+					'consultant'     => $consultant,
+					'companiesCount' => $companiesCount
+				]);
 
 				$processSymbol = '+';
 				$color         = BaseConsole::FG_GREEN;
@@ -181,11 +205,9 @@ class ReassignCompanyConsultantsAction extends Action
 				$color         = BaseConsole::FG_GREY;
 			}
 
-			$totalCompaniesCount += $companiesCount;
-
 			$this->print(
 				sprintf(
-					'%s Companies already assigned to %s (%s): %d',
+					'%s Now %s (%s) has %d companies with selected filters',
 					$processSymbol,
 					$consultant->userProfile->getMediumName(),
 					$consultant->username,
@@ -195,24 +217,20 @@ class ReassignCompanyConsultantsAction extends Action
 			);
 		}
 
-		$this->commentf('Total companies already assigned to consultants: %d', $totalCompaniesCount);
+		usort($consultantsWithCompaniesCount, static fn(ProcessingConsultantDto $a, ProcessingConsultantDto $b) => $a->companiesCount - $b->companiesCount);
 
-
-		return [
-			$consultants,
-			$consultantsCompaniesMap
-		];
+		return $consultantsWithCompaniesCount;
 	}
 
 	/**
 	 * @throws Throwable
 	 */
-	private function assignCompaniesToConsultant(User $consultant, int $assignedCompaniesCount, int $currentCompaniesCount): void
+	private function assignCompaniesToConsultant(User $consultant, int $neededCompaniesCount, int $currentCompaniesCount): void
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$query                       = $this->createCompaniesQuery()->limit($assignedCompaniesCount);
+			$query                       = $this->createNotAssignedCompaniesQuery()->limit($neededCompaniesCount);
 			$totalAssignedCompaniesCount = 0;
 
 			foreach ($query->batch(50) as $companies) {
@@ -225,11 +243,11 @@ class ReassignCompanyConsultantsAction extends Action
 			$tx->commit();
 
 			$this->commentf(
-				'Companies assigned to %s (%s): %d (+%d)',
+				'%d companies assigned to %s (%s), final companies count: %d',
+				$totalAssignedCompaniesCount,
 				$consultant->userProfile->getMediumName(),
 				$consultant->username,
-				$totalAssignedCompaniesCount + $currentCompaniesCount,
-				$totalAssignedCompaniesCount
+				$totalAssignedCompaniesCount + $currentCompaniesCount
 			);
 		} catch (Throwable $th) {
 			$tx->rollBack();
@@ -237,38 +255,41 @@ class ReassignCompanyConsultantsAction extends Action
 		}
 	}
 
-	private function createBaseCompaniesQuery(): CompanyQuery
+	// Create query for companies with active requests and filter by category
+	private function createCompaniesQuery(): CompanyQuery
 	{
 		return Company::find()
 		              ->innerJoinWith(['requests' => function (RequestQuery $query) {
 			              return $query->andOnCondition([Request::field('status') => Request::STATUS_ACTIVE]);
 		              }])
 		              ->innerJoinWith(['categories' => function (ActiveQuery $query) {
-			              return $query->andOnCondition([Category::field('category') => self::COMPANY_CATEGORY]);
+			              return $query->andOnCondition([Category::field('category') => self::COMPANY_CATEGORIES]);
 		              }]);
 	}
 
-	private function createCompaniesQuery(): CompanyQuery
+	private function createNotAssignedCompaniesQuery(): CompanyQuery
 	{
-		return $this->createBaseCompaniesQuery()
+		return $this->createCompaniesQuery()
 		            ->innerJoinWith(['consultant' => function (UserQuery $query) {
 			            return $query->andOnCondition(['!=', User::field('status'), User::STATUS_ACTIVE]);
 		            }]);
 	}
 
+	private function getAverageCompaniesCountPerConsultant(): int
+	{
+		$allCompaniesCount = (int)$this->createCompaniesQuery()->count();
+
+		return (int)ceil($allCompaniesCount / ArrayHelper::length(self::ACTIVE_CONSULTANT_USERNAMES));
+	}
+
 	/**
 	 * @throws ErrorException
 	 */
-	private function createCompaniesQueryByConsultantId(int $consultantId): CompanyQuery
+	private function getConsultantCompaniesCount(User $consultant): int
 	{
-		return $this->createBaseCompaniesQuery()->andWhere([Company::field('consultant_id') => $consultantId]);
-	}
-
-	private function getAverageCompaniesCountPerConsultant(): int
-	{
-		$allCompaniesCount = (int)$this->createBaseCompaniesQuery()->count();
-
-		return (int)ceil($allCompaniesCount / ArrayHelper::length(self::ACTIVE_CONSULTANT_USERNAMES));
+		return (int)$this->createCompaniesQuery()
+		                 ->andWhere([Company::field('consultant_id') => $consultant->id])
+		                 ->count();
 	}
 
 }
