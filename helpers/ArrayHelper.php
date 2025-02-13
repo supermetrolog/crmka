@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use Exception;
+use InvalidArgumentException;
 use yii\helpers\ArrayHelper as YiiArrayHelper;
 
 class ArrayHelper
@@ -176,13 +177,31 @@ class ArrayHelper
 	 */
 	public static function toDistributedValue(array $array, int $value): array
 	{
+		if ($value < 0) {
+			throw new InvalidArgumentException('Value must be positive');
+		}
+
+		if ($value === 0) {
+			return [...$array];
+		}
+
+		$size = self::length($array);
+
+		if ($size === 0) {
+			return [];
+		}
+
 		/** @var int[] $result */
 		$result = [...$array];
-		$size   = self::length($array);
 
 		for ($i = 0; $i < $size; $i++) {
 			if ($i < ($size - 1)) {
-				$gap    = $result[$i + 1] - $result[$i];
+				$gap = $result[$i + 1] - $result[$i];
+
+				if ($gap < 0) {
+					throw new InvalidArgumentException('Array is not sorted');
+				}
+
 				$needed = ($i + 1) * $gap;
 			} else {
 				$needed = $value + 1;
@@ -195,7 +214,7 @@ class ArrayHelper
 
 				$value -= $needed;
 			} else {
-				$gap      = floor($value / ($i + 1));
+				$gap      = (int)floor($value / ($i + 1));
 				$leftover = $value % ($i + 1);
 
 				for ($j = 0; $j < $i + 1; $j++) {

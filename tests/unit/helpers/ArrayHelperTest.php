@@ -55,7 +55,7 @@ class ArrayHelperTest extends TestCase
 				[2, 2, 2, 2],
 				9,
 				[5, 4, 4, 4]
-			]
+			],
 		];
 	}
 }
