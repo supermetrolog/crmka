@@ -4,17 +4,18 @@ namespace app\components\EffectStrategy\Strategies;
 
 use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\components\EffectStrategy\Service\CreateEffectTaskService;
+use app\enum\EffectKind;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
-use app\models\ObjectChatMember;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
+use Exception;
 use Throwable;
 
-class ObjectHasEquipmentForSaleEffectStrategy extends AbstractEffectStrategy
+class ObjectFreeAreaMustBeEditedEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = 'Объект #%s - есть оборудование под продажу, нужно обработать.';
+	private const TASK_MESSAGE_TEXT = 'Объект #%s, свободная площадь в аренду, %s.';
 
 	private CreateEffectTaskService $effectTaskService;
 
@@ -34,18 +35,29 @@ class ObjectHasEquipmentForSaleEffectStrategy extends AbstractEffectStrategy
 	 */
 	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
-		$chatMemberModel = $survey->chatMember->model;
-
 		$this->effectTaskService->createTaskForMessage(
 			$surveyChatMemberMessage,
 			$survey->user,
 			$surveyQuestionAnswer,
-			$this->getTaskMessage($chatMemberModel)
+			$this->getTaskMessage($survey)
 		);
 	}
 
-	public function getTaskMessage(ObjectChatMember $objectChatMember): string
+	/**
+	 * @throws Exception
+	 */
+	public function getTaskMessage(Survey $survey): string
 	{
-		return sprintf(self::TASK_MESSAGE_TEXT, $objectChatMember->object_id);
+		$chatMemberModel = $survey->chatMember->model;
+
+		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::OBJECT_FREE_AREA_MUST_BE_EDITED_DESCRIPTION);
+
+		if ($surveyQuestionAnswerDescription) {
+			$description = $surveyQuestionAnswerDescription->getString() ?? 'подробности в опроснике';
+		} else {
+			$description = 'подробности в опроснике';
+		}
+
+		return sprintf(self::TASK_MESSAGE_TEXT, $chatMemberModel->object_id, $description);
 	}
 }

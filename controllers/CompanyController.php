@@ -107,8 +107,8 @@ class CompanyController extends AppController
 
 		$companyMiniModelsForm = new CompanyMiniModelsForm();
 		$companyMiniModelsForm->load([
-			'productRanges' => $this->request->post('productRanges') ?? [],
-			'categories'    => $this->request->post('categories') ?? [],
+			'productRanges' => $this->request->post('productRanges', []),
+			'categories'    => $this->request->post('categories', []),
 		]);
 		$companyMiniModelsForm->validateOrThrow();
 
@@ -157,8 +157,8 @@ class CompanyController extends AppController
 
 		$companyMiniModelsForm = new CompanyMiniModelsForm();
 		$companyMiniModelsForm->load([
-			'productRanges' => $this->request->post('productRanges') ?? [],
-			'categories'    => $this->request->post('categories') ?? [],
+			'productRanges' => $this->request->post('productRanges', []),
+			'categories'    => $this->request->post('categories', []),
 		]);
 		$companyMiniModelsForm->validateOrThrow();
 

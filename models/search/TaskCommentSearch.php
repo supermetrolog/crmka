@@ -17,7 +17,7 @@ class TaskCommentSearch extends Form
 
 	public $limit = 10;
 
-
+  
 	public function rules(): array
 	{
 		return [
@@ -32,7 +32,7 @@ class TaskCommentSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = TaskComment::find()->with('createdBy.userProfile')
+		$query = TaskComment::find()->with(['createdBy.userProfile', 'files'])
 		                    ->notDeleted()
 		                    ->limit($this->limit)
 		                    ->orderBy([TaskComment::field('id') => SORT_DESC]);
@@ -46,8 +46,8 @@ class TaskCommentSearch extends Form
 		$this->validateOrThrow();
 
 		$query->andFilterWhere([
-			'task_id'       => $this->task_id,
-			'created_by_id' => $this->created_by_id
+			TaskComment::field('task_id')       => $this->task_id,
+			TaskComment::field('created_by_id') => $this->created_by_id,
 		]);
 
 		$query->andFilterWhere(['<', TaskComment::field('id'), $this->id_less_then]);

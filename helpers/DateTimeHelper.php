@@ -35,6 +35,18 @@ class DateTimeHelper
 	/**
 	 * @throws Exception
 	 */
+	public static function tryMakef(?string $datetime, string $format = 'Y-m-d H:i:s'): ?string
+	{
+		if (!$datetime) {
+			return null;
+		}
+
+		return self::makef($datetime, $format);
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public static function make(string $datetime): DateTimeInterface
 	{
 		return new DateTime($datetime);

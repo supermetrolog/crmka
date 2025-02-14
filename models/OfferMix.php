@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\components\interfaces\OfferInterface;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\ComplexQuery;
 use app\models\ActiveQuery\ObjectChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use Throwable;
@@ -13,6 +14,7 @@ use yii\helpers\Json;
 
 /**
  * @property ChatMember $chatMember
+ * @property Complex    $complex
  */
 class OfferMix extends oldDb\OfferMix implements OfferInterface
 {
@@ -260,6 +262,14 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	/**
 	 * @return float
 	 */
+	public function getCeilingHeightMax(): float
+	{
+		return max($this->ceiling_height_min, $this->ceiling_height_max);
+	}
+
+	/**
+	 * @return float
+	 */
 	public function getPower(): float
 	{
 		if ($this->isBlock()) {
@@ -333,7 +343,7 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	 */
 	public function hasHeating(): bool
 	{
-		return $this->heated === 1 && in_array($this->heating, [self::HEATING_CENTRAL_STRING, self::HEATING_AUTO_STRING]);
+		return $this->heated === 1;
 	}
 
 	/**
@@ -341,11 +351,11 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	 */
 	public function getHeatingType(): int
 	{
-		if ($this->heating === self::HEATING_CENTRAL_STRING) {
+		if ($this->complex->heating_central) {
 			return self::HEATING_CENTRAL;
 		}
 
-		if ($this->heating === self::HEATING_AUTO_STRING) {
+		if ($this->complex->heating_autonomous) {
 			return self::HEATING_AUTO;
 		}
 
@@ -482,6 +492,15 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 
 		return $query;
 	}
+
+	public function getComplex(): ComplexQuery
+	{
+		/** @var ComplexQuery $query */
+		$query = $this->hasOne(Complex::class, ['id' => 'complex_id']);
+
+		return $query;
+	}
+
 
 	public function isDeleted(): bool
 	{

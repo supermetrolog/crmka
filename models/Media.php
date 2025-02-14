@@ -27,6 +27,10 @@ use yii\di\NotInstantiableException;
  */
 class Media extends AR
 {
+	public const CATEGORY_TASK                = 'task';
+	public const CATEGORY_TASK_COMMENT        = 'task_comment';
+	public const CATEGORY_CHAT_MEMBER_MESSAGE = 'chat_member_message';
+
 	protected bool $useSoftDelete = true;
 
 	public static function tableName(): string

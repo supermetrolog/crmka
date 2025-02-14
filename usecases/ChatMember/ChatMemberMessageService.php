@@ -21,6 +21,7 @@ use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\Alert;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
@@ -114,29 +115,15 @@ class ChatMemberMessageService
 
 			$message->saveOrThrow();
 
-			foreach ($dto->contactIds as $contactId) {
-				$this->linkRelation($message, Contact::getMorphClass(), $contactId);
-			}
-
-			foreach ($dto->tagIds as $tagId) {
-				$this->linkRelation($message, ChatMemberMessageTag::getMorphClass(), $tagId);
-			}
-
-			foreach ($dto->surveyIds as $surveyId) {
-				$this->linkRelation($message, Survey::getMorphClass(), $surveyId);
-			}
+			$this->linkRelations($message, Contact::getMorphClass(), $dto->contactIds);
+			$this->linkRelations($message, ChatMemberMessageTag::getMorphClass(), $dto->tagIds);
+			$this->linkRelations($message, Survey::getMorphClass(), $dto->surveyIds);
 
 			$message->refresh();
 
 			foreach ($mediaDtos as $mediaDto) {
 				$media = $this->createMediaService->create($mediaDto);
-
-				$this->relationService->create(new CreateRelationDto([
-					'first_type'  => $message::getMorphClass(),
-					'first_id'    => $message->id,
-					'second_type' => $media::getMorphClass(),
-					'second_id'   => $media->id,
-				]));
+				$this->linkRelation($message, $media::getMorphClass(), $media->id);
 			}
 
 			$this->markMessageAsRead($message, $message->fromChatMember);
@@ -165,6 +152,28 @@ class ChatMemberMessageService
 			'second_type' => $relationType,
 			'second_id'   => $relationId,
 		]));
+	}
+
+	/**
+	 * @param array<int|string> $relationIds
+	 *
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function linkRelations(ChatMemberMessage $message, string $relationType, array $relationIds): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			foreach ($relationIds as $relationId) {
+				$this->linkRelation($message, $relationType, $relationId);
+			}
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 
 	/**
@@ -243,13 +252,7 @@ class ChatMemberMessageService
 
 			foreach ($mediaDtos as $mediaDto) {
 				$media = $this->createMediaService->create($mediaDto);
-
-				$this->relationService->create(new CreateRelationDto([
-					'first_type'  => $message::getMorphClass(),
-					'first_id'    => $message->id,
-					'second_type' => $media::getMorphClass(),
-					'second_id'   => $media->id,
-				]));
+				$this->linkRelation($message, $media::getMorphClass(), $media->id);
 			}
 
 			$tx->commit();
@@ -313,16 +316,18 @@ class ChatMemberMessageService
 	}
 
 	/**
+	 * @param CreateMediaDto[] $mediaDtos
+	 *
 	 * @throws SaveModelException
 	 * @throws Exception
 	 * @throws Throwable
 	 */
-	public function createTask(ChatMemberMessage $message, CreateTaskDto $createTaskDto): Task
+	public function createTask(ChatMemberMessage $message, CreateTaskDto $createTaskDto, array $mediaDtos = []): Task
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$task = $this->createTaskService->create($createTaskDto);
+			$task = $this->createTaskService->create($createTaskDto, $mediaDtos);
 
 			$this->linkRelation($message, Task::getMorphClass(), $task->id);
 
@@ -394,13 +399,7 @@ class ChatMemberMessageService
 
 		try {
 			$alert = $this->createAlertService->create($createAlertDto);
-
-			$this->relationService->create(new CreateRelationDto([
-				'first_type'  => $message::getMorphClass(),
-				'first_id'    => $message->id,
-				'second_type' => $alert::getMorphClass(),
-				'second_id'   => $alert->id,
-			]));
+			$this->linkRelation($message, $alert::getMorphClass(), $alert->id);
 
 			$tx->commit();
 
@@ -534,10 +533,11 @@ class ChatMemberMessageService
 	 */
 	private function markChatAsLatestForModel(int $chat_id, string $model_type, int $model_id): void
 	{
+		/** @var ChatMember $chatMember */
 		$chatMember = ChatMember::find()
 		                        ->byModelType($model_type)
 		                        ->byModelId($model_id)
-		                        ->one();
+		                        ->oneOrThrow();
 
 		$this->markChatAsLatestForMember($chat_id, $chatMember->id);
 	}
@@ -572,5 +572,24 @@ class ChatMemberMessageService
 		]);
 
 		return $this->create($chatMemberMessageDto);
+	}
+
+	public function getSystemMessageBySurveyIdAndTemplateAndChatMemberId(int $survey_id, string $template, int $to_chat_member_id): ?ChatMemberMessage
+	{
+		$chatMember = $this->chatMemberRepository->getSystemChatMember();
+
+		if (!$chatMember) {
+			return null;
+		}
+
+		return ChatMemberMessage::find()
+		                        ->notDeleted()
+		                        ->byFromChatMemberId($chatMember->id)
+		                        ->byToChatMemberId($to_chat_member_id)
+		                        ->byTemplate($template)
+		                        ->innerJoinWith(['surveys' => function (SurveyQuery $query) use ($survey_id) {
+			                        $query->byId($survey_id);
+		                        }])
+		                        ->one();
 	}
 }

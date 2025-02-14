@@ -15,9 +15,17 @@ class MediaRepository
 	public function findModelByIdAndModel(int $id, int $modelId, string $modelType): Media
 	{
 		return Media::find()
-		               ->byId($id)
-		               ->notDeleted()
-		               ->byMorph($modelId, $modelType)
-		               ->oneOrThrow();
+		            ->byId($id)
+		            ->notDeleted()
+		            ->byMorph($modelId, $modelType)
+		            ->oneOrThrow();
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function findOneOrThrow(int $id)
+	{
+		return Media::find()->notDeleted()->byId($id)->oneOrThrow();
 	}
 }

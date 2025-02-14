@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\QuestionQuery;
@@ -9,6 +10,7 @@ use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
 use app\models\ActiveQuery\TaskQuery;
+use Exception;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
@@ -122,6 +124,16 @@ class Survey extends AR
 		return $this->morphHasManyVia(Task::class, 'id', 'first')
 		            ->andOnCondition([Task::field('deleted_at') => null])
 		            ->via('relationSecond');
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function getSurveyQuestionAnswerByEffectKind(string $effectKind): ?SurveyQuestionAnswer
+	{
+		return $this->getSurveyQuestionAnswers()->innerJoinWith(['questionAnswer.effects' => function (AQ $query) use ($effectKind) {
+			return $query->andWhere([Effect::field('kind') => $effectKind]);
+		}])->one();
 	}
 
 	public static function find(): SurveyQuery

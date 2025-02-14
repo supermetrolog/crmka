@@ -208,6 +208,9 @@ return
 				'POST,OPTIONS <id>/assign'        => 'assign',
 				'GET,OPTIONS <id>/history'        => 'history',
 				'PATCH,OPTIONS <id>/restore'      => 'restore',
+				'GET,OPTIONS <id>/files'          => 'files',
+				'POST,OPTIONS <id>/files'         => 'create-files',
+				'DELETE,OPTIONS <id>/files'       => 'delete-files'
 			],
 		],
 		[
@@ -307,13 +310,14 @@ return
 			'controller'    => 'survey',
 			'except'        => [],
 			'extraPatterns' => [
-				'GET,OPTIONS'                              => 'index',
-				'GET,OPTIONS <id>'                         => 'view',
-				'GET,OPTIONS <id>/with-questions'          => 'view-with-questions',
-				'POST,OPTIONS'                             => 'create',
-				'POST,OPTIONS with-survey-question-answer' => 'create-with-survey-question-answer',
-				'PUT,OPTIONS <id>'                         => 'update',
-				'DELETE,OPTIONS <id>'                      => 'delete',
+				'GET,OPTIONS'                                  => 'index',
+				'GET,OPTIONS <id>'                             => 'view',
+				'GET,OPTIONS <id>/with-questions'              => 'view-with-questions',
+				'POST,OPTIONS'                                 => 'create',
+				'POST,OPTIONS with-survey-question-answer'     => 'create-with-survey-question-answer',
+				'PUT,OPTIONS <id>'                             => 'update',
+				'PUT,OPTIONS <id>/with-survey-question-answer' => 'update-with-survey-question-answer',
+				'DELETE,OPTIONS <id>'                          => 'delete',
 			],
 		],
 		[
