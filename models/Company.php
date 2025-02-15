@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\helpers\StringHelper;
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
@@ -22,64 +23,66 @@ use yii\db\Expression;
 /**
  * This is the model class for table "company".
  *
- * @property int                        $id
- * @property string|null                $nameEng
- * @property string|null                $nameRu
- * @property string|null                $nameBrand
- * @property int|null                   $noName
- * @property int|null                   $formOfOrganization
- * @property int|null                   $companyGroup_id
- * @property string|null                $officeAdress
- * @property int|null                   $status
- * @property int                        $consultant_id
- * @property int|null                   $broker_id
- * @property string|null                $legalAddress
- * @property string|null                $ogrn
- * @property string|null                $inn
- * @property string|null                $kpp
- * @property string|null                $checkingAccount
- * @property string|null                $correspondentAccount
- * @property string|null                $inTheBank
- * @property string|null                $bik
- * @property string|null                $okved
- * @property string|null                $okpo
- * @property string|null                $signatoryName
- * @property string|null                $signatoryMiddleName
- * @property string|null                $signatoryLastName
- * @property string|null                $basis
- * @property string|null                $documentNumber
- * @property int                        $activityGroup
- * @property int                        $activityProfile
- * @property int                        $active
- * @property int|null                   $processed
- * @property int                        $rating
- * @property string|null                $description
- * @property int|null                   $passive_why
- * @property string|null                $passive_why_comment
- * @property string|null                $created_at
- * @property string|null                $updated_at
- * @property string|null                $latitude
- * @property string|null                $longitude
- * @property ?int                       $media_id
- * @property bool                       $is_individual
- * @property ?string                    $individual_full_name
+ * @property int                           $id
+ * @property string|null                   $nameEng
+ * @property string|null                   $nameRu
+ * @property string|null                   $nameBrand
+ * @property int|null                      $noName
+ * @property int|null                      $formOfOrganization
+ * @property int|null                      $companyGroup_id
+ * @property string|null                   $officeAdress
+ * @property int|null                      $status
+ * @property int                           $consultant_id
+ * @property int|null                      $broker_id
+ * @property string|null                   $legalAddress
+ * @property string|null                   $ogrn
+ * @property string|null                   $inn
+ * @property string|null                   $kpp
+ * @property string|null                   $checkingAccount
+ * @property string|null                   $correspondentAccount
+ * @property string|null                   $inTheBank
+ * @property string|null                   $bik
+ * @property string|null                   $okved
+ * @property string|null                   $okpo
+ * @property string|null                   $signatoryName
+ * @property string|null                   $signatoryMiddleName
+ * @property string|null                   $signatoryLastName
+ * @property string|null                   $basis
+ * @property string|null                   $documentNumber
+ * @property int                           $activityGroup
+ * @property int                           $activityProfile
+ * @property int                           $active
+ * @property int|null                      $processed
+ * @property int                           $rating
+ * @property string|null                   $description
+ * @property int|null                      $passive_why
+ * @property string|null                   $passive_why_comment
+ * @property string|null                   $created_at
+ * @property string|null                   $updated_at
+ * @property string|null                   $latitude
+ * @property string|null                   $longitude
+ * @property ?int                          $media_id
+ * @property bool                          $is_individual
+ * @property ?string                       $individual_full_name
  *
- * @property-read ?User                 $broker
- * @property-read ?Companygroup         $companyGroup
- * @property-read User                  $consultant
- * @property-read ?Media                $logo
- * @property-read Contact               $mainContact
- * @property-read Contact[]             $contacts
- * @property-read Category[]            $categories
- * @property-read Productrange[]        $productRanges
- * @property-read \app\models\Objects[] $objects
- * @property-read Request[]             $requests
- * @property-read Deal[]                $deals
- * @property-read Deal[]                $dealsRequestEmpty
- * @property-read CompanyFile[]         $files
- * @property-read Contact               $generalContact
- * @property-read ChatMember            $chatMember
- * @property-read ?Call                 $lastCall
+ * @property-read ?User                    $broker
+ * @property-read ?Companygroup            $companyGroup
+ * @property-read User                     $consultant
+ * @property-read ?Media                   $logo
+ * @property-read Contact                  $mainContact
+ * @property-read Contact[]                $contacts
+ * @property-read Category[]               $categories
+ * @property-read Productrange[]           $productRanges
+ * @property-read \app\models\Objects[]    $objects
+ * @property-read Request[]                $requests
+ * @property-read Deal[]                   $deals
+ * @property-read Deal[]                   $dealsRequestEmpty
+ * @property-read CompanyFile[]            $files
+ * @property-read Contact                  $generalContact
+ * @property-read ChatMember               $chatMember
+ * @property-read ?Call                    $lastCall
+ * @property-read CompanyActivityGroup[]   $companyActivityGroups
+ * @property-read CompanyActivityProfile[] $companyActivityProfiles
  */
 class Company extends AR
 {
@@ -454,6 +457,18 @@ class Company extends AR
 		/** @var CallQuery */
 		return $this->morphHasOneVia(Call::class, 'id', 'second')
 		            ->via('lastCallRelationFirst');
+	}
+
+	public function getCompanyActivityGroups(): AQ
+	{
+		/** @var AQ */
+		return $this->hasMany(CompanyActivityGroup::class, ['company_id' => 'id']);
+	}
+
+	public function getCompanyActivityProfiles(): AQ
+	{
+		/** @var AQ */
+		return $this->hasMany(CompanyActivityProfile::class, ['company_id' => 'id']);
 	}
 
 

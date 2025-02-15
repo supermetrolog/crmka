@@ -157,7 +157,7 @@ class StringHelper
 
 	public static function toLower(string $string): string
 	{
-		return strtolower($string);
+		return mb_strtolower($string);
 	}
 
 	/** @return string[] */

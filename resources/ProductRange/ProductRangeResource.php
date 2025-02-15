@@ -18,6 +18,8 @@ class ProductRangeResource extends JsonResource
 
 	public function toArray(): array
 	{
-		return [$this->resource->product];
+		return [
+			'product' => $this->resource->getProductName()
+		];
 	}
 }

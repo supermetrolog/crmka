@@ -166,4 +166,14 @@ class ArrayHelper
 	{
 		return self::unique(self::column($array, $key));
 	}
+
+	/**
+	 * @param int[]|string[] $array
+	 *
+	 * @return array
+	 */
+	public static function flip(array $array): array
+	{
+		return array_flip($array);
+	}
 }

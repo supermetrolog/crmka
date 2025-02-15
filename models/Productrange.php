@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;
 use yii\db\ActiveQuery;
 
@@ -58,5 +59,10 @@ class Productrange extends AR
 	public function getCompany(): ActiveQuery
 	{
 		return $this->hasOne(Company::class, ['id' => 'company_id']);
+	}
+
+	public function getProductName(): string
+	{
+		return StringHelper::toLower(StringHelper::trim($this->product));
 	}
 }
