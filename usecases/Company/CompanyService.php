@@ -376,7 +376,7 @@ class CompanyService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function createActivityGroups(Company $company, array $activityGroupIds): void
+	public function createActivityGroups(Company $company, array $activityGroupIds): void
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -404,7 +404,7 @@ class CompanyService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function createActivityProfiles(Company $company, array $activityProfileIds): void
+	public function createActivityProfiles(Company $company, array $activityProfileIds): void
 	{
 		$tx = $this->transactionBeginner->begin();
 
