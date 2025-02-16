@@ -261,10 +261,10 @@ class ReassignCompanyConsultantsAction extends Action
 		return Company::find()
 		              ->innerJoinWith(['requests' => function (RequestQuery $query) {
 			              return $query->andOnCondition([Request::field('status') => Request::STATUS_ACTIVE]);
-		              }])
+		              }], false)
 		              ->innerJoinWith(['categories' => function (ActiveQuery $query) {
 			              return $query->andOnCondition([Category::field('category') => self::COMPANY_CATEGORIES]);
-		              }]);
+		              }], false);
 	}
 
 	private function createNotAssignedCompaniesQuery(): CompanyQuery
@@ -272,7 +272,7 @@ class ReassignCompanyConsultantsAction extends Action
 		return $this->createCompaniesQuery()
 		            ->innerJoinWith(['consultant' => function (UserQuery $query) {
 			            return $query->andOnCondition(['!=', User::field('status'), User::STATUS_ACTIVE]);
-		            }]);
+		            }], false);
 	}
 
 	private function getAverageCompaniesCountPerConsultant(): int
