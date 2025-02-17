@@ -127,6 +127,14 @@ class ArrayHelper
 		return array_key_exists($needle, $array);
 	}
 
+	/**
+	 * @param array[] $array
+	 */
+	public static function filterKeyExists(array $array, $needle): array
+	{
+		return self::filter($array, static fn($el) => self::keyExists($el, $needle));
+	}
+
 	public static function hasEqualsValues(array $array1, array $array2): bool
 	{
 		if (self::length($array1) !== self::length($array2)) {
