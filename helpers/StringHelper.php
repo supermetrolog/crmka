@@ -93,7 +93,7 @@ class StringHelper
 	 */
 	public static function ucFirst(string $string): string
 	{
-		return self::toUpper(self::slice($string, 0, 1)) . self::slice($string, 1);
+		return self::toUpper(self::substr($string, 0, 1)) . self::substr($string, 1);
 	}
 
 	/**
@@ -101,10 +101,10 @@ class StringHelper
 	 */
 	public static function lcFirst(string $string): string
 	{
-		return self::toLower(self::slice($string, 0, 1)) . self::slice($string, 1);
+		return self::toLower(self::substr($string, 0, 1)) . self::substr($string, 1);
 	}
 
-	public static function slice(string $string, int $start, ?int $length = null): string
+	public static function substr(string $string, int $start, ?int $length = null): string
 	{
 		return mb_substr($string, $start, $length);
 	}

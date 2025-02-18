@@ -92,9 +92,4 @@ class SQLHelper
 	{
 		return "%\"$value\"%";
 	}
-
-	public static function trim(string $value): string
-	{
-		return "TRIM($value)";
-	}
 }
