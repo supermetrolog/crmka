@@ -82,10 +82,6 @@ class StringHelper
 
 	/**
 	 * Returns first symbol in string
-	 *
-	 * @param string $string
-	 *
-	 * @return string
 	 */
 	public static function first(string $string): string
 	{
@@ -93,13 +89,24 @@ class StringHelper
 	}
 
 	/**
-	 * @param string $string
-	 *
-	 * @return string
+	 * Make a string's first character uppercase
 	 */
 	public static function ucFirst(string $string): string
 	{
-		return ucfirst($string);
+		return self::toUpper(self::slice($string, 0, 1)) . self::slice($string, 1);
+	}
+
+	/**
+	 * Make a string's first character lowercase
+	 */
+	public static function lcFirst(string $string): string
+	{
+		return self::toLower(self::slice($string, 0, 1)) . self::slice($string, 1);
+	}
+
+	public static function slice(string $string, int $start, ?int $length = null): string
+	{
+		return mb_substr($string, $start, $length);
 	}
 
 	/**
@@ -130,6 +137,21 @@ class StringHelper
 		return ctype_digit($string);
 	}
 
+	public static function isOnlyCharacters(string $string): bool
+	{
+		return preg_match('/^[\pL]+$/u', $string) === 1;
+	}
+
+	public static function isOnlyUpper(string $string): bool
+	{
+		return self::toUpper($string) === $string;
+	}
+
+	public static function isAbbreviation(string $string): bool
+	{
+		return self::length($string) > 1 && self::isOnlyUpper($string) && self::isOnlyCharacters($string);
+	}
+
 	public static function extractDigits(string $string): string
 	{
 		return preg_replace('/[^0-9]/', '', $string);
@@ -147,7 +169,7 @@ class StringHelper
 
 	public static function substrCount(string $haystack, string $needle): int
 	{
-		return substr_count($haystack, $needle);
+		return mb_substr_count($haystack, $needle);
 	}
 
 	public static function explode(string $delimiter, string $string): array
@@ -158,6 +180,11 @@ class StringHelper
 	public static function toLower(string $string): string
 	{
 		return mb_strtolower($string);
+	}
+
+	public static function toUpper(string $string): string
+	{
+		return mb_strtoupper($string);
 	}
 
 	/** @return string[] */
