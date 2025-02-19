@@ -9,7 +9,7 @@ class ArrayHelperTest extends TestCase
 {
 	/**
 	 * @covers       ArrayHelper::toDistributedValue
-	 * @dataProvider providerToDistributedValue
+	 * @dataProvider providerDistributeValue
 	 */
 	public function testToDistributedValue(array $input, int $value, array $expected): void
 	{
@@ -18,7 +18,18 @@ class ArrayHelperTest extends TestCase
 		$this->assertEquals($expected, $result);
 	}
 
-	public static function providerToDistributedValue(): array
+	/**
+	 * @covers       ArrayHelper::distributeValue
+	 * @dataProvider providerDistributeValue
+	 */
+	public function testDistributeValue(array $input, int $value, array $expected): void
+	{
+		ArrayHelper::distributeValue($input, $value);
+
+		$this->assertEquals($expected, $input);
+	}
+
+	public static function providerDistributeValue(): array
 	{
 		return [
 			'basic case'                 => [

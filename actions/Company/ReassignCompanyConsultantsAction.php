@@ -114,10 +114,8 @@ class ReassignCompanyConsultantsAction extends Action
 
 		$this->delimiter();
 
-		$distributedCompanies = ArrayHelper::toDistributedValue(
-			ArrayHelper::column($consultantsWhoNeedProcessing, 'companiesCount'),
-			$companiesCountToAssign
-		);
+		$distributedCompanies = ArrayHelper::column($consultantsWhoNeedProcessing, 'companiesCount');
+		ArrayHelper::distributeValue($distributedCompanies, $companiesCountToAssign);
 
 		$consultantsWhoNeedProcessingCount = ArrayHelper::length($consultantsWhoNeedProcessing);
 
@@ -230,12 +228,18 @@ class ReassignCompanyConsultantsAction extends Action
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$query                       = $this->createNotAssignedCompaniesQuery()->limit($neededCompaniesCount);
+			$query                       = $this->createNotAssignedCompaniesQuery();
 			$totalAssignedCompaniesCount = 0;
 
-			foreach ($query->batch(50) as $companies) {
-				$companiesIds                = ArrayHelper::column($companies, 'id');
-				$totalAssignedCompaniesCount += ArrayHelper::length($companiesIds);
+			$limit = min(50, $neededCompaniesCount);
+
+			while ($totalAssignedCompaniesCount < $neededCompaniesCount) {
+				$companies = $query->limit($limit)->all();
+
+				$totalAssignedCompaniesCount += $limit;
+				$limit                       = min($limit, $neededCompaniesCount - $totalAssignedCompaniesCount);
+
+				$companiesIds = ArrayHelper::column($companies, 'id');
 
 				Company::updateAll(['consultant_id' => $consultant->id], ['id' => $companiesIds]);
 			}
@@ -256,6 +260,10 @@ class ReassignCompanyConsultantsAction extends Action
 	}
 
 	// Create query for companies with active requests and filter by category
+
+	/**
+	 * @throws ErrorException
+	 */
 	private function createCompaniesQuery(): CompanyQuery
 	{
 		return Company::find()
@@ -264,7 +272,8 @@ class ReassignCompanyConsultantsAction extends Action
 		              }], false)
 		              ->innerJoinWith(['categories' => function (ActiveQuery $query) {
 			              return $query->andOnCondition([Category::field('category') => self::COMPANY_CATEGORIES]);
-		              }], false);
+		              }], false)
+		              ->groupBy(Company::field('id'));
 	}
 
 	private function createNotAssignedCompaniesQuery(): CompanyQuery

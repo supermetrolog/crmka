@@ -172,31 +172,26 @@ class ArrayHelper
 	 * Accepts sorted array of integers and distributes value to all of them starting from left to right
 	 *
 	 * @param int[] $array
-	 *
-	 * @return int[] Distributed array
 	 */
-	public static function toDistributedValue(array $array, int $value): array
+	public static function distributeValue(array &$array, int $value): void
 	{
 		if ($value < 0) {
 			throw new InvalidArgumentException('Value must be positive');
 		}
 
 		if ($value === 0) {
-			return [...$array];
+			return;
 		}
 
 		$size = self::length($array);
 
 		if ($size === 0) {
-			return [];
+			return;
 		}
-
-		/** @var int[] $result */
-		$result = [...$array];
 
 		for ($i = 0; $i < $size; $i++) {
 			if ($i < ($size - 1)) {
-				$gap = $result[$i + 1] - $result[$i];
+				$gap = $array[$i + 1] - $array[$i];
 
 				if ($gap < 0) {
 					throw new InvalidArgumentException('Array is not sorted');
@@ -209,7 +204,7 @@ class ArrayHelper
 
 			if ($value >= $needed) {
 				for ($j = 0; $j < $i + 1; $j++) {
-					$result[$j] += $gap;
+					$array[$j] += $gap;
 				}
 
 				$value -= $needed;
@@ -218,17 +213,40 @@ class ArrayHelper
 				$leftover = $value % ($i + 1);
 
 				for ($j = 0; $j < $i + 1; $j++) {
-					$result[$j] += $gap;
+					$array[$j] += $gap;
 
 					if ($j < $leftover) {
-						$result[$j]++;
+						$array[$j]++;
 					}
 				}
 
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Accepts sorted array of integers and distributes value to all of them starting from left to right
+	 *
+	 * @param int[] $array
+	 *
+	 * @return int[] New distributed array
+	 */
+	public static function toDistributedValue(array $array, int $value): array
+	{
+		/** @var int[] $result */
+		$result = [...$array];
+
+		self::distributeValue($result, $value);
 
 		return $result;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public static function reduce(array $array, callable $cb, $initialValue = null)
+	{
+		return array_reduce($array, $cb, $initialValue);
 	}
 }

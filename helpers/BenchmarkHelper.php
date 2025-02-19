@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use Yii;
+
 class BenchmarkHelper
 {
 	public static function getMicroTime(): float
@@ -40,18 +42,27 @@ class BenchmarkHelper
 	{
 		$times = [];
 
+		$executionTimeMin = INF;
+		$executionTimeMax = -INF;
+		$executionTimeSum = 0;
+
 		for ($i = 0; $i < $iterations; $i++) {
 			$startTime = self::getMicroTime();
 
 			$callback();
 
-			$times[] = self::getExecutionTime($startTime);
+			$executionTime = self::getExecutionTime($startTime);
+
+			$times[] = $executionTime;
+
+			$executionTimeSum += $executionTime;
+			$executionTimeMin = min($executionTimeMin, $executionTime);
+			$executionTimeMax = max($executionTimeMax, $executionTime);
 		}
 
-		$executionTimeAvg    = array_sum($times) / count($times);
-		$executionTimeMin    = min($times);
-		$executionTimeMax    = max($times);
-		$executionTimeStdDev = self::calculateStdDev($times);
+		$executionTimeAvg = $executionTimeSum / $iterations;
+
+		$executionTimeStdDev = self::calculateStdDev($executionTimeAvg, $times, $iterations);
 
 		if ($printExecutionTime) {
 			echo 'Test name: ' . $testName . PHP_EOL;
@@ -70,10 +81,13 @@ class BenchmarkHelper
 		];
 	}
 
-	private static function calculateStdDev(array $values): float
+	private static function calculateStdDev(int $avg, array $values, int $size): float
 	{
-		$mean     = array_sum($values) / count($values);
-		$variance = array_sum(array_map(static fn($x) => ($x - $mean) ** 2, $values)) / count($values);
+		$variance = ArrayHelper::reduce(
+				$values,
+				static fn($acc, $x) => $acc + (($x - $avg) ** 2),
+				0
+			) / $size;
 
 		return sqrt($variance);
 	}
@@ -85,10 +99,7 @@ class BenchmarkHelper
 
 	private static function formatMemory(int $bytes): string
 	{
-		$units  = ['B', 'KB', 'MB', 'GB'];
-		$factor = (int)floor(log($bytes, 1024));
-
-		return number_format($bytes / (1024 ** $factor), 2) . ' ' . $units[$factor];
+		return Yii::$app->formatter->asShortSize($bytes);
 	}
 
 	public static function createLog(array $results, string $filename = 'benchmark.log'): void
