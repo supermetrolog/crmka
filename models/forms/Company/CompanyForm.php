@@ -46,6 +46,8 @@ class CompanyForm extends Form
 	public $broker_id;
 
 	public $files                = [];
+	public $activity_group_ids   = [];
+	public $activity_profile_ids = [];
 	public $logo_id;
 	public $is_individual        = false;
 	public $individual_full_name = null;
@@ -54,7 +56,8 @@ class CompanyForm extends Form
 	{
 		return [
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating', 'logo_id'], 'integer'],
-			[['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
+			[['consultant_id', 'activityGroup', 'activityProfile', 'activity_group_ids', 'activity_profile_ids'], 'required'],
+			[['activity_group_ids', 'activity_profile_ids'], 'each', 'rule' => ['integer']],
 			[['nameRu', 'nameEng', 'noName'], 'validateCompanyName'],
 			[['description'], 'string'],
 			[['is_individual'], 'boolean'],
@@ -117,6 +120,8 @@ class CompanyForm extends Form
 			'processed'            => $this->processed,
 			'is_individual'        => $this->is_individual,
 			'individual_full_name' => $this->individual_full_name,
+			'activity_group_ids'   => $this->activity_group_ids,
+			'activity_profile_ids' => $this->activity_profile_ids,
 
 			'files'   => $this->files,
 			'logo_id' => $this->logo_id

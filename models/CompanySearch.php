@@ -7,6 +7,7 @@ use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\TimelineQuery;
+use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\Phone;
 use app\models\views\CompanySearchView;
 use Exception;
@@ -40,6 +41,12 @@ class CompanySearch extends Form
 
 	public $all;
 	public $processed;
+	public $product_ranges;
+	public $activity_group_ids   = [];
+	public $activity_profile_ids = [];
+
+	public $without_product_ranges  = false;
+	public $with_passive_consultant = false;
 
 	/**
 	 * {@inheritdoc}
@@ -48,7 +55,9 @@ class CompanySearch extends Form
 	{
 		return [
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
-			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd'], 'safe'],
+			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd', 'product_ranges'], 'safe'],
+			[['activity_group_ids', 'activity_profile_ids'], 'each', 'rule' => ['integer']],
+			[['without_product_ranges', 'with_passive_consultant'], 'boolean'],
 		];
 	}
 
@@ -71,7 +80,7 @@ class CompanySearch extends Form
 			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
 			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
 		                          ])
-		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects'])
+		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects', 'productRanges', 'companyActivityGroups', 'companyActivityProfiles'])
 		                          ->joinWith(['chatMember cm'])
 		                          ->leftJoinLastCallRelation()
 		                          ->with([
@@ -83,7 +92,6 @@ class CompanySearch extends Form
 			                          'logo',
 			                          'companyGroup',
 			                          'consultant.userProfile',
-			                          'productRanges',
 			                          'mainContact.emails', 'mainContact.phones',
 			                          'generalContact.phones', 'generalContact.emails', 'generalContact.websites',
 			                          'categories',
@@ -206,17 +214,31 @@ class CompanySearch extends Form
                 DESC
             "));
 		}
+
+		if ($this->isFilterTrue($this->without_product_ranges)) {
+			$query->andWhere([Productrange::field('id') => null]);
+		}
+
+		if ($this->isFilterTrue($this->with_passive_consultant)) {
+			$query->innerJoinWith(['consultant' => function (UserQuery $query) {
+				$query->andWhere(['!=', User::field('status'), User::STATUS_ACTIVE]);
+			}]);
+		}
+
 		$query->andFilterWhere([
-			Company::field('id')              => $this->id,
-			Company::field('noName')          => $this->noName,
-			Company::field('companyGroup_id') => $this->companyGroup_id,
-			Company::field('status')          => $this->status,
-			Company::field('consultant_id')   => $this->consultant_id,
-			Company::field('broker_id')       => $this->broker_id,
-			Company::field('activityGroup')   => $this->activityGroup,
-			Company::field('activityProfile') => $this->activityProfile,
-			Category::field('category')       => $this->categories,
-			Company::field('is_individual')   => $this->is_individual
+			Company::field('id')                                 => $this->id,
+			Company::field('noName')                             => $this->noName,
+			Company::field('companyGroup_id')                    => $this->companyGroup_id,
+			Company::field('status')                             => $this->status,
+			Company::field('consultant_id')                      => $this->consultant_id,
+			Company::field('broker_id')                          => $this->broker_id,
+			Company::field('activityGroup')                      => $this->activityGroup,
+			Company::field('activityProfile')                    => $this->activityProfile,
+			CompanyActivityGroup::field('activity_group_id')     => $this->activity_group_ids,
+			CompanyActivityProfile::field('activity_profile_id') => $this->activity_profile_ids,
+			Category::field('category')                          => $this->categories,
+			Company::field('is_individual')                      => $this->is_individual,
+			Productrange::field('product')                       => $this->product_ranges
 		]);
 
 		$query->andFilterWhere(['like', Company::field('nameEng'), $this->nameEng])

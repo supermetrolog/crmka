@@ -169,6 +169,16 @@ class ArrayHelper
 	}
 
 	/**
+	 * @param int[]|string[] $array
+	 *
+	 * @return array
+	 */
+	public static function flip(array $array): array
+	{
+		return array_flip($array);
+  }
+  
+  /**
 	 * Accepts sorted array of integers and distributes value to all of them starting from left to right
 	 *
 	 * @param int[] $array

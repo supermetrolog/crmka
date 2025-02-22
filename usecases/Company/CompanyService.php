@@ -6,6 +6,8 @@ namespace app\usecases\Company;
 
 use app\components\EventManager;
 use app\components\Media\SaveMediaErrorException;
+use app\dto\Company\CompanyActivityGroupDto;
+use app\dto\Company\CompanyActivityProfileDto;
 use app\dto\Company\CompanyDto;
 use app\dto\Company\CompanyMediaDto;
 use app\dto\Company\CompanyMiniModelsDto;
@@ -18,6 +20,8 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Category;
 use app\models\Company;
+use app\models\CompanyActivityGroup;
+use app\models\CompanyActivityProfile;
 use app\models\Media;
 use app\models\miniModels\CompanyFile;
 use app\models\Notification;
@@ -25,6 +29,7 @@ use app\models\Productrange;
 use app\models\User;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
+use ErrorException;
 use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
@@ -38,6 +43,9 @@ class CompanyService
 	private CompanyFileService $companyFileService;
 	private EventManager       $eventManager;
 
+	private CompanyActivityGroupService   $companyActivityGroupService;
+	private CompanyActivityProfileService $companyActivityProfileService;
+
 	private CreateMediaService $createMediaService;
 
 	private MediaService $mediaService;
@@ -47,14 +55,18 @@ class CompanyService
 		CompanyFileService $companyFileService,
 		CreateMediaService $createMediaService,
 		MediaService $mediaService,
-		EventManager $eventManager
+		EventManager $eventManager,
+		CompanyActivityGroupService $companyActivityGroupService,
+		CompanyActivityProfileService $companyActivityProfileService
 	)
 	{
-		$this->transactionBeginner = $transactionBeginner;
-		$this->companyFileService  = $companyFileService;
-		$this->createMediaService  = $createMediaService;
-		$this->mediaService        = $mediaService;
-		$this->eventManager        = $eventManager;
+		$this->transactionBeginner           = $transactionBeginner;
+		$this->companyFileService            = $companyFileService;
+		$this->createMediaService            = $createMediaService;
+		$this->mediaService                  = $mediaService;
+		$this->eventManager                  = $eventManager;
+		$this->companyActivityGroupService   = $companyActivityGroupService;
+		$this->companyActivityProfileService = $companyActivityProfileService;
 	}
 
 	/**
@@ -109,6 +121,9 @@ class CompanyService
 			]);
 
 			$model->saveOrThrow();
+
+			$this->createActivityGroups($model, $dto->activity_group_ids);
+			$this->createActivityProfiles($model, $dto->activity_profile_ids);
 
 			$model->createManyMiniModels([
 				Category::class     => $miniModelsDto->categories,
@@ -199,6 +214,9 @@ class CompanyService
 			]);
 
 			$model->saveOrThrow();
+
+			$this->updateActivityGroups($model, $dto->activity_group_ids);
+			$this->updateActivityProfiles($model, $dto->activity_profile_ids);
 
 			$model->updateManyMiniModels([
 				Category::class     => $miniModelsDto->categories,
@@ -348,6 +366,167 @@ class CompanyService
 			return $createdLogo;
 		} catch (Throwable $th) {
 			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @param int[] $activityGroupIds
+	 *
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function createActivityGroups(Company $company, array $activityGroupIds): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			foreach ($activityGroupIds as $activityGroupId) {
+				$this->companyActivityGroupService->create(
+					new CompanyActivityGroupDto([
+						'company_id'        => $company->id,
+						'activity_group_id' => $activityGroupId,
+					])
+				);
+			}
+
+			$tx->commit();
+		} catch (Throwable $e) {
+			$tx->rollBack();
+			throw $e;
+		}
+
+	}
+
+	/**
+	 * @param int[] $activityProfileIds
+	 *
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function createActivityProfiles(Company $company, array $activityProfileIds): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			foreach ($activityProfileIds as $activityProfileId) {
+				$this->companyActivityProfileService->create(
+					new CompanyActivityProfileDto([
+						'company_id'          => $company->id,
+						'activity_profile_id' => $activityProfileId,
+					])
+				);
+			}
+
+			$tx->commit();
+		} catch (Throwable $e) {
+			$tx->rollBack();
+			throw $e;
+		}
+	}
+
+	/**
+	 * @param CompanyActivityGroup[] $activityGroups
+	 *
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 * @throws ErrorException
+	 */
+	private function deleteActivityGroups(array $activityGroups): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			foreach ($activityGroups as $group) {
+				$this->companyActivityGroupService->delete($group);
+			}
+
+			$tx->commit();
+		} catch (Throwable $e) {
+			$tx->rollBack();
+			throw $e;
+		}
+	}
+
+	/**
+	 * @param CompanyActivityProfile[] $activityProfiles
+	 *
+	 * @throws StaleObjectException
+	 * @throws Throwable
+	 * @throws ErrorException
+	 */
+	private function deleteActivityProfiles(array $activityProfiles): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			foreach ($activityProfiles as $profile) {
+				$this->companyActivityProfileService->delete($profile);
+			}
+
+			$tx->commit();
+		} catch (Throwable $e) {
+			$tx->rollBack();
+			throw $e;
+		}
+	}
+
+	/**
+	 * @param int[] $activityProfileIds
+	 *
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function updateActivityProfiles(Company $company, array $activityProfileIds): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$currentActivityProfiles = $company->companyActivityProfiles;
+
+			$currentActivityProfileIds = ArrayHelper::column($currentActivityProfiles, 'activity_profile_id');
+			$newActivityProfileIds     = ArrayHelper::diff($activityProfileIds, $currentActivityProfileIds);
+
+			$this->createActivityProfiles($company, $newActivityProfileIds);
+
+			$activityProfileIdsHashSet = ArrayHelper::flip($activityProfileIds);
+			$deletedActivityProfiles   = ArrayHelper::filter($currentActivityProfiles, static fn(CompanyActivityProfile $profile) => !isset($activityProfileIdsHashSet[$profile->activity_profile_id]));
+
+			$this->deleteActivityProfiles($deletedActivityProfiles);
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @param int[] $activityGroupIds
+	 *
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function updateActivityGroups(Company $company, array $activityGroupIds): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$currentActivityGroups = $company->companyActivityGroups;
+
+			$currentActivityGroupIds = ArrayHelper::column($currentActivityGroups, 'activity_group_id');
+			$newActivityGroupIds     = ArrayHelper::diff($activityGroupIds, $currentActivityGroupIds);
+
+			$this->createActivityGroups($company, $newActivityGroupIds);
+
+			$activityGroupIdsHashSet = ArrayHelper::flip($activityGroupIds);
+			$deletedActivityGroups   = ArrayHelper::filter($currentActivityGroups, static fn(CompanyActivityGroup $group) => !isset($activityGroupIdsHashSet[$group->activity_group_id]));
+
+			$this->deleteActivityGroups($deletedActivityGroups);
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
 			throw $th;
 		}
 	}
