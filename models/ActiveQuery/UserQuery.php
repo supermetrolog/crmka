@@ -83,7 +83,7 @@ class UserQuery extends AQ
 		);
 	}
 
-	public function byStatus(string $status): self
+	public function byStatus(int $status): self
 	{
 		return $this->andWhere([$this->field('status') => $status]);
 	}

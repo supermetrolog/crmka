@@ -43,4 +43,9 @@ class UserRepository
 	{
 		return User::find()->byUsername($username)->notDeleted()->oneOrThrow();
 	}
+
+	public function getByUsername(string $username): ?User
+	{
+		return User::find()->byUsername($username)->notDeleted()->one();
+	}
 }
