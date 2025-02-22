@@ -4,40 +4,24 @@ declare(strict_types=1);
 
 namespace app\commands;
 
-use app\components\Notification\Factories\NotifierFactory;
-use app\components\Notification\Notification;
-use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\Notification\NotificationChannel;
-use app\models\User;
-use Throwable;
-use yii\base\ErrorException;
+use app\helpers\ArrayHelper;
+use app\helpers\BenchmarkHelper;
 use yii\console\Controller;
 
 class TestController extends Controller
 {
-	private NotifierFactory $notifierFactory;
 
-	public function __construct($id, $module, NotifierFactory $notifierFactory, array $config = [])
-	{
-		$this->notifierFactory = $notifierFactory;
-
-		parent::__construct($id, $module, $config);
-	}
-
-	/**
-	 * @throws SaveModelException
-	 * @throws ErrorException
-	 * @throws Throwable
-	 */
 	public function actionIndex(): void
 	{
-		$model = $this->notifierFactory
-			->create()
-			->setChannel(NotificationChannel::WEB)
-			->setNotification(new Notification('Subject', 'Message'))
-			->setNotifiable(User::find()->one())
-			->setCreatedByType(User::getMorphClass())
-			->setCreatedById(User::find()->one()->id)
-			->send();
+		$array   = [20, 120, 220, 320, 420, 520, 620, 720, 820, 920];
+		$clients = 2_000;
+
+		BenchmarkHelper::testWithArgs(
+			[ArrayHelper::class, 'toDistributedValue'],
+			[$array, $clients],
+			10,
+			true,
+			'toDistributedValue'
+		);
 	}
 }
