@@ -49,8 +49,8 @@ use yii\db\Expression;
  * @property string|null                   $signatoryLastName
  * @property string|null                   $basis
  * @property string|null                   $documentNumber
- * @property int                           $activityGroup
- * @property int                           $activityProfile
+ * @property ?int                          $activityGroup
+ * @property ?int                          $activityProfile
  * @property int                           $active
  * @property int|null                      $processed
  * @property int                           $rating
@@ -132,7 +132,7 @@ class Company extends AR
 	{
 		return [
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
-			[['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
+			[['consultant_id'], 'required'],
 			[['description'], 'string'],
 			[['is_individual'], 'boolean'],
 			[['created_at', 'updated_at'], 'safe'],
