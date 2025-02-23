@@ -10,7 +10,7 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
-use app\models\Company;
+use app\models\ObjectChatMember;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
@@ -21,8 +21,8 @@ use yii\base\Exception;
 
 class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT_WITH_NEW_COMPANIES    = '%s, выявлено %d арендатор(а) на объектах собственника, %d новых. ';
-	private const TASK_MESSAGE_TEXT_WITHOUT_NEW_COMPANIES = '%s, выявлено %d аредатор(а) на объектах собственника';
+	private const TASK_MESSAGE_TEXT_WITH_NEW_COMPANIES    = 'Объект #%s, выявлено %d арендатор(а), %d новых. ';
+	private const TASK_MESSAGE_TEXT_WITHOUT_NEW_COMPANIES = 'Объект #%s, выявлено %d арендатор(а)';
 
 	private CreateEffectSystemMessageService $effectSystemMessageService;
 	private CreateEffectTaskService          $effectTaskService;
@@ -126,20 +126,20 @@ class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 			$message,
 			$survey->user,
 			$surveyQuestionAnswer,
-			$this->getTaskMessage($survey->chatMember->model->company, $companiesData)
+			$this->getTaskMessage($survey->chatMember->model, $companiesData)
 		);
 	}
 
-	private function getTaskMessage(Company $company, array $companiesData): string
+	private function getTaskMessage(ObjectChatMember $objectChatMember, array $companiesData): string
 	{
 		$companiesCount      = ArrayHelper::length($companiesData);
 		$knownCompaniesCount = ArrayHelper::length(ArrayHelper::filterKeyExists($companiesData, 'company_id'));
 
 		if ($knownCompaniesCount > 0) {
-			return sprintf(self::TASK_MESSAGE_TEXT_WITH_NEW_COMPANIES, $company->getFullName(), $companiesCount, $knownCompaniesCount);
+			return sprintf(self::TASK_MESSAGE_TEXT_WITH_NEW_COMPANIES, $objectChatMember->object_id, $companiesCount, $knownCompaniesCount);
 		}
 
-		return sprintf(self::TASK_MESSAGE_TEXT_WITHOUT_NEW_COMPANIES, $company->getFullName(), $companiesCount);
+		return sprintf(self::TASK_MESSAGE_TEXT_WITHOUT_NEW_COMPANIES, $objectChatMember->object_id, $companiesCount);
 	}
 }
 
