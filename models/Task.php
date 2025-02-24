@@ -46,7 +46,7 @@ class Task extends AR
 {
 	use ManyToManyTrait;
 
-	public const LAST_COMMENTS_LIMIT = 5;
+	public const LAST_COMMENTS_LIMIT = 10;
 	public const STATUS_CREATED      = 1;
 	public const STATUS_ACCEPTED     = 2;
 	public const STATUS_DONE         = 3;

@@ -8,6 +8,8 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Company;
 use app\resources\Call\CallShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\Company\ActivityGroup\CompanyActivityGroupResource;
+use app\resources\Company\ActivityProfile\CompanyActivityProfileResource;
 use app\resources\Company\Category\CompanyCategoryResource;
 use app\resources\Company\Contact\CompanyContactResource;
 use app\resources\Company\Group\CompanyGroupResource;
@@ -55,11 +57,13 @@ class CompanyInListResource extends JsonResource
 			'updated_at'           => $this->resource->updated_at,
 			'logo'                 => $this->resource->getLogoUrl(),
 
-			'consultant'    => UserShortResource::tryMakeArray($this->resource->consultant),
-			'mainContact'   => CompanyContactResource::tryMakeArray($this->resource->mainContact),
-			'categories'    => CompanyCategoryResource::collection($this->resource->categories),
-			'productRanges' => CompanyProductRangeResource::collection($this->resource->productRanges),
-			'companyGroup'  => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
+			'consultant'        => UserShortResource::tryMakeArray($this->resource->consultant),
+			'mainContact'       => CompanyContactResource::tryMakeArray($this->resource->mainContact),
+			'categories'        => CompanyCategoryResource::collection($this->resource->categories),
+			'productRanges'     => CompanyProductRangeResource::collection($this->resource->productRanges),
+			'companyGroup'      => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
+			'activity_groups'   => CompanyActivityGroupResource::collection($this->resource->companyActivityGroups),
+			'activity_profiles' => CompanyActivityProfileResource::collection($this->resource->companyActivityProfiles),
 
 			'objects'  => CompanyObjectResource::collection($this->resource->objects),
 			'requests' => CompanyRequestResource::collection($this->resource->requests),

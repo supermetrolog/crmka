@@ -36,8 +36,6 @@ class CompanyForm extends Form
 	public $signatoryLastName;
 	public $basis;
 	public $documentNumber;
-	public $activityGroup;
-	public $activityProfile;
 	public $description;
 	public $passive_why;
 	public $passive_why_comment;
@@ -46,6 +44,8 @@ class CompanyForm extends Form
 	public $broker_id;
 
 	public $files                = [];
+	public $activity_group_ids   = [];
+	public $activity_profile_ids = [];
 	public $logo_id;
 	public $is_individual        = false;
 	public $individual_full_name = null;
@@ -53,8 +53,9 @@ class CompanyForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating', 'logo_id'], 'integer'],
-			[['consultant_id', 'activityGroup', 'activityProfile'], 'required'],
+			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'formOfOrganization', 'processed', 'passive_why', 'rating', 'logo_id'], 'integer'],
+			[['consultant_id', 'activity_group_ids', 'activity_profile_ids'], 'required'],
+			[['activity_group_ids', 'activity_profile_ids'], 'each', 'rule' => ['integer']],
 			[['nameRu', 'nameEng', 'noName'], 'validateCompanyName'],
 			[['description'], 'string'],
 			[['is_individual'], 'boolean'],
@@ -108,8 +109,6 @@ class CompanyForm extends Form
 			'signatoryLastName'    => $this->signatoryLastName,
 			'basis'                => $this->basis,
 			'documentNumber'       => $this->documentNumber,
-			'activityGroup'        => $this->activityGroup,
-			'activityProfile'      => $this->activityProfile,
 			'description'          => $this->description,
 			'passive_why'          => $this->passive_why,
 			'passive_why_comment'  => $this->passive_why_comment,
@@ -117,6 +116,8 @@ class CompanyForm extends Form
 			'processed'            => $this->processed,
 			'is_individual'        => $this->is_individual,
 			'individual_full_name' => $this->individual_full_name,
+			'activity_group_ids'   => $this->activity_group_ids,
+			'activity_profile_ids' => $this->activity_profile_ids,
 
 			'files'   => $this->files,
 			'logo_id' => $this->logo_id

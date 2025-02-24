@@ -10,11 +10,11 @@ use yii\base\ErrorException;
 class ProductRangeRepository
 {
 	/**
-	 * @return string[]
+	 * @return Productrange[]
 	 * @throws ErrorException
 	 */
 	public function getUniqueAll(): array
 	{
-		return Productrange::find()->distinct()->select(Productrange::field('product'))->column();
+		return Productrange::find()->distinct()->select(Productrange::field('product'))->all();
 	}
 }

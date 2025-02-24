@@ -19,6 +19,7 @@ use app\resources\Company\CompanyInListResource;
 use app\resources\Company\CompanyViewResource;
 use app\resources\Company\CreatedCompanyResource;
 use app\resources\Media\MediaShortResource;
+use app\resources\ProductRange\ProductRangeResource;
 use app\usecases\Company\CompanyService;
 use app\usecases\Company\CompanyWithGeneralContactService;
 use Throwable;
@@ -188,7 +189,9 @@ class CompanyController extends AppController
 	 */
 	public function actionProductRangeList(): array
 	{
-		return $this->productRangeRepository->getUniqueAll();
+		$resources = $this->productRangeRepository->getUniqueAll();
+
+		return ProductRangeResource::collection($resources);
 	}
 
 	/**

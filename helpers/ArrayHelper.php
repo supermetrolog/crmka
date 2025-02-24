@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use Exception;
+use InvalidArgumentException;
 use yii\helpers\ArrayHelper as YiiArrayHelper;
 
 class ArrayHelper
@@ -165,5 +166,97 @@ class ArrayHelper
 	public static function uniqueByKey(array $array, $key): array
 	{
 		return self::unique(self::column($array, $key));
+	}
+
+	/**
+	 * @param int[]|string[] $array
+	 *
+	 * @return array
+	 */
+	public static function flip(array $array): array
+	{
+		return array_flip($array);
+  }
+  
+  /**
+	 * Accepts sorted array of integers and distributes value to all of them starting from left to right
+	 *
+	 * @param int[] $array
+	 */
+	public static function distributeValue(array &$array, int $value): void
+	{
+		if ($value < 0) {
+			throw new InvalidArgumentException('Value must be positive');
+		}
+
+		if ($value === 0) {
+			return;
+		}
+
+		$size = self::length($array);
+
+		if ($size === 0) {
+			return;
+		}
+
+		for ($i = 0; $i < $size; $i++) {
+			if ($i < ($size - 1)) {
+				$gap = $array[$i + 1] - $array[$i];
+
+				if ($gap < 0) {
+					throw new InvalidArgumentException('Array is not sorted');
+				}
+
+				$needed = ($i + 1) * $gap;
+			} else {
+				$needed = $value + 1;
+			}
+
+			if ($value >= $needed) {
+				for ($j = 0; $j < $i + 1; $j++) {
+					$array[$j] += $gap;
+				}
+
+				$value -= $needed;
+			} else {
+				$gap      = (int)floor($value / ($i + 1));
+				$leftover = $value % ($i + 1);
+
+				for ($j = 0; $j < $i + 1; $j++) {
+					$array[$j] += $gap;
+
+					if ($j < $leftover) {
+						$array[$j]++;
+					}
+				}
+
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Accepts sorted array of integers and distributes value to all of them starting from left to right
+	 *
+	 * @param int[] $array
+	 *
+	 * @return int[] New distributed array
+	 */
+	public static function toDistributedValue(array $array, int $value): array
+	{
+		/** @var int[] $result */
+		$result = [...$array];
+
+		self::distributeValue($result, $value);
+
+		return $result;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public static function reduce(array $array, callable $cb, $initialValue = null)
+	{
+		return array_reduce($array, $cb, $initialValue);
 	}
 }

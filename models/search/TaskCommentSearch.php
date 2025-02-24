@@ -10,15 +10,19 @@ use yii\data\ActiveDataProvider;
 
 class TaskCommentSearch extends Form
 {
-	public $task_id;
 	public $created_by_id;
+	public $task_id;
 
 	public $id_less_then;
 
+	public $limit = 10;
+
+  
 	public function rules(): array
 	{
 		return [
 			[['task_id', 'created_by_id', 'id_less_then'], 'integer'],
+			['limit', 'integer', 'max' => 100, 'min' => 5]
 		];
 	}
 
@@ -30,7 +34,7 @@ class TaskCommentSearch extends Form
 	{
 		$query = TaskComment::find()->with(['createdBy.userProfile', 'files'])
 		                    ->notDeleted()
-		                    ->limit(10)
+		                    ->limit($this->limit)
 		                    ->orderBy([TaskComment::field('id') => SORT_DESC]);
 
 		$dataProvider = new ActiveDataProvider([

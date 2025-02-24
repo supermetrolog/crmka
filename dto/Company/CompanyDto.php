@@ -30,8 +30,8 @@ class CompanyDto extends BaseObject
 	public ?string $signatoryLastName;
 	public ?string $basis;
 	public ?string $documentNumber;
-	public int     $activityGroup;
-	public int     $activityProfile;
+	public array   $activity_group_ids   = [];
+	public array   $activity_profile_ids = [];
 	public ?string $description;
 	public ?int    $passive_why;
 	public ?string $passive_why_comment;

@@ -9,6 +9,8 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Company;
 use app\resources\Call\CallResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\Company\ActivityGroup\CompanyActivityGroupResource;
+use app\resources\Company\ActivityProfile\CompanyActivityProfileResource;
 use app\resources\Company\Category\CompanyCategoryResource;
 use app\resources\Company\Contact\CompanyGeneralContactResource;
 use app\resources\Company\File\CompanyFileResource;
@@ -40,6 +42,8 @@ class CompanyViewResource extends JsonResource
 				'logo'                  => MediaShortResource::tryMakeArray($this->resource->logo),
 				'consultant'            => UserShortResource::tryMakeArray($this->resource->consultant),
 				'last_call'             => CallResource::tryMakeArray($this->resource->lastCall),
+				'activity_groups'       => CompanyActivityGroupResource::collection($this->resource->companyActivityGroups),
+				'activity_profiles'     => CompanyActivityProfileResource::collection($this->resource->companyActivityProfiles),
 				'dealsRequestEmpty'     => $this->resource->dealsRequestEmpty,
 				'objects_count'         => $this->resource->objects_count,
 				'requests_count'        => $this->resource->requests_count,
