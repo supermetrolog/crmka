@@ -36,8 +36,6 @@ class CompanyForm extends Form
 	public $signatoryLastName;
 	public $basis;
 	public $documentNumber;
-	public $activityGroup;
-	public $activityProfile;
 	public $description;
 	public $passive_why;
 	public $passive_why_comment;
@@ -55,8 +53,8 @@ class CompanyForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating', 'logo_id'], 'integer'],
-			[['consultant_id', 'activityGroup', 'activityProfile', 'activity_group_ids', 'activity_profile_ids'], 'required'],
+			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'formOfOrganization', 'processed', 'passive_why', 'rating', 'logo_id'], 'integer'],
+			[['consultant_id', 'activity_group_ids', 'activity_profile_ids'], 'required'],
 			[['activity_group_ids', 'activity_profile_ids'], 'each', 'rule' => ['integer']],
 			[['nameRu', 'nameEng', 'noName'], 'validateCompanyName'],
 			[['description'], 'string'],
@@ -111,8 +109,6 @@ class CompanyForm extends Form
 			'signatoryLastName'    => $this->signatoryLastName,
 			'basis'                => $this->basis,
 			'documentNumber'       => $this->documentNumber,
-			'activityGroup'        => $this->activityGroup,
-			'activityProfile'      => $this->activityProfile,
 			'description'          => $this->description,
 			'passive_why'          => $this->passive_why,
 			'passive_why_comment'  => $this->passive_why_comment,
