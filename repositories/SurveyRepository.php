@@ -29,6 +29,12 @@ class SurveyRepository
 		                     'tasks.createdByUser.userProfile',
 		                     'tasks.observers.user.userProfile',
 		                     'tasks.targetUserObserver'])
+		             ->with(['dependentSurveys.user.userProfile',
+		                     'dependentSurveys.contact.consultant',
+		                     'dependentSurveys.contact.emails',
+		                     'dependentSurveys.contact.phones',
+		                     'dependentSurveys.contact.websites',
+		                     'dependentSurveys.contact.waysOfInforming'])
 		             ->oneOrThrow();
 	}
 }
