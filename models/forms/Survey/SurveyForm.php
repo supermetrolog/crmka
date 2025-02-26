@@ -59,17 +59,17 @@ class SurveyForm extends Form
 		switch ($this->getScenario()) {
 			case self::SCENARIO_CREATE:
 				return new CreateSurveyDto([
-					'user'              => User::find()->byId($this->user_id)->one(),
-					'contact'           => Contact::find()->byId($this->contact_id)->one(),
-					'chatMember'        => ChatMember::find()->byId($this->chat_member_id)->one(),
+					'user'              => User::find()->byId((int)$this->user_id)->one(),
+					'contact'           => Contact::find()->byId((int)$this->contact_id)->one(),
+					'chatMember'        => ChatMember::find()->byId((int)$this->chat_member_id)->one(),
 					'related_survey_id' => $this->related_survey_id
 				]);
 
 			default:
 				return new UpdateSurveyDto([
-					'user'              => User::find()->byId($this->user_id)->one(),
-					'contact'           => Contact::find()->byId($this->contact_id)->one(),
-					'chatMember'        => ChatMember::find()->byId($this->chat_member_id)->one(),
+					'user'              => User::find()->byId((int)$this->user_id)->one(),
+					'contact'           => Contact::find()->byId((int)$this->contact_id)->one(),
+					'chatMember'        => ChatMember::find()->byId((int)$this->chat_member_id)->one(),
 					'related_survey_id' => $this->related_survey_id
 				]);
 		}

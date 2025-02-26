@@ -19,11 +19,14 @@ class QuestionRepository
 		               ->joinWith([
 			               'answers.surveyQuestionAnswer' => function (ActiveQuery $query) use ($surveyId) {
 				               $query->where([SurveyQuestionAnswer::field('survey_id') => $surveyId]);
-				               $query->with(['tasks.user.userProfile',
-				                             'tasks.tags',
-				                             'tasks.createdByUser.userProfile',
-				                             'tasks.observers.user.userProfile',
-				                             'tasks.targetUserObserver']);
+				               $query->with([
+					               'tasks.user.userProfile',
+					               'tasks.tags',
+					               'tasks.createdByUser.userProfile',
+					               'tasks.observers.user.userProfile',
+					               'tasks.targetUserObserver',
+					               'files'
+				               ]);
 			               }
 		               ])
 		               ->all();

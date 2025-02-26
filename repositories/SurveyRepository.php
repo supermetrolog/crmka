@@ -34,7 +34,7 @@ class SurveyRepository
 		                     'dependentSurveys.contact.emails',
 		                     'dependentSurveys.contact.phones',
 		                     'dependentSurveys.contact.websites',
-		                     'dependentSurveys.contact.waysOfInforming'])
+		                     'dependentSurveys.contact.wayOfInformings'])
 		             ->oneOrThrow();
 	}
 }

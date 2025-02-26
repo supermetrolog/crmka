@@ -6,8 +6,9 @@ namespace app\resources\Survey;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\SurveyQuestionAnswer;
+use app\resources\Media\MediaShortResource;
 use app\resources\Task\TaskResource;
-use yii\helpers\Json;
+use yii\base\Exception;
 
 class SurveyQuestionAnswerResource extends JsonResource
 {
@@ -18,14 +19,18 @@ class SurveyQuestionAnswerResource extends JsonResource
 		$this->resource = $resource;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function toArray(): array
 	{
 		return [
 			'id'                 => $this->resource->id,
 			'question_answer_id' => $this->resource->question_answer_id,
 			'survey_id'          => $this->resource->survey_id,
-			'value'              => Json::decode($this->resource->value),
+			'value'              => $this->resource->toEncodedValue(),
 
+			'files' => MediaShortResource::collection($this->resource->files),
 			'tasks' => TaskResource::collection($this->resource->tasks)
 		];
 	}

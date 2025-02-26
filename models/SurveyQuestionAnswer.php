@@ -6,6 +6,7 @@ use app\exceptions\QuestionAnswerConversionException;
 use app\helpers\TypeConverterHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\FieldQuery;
+use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\SurveyQuery;
@@ -30,6 +31,8 @@ use yii\helpers\Json;
  * @property-read Field      $field
  * @property-read Task[]     $tasks
  * @property-read Relation[] $relationSecond
+ * @property-read Relation[] $relationFirst
+ * @property-read Media[]    $files
  */
 class SurveyQuestionAnswer extends AR
 {
@@ -93,6 +96,16 @@ class SurveyQuestionAnswer extends AR
 	/**
 	 * @throws ErrorException
 	 */
+	public function getRelationFirst(): RelationQuery
+	{
+		/** @var RelationQuery */
+		return $this->morphHasMany(Relation::class, 'id', 'first');
+	}
+
+
+	/**
+	 * @throws ErrorException
+	 */
 	public function getTasks(): TaskQuery
 	{
 		/** @var TaskQuery */
@@ -101,9 +114,22 @@ class SurveyQuestionAnswer extends AR
 		            ->via('relationSecond');
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFiles(): MediaQuery
+	{
+		/** @var MediaQuery */
+		return $this->morphHasManyVia(Media::class, 'id', 'second')
+		            ->andOnCondition([Media::field('deleted_at') => null])
+		            ->via('relationFirst');
+	}
+
 	protected function toBool(): bool
 	{
-		return TypeConverterHelper::toBool($this->value);
+		$decoded = Json::decode($this->value);
+
+		return TypeConverterHelper::toBool($decoded);
 	}
 
 	/** @return mixed */
@@ -112,11 +138,27 @@ class SurveyQuestionAnswer extends AR
 		return Json::decode($this->value);
 	}
 
+	protected function toInteger(): int
+	{
+		$decoded = Json::decode($this->value);
 
-	public function getMaybeBool(bool $fallback = false): bool
+		return TypeConverterHelper::toInt($decoded);
+	}
+
+	protected function toString(): string
+	{
+		$decoded = Json::decode($this->value);
+
+		return TypeConverterHelper::toString($decoded);
+	}
+
+
+	public function getMaybeBool(?bool $fallback = false): ?bool
 	{
 		try {
-			return $this->toBool();
+			$value = $this->getBool();
+
+			return is_null($value) ? $fallback : $value;
 		} catch (Throwable $e) {
 			return $fallback;
 		}
@@ -125,10 +167,15 @@ class SurveyQuestionAnswer extends AR
 	/**
 	 * @throws Exception
 	 */
-	public function getBool(): bool
+	public function getBool(): ?bool
 	{
 		if ($this->field->canBeConvertedToBool()) {
+			if (is_null($this->value)) {
+				return null;
+			}
+
 			return $this->toBool();
+
 		}
 
 		throw new QuestionAnswerConversionException('bool');
@@ -153,21 +200,76 @@ class SurveyQuestionAnswer extends AR
 	public function getString(): ?string
 	{
 		if ($this->field->canBeConvertedToString()) {
-			return $this->value;
+			if (is_null($this->value)) {
+				return null;
+			}
+
+			return $this->toString();
 		}
 
 		throw new QuestionAnswerConversionException('string');
 	}
 
-	public function getMaybeString(string $fallback = ''): string
+	public function getMaybeString(string $fallback = ''): ?string
 	{
 		try {
-			return $this->getString();
+			$value = $this->getString();
+
+			return is_null($value) ? $fallback : $value;
 		} catch (Throwable $e) {
 			return $fallback;
 		}
 	}
 
+	/**
+	 * @throws QuestionAnswerConversionException
+	 */
+	public function getInteger(): ?int
+	{
+		if ($this->field->canBeConvertedToInteger()) {
+			if (is_null($this->value)) {
+				return null;
+			}
+
+			return $this->toInteger();
+		}
+
+		throw new QuestionAnswerConversionException('integer');
+	}
+
+	public function getMaybeInteger(int $fallback): ?int
+	{
+		try {
+			$value = $this->getInteger();
+
+			return is_null($value) ? $fallback : $value;
+		} catch (Throwable $e) {
+			return $fallback;
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function toEncodedValue()
+	{
+		if (is_null($this->value)) {
+			return null;
+		}
+
+		switch ($this->field->type) {
+			case Field::TYPE_BOOLEAN:
+				return $this->getBool();
+			case Field::TYPE_JSON:
+				return $this->getJSON();
+			case Field::TYPE_STRING:
+				return $this->getString();
+			case Field::TYPE_INTEGER:
+				return $this->getInteger();
+			default:
+				throw new Exception('Unknown field type');
+		}
+	}
 
 	public static function find(): SurveyQuestionAnswerQuery
 	{

@@ -2,13 +2,17 @@
 
 namespace app\controllers;
 
+use app\helpers\ArrayHelper;
+use app\helpers\TypeConverterHelper;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Media\MediaForm;
 use app\models\forms\Survey\SurveyForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
+use app\models\Media;
 use app\models\search\SurveySearch;
 use app\repositories\QuestionRepository;
 use app\repositories\SurveyRepository;
@@ -20,6 +24,7 @@ use Exception;
 use Throwable;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
+use yii\web\UploadedFile;
 
 class SurveyController extends AppController
 {
@@ -107,11 +112,22 @@ class SurveyController extends AppController
 	{
 		// Create Survey Question Answers
 
-		$answerDtos = [];
+		$answerDtos   = [];
+		$mediaDtosMap = [];
 
-		foreach ($this->request->post('question_answers', []) as $questionAnswer) {
+		foreach ($this->request->post('question_answers', []) as $key => $questionAnswer) {
 			$surveyQuestionAnswerForm = $this->makeQuestionAnswerForm($questionAnswer);
-			$answerDtos[]             = $surveyQuestionAnswerForm->getDto();
+			$answerDto                = $surveyQuestionAnswerForm->getDto();
+
+			if (ArrayHelper::keyExists($questionAnswer, 'file') && TypeConverterHelper::toBool($questionAnswer['file'])) {
+				$filesPath = "question_answers[$key][files]";
+
+				$mediaForm = $this->makeMediaForm(Media::CATEGORY_SURVEY_QUESTION_ANSWER, $filesPath);
+
+				$mediaDtosMap[$answerDto->question_answer_id] = $mediaForm->getDtos();
+			}
+
+			$answerDtos[] = $answerDto;
 		}
 
 		// Create Survey
@@ -124,7 +140,7 @@ class SurveyController extends AppController
 
 		$surveyForm->validateOrThrow();
 
-		$model = $this->service->createWithSurveyQuestionAnswer($surveyForm->getDto(), $answerDtos);
+		$model = $this->service->createWithSurveyQuestionAnswer($surveyForm->getDto(), $answerDtos, $mediaDtosMap);
 
 		return new SurveyShortResource($model);
 	}
@@ -161,14 +177,26 @@ class SurveyController extends AppController
 	{
 		$survey = $this->repository->findOneOrThrow($id);
 
-		$answerDtos = [];
+		$answerDtos   = [];
+		$mediaDtosMap = [];
 
-		foreach ($this->request->post('question_answers', []) as $questionAnswer) {
-			$form         = $this->makeQuestionAnswerForm($questionAnswer);
-			$answerDtos[] = $form->getDto();
+		foreach ($this->request->post('question_answers', []) as $key => $questionAnswer) {
+			$surveyQuestionAnswerForm = $this->makeQuestionAnswerForm($questionAnswer);
+			$answerDto                = $surveyQuestionAnswerForm->getDto();
+
+			if (ArrayHelper::keyExists($questionAnswer, 'file') && TypeConverterHelper::toBool($questionAnswer['file'])) {
+				$filesPath = "question_answers[$key][files]";
+
+				$mediaForm = $this->makeMediaForm(Media::CATEGORY_SURVEY_QUESTION_ANSWER, $filesPath);
+
+				$mediaDtosMap[$answerDto->question_answer_id] = $mediaForm->getDtos();
+			}
+
+			$answerDtos[] = $answerDto;
 		}
 
-		$survey    = $this->service->updateWithQuestionAnswer($survey, $answerDtos);
+		$survey = $this->service->updateWithQuestionAnswer($survey, $answerDtos, $mediaDtosMap);
+
 		$questions = $this->questionRepository->findAllBySurveyIdWithAnswers($survey->id);
 
 		return new SurveyWithQuestionsResource($survey, $questions);
@@ -198,6 +226,24 @@ class SurveyController extends AppController
 		$form->setScenario(SurveyQuestionAnswerForm::SCENARIO_CREATE_WITH_SURVEY);
 
 		$form->load($formData);
+
+		$form->validateOrThrow();
+
+		return $form;
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeMediaForm(string $category, string $name): MediaForm
+	{
+		$form = new MediaForm();
+
+		$form->category   = $category;
+		$form->model_id   = $this->user->id;
+		$form->model_type = $this->user->identity::getMorphClass();
+
+		$form->files = UploadedFile::getInstancesByName($name);
 
 		$form->validateOrThrow();
 

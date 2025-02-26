@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\usecases\Survey;
 
 use app\components\EventManager;
+use app\dto\Media\CreateMediaDto;
 use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
@@ -12,11 +13,13 @@ use app\dto\SurveyQuestionAnswer\UpdateSurveyQuestionAnswerDto;
 use app\events\Survey\CreateSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\usecases\SurveyQuestionAnswer\SurveyQuestionAnswerService;
 use Throwable;
+use yii\base\ErrorException;
 use yii\db\StaleObjectException;
 
 class SurveyService
@@ -55,10 +58,11 @@ class SurveyService
 
 	/**
 	 * @param CreateSurveyQuestionAnswerDto[] $answerDtos
+	 * @param array<CreateMediaDto[]>         $mediaDtosMap
 	 *
 	 * @throws SaveModelException|Throwable
 	 */
-	public function createWithSurveyQuestionAnswer(CreateSurveyDto $dto, array $answerDtos = []): Survey
+	public function createWithSurveyQuestionAnswer(CreateSurveyDto $dto, array $answerDtos = [], array $mediaDtosMap = []): Survey
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -68,7 +72,7 @@ class SurveyService
 			$event = new CreateSurveyEvent($survey);
 
 			foreach ($answerDtos as $answerDto) {
-				$this->createSurveyQuestionAnswer($survey, $answerDto);
+				$this->createSurveyQuestionAnswer($survey, $answerDto, $mediaDtosMap[$answerDto->question_answer_id] ?? []);
 			}
 
 			$this->eventManager->trigger($event);
@@ -82,15 +86,17 @@ class SurveyService
 	}
 
 	/**
+	 * @param CreateMediaDto[] $mediaDtos
+	 *
 	 * @throws SaveModelException
-	 * @throws \Exception
 	 * @throws Throwable
+	 * @throws ModelNotFoundException
 	 */
-	public function createSurveyQuestionAnswer(Survey $survey, CreateSurveyQuestionAnswerDto $dto): SurveyQuestionAnswer
+	public function createSurveyQuestionAnswer(Survey $survey, CreateSurveyQuestionAnswerDto $dto, array $mediaDtos = []): SurveyQuestionAnswer
 	{
 		$dto->survey_id = $survey->id;
 
-		return $this->surveyQuestionAnswerService->create($dto);
+		return $this->surveyQuestionAnswerService->create($dto, $mediaDtos);
 	}
 
 	/**
@@ -111,10 +117,12 @@ class SurveyService
 	}
 
 	/**
+	 * @param array<CreateMediaDto[]> $mediaDtosMap
+	 *
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function updateWithQuestionAnswer(Survey $survey, array $answerDtos = []): Survey
+	public function updateWithQuestionAnswer(Survey $survey, array $answerDtos = [], array $mediaDtosMap = []): Survey
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -122,7 +130,11 @@ class SurveyService
 			$event = new UpdateSurveyEvent($survey);
 
 			foreach ($answerDtos as $answerDto) {
-				$this->updateOrCreateSurveyQuestionAnswer($survey, $answerDto);
+				$this->updateOrCreateSurveyQuestionAnswer(
+					$survey,
+					$answerDto,
+					$mediaDtosMap[$answerDto->question_answer_id] ?? []
+				);
 			}
 
 			$survey->saveOrThrow();
@@ -138,23 +150,25 @@ class SurveyService
 	}
 
 	/**
+	 * @param CreateMediaDto[] $mediaDtos
+	 *
+	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
-	 * @throws \Exception
 	 * @throws Throwable
+	 * @throws ErrorException
 	 */
-	public function updateOrCreateSurveyQuestionAnswer(Survey $survey, CreateSurveyQuestionAnswerDto $dto): SurveyQuestionAnswer
+	public function updateOrCreateSurveyQuestionAnswer(Survey $survey, CreateSurveyQuestionAnswerDto $dto, array $mediaDtos = []): SurveyQuestionAnswer
 	{
 		$surveyQuestionAnswer = $this->surveyQuestionAnswerService->getBySurveyIdAndQuestionAnswerId($survey->id, $dto->question_answer_id);
 
 		if ($surveyQuestionAnswer) {
-			return $this->surveyQuestionAnswerService->update(
-				$surveyQuestionAnswer,
-				new UpdateSurveyQuestionAnswerDto([
-					'survey_id'          => $survey->id,
-					'question_answer_id' => $dto->question_answer_id,
-					'value'              => $dto->value
-				])
-			);
+			$updateDto = new UpdateSurveyQuestionAnswerDto([
+				'survey_id'          => $survey->id,
+				'question_answer_id' => $dto->question_answer_id,
+				'value'              => $dto->value
+			]);
+
+			return $this->surveyQuestionAnswerService->update($surveyQuestionAnswer, $updateDto, $mediaDtos);
 		}
 
 		$dto->survey_id = $survey->id;
