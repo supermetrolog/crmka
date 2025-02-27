@@ -271,6 +271,30 @@ class SurveyQuestionAnswer extends AR
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	public function hasPositiveAnswer(): bool
+	{
+		if ($this->field->type === Field::TYPE_BOOLEAN) {
+			return $this->getBool() === true;
+		}
+
+		throw new Exception('SurveyQuestionAnswer cannot be converted to positive/negative answer');
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function hasNegativeAnswer(): bool
+	{
+		if ($this->field->type === Field::TYPE_BOOLEAN) {
+			return $this->getBool() === false;
+		}
+
+		throw new Exception('SurveyQuestionAnswer cannot be converted to positive/negative answer');
+	}
+
 	public static function find(): SurveyQuestionAnswerQuery
 	{
 		return new SurveyQuestionAnswerQuery(get_called_class());

@@ -15,6 +15,7 @@ use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\services\ChatMemberSystemMessage\CompanyHasSubleaseOrStorageSystemMessage;
 use Throwable;
+use yii\base\Exception;
 
 class CompanyHasSubleaseOrStorageEffectStrategy extends AbstractEffectStrategy
 {
@@ -35,9 +36,12 @@ class CompanyHasSubleaseOrStorageEffectStrategy extends AbstractEffectStrategy
 		$this->effectSystemMessageService = $effectSystemMessageService;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->getMaybeBool();
+		return $answer->surveyQuestionAnswer->hasPositiveAnswer();
 	}
 
 	/**

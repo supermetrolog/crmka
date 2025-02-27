@@ -25,9 +25,12 @@ class CompanyWantsToSellMustBeEditedEffectStrategy extends AbstractEffectStrateg
 		$this->effectTaskService = $effectTaskService;
 	}
 
+	/**
+	 * @throws \yii\base\Exception
+	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->getMaybeBool() && $survey->chatMember->model_type === ObjectChatMember::getMorphClass();
+		return $answer->surveyQuestionAnswer->hasPositiveAnswer() && $survey->chatMember->model_type === ObjectChatMember::getMorphClass();
 	}
 
 	/**

@@ -15,6 +15,7 @@ use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\services\ChatMemberSystemMessage\CompanyHasNewRequestSystemMessage;
 use Throwable;
+use yii\base\Exception;
 
 class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 {
@@ -35,9 +36,12 @@ class CompanyHasNewRequestEffectStrategy extends AbstractEffectStrategy
 		$this->effectSystemMessageService = $effectSystemMessageService;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->getMaybeBool();
+		return $answer->surveyQuestionAnswer->hasPositiveAnswer();
 	}
 
 	/**

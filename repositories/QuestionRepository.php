@@ -16,18 +16,21 @@ class QuestionRepository
 	public function findAllBySurveyIdWithAnswers(int $surveyId): array
 	{
 		return Question::find()
-		               ->joinWith([
+		               ->innerJoinWith([
 			               'answers.surveyQuestionAnswer' => function (ActiveQuery $query) use ($surveyId) {
-				               $query->where([SurveyQuestionAnswer::field('survey_id') => $surveyId]);
-				               $query->with([
-					               'tasks.user.userProfile',
-					               'tasks.tags',
-					               'tasks.createdByUser.userProfile',
-					               'tasks.observers.user.userProfile',
-					               'tasks.targetUserObserver',
-					               'files'
-				               ]);
+				               $query->andOnCondition([SurveyQuestionAnswer::field('survey_id') => $surveyId]);
 			               }
+		               ])
+		               ->with([
+			               'answers.effects',
+			               'answers.field',
+			               'answers.surveyQuestionAnswer.tasks.user.userProfile',
+			               'answers.surveyQuestionAnswer.tasks.tags',
+			               'answers.surveyQuestionAnswer.tasks.createdByUser.userProfile',
+			               'answers.surveyQuestionAnswer.tasks.observers.user.userProfile',
+			               'answers.surveyQuestionAnswer.tasks.targetUserObserver',
+			               'answers.surveyQuestionAnswer.files',
+			               'answers.surveyQuestionAnswer.field',
 		               ])
 		               ->all();
 	}

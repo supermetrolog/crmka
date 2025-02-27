@@ -24,9 +24,12 @@ class ObjectFreeAreaMustBeEditedEffectStrategy extends AbstractEffectStrategy
 		$this->effectTaskService = $effectTaskService;
 	}
 
+	/**
+	 * @throws \yii\base\Exception
+	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->getMaybeBool();
+		return $answer->surveyQuestionAnswer->hasPositiveAnswer();
 	}
 
 	/**
