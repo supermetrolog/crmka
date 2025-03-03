@@ -152,13 +152,15 @@ class SurveyQuestionAnswer extends AR
 		return TypeConverterHelper::toString($decoded);
 	}
 
+	public function hasAnswer(): bool
+	{
+		return !is_null($this->value);
+	}
 
-	public function getMaybeBool(?bool $fallback = false): ?bool
+	public function getMaybeBool(?bool $fallback = false): bool
 	{
 		try {
-			$value = $this->getBool();
-
-			return is_null($value) ? $fallback : $value;
+			return $this->toBool();
 		} catch (Throwable $e) {
 			return $fallback;
 		}
@@ -167,15 +169,10 @@ class SurveyQuestionAnswer extends AR
 	/**
 	 * @throws Exception
 	 */
-	public function getBool(): ?bool
+	public function getBool(): bool
 	{
 		if ($this->field->canBeConvertedToBool()) {
-			if (is_null($this->value)) {
-				return null;
-			}
-
 			return $this->toBool();
-
 		}
 
 		throw new QuestionAnswerConversionException('bool');
@@ -197,25 +194,19 @@ class SurveyQuestionAnswer extends AR
 	/**
 	 * @throws Exception
 	 */
-	public function getString(): ?string
+	public function getString(): string
 	{
 		if ($this->field->canBeConvertedToString()) {
-			if (is_null($this->value)) {
-				return null;
-			}
-
 			return $this->toString();
 		}
 
 		throw new QuestionAnswerConversionException('string');
 	}
 
-	public function getMaybeString(string $fallback = ''): ?string
+	public function getMaybeString(string $fallback = ''): string
 	{
 		try {
-			$value = $this->getString();
-
-			return is_null($value) ? $fallback : $value;
+			return $this->toString();
 		} catch (Throwable $e) {
 			return $fallback;
 		}
@@ -224,25 +215,19 @@ class SurveyQuestionAnswer extends AR
 	/**
 	 * @throws QuestionAnswerConversionException
 	 */
-	public function getInteger(): ?int
+	public function getInteger(): int
 	{
 		if ($this->field->canBeConvertedToInteger()) {
-			if (is_null($this->value)) {
-				return null;
-			}
-
 			return $this->toInteger();
 		}
 
 		throw new QuestionAnswerConversionException('integer');
 	}
 
-	public function getMaybeInteger(int $fallback): ?int
+	public function getMaybeInteger(int $fallback): int
 	{
 		try {
-			$value = $this->getInteger();
-
-			return is_null($value) ? $fallback : $value;
+			return $this->toInteger();
 		} catch (Throwable $e) {
 			return $fallback;
 		}
@@ -276,11 +261,15 @@ class SurveyQuestionAnswer extends AR
 	 */
 	public function hasPositiveAnswer(): bool
 	{
-		if ($this->field->type === Field::TYPE_BOOLEAN) {
-			return $this->getBool() === true;
+		if ($this->field->type !== Field::TYPE_BOOLEAN) {
+			throw new Exception('SurveyQuestionAnswer cannot be converted to positive/negative answer');
 		}
 
-		throw new Exception('SurveyQuestionAnswer cannot be converted to positive/negative answer');
+		if ($this->hasAnswer()) {
+			return $this->toBool();
+		}
+
+		return false;
 	}
 
 	/**
@@ -288,11 +277,15 @@ class SurveyQuestionAnswer extends AR
 	 */
 	public function hasNegativeAnswer(): bool
 	{
-		if ($this->field->type === Field::TYPE_BOOLEAN) {
-			return $this->getBool() === false;
+		if ($this->field->type !== Field::TYPE_BOOLEAN) {
+			throw new Exception('SurveyQuestionAnswer cannot be converted to positive/negative answer');
 		}
 
-		throw new Exception('SurveyQuestionAnswer cannot be converted to positive/negative answer');
+		if ($this->hasAnswer()) {
+			return !$this->toBool();
+		}
+
+		return false;
 	}
 
 	public static function find(): SurveyQuestionAnswerQuery

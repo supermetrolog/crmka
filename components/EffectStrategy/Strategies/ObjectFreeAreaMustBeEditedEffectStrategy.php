@@ -55,8 +55,8 @@ class ObjectFreeAreaMustBeEditedEffectStrategy extends AbstractEffectStrategy
 
 		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::OBJECT_FREE_AREA_MUST_BE_EDITED_DESCRIPTION);
 
-		if ($surveyQuestionAnswerDescription) {
-			$description = $surveyQuestionAnswerDescription->getString() ?? 'подробности в опроснике';
+		if ($surveyQuestionAnswerDescription && $surveyQuestionAnswerDescription->hasAnswer()) {
+			$description = $surveyQuestionAnswerDescription->getString();
 		} else {
 			$description = 'подробности в опроснике';
 		}
