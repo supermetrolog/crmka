@@ -40,6 +40,7 @@ class QuestionAnswer extends AR
 	public const CATEGORY_TAB         = 'tab';
 	public const CATEGORY_CHECKBOX    = 'checkbox';
 	public const CATEGORY_FILES       = 'files';
+	public const CATEGORY_CUSTOM      = 'custom';
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -87,6 +88,7 @@ class QuestionAnswer extends AR
 			self::CATEGORY_TAB,
 			self::CATEGORY_CHECKBOX,
 			self::CATEGORY_FILES,
+			self::CATEGORY_CUSTOM,
 		];
 	}
 
