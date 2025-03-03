@@ -20,7 +20,7 @@ class CompanyHasSubleaseOrStorageEffectStrategy extends AbstractEffectStrategy
 	private CreateEffectTaskService $effectTaskService;
 
 	public function __construct(
-		CreateEffectTaskService $effectTaskService,
+		CreateEffectTaskService $effectTaskService
 	)
 	{
 		$this->effectTaskService = $effectTaskService;
