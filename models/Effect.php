@@ -28,7 +28,7 @@ class Effect extends AR
 			[['kind', 'title'], 'required'],
 			[['kind', 'title'], 'string', 'max' => 64],
 			[['kind'], 'unique'],
-			[['active'], 'boolean', 'default' => true],
+			[['active'], 'boolean'],
 			[['description'], 'string', 'max' => 255],
 		];
 	}

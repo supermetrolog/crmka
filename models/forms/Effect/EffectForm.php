@@ -26,7 +26,7 @@ class EffectForm extends Form
 			[['title', 'kind'], 'string', 'max' => 64],
 			[['kind'], 'unique', 'targetClass' => Effect::class],
 			[['description'], 'string', 'max' => 255],
-			[['active'], 'boolean', 'default' => true],
+			[['active'], 'boolean'],
 		];
 	}
 
