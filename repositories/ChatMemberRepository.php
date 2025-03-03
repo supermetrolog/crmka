@@ -235,7 +235,7 @@ class ChatMemberRepository
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	public function getByCompanyId(int $company_id): ChatMember
+	public function getByCompanyIdOrThrow(int $company_id): ChatMember
 	{
 		/** @var ChatMember */
 		return ChatMember::find()->byMorph($company_id, Company::getMorphClass())->oneOrThrow();

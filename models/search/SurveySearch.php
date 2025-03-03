@@ -5,9 +5,9 @@ namespace app\models\search;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\Contact;
+use app\models\Survey;
 use app\models\UserProfile;
 use yii\data\ActiveDataProvider;
-use app\models\Survey;
 
 class SurveySearch extends Form
 {
@@ -33,7 +33,8 @@ class SurveySearch extends Form
 	{
 		$query = Survey::find()
 		               ->joinWith('user.userProfile')
-		               ->joinWith('contact');
+		               ->joinWith('contact')
+		               ->with(['chatMember']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,

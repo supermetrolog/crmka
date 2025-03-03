@@ -25,9 +25,12 @@ class CompanyDoesNotWantToSellEffectStrategy extends AbstractEffectStrategy
 		$this->effectTaskService = $effectTaskService;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return !$answer->surveyQuestionAnswer->getMaybeBool();
+		return $answer->surveyQuestionAnswer->hasNegativeAnswer();
 	}
 
 	/**

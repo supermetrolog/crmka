@@ -7,10 +7,12 @@ use InvalidArgumentException;
 
 class CompanyOnObjectChatMemberSystemMessage extends AbstractChatMemberSystemMessage
 {
-	private ?int     $surveyId = null;
-	private ?int     $objectId = null;
-	private ?int     $area     = null;
-	protected string $template = '%s  Компания сидит на объекте %s. Занимает площадь: %s. Подробнее в прикрепленном опросе %s.';
+	private ?int    $surveyId = null;
+	private ?int    $objectId = null;
+	private ?int    $area     = null;
+	private ?string $description;
+
+	protected string $template = '%s  Компания сидит на объекте %s. Занимает площадь: %s. Комментарий: %s. Подробнее в прикрепленном опросе %s.';
 
 	public function validateOrThrow(): void
 	{
@@ -46,6 +48,13 @@ class CompanyOnObjectChatMemberSystemMessage extends AbstractChatMemberSystemMes
 		return $this;
 	}
 
+	public function setDescription(string $description): self
+	{
+		$this->description = $description;
+
+		return $this;
+	}
+
 	public function getTemplateArgs(): array
 	{
 		if ($this->area) {
@@ -58,6 +67,7 @@ class CompanyOnObjectChatMemberSystemMessage extends AbstractChatMemberSystemMes
 			HTMLHelper::icon('solid', 'circle-info'),
 			HTMLHelper::bold("#$this->objectId"),
 			$formattedArea,
+			$this->description ?? 'нет',
 			HTMLHelper::bold("#$this->surveyId"),
 		];
 	}

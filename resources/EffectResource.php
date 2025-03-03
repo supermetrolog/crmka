@@ -22,7 +22,8 @@ class EffectResource extends JsonResource
 			'id'          => $this->resource->id,
 			'title'       => $this->resource->title,
 			'kind'        => $this->resource->kind,
-			'description' => $this->resource->description
+			'description' => $this->resource->description,
+			'active'      => $this->resource->active
 		];
 	}
 }

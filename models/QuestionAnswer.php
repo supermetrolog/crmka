@@ -19,7 +19,7 @@ use yii\db\ActiveQuery;
  * @property int                  $id
  * @property int                  $question_id
  * @property int                  $field_id
- * @property int                  $category
+ * @property string               $category
  * @property string               $value
  * @property ?string              $message
  * @property string               $created_at
@@ -39,6 +39,8 @@ class QuestionAnswer extends AR
 	public const CATEGORY_TEXT_ANSWER = 'text-answer';
 	public const CATEGORY_TAB         = 'tab';
 	public const CATEGORY_CHECKBOX    = 'checkbox';
+	public const CATEGORY_FILES       = 'files';
+	public const CATEGORY_CUSTOM      = 'custom';
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -85,6 +87,8 @@ class QuestionAnswer extends AR
 			self::CATEGORY_TEXT_ANSWER,
 			self::CATEGORY_TAB,
 			self::CATEGORY_CHECKBOX,
+			self::CATEGORY_FILES,
+			self::CATEGORY_CUSTOM,
 		];
 	}
 
@@ -134,6 +138,11 @@ class QuestionAnswer extends AR
 	public function hasAdditionalMessage(): bool
 	{
 		return !empty($this->message);
+	}
+
+	public function isFilesFieldType(): bool
+	{
+		return $this->field->field_type === Field::FIELD_TYPE_FILES;
 	}
 
 	public static function find(): QuestionAnswerQuery

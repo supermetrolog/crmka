@@ -11,6 +11,7 @@ use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use Throwable;
+use yii\base\Exception;
 
 class ObjectFreeAreaMustBeDeletedEffectStrategy extends AbstractEffectStrategy
 {
@@ -23,9 +24,12 @@ class ObjectFreeAreaMustBeDeletedEffectStrategy extends AbstractEffectStrategy
 		$this->effectTaskService = $effectTaskService;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->getMaybeBool();
+		return $answer->surveyQuestionAnswer->hasPositiveAnswer();
 	}
 
 	/**

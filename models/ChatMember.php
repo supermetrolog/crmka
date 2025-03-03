@@ -212,6 +212,21 @@ class ChatMember extends AR
 		            ->via('lastCallRelationFirst');
 	}
 
+	public function isObjectChatMember(): bool
+	{
+		return $this->model_type === ObjectChatMember::getMorphClass();
+	}
+
+	public function isCompanyChatMember(): bool
+	{
+		return $this->model_type === Company::getMorphClass();
+	}
+
+	public function isUserChatMember(): bool
+	{
+		return $this->model_type === User::getMorphClass();
+	}
+
 	public static function find(): ChatMemberQuery
 	{
 		return new ChatMemberQuery(get_called_class());

@@ -83,7 +83,7 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 
 		foreach ($questionAnswers as $answer) {
 			foreach ($answer->effects as $effect) {
-				if ($this->effectStrategyFactory->hasStrategy($effect->kind)) {
+				if ($effect->isActive() && $this->effectStrategyFactory->hasStrategy($effect->kind)) {
 					$this->effectStrategyFactory->createStrategy($effect->kind)
 					                            ->handle($survey, $answer, $message);
 				}

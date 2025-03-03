@@ -49,16 +49,18 @@ class CreateSurveyChatMemberSystemMessage extends AbstractChatMemberSystemMessag
 			$answerMessages = [];
 
 			foreach ($question->answers as $answer) {
-				if (!$answer->hasAdditionalMessage()) {
+				if (!$answer->hasAdditionalMessage() || !$answer->surveyQuestionAnswer->hasAnswer()) {
 					continue;
 				}
 
 				$shouldBeInserted = false;
 
 				if ($answer->field->canBeConvertedToBool()) {
-					$shouldBeInserted = $answer->surveyQuestionAnswer->getMaybeBool();
+					$shouldBeInserted = $answer->surveyQuestionAnswer->getBool();
 				} elseif ($answer->field->canBeConvertedToString()) {
-					$shouldBeInserted = StringHelper::isNotEmpty($answer->surveyQuestionAnswer->getMaybeString());
+					$value = $answer->surveyQuestionAnswer->getMaybeString();
+
+					$shouldBeInserted = StringHelper::isString($value) && StringHelper::isNotEmpty($value);
 				}
 
 				if ($shouldBeInserted) {

@@ -21,6 +21,7 @@ use yii\db\ActiveQuery;
  * @property int                         $user_id
  * @property int                         $contact_id
  * @property int                         $chat_member_id
+ * @property ?int                        $related_survey_id
  * @property string                      $created_at
  * @property string                      $updated_at
  *
@@ -31,6 +32,8 @@ use yii\db\ActiveQuery;
  * @property-read Question[]             $questions
  * @property-read ChatMember             $chatMember
  * @property-read Task[]                 $tasks
+ * @property-read ?Survey                $relatedSurvey
+ * @property-read Survey[]               $dependentSurveys
  */
 class Survey extends AR
 {
@@ -46,21 +49,23 @@ class Survey extends AR
 	{
 		return [
 			[['user_id', 'contact_id', 'chat_member_id'], 'required'],
-			[['user_id', 'contact_id', 'chat_member_id'], 'integer'],
+			[['user_id', 'contact_id', 'chat_member_id', 'related_survey_id'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+			[['related_survey_id'], 'exist', 'skipOnError' => true, 'targetClass' => Survey::class, 'targetAttribute' => ['related_survey_id' => 'id']]
 		];
 	}
 
 	public function attributeLabels(): array
 	{
 		return [
-			'id'         => 'ID',
-			'user_id'    => 'User ID',
-			'contact_id' => 'Contact ID',
-			'created_at' => 'Created At',
-			'updated_at' => 'Updated At',
+			'id'                => 'ID',
+			'user_id'           => 'User ID',
+			'contact_id'        => 'Contact ID',
+			'related_survey_id' => 'Related Survey ID',
+			'created_at'        => 'Created At',
+			'updated_at'        => 'Updated At',
 		];
 	}
 
@@ -134,6 +139,18 @@ class Survey extends AR
 		return $this->getSurveyQuestionAnswers()->innerJoinWith(['questionAnswer.effects' => function (AQ $query) use ($effectKind) {
 			return $query->andWhere([Effect::field('kind') => $effectKind]);
 		}])->one();
+	}
+
+	public function getRelatedSurvey(): SurveyQuery
+	{
+		/** @var SurveyQuery */
+		return $this->hasOne(Survey::class, ['id' => 'related_survey_id']);
+	}
+
+	public function getDependentSurveys(): SurveyQuery
+	{
+		/** @var SurveyQuery */
+		return $this->hasMany(Survey::class, ['related_survey_id' => 'id']);
 	}
 
 	public static function find(): SurveyQuery
