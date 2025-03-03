@@ -10,4 +10,5 @@ class UpdateEffectDto extends BaseObject
 {
 	public string  $title;
 	public ?string $description;
+	public bool    $active = true;
 }

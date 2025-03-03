@@ -23,6 +23,7 @@ class Field extends AR
 	public const FIELD_TYPE_TAB_CHECKBOX = 'tab-checkbox';
 	public const FIELD_TYPE_INPUT        = 'input';
 	public const FIELD_TYPE_TEXTAREA     = 'textarea';
+	public const FIELD_TYPE_FILES        = 'files';
 	public const FIELD_TYPE_CUSTOM       = 'custom';
 
 	public const TYPE_BOOLEAN = 'boolean';
@@ -80,7 +81,8 @@ class Field extends AR
 			self::FIELD_TYPE_TAB_CHECKBOX,
 			self::FIELD_TYPE_INPUT,
 			self::FIELD_TYPE_TEXTAREA,
-			self::FIELD_TYPE_CUSTOM
+			self::FIELD_TYPE_CUSTOM,
+			self::FIELD_TYPE_FILES
 		];
 	}
 

@@ -17,6 +17,7 @@ use yii\db\Expression;
 class ObjectChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 {
 	public $object_id;
+	public $object_ids;
 	public $company_id;
 	public $type;
 
@@ -26,6 +27,7 @@ class ObjectChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 			parent::rules(),
 			[
 				[['object_id', 'company_id'], 'integer'],
+				['object_ids', 'each', 'rule' => ['integer']],
 				['type', 'string']
 			]
 		);
@@ -64,6 +66,10 @@ class ObjectChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 			'chm.id'                             => $this->consultant_ids,
 			ObjectChatMember::field('type')      => $this->type,
 			Objects::field('company_id')         => $this->company_id
+		]);
+
+		$query->andFilterWhere([
+			ObjectChatMember::field('object_id') => $this->object_ids
 		]);
 
 		if ($this->isFilterTrue($this->need_calling)) {

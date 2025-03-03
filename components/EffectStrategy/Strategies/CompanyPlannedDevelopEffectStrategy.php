@@ -14,6 +14,7 @@ use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use app\services\ChatMemberSystemMessage\CompanyPlannedDevelopChatMemberSystemMessage;
 use Throwable;
+use yii\base\Exception;
 
 class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
 {
@@ -26,9 +27,12 @@ class CompanyPlannedDevelopEffectStrategy extends AbstractEffectStrategy
 		$this->effectSystemMessageService = $effectSystemMessageService;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->getMaybeBool() && $survey->chatMember->model_type === ObjectChatMember::getMorphClass();
+		return $answer->surveyQuestionAnswer->hasPositiveAnswer() && $survey->chatMember->model_type === ObjectChatMember::getMorphClass();
 	}
 
 	/**

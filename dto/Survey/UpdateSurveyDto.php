@@ -14,4 +14,5 @@ class UpdateSurveyDto extends BaseObject
 	public User       $user;
 	public Contact    $contact;
 	public ChatMember $chatMember;
+	public ?int       $related_survey_id = null;
 }

@@ -11,6 +11,7 @@ use app\models\ActiveQuery\EffectQuery;
  * @property int     $id
  * @property string  $title
  * @property string  $kind
+ * @property bool    $active
  * @property ?string $description
  *
  */
@@ -27,6 +28,7 @@ class Effect extends AR
 			[['kind', 'title'], 'required'],
 			[['kind', 'title'], 'string', 'max' => 64],
 			[['kind'], 'unique'],
+			[['active'], 'boolean'],
 			[['description'], 'string', 'max' => 255],
 		];
 	}
@@ -37,8 +39,14 @@ class Effect extends AR
 			'id'          => 'ID',
 			'title'       => 'Title',
 			'kind'        => 'Kind',
+			'active'      => 'Active',
 			'description' => 'Description',
 		];
+	}
+
+	public function isActive(): bool
+	{
+		return $this->active;
 	}
 
 	public static function find(): EffectQuery

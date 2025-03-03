@@ -32,4 +32,32 @@ class TypeConverterHelper
 
 		throw new InvalidArgumentException("Value '$value' with type '" . gettype($value) . "' cannot be converted to bool");
 	}
+
+	public static function toInt($value): int
+	{
+		if (is_int($value)) {
+			return $value;
+		}
+
+		if (NumberHelper::isNumber($value)) {
+			return (int)$value;
+		}
+
+		throw new InvalidArgumentException("Value '$value' with type '" . gettype($value) . "' cannot be converted to int");
+	}
+
+	public static function toString($value): string
+	{
+		if (is_string($value)) {
+			return $value;
+		}
+
+		if (NumberHelper::isNumber($value)) {
+			return (string)$value;
+		}
+
+		throw new InvalidArgumentException("Value '$value' with type '" . gettype($value) . "' cannot be converted to string");
+	}
+
+
 }

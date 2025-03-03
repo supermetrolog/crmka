@@ -24,11 +24,27 @@ class SurveyRepository
 	{
 		return Survey::find()
 		             ->byId($id)
-		             ->with(['tasks.user.userProfile',
-		                     'tasks.tags',
-		                     'tasks.createdByUser.userProfile',
-		                     'tasks.observers.user.userProfile',
-		                     'tasks.targetUserObserver'])
+		             ->with([
+			             'tasks.user.userProfile',
+			             'tasks.tags',
+			             'tasks.createdByUser.userProfile',
+			             'tasks.observers.user.userProfile',
+			             'tasks.targetUserObserver'
+		             ])
+		             ->with([
+			             'dependentSurveys.chatMember.objectChatMember.object.company',
+			             'dependentSurveys.chatMember.objectChatMember.object.consultant.userProfile',
+			             'dependentSurveys.chatMember.objectChatMember.object.offers',
+			             'dependentSurveys.chatMember.company.consultant.userProfile',
+			             'dependentSurveys.chatMember.company.categories',
+			             'dependentSurveys.chatMember.company.companyGroup',
+			             'dependentSurveys.user.userProfile',
+			             'dependentSurveys.contact.consultant.userProfile',
+			             'dependentSurveys.contact.emails',
+			             'dependentSurveys.contact.phones',
+			             'dependentSurveys.contact.websites',
+			             'dependentSurveys.contact.wayOfInformings'
+		             ])
 		             ->oneOrThrow();
 	}
 }
