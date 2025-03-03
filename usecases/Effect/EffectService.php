@@ -21,7 +21,8 @@ class EffectService
 		$model = new Effect([
 			'title'       => $dto->title,
 			'kind'        => $dto->kind,
-			'description' => $dto->description
+			'description' => $dto->description,
+			'active'      => $dto->active
 		]);
 
 		$model->saveOrThrow();
@@ -36,7 +37,8 @@ class EffectService
 	{
 		$model->load([
 			'title'       => $dto->title,
-			'description' => $dto->description
+			'description' => $dto->description,
+			'active'      => $dto->active
 		]);
 
 		$model->saveOrThrow();

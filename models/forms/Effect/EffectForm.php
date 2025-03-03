@@ -17,6 +17,7 @@ class EffectForm extends Form
 	public $title;
 	public $description;
 	public $kind;
+	public $active;
 
 	public function rules(): array
 	{
@@ -25,6 +26,7 @@ class EffectForm extends Form
 			[['title', 'kind'], 'string', 'max' => 64],
 			[['kind'], 'unique', 'targetClass' => Effect::class],
 			[['description'], 'string', 'max' => 255],
+			[['active'], 'boolean', 'default' => true],
 		];
 	}
 
@@ -32,7 +34,8 @@ class EffectForm extends Form
 	{
 		$common = [
 			'title',
-			'description'
+			'description',
+			'active'
 		];
 
 		return [
@@ -48,12 +51,14 @@ class EffectForm extends Form
 				return new CreateEffectDto([
 					'title'       => $this->title,
 					'kind'        => $this->kind,
-					'description' => $this->description
+					'description' => $this->description,
+					'active'      => $this->active
 				]);
 			default:
 				return new UpdateEffectDto([
 					'title'       => $this->title,
-					'description' => $this->description
+					'description' => $this->description,
+					'active'      => $this->active
 				]);
 		}
 	}

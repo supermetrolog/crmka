@@ -11,4 +11,5 @@ class CreateEffectDto extends BaseObject
 	public string  $title;
 	public string  $kind;
 	public ?string $description;
+	public bool    $active = true;
 }
