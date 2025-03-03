@@ -25,18 +25,18 @@ use yii\di\NotInstantiableException;
 class EffectStrategyFactory implements EffectStrategyFactoryInterface
 {
 	private array $strategies = [
-		EffectKind::REQUESTS_NO_LONGER_RELEVANT            => RequestsNoLongerRelevantEffectStrategy::class,
-		EffectKind::COMPANY_PLANNED_DEVELOP                => CompanyPlannedDevelopEffectStrategy::class,
-		EffectKind::COMPANIES_ON_OBJECT_IDENTIFIED         => CompaniesOnObjectIdentifiedEffectStrategy::class,
-		EffectKind::COMPANY_WANTS_TO_SELL_MUST_BE_EDITED   => CompanyWantsToSellMustBeEditedEffectStrategy::class,
-		EffectKind::COMPANY_WANTS_TO_BUY_OR_BUILD          => CompanyWantsToBuyOrBuildEffectStrategy::class,
-		EffectKind::COMPANY_HAS_NEW_REQUEST                => CompanyHasNewRequestEffectStrategy::class,
-		EffectKind::COMPANY_WANTS_TO_BUY_OR_SELL_EQUIPMENT => CompanyWantsToBuyOrSellEquipmentEffectStrategy::class,
-		EffectKind::OBJECT_HAS_EQUIPMENT_FOR_SALE          => ObjectHasEquipmentForSaleEffectStrategy::class,
-		EffectKind::COMPANY_HAS_SUBLEASE_OR_STORAGE        => CompanyHasSubleaseOrStorageEffectStrategy::class,
-		EffectKind::OBJECT_FREE_AREA_MUST_BE_EDITED        => ObjectFreeAreaMustBeEditedEffectStrategy::class,
-		EffectKind::OBJECT_FREE_AREA_MUST_BE_DELETED       => ObjectFreeAreaMustBeDeletedEffectStrategy::class,
-		EffectKind::COMPANY_DOES_NOT_WANT_TO_SELL          => CompanyDoesNotWantToSellEffectStrategy::class,
+		EffectKind::REQUESTS_NO_LONGER_RELEVANT     => RequestsNoLongerRelevantEffectStrategy::class,
+		//		EffectKind::COMPANY_PLANNED_DEVELOP                => CompanyPlannedDevelopEffectStrategy::class,
+		EffectKind::COMPANIES_ON_OBJECT_IDENTIFIED  => CompaniesOnObjectIdentifiedEffectStrategy::class,
+		//		EffectKind::COMPANY_WANTS_TO_SELL_MUST_BE_EDITED   => CompanyWantsToSellMustBeEditedEffectStrategy::class,
+		EffectKind::COMPANY_WANTS_TO_BUY_OR_BUILD   => CompanyWantsToBuyOrBuildEffectStrategy::class,
+		EffectKind::COMPANY_HAS_NEW_REQUEST         => CompanyHasNewRequestEffectStrategy::class,
+		//		EffectKind::COMPANY_WANTS_TO_BUY_OR_SELL_EQUIPMENT => CompanyWantsToBuyOrSellEquipmentEffectStrategy::class,
+		//		EffectKind::OBJECT_HAS_EQUIPMENT_FOR_SALE   => ObjectHasEquipmentForSaleEffectStrategy::class,
+		EffectKind::COMPANY_HAS_SUBLEASE_OR_STORAGE => CompanyHasSubleaseOrStorageEffectStrategy::class,
+		//		EffectKind::OBJECT_FREE_AREA_MUST_BE_EDITED        => ObjectFreeAreaMustBeEditedEffectStrategy::class,
+		//		EffectKind::OBJECT_FREE_AREA_MUST_BE_DELETED       => ObjectFreeAreaMustBeDeletedEffectStrategy::class,
+		//		EffectKind::COMPANY_DOES_NOT_WANT_TO_SELL          => CompanyDoesNotWantToSellEffectStrategy::class,
 	];
 
 	public function hasStrategy(string $effectKind): bool
