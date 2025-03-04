@@ -440,4 +440,12 @@ return
 				'POST,OPTIONS <id>/change-position' => 'change-position',
 			],
 		],
+		[
+			'class'         => 'yii\rest\UrlRule',
+			'controller'    => ['utilities' => 'utilities'],
+			'except'        => [],
+			'extraPatterns' => [
+				'POST,OPTIONS fix-land-object-purposes' => 'fix-land-object-purposes',
+			],
+		]
 	];

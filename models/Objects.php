@@ -301,6 +301,11 @@ class Objects extends oldDb\Objects
 		return $this->hasOne(User::class, ['user_id_old' => 'agent_id']);
 	}
 
+	public function isLand(): bool
+	{
+		return $this->is_land === 1;
+	}
+
 	public static function find(): AQ
 	{
 		return new AQ(get_called_class());
