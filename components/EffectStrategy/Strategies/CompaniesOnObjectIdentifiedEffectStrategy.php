@@ -47,9 +47,13 @@ class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		$jsonData = $answer->surveyQuestionAnswer->getJSON();
+		if ($answer->surveyQuestionAnswer->hasAnswer()) {
+			$jsonData = $answer->surveyQuestionAnswer->getJSON();
 
-		return ArrayHelper::isArray($jsonData) && ArrayHelper::length($jsonData) > 0;
+			return ArrayHelper::isArray($jsonData) && ArrayHelper::notEmpty($jsonData) && $survey->chatMember->isObjectChatMember() && $survey->chatMember->model->isRentOrSale();
+		}
+
+		return false;
 	}
 
 	/**
@@ -122,13 +126,16 @@ class CompaniesOnObjectIdentifiedEffectStrategy extends AbstractEffectStrategy
 	 */
 	private function createTask(Survey $survey, ChatMemberMessage $message, SurveyQuestionAnswer $surveyQuestionAnswer, array $companiesData): void
 	{
+		$taskMessage = $this->getTaskMessage($survey->chatMember->model, $companiesData);
+
 		$this->effectTaskService->createTaskForMessage(
 			$message,
 			$survey->user,
 			$surveyQuestionAnswer,
-			$this->getTaskMessage($survey->chatMember->model, $companiesData)
+			$taskMessage
 		);
 	}
+
 
 	private function getTaskMessage(ObjectChatMember $objectChatMember, array $companiesData): string
 	{

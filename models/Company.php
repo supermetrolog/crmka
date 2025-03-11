@@ -193,6 +193,10 @@ class Company extends AR
 
 	public function getFullName(): string
 	{
+		if ($this->is_individual) {
+			return "$this->individual_full_name (физ.лицо)";
+		}
+
 		$formOfOrganization = $this->formOfOrganization;
 		$englishName        = $this->nameEng;
 		$russianName        = $this->nameRu;
@@ -226,6 +230,19 @@ class Company extends AR
 		}
 
 		return StringHelper::trim($name);
+	}
+
+	public function getShortName(): string
+	{
+		if ($this->is_individual) {
+			return "$this->individual_full_name (физ.лицо)";
+		}
+
+		if ($this->noName) {
+			return '-';
+		}
+
+		return $this->nameRu ?? $this->nameEng;
 	}
 
 	public function fields(): array

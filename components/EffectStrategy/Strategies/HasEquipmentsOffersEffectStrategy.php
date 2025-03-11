@@ -7,15 +7,16 @@ use app\components\EffectStrategy\Service\CreateEffectTaskService;
 use app\enum\EffectKind;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
+use app\models\Company;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
-use Exception;
 use Throwable;
+use yii\base\Exception;
 
-class CompanyWantsToSellMustBeEditedEffectStrategy extends AbstractEffectStrategy
+class HasEquipmentsOffersEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = 'Продажа объекта #%s (%s), %s.';
+	private const TASK_MESSAGE_TEXT = '%s (#%s) хотят продать обрудование, %s.';
 
 	private CreateEffectTaskService $effectTaskService;
 
@@ -25,17 +26,11 @@ class CompanyWantsToSellMustBeEditedEffectStrategy extends AbstractEffectStrateg
 	}
 
 	/**
-	 * @throws \yii\base\Exception
+	 * @throws Exception
 	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		if ($answer->surveyQuestionAnswer->hasPositiveAnswer()) {
-			$chatMember = $survey->chatMember;
-
-			return $chatMember->isObjectChatMember() && $chatMember->objectChatMember->isRentOrSale();
-		}
-
-		return false;
+		return $answer->surveyQuestionAnswer->hasPositiveAnswer();
 	}
 
 	/**
@@ -44,30 +39,48 @@ class CompanyWantsToSellMustBeEditedEffectStrategy extends AbstractEffectStrateg
 	 */
 	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
+		$this->createTask($survey, $surveyQuestionAnswer, $surveyChatMemberMessage);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function createTask(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
+	{
+		$taskMessage = $this->getTaskMessage($survey);
+
+
 		$this->effectTaskService->createTaskForMessage(
 			$surveyChatMemberMessage,
 			$survey->user,
 			$surveyQuestionAnswer,
-			$this->getTaskMessage($survey)
+			$taskMessage
 		);
 	}
 
 	/**
 	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function getTaskMessage(Survey $survey): string
 	{
-		$chatMemberModel = $survey->chatMember->model;
-		$company         = $chatMemberModel->company;
+		/** @var Company $company */
+		$company = $survey->chatMember->model;
+
+		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::HAS_EQUIPMENTS_OFFERS_DESCRIPTION);
 
 		$description = 'подробности в опроснике';
-
-		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::COMPANY_WANTS_TO_SELL_MUST_BE_EDITED_DESCRIPTION);
 
 		if ($surveyQuestionAnswerDescription && $surveyQuestionAnswerDescription->hasAnswer()) {
 			$description = $surveyQuestionAnswerDescription->getString();
 		}
 
-		return sprintf(self::TASK_MESSAGE_TEXT, $chatMemberModel->object_id, $company->getShortName(), $description);
+		return sprintf(
+			self::TASK_MESSAGE_TEXT,
+			$company->getShortName(),
+			$company->id,
+			$description
+		);
 	}
 }
