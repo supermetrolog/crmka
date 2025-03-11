@@ -12,6 +12,7 @@ use app\components\EffectStrategy\Strategies\CompanyPlannedDevelopEffectStrategy
 use app\components\EffectStrategy\Strategies\CompanyWantsToBuyOrBuildEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyWantsToBuyOrSellEquipmentEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyWantsToSellMustBeEditedEffectStrategy;
+use app\components\EffectStrategy\Strategies\HasActualRequestsEffectStrategy;
 use app\components\EffectStrategy\Strategies\ObjectFreeAreaMustBeDeletedEffectStrategy;
 use app\components\EffectStrategy\Strategies\ObjectFreeAreaMustBeEditedEffectStrategy;
 use app\components\EffectStrategy\Strategies\ObjectHasEquipmentForSaleEffectStrategy;
@@ -37,6 +38,8 @@ class EffectStrategyFactory implements EffectStrategyFactoryInterface
 		EffectKind::OBJECT_FREE_AREA_MUST_BE_EDITED        => ObjectFreeAreaMustBeEditedEffectStrategy::class,
 		EffectKind::OBJECT_FREE_AREA_MUST_BE_DELETED       => ObjectFreeAreaMustBeDeletedEffectStrategy::class,
 		EffectKind::COMPANY_DOES_NOT_WANT_TO_SELL          => CompanyDoesNotWantToSellEffectStrategy::class,
+
+		EffectKind::HAS_ACTUAL_REQUESTS => HasActualRequestsEffectStrategy::class
 	];
 
 	public function hasStrategy(string $effectKind): bool

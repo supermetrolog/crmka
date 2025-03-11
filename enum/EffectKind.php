@@ -21,4 +21,7 @@ class EffectKind
 	public const OBJECT_FREE_AREA_MUST_BE_EDITED                  = 'object-free-area-must-be-edited';
 	public const OBJECT_FREE_AREA_MUST_BE_EDITED_DESCRIPTION      = 'object-free-area-must-be-edited-description';
 	public const OBJECT_FREE_AREA_MUST_BE_DELETED                 = 'object-free-area-must-be-deleted';
+
+	public const HAS_ACTUAL_REQUESTS = 'has-actual-requests';
+	public const HAS_ACTUAL_OFFERS   = 'has-actual-offers';
 }
