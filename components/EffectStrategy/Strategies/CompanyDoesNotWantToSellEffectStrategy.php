@@ -30,7 +30,13 @@ class CompanyDoesNotWantToSellEffectStrategy extends AbstractEffectStrategy
 	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->hasNegativeAnswer();
+		if ($answer->surveyQuestionAnswer->hasNegativeAnswer()) {
+			$chatMember = $survey->chatMember;
+
+			return $chatMember->isObjectChatMember() && $chatMember->objectChatMember->isRentOrSale();
+		}
+
+		return false;
 	}
 
 	/**
@@ -41,7 +47,7 @@ class CompanyDoesNotWantToSellEffectStrategy extends AbstractEffectStrategy
 	{
 		$saleOffers = $survey->chatMember->object->getOffers()->notDelete()->active()->saleDealType()->all();
 
-		if (ArrayHelper::length($saleOffers) > 0) {
+		if (ArrayHelper::notEmpty($saleOffers)) {
 			$this->effectTaskService->createTaskForMessage(
 				$surveyChatMemberMessage,
 				$survey->user,

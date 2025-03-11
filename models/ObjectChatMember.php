@@ -21,6 +21,9 @@ use yii\db\ActiveQuery;
  */
 class ObjectChatMember extends AR
 {
+	public const RENT_OR_SALE_TYPE     = 'rent_or_sale';
+	public const SUBLEASE_TYPE         = 'sublease';
+	public const RESPONSE_STORAGE_TYPE = 'response_storage';
 
 	public static function tableName(): string
 	{
@@ -85,5 +88,20 @@ class ObjectChatMember extends AR
 	public function getCompany(): AQ
 	{
 		return $this->hasOne(Company::class, ['id' => 'company_id'])->from([Company::tableName() => Company::getTable()])->via('object');
+	}
+
+	public function isRentOrSale(): bool
+	{
+		return $this->type === self::RENT_OR_SALE_TYPE;
+	}
+
+	public function isSublease(): bool
+	{
+		return $this->type === self::SUBLEASE_TYPE;
+	}
+
+	public function isResponseStorage(): bool
+	{
+		return $this->type === self::RESPONSE_STORAGE_TYPE;
 	}
 }

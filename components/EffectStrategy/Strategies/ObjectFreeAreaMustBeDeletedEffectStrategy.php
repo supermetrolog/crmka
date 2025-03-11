@@ -29,7 +29,13 @@ class ObjectFreeAreaMustBeDeletedEffectStrategy extends AbstractEffectStrategy
 	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->hasPositiveAnswer();
+		if ($answer->surveyQuestionAnswer->hasPositiveAnswer()) {
+			$chatMember = $survey->chatMember;
+
+			return $chatMember->isObjectChatMember() && $chatMember->objectChatMember->isRentOrSale();
+		}
+
+		return false;
 	}
 
 	/**
