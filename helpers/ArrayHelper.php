@@ -184,9 +184,9 @@ class ArrayHelper
 	public static function flip(array $array): array
 	{
 		return array_flip($array);
-  }
-  
-  /**
+	}
+
+	/**
 	 * Accepts sorted array of integers and distributes value to all of them starting from left to right
 	 *
 	 * @param int[] $array
@@ -266,5 +266,17 @@ class ArrayHelper
 	public static function reduce(array $array, callable $cb, $initialValue = null)
 	{
 		return array_reduce($array, $cb, $initialValue);
+	}
+
+	/**
+	 * @param array|object  $array
+	 * @param string|number $key
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public static function getValue($array, $key, $defaultValue = null)
+	{
+		return YiiArrayHelper::getValue($array, $key, $defaultValue);
 	}
 }

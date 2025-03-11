@@ -85,6 +85,14 @@ class Request extends AR
 	public const DEAL_TYPE_RESPONSE_STORAGE = 2;
 	public const DEAL_TYPE_SUBLEASE         = 3;
 
+	public const PASSIVE_WHY_BLOCK        = 0;
+	public const PASSIVE_WHY_ALREADY_RENT = 1;
+	public const PASSIVE_WHY_ALREADY_BUY  = 2;
+	public const PASSIVE_WHY_OUTDATED     = 3;
+	public const PASSIVE_WHY_SUSPEND      = 4;
+	public const PASSIVE_WHY_OTHER        = 5;
+	public const PASSIVE_WHY_SURVEY       = 6;
+
 
 	public const REQUEST_CREATED_EVENT = 'request_created_event';
 	public const REQUEST_UPDATED_EVENT = 'request_updated_event';
@@ -123,7 +131,7 @@ class Request extends AR
 	public function rules()
 	{
 		return [
-			[['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'consultant_id', 'contact_id'], 'required'],
+			[['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'consultant_id'], 'required'],
 			[['heated', 'antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
 			[['contact_id', 'region_neardy', 'outside_mkad', 'company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
 			[['related_updated_at', 'created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
@@ -488,5 +496,10 @@ class Request extends AR
 	public static function find(): RequestQuery
 	{
 		return new RequestQuery(get_called_class());
+	}
+
+	public function isPassive(): bool
+	{
+		return $this->status === self::STATUS_PASSIVE;
 	}
 }

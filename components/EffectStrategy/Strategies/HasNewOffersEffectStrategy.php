@@ -4,18 +4,19 @@ namespace app\components\EffectStrategy\Strategies;
 
 use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\components\EffectStrategy\Service\CreateEffectTaskService;
+use app\helpers\ArrayHelper;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
-use app\models\ObjectChatMember;
+use app\models\Company;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
 use Throwable;
 use yii\base\Exception;
 
-class ObjectHasEquipmentForSaleEffectStrategy extends AbstractEffectStrategy
+class HasNewOffersEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = 'Объект #%s - есть оборудование под продажу, нужно обработать.';
+	private const TASK_MESSAGE_TEXT = 'Новые предложения у %s (#%s), подробности в опроснике.';
 
 	private CreateEffectTaskService $effectTaskService;
 
@@ -29,7 +30,7 @@ class ObjectHasEquipmentForSaleEffectStrategy extends AbstractEffectStrategy
 	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->hasPositiveAnswer();
+		return $answer->surveyQuestionAnswer->hasAnswer() && ArrayHelper::notEmpty($answer->surveyQuestionAnswer->getJSON());
 	}
 
 	/**
@@ -38,18 +39,34 @@ class ObjectHasEquipmentForSaleEffectStrategy extends AbstractEffectStrategy
 	 */
 	public function process(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
-		$chatMemberModel = $survey->chatMember->model;
+		$this->createTask($survey, $surveyQuestionAnswer, $surveyChatMemberMessage);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function createTask(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
+	{
+		$taskMessage = $this->getTaskMessage($survey);
 
 		$this->effectTaskService->createTaskForMessage(
 			$surveyChatMemberMessage,
 			$survey->user,
 			$surveyQuestionAnswer,
-			$this->getTaskMessage($chatMemberModel)
+			$taskMessage
 		);
 	}
 
-	public function getTaskMessage(ObjectChatMember $objectChatMember): string
+	public function getTaskMessage(Survey $survey): string
 	{
-		return sprintf(self::TASK_MESSAGE_TEXT, $objectChatMember->object_id);
+		/** @var Company $company */
+		$company = $survey->chatMember->model;
+
+		return sprintf(
+			self::TASK_MESSAGE_TEXT,
+			$company->getShortName(),
+			$company->id
+		);
 	}
 }

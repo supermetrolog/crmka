@@ -15,7 +15,7 @@ use Throwable;
 
 class ObjectFreeAreaMustBeEditedEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = 'Объект #%s, свободная площадь в аренду, %s.';
+	private const TASK_MESSAGE_TEXT = 'Площадь в аренду на объекте #%s (%s), %s.';
 
 	private CreateEffectTaskService $effectTaskService;
 
@@ -29,7 +29,13 @@ class ObjectFreeAreaMustBeEditedEffectStrategy extends AbstractEffectStrategy
 	 */
 	public function shouldBeProcessed(Survey $survey, QuestionAnswer $answer): bool
 	{
-		return $answer->surveyQuestionAnswer->hasPositiveAnswer();
+		if ($answer->surveyQuestionAnswer->hasPositiveAnswer()) {
+			$chatMember = $survey->chatMember;
+
+			return $chatMember->isObjectChatMember() && $chatMember->objectChatMember->isRentOrSale();
+		}
+
+		return false;
 	}
 
 	/**
@@ -52,15 +58,16 @@ class ObjectFreeAreaMustBeEditedEffectStrategy extends AbstractEffectStrategy
 	public function getTaskMessage(Survey $survey): string
 	{
 		$chatMemberModel = $survey->chatMember->model;
+		$company         = $chatMemberModel->company;
+
+		$description = 'подробности в опроснике';
 
 		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::OBJECT_FREE_AREA_MUST_BE_EDITED_DESCRIPTION);
 
 		if ($surveyQuestionAnswerDescription && $surveyQuestionAnswerDescription->hasAnswer()) {
 			$description = $surveyQuestionAnswerDescription->getString();
-		} else {
-			$description = 'подробности в опроснике';
 		}
 
-		return sprintf(self::TASK_MESSAGE_TEXT, $chatMemberModel->object_id, $description);
+		return sprintf(self::TASK_MESSAGE_TEXT, $chatMemberModel->object_id, $company->getShortName(), $description);
 	}
 }
