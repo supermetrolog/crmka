@@ -77,6 +77,7 @@ class CompanySearch extends Form
 			                          'last_call_rel_id'      => 'last_call_rel.id',
 			                          'objects_count'         => 'COUNT(DISTINCT ' . Objects::field('id') . ' )',
 			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
+			                          'active_requests_count' => 'COUNT(DISTINCT CASE WHEN request.status = 1 THEN request.id ELSE NULL END)',
 			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
 			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
 		                          ])
