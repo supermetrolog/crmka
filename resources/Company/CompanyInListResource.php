@@ -72,6 +72,7 @@ class CompanyInListResource extends JsonResource
 
 			'objects_count'         => $this->resource->objects_count,
 			'requests_count'        => $this->resource->requests_count,
+			'active_requests_count' => $this->resource->active_requests_count,
 			'contacts_count'        => $this->resource->contacts_count,
 			'active_contacts_count' => $this->resource->active_contacts_count
 		];

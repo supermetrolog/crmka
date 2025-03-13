@@ -266,6 +266,7 @@ class Company extends AR
 		$extraFields['contacts_count']        = fn() => (int)$this->getContacts()->count();
 		$extraFields['active_contacts_count'] = fn() => (int)$this->getActiveContacts()->count();
 		$extraFields['requests_count']        = fn() => (int)$this->getRequests()->count();
+		$extraFields['active_requests_count'] = fn() => (int)$this->getActiveRequests()->count();
 		$extraFields['objects_count']         = fn() => (int)$this->getObjects()->count();
 
 		$extraFields['offers_count'] = function ($efields) {
@@ -415,6 +416,14 @@ class Company extends AR
 	{
 		/** @var RequestQuery */
 		return $this->hasMany(Request::class, ['company_id' => 'id']);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getActiveRequests(): RequestQuery
+	{
+		return $this->getRequests()->andOnCondition([Request::field('status') => Request::STATUS_ACTIVE]);
 	}
 
 	/**
