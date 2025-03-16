@@ -307,6 +307,11 @@ class Task extends AR
 		return $this->isDeleted();
 	}
 
+	public function isDone(): bool
+	{
+		return $this->status === self::STATUS_DONE;
+	}
+
 	/**
 	 * @throws ErrorException
 	 */

@@ -15,6 +15,7 @@ use app\models\forms\Task\TaskAssignForm;
 use app\models\forms\Task\TaskChangeStatusForm;
 use app\models\forms\Task\TaskCommentForm;
 use app\models\forms\Task\TaskForm;
+use app\models\forms\Task\TaskPostponeForm;
 use app\models\Media;
 use app\models\search\TaskSearch;
 use app\models\Task;
@@ -452,6 +453,27 @@ class TaskController extends AppController
 		} catch (RelationNotExistsException $e) {
 			return $this->errorf("Файл %s не связан с данной задачей", $e->data);
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ModelNotFoundException
+	 * @throws ValidateException
+	 */
+	public function actionPostpone(int $id): TaskResource
+	{
+		$task = $this->repository->findModelById($id);
+
+		$form = new TaskPostponeForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$model = $this->taskService->postpone($task, $form->getDto(), $this->user->identity);
+
+		return new TaskResource($model);
 	}
 
 
