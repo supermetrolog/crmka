@@ -9,10 +9,12 @@ use app\dto\Media\CreateMediaDto;
 use app\dto\Media\DeleteMediaDto;
 use app\dto\Relation\CreateRelationDto;
 use app\dto\Task\ChangeTaskStatusDto;
+use app\dto\Task\PostponeTaskDto;
 use app\dto\Task\UpdateTaskDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
 use app\events\Task\CreateFileTaskEvent;
 use app\events\Task\DeleteFileTaskEvent;
+use app\events\Task\PostponeTaskEvent;
 use app\exceptions\services\RelationNotExistsException;
 use app\helpers\ArrayHelper;
 use app\helpers\DateTimeHelper;
@@ -365,4 +367,40 @@ class TaskService
 		}
 	}
 
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function postpone(Task $task, PostponeTaskDto $dto, User $initiator): Task
+	{
+		if ($task->isDone()) {
+			throw new InvalidCallException('Task is done and can not be postponed');
+		}
+
+		$canBePostponed = $task->user_id === $initiator->id ||
+		                  ($task->created_by_type === User::getMorphClass() && $task->created_by_id === $initiator->id) ||
+		                  $initiator->isModeratorOrHigher();
+
+		if (!$canBePostponed) {
+			throw new InvalidCallException('You can not postpone this task');
+		}
+
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$task->start = DateTimeHelper::format($dto->start);
+			$task->end   = DateTimeHelper::format($dto->end);
+
+			$task->saveOrThrow();
+
+			$this->eventManager->trigger(new PostponeTaskEvent($task, $initiator));
+
+			$tx->commit();
+
+			return $task;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
 }

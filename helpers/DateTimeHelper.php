@@ -7,9 +7,21 @@ namespace app\helpers;
 use DateTime;
 use DateTimeInterface;
 use Exception;
+use Throwable;
 
 class DateTimeHelper
 {
+	public static function isValid(string $datetime): bool
+	{
+		try {
+			self::make($datetime);
+
+			return true;
+		} catch (Throwable $e) {
+			return false;
+		}
+	}
+
 	public static function now(): DateTimeInterface
 	{
 		return new DateTime();

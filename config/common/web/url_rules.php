@@ -210,7 +210,8 @@ return
 				'PATCH,OPTIONS <id>/restore'      => 'restore',
 				'GET,OPTIONS <id>/files'          => 'files',
 				'POST,OPTIONS <id>/files'         => 'create-files',
-				'DELETE,OPTIONS <id>/files'       => 'delete-files'
+				'DELETE,OPTIONS <id>/files'       => 'delete-files',
+				'POST,OPTIONS <id>/postpone'      => 'postpone',
 			],
 		],
 		[

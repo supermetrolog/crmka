@@ -282,6 +282,16 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 		return $this->role === self::ROLE_SYSTEM;
 	}
 
+	public function isModerator(): bool
+	{
+		return $this->role === self::ROLE_MODERATOR;
+	}
+
+	public function isModeratorOrHigher(): bool
+	{
+		return $this->role >= self::ROLE_MODERATOR;
+	}
+
 	/**
 	 * @throws Exception
 	 */
