@@ -11,7 +11,6 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
 use app\models\TaskHistory;
 use Throwable;
-use yii\base\ErrorException;
 
 class TaskMessageToTitleAction extends Action
 {
@@ -29,30 +28,25 @@ class TaskMessageToTitleAction extends Action
 		parent::__construct($id, $controller, $config);
 	}
 
-	/**
-	 * @throws SaveModelException
-	 * @throws ErrorException
-	 */
 	public function run(): void
 	{
-		$this->info('Start moving task message to title');
+		$this->info('Start migration Task message to title');
 
-		$query = Task::find()->andWhereNull(Task::field('title'))->with(['lastHistory']);
+		$query = Task::find()->with(['lastHistory']);
 
 		$changedTasksCount = 0;
 
 		/** @var Task $task */
 		foreach ($query->each() as $task) {
-			$this->moveTaskMessageToTitle($task);
-			$changedTasksCount++;
+			if (empty($task->title)) {
+				$this->moveTaskMessageToTitle($task);
+				$changedTasksCount++;
+			}
 		}
 
 		$this->infof('Complete. Changed tasks: %d', $changedTasksCount);
 	}
 
-	/**
-	 * @throws SaveModelException
-	 */
 	private function moveTaskMessageToTitle(Task $task): void
 	{
 		$tx = $this->transactionBeginner->begin();
