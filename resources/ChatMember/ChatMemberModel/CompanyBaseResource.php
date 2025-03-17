@@ -39,6 +39,7 @@ class CompanyBaseResource extends JsonResource
 			'office_address'       => $this->resource->officeAdress,
 			'legal_address'        => $this->resource->legalAddress,
 			'status'               => $this->resource->status,
+			'show_product_ranges'  => $this->resource->show_product_ranges,
 			'created_at'           => $this->resource->created_at,
 			'updated_at'           => $this->resource->updated_at
 		];

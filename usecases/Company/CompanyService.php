@@ -115,7 +115,8 @@ class CompanyService
 				'rating'               => $dto->rating,
 				'processed'            => $dto->processed,
 				'is_individual'        => $dto->is_individual,
-				'individual_full_name' => $dto->individual_full_name
+				'individual_full_name' => $dto->individual_full_name,
+				'show_product_ranges'  => $dto->show_product_ranges
 			]);
 
 			$model->saveOrThrow();
@@ -206,7 +207,8 @@ class CompanyService
 				'rating'               => $dto->rating,
 				'processed'            => $dto->processed,
 				'is_individual'        => $dto->is_individual,
-				'individual_full_name' => $dto->individual_full_name
+				'individual_full_name' => $dto->individual_full_name,
+				'show_product_ranges'  => $dto->show_product_ranges
 			]);
 
 			$model->saveOrThrow();
