@@ -71,7 +71,7 @@ class Task extends AR
 			[['user_id', 'title', 'status', 'created_by_type', 'created_by_id'], 'required'],
 			[['user_id', 'status', 'created_by_id'], 'integer'],
 			[['message'], 'string'],
-			[['title'], 'string', 'max' => 255, 'min' => 16],
+			[['title'], 'string', 'max' => self::TITLE_MAX_LENGTH, 'min' => 16],
 			[['start', 'end', 'created_at', 'updated_at', 'impossible_to'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
 			['status', 'in', 'range' => self::getStatuses()],
