@@ -6,6 +6,7 @@ use app\dto\Task\CreateTaskDto;
 use app\helpers\ArrayHelper;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
+use app\helpers\StringHelper;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Task;
 use app\models\User;
@@ -22,6 +23,7 @@ class TaskBuilder
 	protected ?User              $user                   = null;
 	protected                    $createdBy              = null;
 	protected ?string            $message                = null;
+	protected ?string            $title                  = null;
 	protected DateTimeInterface  $start;
 	protected ?DateTimeInterface $end                    = null;
 	protected array              $tagIds                 = [];
@@ -69,9 +71,20 @@ class TaskBuilder
 		return $this->user;
 	}
 
-	public function setMessage(string $message): self
+	public function setMessage(?string $message): self
 	{
 		$this->message = $message;
+
+		return $this;
+	}
+
+	public function setTitle(string $title): self
+	{
+		if (StringHelper::length($title) > Task::TITLE_MAX_LENGTH) {
+			throw new InvalidArgumentException('Title is too long');
+		}
+
+		$this->title = $title;
 
 		return $this;
 	}
@@ -213,8 +226,12 @@ class TaskBuilder
 			throw new InvalidArgumentException('User must be set');
 		}
 
-		if (empty($this->message)) {
-			throw new InvalidArgumentException('Message must be set');
+		if (empty($this->title)) {
+			throw new InvalidArgumentException('Title must be set');
+		}
+
+		if (StringHelper::length($this->title) > Task::TITLE_MAX_LENGTH) {
+			throw new InvalidArgumentException('Title is too long');
 		}
 
 		if (is_null($this->getCreatedBy())) {
@@ -233,6 +250,7 @@ class TaskBuilder
 		return new CreateTaskDto([
 			'user'                   => $this->getUser(),
 			'message'                => $this->message,
+			'title'                  => $this->title,
 			'status'                 => $this->getStatus(),
 			'start'                  => $this->getStart(),
 			'end'                    => $this->getEnd(),

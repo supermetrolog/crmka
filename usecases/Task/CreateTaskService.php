@@ -56,6 +56,7 @@ class CreateTaskService
 		try {
 			$task = new Task([
 				'user_id'         => $dto->user->id,
+				'title'           => $dto->title,
 				'message'         => $dto->message,
 				'status'          => $dto->status,
 				'start'           => $dto->start ? $dto->start->format('Y-m-d H:i:s') : null,
@@ -101,6 +102,7 @@ class CreateTaskService
 			foreach ($dto->users as $user) {
 				$task = $this->create(new CreateTaskDto([
 					'user'            => $user,
+					'title'           => $dto->title,
 					'message'         => $dto->message,
 					'status'          => $dto->status,
 					'start'           => $dto->start,

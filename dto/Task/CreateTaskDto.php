@@ -11,7 +11,8 @@ use yii\base\BaseObject;
 class CreateTaskDto extends BaseObject
 {
 	public User               $user;
-	public string             $message;
+	public ?string            $message;
+	public string             $title;
 	public int                $status;
 	public ?DateTimeInterface $start                  = null;
 	public ?DateTimeInterface $end                    = null;

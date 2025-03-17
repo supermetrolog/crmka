@@ -76,6 +76,7 @@ class TaskService
 
 		try {
 			$task->load([
+				'title'   => $dto->title,
 				'message' => $dto->message,
 				'start'   => DateTimeHelper::tryMakef($dto->start),
 				'end'     => DateTimeHelper::tryMakef($dto->end)

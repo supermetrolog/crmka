@@ -18,7 +18,8 @@ use yii\db\ActiveQuery;
  *
  * @property int                $id
  * @property int                $user_id
- * @property string             $message
+ * @property ?string            $message
+ * @property string             $title
  * @property int                $status
  * @property string|null        $start
  * @property string|null        $end
@@ -46,6 +47,8 @@ class Task extends AR
 {
 	use ManyToManyTrait;
 
+	public const TITLE_MAX_LENGTH = 255;
+
 	public const LAST_COMMENTS_LIMIT = 10;
 	public const STATUS_CREATED      = 1;
 	public const STATUS_ACCEPTED     = 2;
@@ -65,9 +68,10 @@ class Task extends AR
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'message', 'status', 'created_by_type', 'created_by_id'], 'required'],
+			[['user_id', 'title', 'status', 'created_by_type', 'created_by_id'], 'required'],
 			[['user_id', 'status', 'created_by_id'], 'integer'],
 			[['message'], 'string'],
+			[['title'], 'string', 'max' => 255, 'min' => 16],
 			[['start', 'end', 'created_at', 'updated_at', 'impossible_to'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
 			['status', 'in', 'range' => self::getStatuses()],
