@@ -175,9 +175,7 @@ class TaskSearch extends Form
 				'or',
 				['like', Task::field('id'), $this->message],
 				['like', Task::field('message'), $this->message],
-				['like', Task::field('title'), $this->message],
-				['like', Task::field('end'), $this->message]
-
+				['like', Task::field('title'), $this->message]
 			]);
 		}
 
