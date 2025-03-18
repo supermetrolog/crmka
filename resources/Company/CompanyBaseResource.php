@@ -57,6 +57,7 @@ class CompanyBaseResource extends JsonResource
 			'consultant_id'        => $this->resource->consultant_id,
 			'is_individual'        => $this->resource->is_individual,
 			'individual_full_name' => $this->resource->individual_full_name,
+			'show_product_ranges'  => $this->resource->show_product_ranges,
 			'created_at'           => $this->resource->created_at,
 			'updated_at'           => $this->resource->updated_at
 		];

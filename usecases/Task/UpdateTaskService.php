@@ -25,6 +25,7 @@ class UpdateTaskService
 
 	private array $trackedAttributes = [
 		'message' => TaskEvent::EVENT_TYPE_DESCRIPTION_CHANGED,
+		'title'   => TaskEvent::EVENT_TYPE_TITLE_CHANGED,
 		'start'   => TaskEvent::EVENT_TYPE_STARTING_DATE_CHANGED,
 		'end'     => TaskEvent::EVENT_TYPE_ENDING_DATE_CHANGED
 	];

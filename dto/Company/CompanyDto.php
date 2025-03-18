@@ -42,4 +42,5 @@ class CompanyDto extends BaseObject
 	public ?int    $logo_id;
 	public bool    $is_individual;
 	public ?string $individual_full_name;
+	public bool    $show_product_ranges;
 }

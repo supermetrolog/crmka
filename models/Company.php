@@ -64,6 +64,7 @@ use yii\db\Expression;
  * @property ?int                          $media_id
  * @property bool                          $is_individual
  * @property ?string                       $individual_full_name
+ * @property bool                          $show_product_ranges
  *
  * @property-read ?User                    $broker
  * @property-read ?Companygroup            $companyGroup
@@ -134,7 +135,7 @@ class Company extends AR
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['consultant_id'], 'required'],
 			[['description'], 'string'],
-			[['is_individual'], 'boolean'],
+			[['is_individual', 'show_product_ranges'], 'boolean'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'latitude', 'longitude', 'individual_full_name'], 'string', 'max' => 255],
 			[['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['broker_id' => 'id']],
@@ -146,7 +147,7 @@ class Company extends AR
 	/**
 	 * {@inheritdoc}
 	 */
-	public function attributeLabels()
+	public function attributeLabels(): array
 	{
 		return [
 			'id'                   => 'ID',

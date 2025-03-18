@@ -10,7 +10,8 @@ use yii\base\BaseObject;
 class UpdateTaskDto extends BaseObject
 {
 	public User    $user;
-	public string  $message;
+	public ?string $message;
+	public string  $title;
 	public int     $status;
 	public ?int    $created_by_id;
 	public ?string $start = null;

@@ -24,6 +24,7 @@ class TaskHistoryViewResource extends JsonResource
 			'id'         => $this->resource->id,
 			'snapshot'   => [
 				'message'       => $this->resource->message,
+				'title'         => $this->resource->title,
 				'status'        => $this->resource->status,
 				'start'         => $this->resource->start,
 				'end'           => $this->resource->end,

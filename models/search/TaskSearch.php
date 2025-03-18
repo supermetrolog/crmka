@@ -170,9 +170,16 @@ class TaskSearch extends Form
 		]);
 
 
-		$query->andFilterWhere(['or',
-		                        ['like', Task::getColumn('message'), $this->message],
-		                        ['like', Task::getColumn('id'), $this->message]]);
+		if (!empty($this->message)) {
+			$query->andFilterWhere([
+				'or',
+				['like', Task::field('id'), $this->message],
+				['like', Task::field('message'), $this->message],
+				['like', Task::field('title'), $this->message]
+			]);
+		}
+
+		// TODO: Фильтры по файлам, user, survey, comments, created_by..
 
 		$query->andFilterWhere(['in', TaskTag::xfield('id'), $this->tag_ids]);
 

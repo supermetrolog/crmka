@@ -49,6 +49,7 @@ class CompanyForm extends Form
 	public $logo_id;
 	public $is_individual        = false;
 	public $individual_full_name = null;
+	public $show_product_ranges  = true;
 
 	public function rules(): array
 	{
@@ -58,7 +59,7 @@ class CompanyForm extends Form
 			[['activity_group_ids', 'activity_profile_ids'], 'each', 'rule' => ['integer']],
 			[['nameRu', 'nameEng', 'noName'], 'validateCompanyName'],
 			[['description'], 'string'],
-			[['is_individual'], 'boolean'],
+			[['is_individual', 'show_product_ranges'], 'boolean'],
 			[['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'individual_full_name'], 'string', 'max' => 255],
 			[['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['broker_id' => 'id']],
 			[['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::class, 'targetAttribute' => ['companyGroup_id' => 'id']],
@@ -118,6 +119,7 @@ class CompanyForm extends Form
 			'individual_full_name' => $this->individual_full_name,
 			'activity_group_ids'   => $this->activity_group_ids,
 			'activity_profile_ids' => $this->activity_profile_ids,
+			'show_product_ranges'  => $this->show_product_ranges,
 
 			'files'   => $this->files,
 			'logo_id' => $this->logo_id

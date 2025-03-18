@@ -47,6 +47,7 @@ class CompanySearch extends Form
 
 	public $without_product_ranges  = false;
 	public $with_passive_consultant = false;
+	public $show_product_ranges;
 
 	/**
 	 * {@inheritdoc}
@@ -57,7 +58,7 @@ class CompanySearch extends Form
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd', 'product_ranges'], 'safe'],
 			[['activity_group_ids', 'activity_profile_ids'], 'each', 'rule' => ['integer']],
-			[['without_product_ranges', 'with_passive_consultant'], 'boolean'],
+			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges'], 'boolean'],
 		];
 	}
 
@@ -233,6 +234,7 @@ class CompanySearch extends Form
 			Company::field('status')                             => $this->status,
 			Company::field('consultant_id')                      => $this->consultant_id,
 			Company::field('broker_id')                          => $this->broker_id,
+			Company::field('show_product_ranges')                => $this->show_product_ranges,
 			Company::field('activityGroup')                      => $this->activityGroup,
 			Company::field('activityProfile')                    => $this->activityProfile,
 			CompanyActivityGroup::field('activity_group_id')     => $this->activity_group_ids,

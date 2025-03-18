@@ -27,6 +27,7 @@ class TaskForm extends Form
 	public $created_by_type;
 	public $created_by_id;
 	public $message;
+	public $title;
 	public $status;
 	public $start;
 	public $end;
@@ -38,9 +39,10 @@ class TaskForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'message', 'status', 'created_by_type', 'created_by_id', 'user_ids'], 'required'],
+			[['user_id', 'title', 'status', 'created_by_type', 'created_by_id', 'user_ids'], 'required'],
 			[['user_id', 'status', 'created_by_id', 'survey_id'], 'integer'],
 			[['message'], 'string'],
+			[['title'], 'string', 'max' => 255, 'min' => 16],
 			[['start', 'end'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
 			['status', 'in', 'range' => Task::getStatuses()],
@@ -63,10 +65,28 @@ class TaskForm extends Form
 		];
 	}
 
+	public function attributeLabels(): array
+	{
+		return [
+			'user_id'       => 'ID пользователя',
+			'user_ids'      => 'ID пользователей',
+			'message'       => 'Описание',
+			'title'         => 'Заголовок',
+			'status'        => 'Статус',
+			'start'         => 'Дата старта',
+			'end'           => 'Дата окончания',
+			'tag_ids'       => 'Тэги',
+			'observer_ids'  => 'Наблюдители',
+			'survey_id'     => 'ID опроса',
+			'current_files' => 'Текущие файлы'
+		];
+	}
+
 	public function scenarios(): array
 	{
 		$common = [
 			'message',
+			'title',
 			'status',
 			'start',
 			'end',
@@ -91,6 +111,7 @@ class TaskForm extends Form
 			return new CreateTaskDto([
 				'user'            => User::find()->byId((int)$this->user_id)->one(),
 				'message'         => $this->message,
+				'title'           => $this->title,
 				'status'          => Task::STATUS_CREATED,
 				'start'           => DateTimeHelper::tryMake($this->start),
 				'end'             => DateTimeHelper::tryMake($this->end),
@@ -106,6 +127,7 @@ class TaskForm extends Form
 			return new CreateTaskForUsersDto([
 				'users'           => User::find()->byIds($this->user_ids)->all(),
 				'message'         => $this->message,
+				'title'           => $this->title,
 				'status'          => Task::STATUS_CREATED,
 				'start'           => DateTimeHelper::tryMake($this->start),
 				'end'             => DateTimeHelper::tryMake($this->end),
@@ -120,6 +142,7 @@ class TaskForm extends Form
 		return new UpdateTaskDto([
 			'user'          => User::find()->byId((int)$this->user_id)->one(),
 			'message'       => $this->message,
+			'title'         => $this->title,
 			'status'        => $this->status,
 			'start'         => $this->start,
 			'end'           => $this->end,
