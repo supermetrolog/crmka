@@ -16,7 +16,7 @@ use yii\base\Exception;
 
 class HasEquipmentsRequestsEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = '%s (#%s) хотят купить обрудование, %s.';
+	private const TASK_MESSAGE_TEXT = '%s (#%s) хотят купить обрудование';
 
 	private CreateEffectTaskService $effectTaskService;
 
@@ -48,39 +48,38 @@ class HasEquipmentsRequestsEffectStrategy extends AbstractEffectStrategy
 	 */
 	private function createTask(Survey $survey, SurveyQuestionAnswer $surveyQuestionAnswer, ChatMemberMessage $surveyChatMemberMessage): void
 	{
-		$taskMessage = $this->getTaskMessage($survey);
-
-
 		$this->effectTaskService->createTaskForMessage(
 			$surveyChatMemberMessage,
 			$survey->user,
 			$surveyQuestionAnswer,
-			$taskMessage
+			$this->getTaskTitle($survey),
+			$this->getTaskMessage($survey)
 		);
 	}
 
-	/**
-	 * @throws Exception
-	 * @throws \Exception
-	 */
-	public function getTaskMessage(Survey $survey): string
+	private function getTaskTitle(Survey $survey): string
 	{
 		/** @var Company $company */
 		$company = $survey->chatMember->model;
 
-		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::HAS_EQUIPMENTS_REQUESTS_DESCRIPTION);
-
-		$description = 'подробности в опроснике';
-
-		if ($surveyQuestionAnswerDescription && $surveyQuestionAnswerDescription->hasAnswer()) {
-			$description = $surveyQuestionAnswerDescription->getString();
-		}
-
 		return sprintf(
 			self::TASK_MESSAGE_TEXT,
 			$company->getShortName(),
-			$company->id,
-			$description
+			$company->id
 		);
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	private function getTaskMessage(Survey $survey): string
+	{
+		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::HAS_EQUIPMENTS_REQUESTS_DESCRIPTION);
+
+		if ($surveyQuestionAnswerDescription && $surveyQuestionAnswerDescription->hasAnswer()) {
+			return $surveyQuestionAnswerDescription->getString();
+		}
+
+		return 'Подробности в опроснике';
 	}
 }

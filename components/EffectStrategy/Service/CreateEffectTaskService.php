@@ -28,10 +28,11 @@ class CreateEffectTaskService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function createTaskForMessage(ChatMemberMessage $message, User $user, SurveyQuestionAnswer $surveyQuestionAnswer, string $text): Task
+	public function createTaskForMessage(ChatMemberMessage $message, User $user, SurveyQuestionAnswer $surveyQuestionAnswer, string $title, ?string $text = null): Task
 	{
 		$dto = $this->taskBuilderFactory
 			->createEffectBuilder()
+			->setTitle($title)
 			->setMessage($text)
 			->setCreatedBy($user)
 			->setSurveyQuestionAnswerId($surveyQuestionAnswer->id)

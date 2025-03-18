@@ -15,7 +15,7 @@ use Throwable;
 
 class CompanyWantsToSellMustBeEditedEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = 'Продажа объекта #%s (%s), %s.';
+	private const TASK_MESSAGE_TEXT = 'Продажа объекта #%s (%s)';
 
 	private CreateEffectTaskService $effectTaskService;
 
@@ -48,26 +48,30 @@ class CompanyWantsToSellMustBeEditedEffectStrategy extends AbstractEffectStrateg
 			$surveyChatMemberMessage,
 			$survey->user,
 			$surveyQuestionAnswer,
+			$this->getTaskTitle($survey),
 			$this->getTaskMessage($survey)
 		);
+	}
+
+	private function getTaskTitle(Survey $survey): string
+	{
+		$chatMemberModel = $survey->chatMember->model;
+		$company         = $chatMemberModel->company;
+
+		return sprintf(self::TASK_MESSAGE_TEXT, $chatMemberModel->object_id, $company->getShortName());
 	}
 
 	/**
 	 * @throws Exception
 	 */
-	public function getTaskMessage(Survey $survey): string
+	private function getTaskMessage(Survey $survey): string
 	{
-		$chatMemberModel = $survey->chatMember->model;
-		$company         = $chatMemberModel->company;
-
-		$description = 'подробности в опроснике';
-
 		$surveyQuestionAnswerDescription = $survey->getSurveyQuestionAnswerByEffectKind(EffectKind::COMPANY_WANTS_TO_SELL_MUST_BE_EDITED_DESCRIPTION);
 
 		if ($surveyQuestionAnswerDescription && $surveyQuestionAnswerDescription->hasAnswer()) {
-			$description = $surveyQuestionAnswerDescription->getString();
+			return $surveyQuestionAnswerDescription->getString();
 		}
 
-		return sprintf(self::TASK_MESSAGE_TEXT, $chatMemberModel->object_id, $company->getShortName(), $description);
+		return 'Подробности в опроснике';
 	}
 }

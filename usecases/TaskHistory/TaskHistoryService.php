@@ -49,6 +49,7 @@ class TaskHistoryService
 			'state'   => $taskState,
 
 			'user_id'         => $dto->task->user_id,
+			'title'           => $dto->task->title,
 			'message'         => $dto->task->message,
 			'status'          => $dto->task->status,
 			'start'           => $dto->task->start,

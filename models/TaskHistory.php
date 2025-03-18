@@ -13,7 +13,8 @@ use yii\helpers\Json;
  *
  * @property int               $id
  * @property int               $user_id
- * @property string            $message
+ * @property ?string           $message
+ * @property string            $title
  * @property int               $status
  * @property string|null       $start
  * @property string|null       $end
@@ -48,9 +49,10 @@ class TaskHistory extends AR
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'message', 'status', 'created_by_type', 'created_by_id', 'task_id'], 'required'],
+			[['user_id', 'title', 'status', 'created_by_type', 'created_by_id', 'task_id'], 'required'],
 			[['user_id', 'status', 'created_by_id', 'task_id', 'prev_id'], 'integer'],
 			[['message', 'state'], 'string'],
+			[['title'], 'string', 'max' => 255, 'min' => 16],
 			[['start', 'end', 'created_at', 'updated_at', 'impossible_to'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
 			['status', 'in', 'range' => Task::getStatuses()],

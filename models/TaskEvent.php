@@ -21,6 +21,7 @@ class TaskEvent extends AR
 	public const EVENT_TYPE_STATUS_CHANGED        = 'status_changed';
 	public const EVENT_TYPE_ASSIGNED              = 'assigned';
 	public const EVENT_TYPE_DESCRIPTION_CHANGED   = 'description_changed';
+	public const EVENT_TYPE_TITLE_CHANGED         = 'title_changed';
 	public const EVENT_TYPE_STARTING_DATE_CHANGED = 'starting_date_changed';
 	public const EVENT_TYPE_ENDING_DATE_CHANGED   = 'ending_date_changed';
 	public const EVENT_TYPE_TAGS_CHANGED          = 'tags_changed';
