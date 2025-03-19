@@ -20,6 +20,7 @@ class ShortMixedOfferInObjectResource extends JsonResource
 	{
 		return [
 			'id'         => $this->resource->id,
+			'visual_id'  => $this->resource->visual_id,
 			'deal_type'  => $this->resource->deal_type,
 			'status'     => $this->resource->status,
 			'is_deleted' => $this->resource->isDeleted()
