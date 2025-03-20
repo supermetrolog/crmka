@@ -46,7 +46,7 @@ class SurveyQuestionAnswer extends AR
 		return [
 			[['survey_id', 'question_answer_id'], 'required'],
 			[['survey_id', 'question_answer_id'], 'integer'],
-			[['value'], 'string', 'max' => 1024],
+			[['value'], 'string', 'max' => 2048],
 			[['question_answer_id'], 'exist', 'skipOnError' => true, 'targetClass' => QuestionAnswer::className(), 'targetAttribute' => ['question_answer_id' => 'id']],
 			[['survey_id'], 'exist', 'skipOnError' => true, 'targetClass' => Survey::className(), 'targetAttribute' => ['survey_id' => 'id']],
 		];
