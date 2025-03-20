@@ -53,12 +53,13 @@ class ObjectsSearch extends Objects
 			return $query->where(['c_industry_offers_mix.deleted' => 0, 'c_industry_offers_mix.type_id' => 2]);
 		}]);
 
-		// add conditions that should always apply here
+		$this->load($params);
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
 			'pagination' => [
-				'pageSize' => 10,
+				'defaultPageSize' => 10,
+				'pageSizeLimit'   => [0, 30],
 			],
 			'sort'       => [
 				'enableMultiSort' => true,
@@ -80,8 +81,6 @@ class ObjectsSearch extends Objects
 				],
 			]
 		]);
-
-		$this->load($params, '');
 
 		if (!$this->validate()) {
 			// uncomment the following line if you do not want to return any records when validation fails
