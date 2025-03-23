@@ -14,6 +14,7 @@ use app\models\forms\Contact\ContactForm;
 use app\repositories\ContactRepository;
 use app\resources\Contact\Comment\ContactCommentResource;
 use app\resources\Contact\ContactResource;
+use app\resources\Contact\ContactSearchResource;
 use app\resources\Contact\ContactWithCommentsResource;
 use app\usecases\Contact\ContactCommentService;
 use app\usecases\Contact\ContactService;
@@ -57,7 +58,7 @@ class ContactController extends AppController
 
 		$dataProvider = $searchModel->search($this->request->get());
 
-		return ContactResource::fromDataProvider($dataProvider);
+		return ContactSearchResource::fromDataProvider($dataProvider);
 	}
 
 	public function actionCompanyContacts($id): array

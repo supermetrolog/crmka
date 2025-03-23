@@ -5,6 +5,9 @@ namespace app\models;
 use app\helpers\SQLHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\miniModels\ContactComment;
+use app\models\miniModels\Email;
+use app\models\miniModels\Phone;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 
@@ -70,45 +73,53 @@ class ContactSearch extends Form
 		$this->validateOrThrow();
 
 		$query->andFilterWhere([
-			'id'                => $this->id,
-			'company_id'        => $this->company_id,
-			'type'              => $this->type,
-			'created_at'        => $this->created_at,
-			'updated_at'        => $this->updated_at,
-			'consultant_id'     => $this->consultant_id,
-			'position'          => $this->position,
-			'faceToFaceMeeting' => $this->faceToFaceMeeting,
-			'warning'           => $this->warning,
-			'good'              => $this->good,
-			'status'            => $this->status,
-			'passive_why'       => $this->passive_why,
-			'position_unknown'  => $this->position_unknown,
-			'isMain'            => $this->isMain,
+			Contact::field('id')                => $this->id,
+			Contact::field('company_id')        => $this->company_id,
+			Contact::field('type')              => $this->type,
+			Contact::field('created_at')        => $this->created_at,
+			Contact::field('updated_at')        => $this->updated_at,
+			Contact::field('consultant_id')     => $this->consultant_id,
+			Contact::field('position')          => $this->position,
+			Contact::field('faceToFaceMeeting') => $this->faceToFaceMeeting,
+			Contact::field('warning')           => $this->warning,
+			Contact::field('good')              => $this->good,
+			Contact::field('status')            => $this->status,
+			Contact::field('passive_why')       => $this->passive_why,
+			Contact::field('position_unknown')  => $this->position_unknown,
+			Contact::field('isMain')            => $this->isMain,
 		]);
 
-		$query->andFilterWhere(['like', 'middle_name', $this->middle_name])
-		      ->andFilterWhere(['like', 'last_name', $this->last_name])
-		      ->andFilterWhere(['like', 'first_name', $this->first_name])
-		      ->andFilterWhere(['like', 'passive_why_comment', $this->passive_why_comment])
-		      ->andFilterWhere(['like', 'warning_why_comment', $this->warning_why_comment]);
+		$query->andFilterWhere(['like', Contact::field('middle_name'), $this->middle_name])
+		      ->andFilterWhere(['like', Contact::field('last_name'), $this->last_name])
+		      ->andFilterWhere(['like', Contact::field('first_name'), $this->first_name])
+		      ->andFilterWhere(['like', Contact::field('passive_why_comment'), $this->passive_why_comment])
+		      ->andFilterWhere(['like', Contact::field('warning_why_comment'), $this->warning_why_comment]);
 
 		if (!empty($this->search)) {
+			$query->joinWith(['emails', 'phones', 'contactComments', 'company']);
+
 			$query->andFilterWhere([
 				'or',
 				[
 					'like',
 					SQLHelper::concatWithCoalesce([
-						Contact::xfield('first_name'),
-						Contact::xfield('middle_name'),
-						Contact::xfield('last_name')
+						Contact::field('first_name'),
+						Contact::field('middle_name'),
+						Contact::field('last_name')
 					]),
 					$this->search
 				],
-				['like', 'id', $this->search],
-				['like', 'company_id', $this->search],
-				['like', 'passive_why_comment', $this->search],
-				['like', 'warning_why_comment', $this->search]
-
+				['like', Contact::field('id'), $this->search],
+				['like', Contact::field('company_id'), $this->search],
+				['like', Contact::field('passive_why_comment'), $this->search],
+				['like', Contact::field('warning_why_comment'), $this->search],
+				['like', Phone::field('phone'), $this->search],
+				['like', Email::field('email'), $this->search],
+				['like', ContactComment::field('comment'), $this->search],
+				['like', Company::field('nameEng'), $this->search],
+				['like', Company::field('nameRu'), $this->search],
+				['like', Company::field('nameBrand'), $this->search],
+				['like', Company::field('individual_full_name'), $this->search],
 			]);
 		}
 
