@@ -52,7 +52,9 @@ class CallSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = Call::find()->joinWith(['user.userProfile', 'contact']);
+		$query = Call::find()
+		             ->joinWith(['user.userProfile', 'contact'])
+		             ->with(['contact.websites', 'contact.wayOfInformings', 'contact.consultant.userProfile']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -145,7 +147,7 @@ class CallSearch extends Form
 				['like', Company::field('individual_full_name'), $this->search],
 			]);
 		} else {
-			$query->with(['contact.phones', 'contact.emails']);
+			$query->with(['contact.phones', 'contact.emails', 'contact.company']);
 		}
 
 		return $dataProvider;
