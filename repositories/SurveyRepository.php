@@ -45,6 +45,7 @@ class SurveyRepository
 			             'dependentSurveys.contact.websites',
 			             'dependentSurveys.contact.wayOfInformings'
 		             ])
+		             ->with(['calls'])
 		             ->oneOrThrow();
 	}
 }

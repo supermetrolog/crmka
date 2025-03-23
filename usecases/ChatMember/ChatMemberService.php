@@ -15,8 +15,8 @@ use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\usecases\Call\CreateCallService;
 use app\usecases\Relation\RelationService;
+use Throwable;
 use yii\db\Exception;
-use \Throwable;
 
 class ChatMemberService
 {
@@ -103,21 +103,29 @@ class ChatMemberService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$model = $this->createCallService->create($dto);
+			$call = $this->createCallService->create($dto);
 
-			$this->relationService->create(new CreateRelationDto([
-				'first_type'  => $member::getMorphClass(),
-				'first_id'    => $member->id,
-				'second_type' => $model::getMorphClass(),
-				'second_id'   => $model->id,
-			]));
+			$this->linkCall($member, $call);
 
 			$tx->commit();
 
-			return $model;
+			return $call;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function linkCall(ChatMember $member, Call $call): void
+	{
+		$this->relationService->create(new CreateRelationDto([
+			'first_type'  => $member::getMorphClass(),
+			'first_id'    => $member->id,
+			'second_type' => $call::getMorphClass(),
+			'second_id'   => $call->id,
+		]));
 	}
 }

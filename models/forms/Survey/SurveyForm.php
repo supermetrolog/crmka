@@ -7,6 +7,7 @@ namespace app\models\forms\Survey;
 use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
 use app\kernel\common\models\Form\Form;
+use app\models\Call;
 use app\models\ChatMember;
 use app\models\Contact;
 use app\models\Survey;
@@ -22,6 +23,7 @@ class SurveyForm extends Form
 	public $contact_id;
 	public $chat_member_id;
 	public $related_survey_id;
+	public $call_ids = [];
 
 	public function rules(): array
 	{
@@ -32,6 +34,7 @@ class SurveyForm extends Form
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
 			[['chat_member_id'], 'exist', 'skipOnError' => true, 'targetClass' => ChatMember::class, 'targetAttribute' => ['chat_member_id' => 'id']],
 			[['related_survey_id'], 'exist', 'skipOnError' => true, 'targetClass' => Survey::class, 'targetAttribute' => ['related_survey_id' => 'id']],
+			['call_ids', 'each', 'rule' => ['exist', 'targetClass' => Call::class, 'targetAttribute' => ['call_ids' => 'id']]],
 		];
 	}
 
@@ -41,11 +44,11 @@ class SurveyForm extends Form
 			'user_id',
 			'contact_id',
 			'chat_member_id',
-			'related_survey_id',
+			'related_survey_id'
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common],
+			self::SCENARIO_CREATE => [...$common, 'call_ids'],
 			self::SCENARIO_UPDATE => [...$common],
 		];
 	}
@@ -62,7 +65,8 @@ class SurveyForm extends Form
 					'user'              => User::find()->byId((int)$this->user_id)->one(),
 					'contact'           => Contact::find()->byId((int)$this->contact_id)->one(),
 					'chatMember'        => ChatMember::find()->byId((int)$this->chat_member_id)->one(),
-					'related_survey_id' => $this->related_survey_id
+					'related_survey_id' => $this->related_survey_id,
+					'calls'             => Call::find()->byIds($this->call_ids)->all()
 				]);
 
 			default:

@@ -123,4 +123,33 @@ class Call extends \app\kernel\common\models\AR\AR
 	{
 		return new CallQuery(get_called_class());
 	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getRelationSecond(): RelationQuery
+	{
+		/** @var RelationQuery */
+		return $this->morphHasMany(Relation::class, 'id', 'second');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getChatMembers(): ChatMemberQuery
+	{
+		/** @var ChatMemberQuery */
+		return $this->morphHasManyVia(ChatMemberQuery::class, 'id', 'first')
+		            ->via('relationSecond');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getSurveys(): SurveyQuery
+	{
+		/** @var SurveyQuery */
+		return $this->morphHasManyVia(Survey::class, 'id', 'first')
+		            ->via('relationSecond');
+	}
 }
