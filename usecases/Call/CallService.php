@@ -19,9 +19,10 @@ class CallService
 	public function update(Call $model, UpdateCallDto $dto): Call
 	{
 		$model->load([
-			'contact_id' => $dto->contact->id,
-			'type'       => $dto->type,
-			'status'     => $dto->status
+			'contact_id'  => $dto->contact->id,
+			'type'        => $dto->type,
+			'status'      => $dto->status,
+			'description' => $dto->description
 		]);
 
 		$model->saveOrThrow();

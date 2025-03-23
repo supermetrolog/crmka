@@ -3,21 +3,30 @@
 namespace app\models;
 
 use app\models\ActiveQuery\CallQuery;
-use yii\db\ActiveQuery;
+use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\ContactQuery;
+use app\models\ActiveQuery\RelationQuery;
+use app\models\ActiveQuery\SurveyQuery;
+use app\models\ActiveQuery\UserQuery;
+use yii\base\ErrorException;
 
 /**
  * This is the model class for table "call".
  *
- * @property int         $id
- * @property int         $user_id
- * @property int|null    $contact_id
- * @property int         $type
- * @property int         $status
- * @property string      $created_at
- * @property string      $updated_at
- * @property string|null $deleted_at
+ * @property int               $id
+ * @property int               $user_id
+ * @property int|null          $contact_id
+ * @property int               $type
+ * @property int               $status
+ * @property ?string           $description
+ * @property string            $created_at
+ * @property string            $updated_at
+ * @property ?string           $deleted_at
  *
- * @property User        $user
+ * @property-read User         $user
+ * @property-read Contact      $contact
+ * @property-read ChatMember[] $chatMembers
+ * @property-read Survey[]     $surveys
  */
 class Call extends \app\kernel\common\models\AR\AR
 {
@@ -67,6 +76,7 @@ class Call extends \app\kernel\common\models\AR\AR
 		return [
 			[['user_id', 'contact_id', 'type', 'status'], 'required'],
 			[['user_id', 'contact_id', 'type', 'status'], 'integer'],
+			['description', 'string', 'max' => 512],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
@@ -87,20 +97,16 @@ class Call extends \app\kernel\common\models\AR\AR
 		];
 	}
 
-	/**
-	 * @return ActiveQuery
-	 */
-	public function getUser(): ActiveQuery
+	public function getUser(): UserQuery
 	{
-		return $this->hasOne(User::className(), ['id' => 'user_id']);
+		/** @var UserQuery */
+		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
-	/**
-	 * @return ActiveQuery
-	 */
-	public function getContact(): ActiveQuery
+	public function getContact(): ContactQuery
 	{
-		return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
+		/** @var ContactQuery */
+		return $this->hasOne(Contact::class, ['id' => 'contact_id']);
 	}
 
 	public function isOutgoing(): bool
