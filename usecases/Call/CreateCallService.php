@@ -16,10 +16,11 @@ class CreateCallService
 	public function create(CreateCallDto $dto): Call
 	{
 		$model = new Call([
-			'user_id'    => $dto->user->id,
-			'contact_id' => $dto->contact->id,
-			'type'       => $dto->type,
-			'status'     => $dto->status
+			'user_id'     => $dto->user->id,
+			'contact_id'  => $dto->contact->id,
+			'type'        => $dto->type,
+			'status'      => $dto->status,
+			'description' => $dto->description
 		]);
 
 		$model->saveOrThrow();

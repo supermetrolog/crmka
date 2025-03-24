@@ -7,9 +7,9 @@ namespace app\resources\Call;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Call;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
-use app\resources\Contact\ContactShortResource;
+use app\resources\Contact\ContactSearchResource;
 
-class CallResource extends JsonResource
+class CallSearchResource extends JsonResource
 {
 	private Call $resource;
 
@@ -32,7 +32,7 @@ class CallResource extends JsonResource
 			'deleted_at'  => $this->resource->deleted_at,
 
 			'user'    => UserShortResource::make($this->resource->user)->toArray(),
-			'contact' => ContactShortResource::make($this->resource->contact)->toArray(),
+			'contact' => ContactSearchResource::make($this->resource->contact)->toArray(),
 		];
 	}
 }

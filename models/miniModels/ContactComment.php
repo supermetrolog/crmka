@@ -2,6 +2,7 @@
 
 namespace app\models\miniModels;
 
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\Contact;
 use app\models\User;
@@ -76,5 +77,10 @@ class ContactComment extends AR
 	public function getContact(): ActiveQuery
 	{
 		return $this->hasOne(Contact::class, ['id' => 'contact_id']);
+	}
+
+	public static function find(): AQ
+	{
+		return new AQ(static::class);
 	}
 }

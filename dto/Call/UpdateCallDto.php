@@ -12,4 +12,5 @@ class UpdateCallDto extends BaseObject
 	public int     $type;
 	public int     $status;
 	public Contact $contact;
+	public ?string $description;
 }

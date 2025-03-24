@@ -10,6 +10,7 @@ use app\models\Call;
 use app\models\forms\Call\CallForm;
 use app\models\search\CallSearch;
 use app\resources\Call\CallResource;
+use app\resources\Call\CallSearchResource;
 use app\usecases\Call\CallService;
 use app\usecases\Call\CreateCallService;
 use Exception;
@@ -46,7 +47,7 @@ class CallController extends AppController
 		$searchModel  = new CallSearch();
 		$dataProvider = $searchModel->search($this->request->get());
 
-		return CallResource::fromDataProvider($dataProvider);
+		return CallSearchResource::fromDataProvider($dataProvider);
 	}
 
 	/**

@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\QuestionQuery;
 use app\models\ActiveQuery\RelationQuery;
@@ -34,6 +35,7 @@ use yii\db\ActiveQuery;
  * @property-read Task[]                 $tasks
  * @property-read ?Survey                $relatedSurvey
  * @property-read Survey[]               $dependentSurveys
+ * @property-read Call[]                 $calls
  */
 class Survey extends AR
 {
@@ -114,6 +116,15 @@ class Survey extends AR
 	/**
 	 * @throws ErrorException
 	 */
+	public function getRelationFirst(): RelationQuery
+	{
+		/** @var RelationQuery */
+		return $this->morphHasMany(Relation::class, 'id', 'first');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
 	public function getRelationSecond(): RelationQuery
 	{
 		/** @var RelationQuery */
@@ -151,6 +162,16 @@ class Survey extends AR
 	{
 		/** @var SurveyQuery */
 		return $this->hasMany(Survey::class, ['related_survey_id' => 'id']);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getCalls(): CallQuery
+	{
+		/** @var CallQuery */
+		return $this->morphHasManyVia(Call::class, 'id', 'second')
+		            ->via('relationFirst');
 	}
 
 	public static function find(): SurveyQuery

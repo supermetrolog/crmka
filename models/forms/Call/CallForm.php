@@ -21,12 +21,14 @@ class CallForm extends Form
 	public $contact_id;
 	public $status;
 	public $type;
+	public $description;
 
 	public function rules(): array
 	{
 		return [
 			[['user_id', 'contact_id', 'status', 'type'], 'required'],
 			[['user_id', 'contact_id', 'status', 'type'], 'integer'],
+			['description', 'string', 'max' => 512],
 			['status', 'in', 'range' => Call::getStatuses()],
 			['type', 'in', 'range' => Call::getTypes()],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -40,6 +42,7 @@ class CallForm extends Form
 			'contact_id',
 			'status',
 			'type',
+			'description'
 		];
 
 		return [
@@ -51,10 +54,11 @@ class CallForm extends Form
 	public function attributeLabels(): array
 	{
 		return [
-			'user_id'    => 'ID сотрудника',
-			'contact_id' => 'ID контакта',
-			'type'       => 'Тип звонка',
-			'status'     => 'Статус звонка'
+			'user_id'     => 'ID сотрудника',
+			'contact_id'  => 'ID контакта',
+			'type'        => 'Тип звонка',
+			'status'      => 'Статус звонка',
+			'description' => 'Описание',
 		];
 	}
 
@@ -67,17 +71,19 @@ class CallForm extends Form
 		switch ($this->getScenario()) {
 			case self::SCENARIO_CREATE:
 				return new CreateCallDto([
-					'user'    => User::find()->byId($this->user_id)->one(),
-					'contact' => Contact::find()->byId($this->contact_id)->one(),
-					'type'    => $this->type,
-					'status'  => $this->status
+					'user'        => User::find()->byId((int)$this->user_id)->one(),
+					'contact'     => Contact::find()->byId((int)$this->contact_id)->one(),
+					'type'        => $this->type,
+					'status'      => $this->status,
+					'description' => $this->description
 				]);
 
 			default:
 				return new UpdateCallDto([
-					'contact' => Contact::find()->byId($this->contact_id)->one(),
-					'type'    => $this->type,
-					'status'  => $this->status
+					'contact'     => Contact::find()->byId((int)$this->contact_id)->one(),
+					'type'        => $this->type,
+					'status'      => $this->status,
+					'description' => $this->description
 				]);
 		}
 	}
