@@ -7,6 +7,7 @@ namespace app\resources\Survey;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Question;
 use app\models\Survey;
+use app\resources\Call\CallResource;
 use app\resources\Contact\ContactResource;
 use app\resources\QuestionAnswerResource;
 use app\resources\QuestionResource;
@@ -47,6 +48,7 @@ class SurveyWithQuestionsResource extends JsonResource
 			'tasks'            => TaskResource::collection($this->resource->tasks),
 			'relatedSurvey'    => SurveyResource::tryMakeArray($this->resource->relatedSurvey),
 			'dependentSurveys' => SurveyResource::collection($this->resource->dependentSurveys),
+			'calls'            => CallResource::collection($this->resource->calls),
 
 			'questions' => $this->getQuestions(),
 		];

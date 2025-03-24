@@ -6,6 +6,7 @@ namespace app\resources\Survey;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Survey;
+use app\resources\Call\CallShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\ChatMember\ChatMemberShortResource;
 use app\resources\Contact\ContactResource;
@@ -32,7 +33,8 @@ class SurveyResource extends JsonResource
 
 			'user'       => UserShortResource::make($this->resource->user)->toArray(),
 			'contact'    => ContactResource::make($this->resource->contact)->toArray(),
-			'chatMember' => ChatMemberShortResource::tryMakeArray($this->resource->chatMember)
+			'chatMember' => ChatMemberShortResource::tryMakeArray($this->resource->chatMember),
+			'calls'      => CallShortResource::collection($this->resource->calls)
 		];
 	}
 }

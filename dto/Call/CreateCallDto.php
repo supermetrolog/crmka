@@ -15,4 +15,5 @@ class CreateCallDto extends BaseObject
 	public Contact $contact;
 	public int     $type   = Call::TYPE_OUTGOING;
 	public int     $status = Call::STATUS_COMPLETED;
+	public ?string $description;
 }

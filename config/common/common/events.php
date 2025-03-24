@@ -15,7 +15,6 @@ use app\events\Task\RestoreTaskEvent;
 use app\events\Task\UpdateTaskEvent;
 use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
-use app\listeners\Survey\CreateSurveyUpdateLastCallListener;
 use app\listeners\Survey\UpdateSurveySystemChatMessageListener;
 use app\listeners\Task\AssignTaskListener;
 use app\listeners\Task\ChangeStatusTaskListener;
@@ -31,8 +30,7 @@ use app\listeners\Task\UpdateTaskListener;
 
 return [
 	CreateSurveyEvent::class            => [
-		CreateSurveySystemChatMessageListener::class,
-		CreateSurveyUpdateLastCallListener::class
+		CreateSurveySystemChatMessageListener::class
 	],
 	UpdateSurveyEvent::class            => [
 		UpdateSurveySystemChatMessageListener::class,

@@ -74,6 +74,15 @@ return
 		],
 		[
 			'class'         => 'yii\rest\UrlRule',
+			'controller'    => 'contact-comment',
+			'except'        => [],
+			'extraPatterns' => [
+				'PUT,OPTIONS <id>'    => 'update',
+				'DELETE,OPTIONS <id>' => 'delete',
+			],
+		],
+		[
+			'class'         => 'yii\rest\UrlRule',
 			'controller'    => ['timeline' => 'timeline'],
 			'except'        => [],
 			'extraPatterns' => [

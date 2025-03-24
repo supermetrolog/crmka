@@ -8,7 +8,9 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Call\CallForm;
 use app\models\forms\Media\MediaForm;
 use app\models\forms\Survey\SurveyForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
@@ -102,14 +104,40 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @return SurveyShortResource
+	 * @return SurveyResource|ErrorResponse
 	 * @throws Throwable
 	 * @throws Exception
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
-	public function actionCreateWithSurveyQuestionAnswer(): SurveyShortResource
+	public function actionCreateWithSurveyQuestionAnswer()
 	{
+		// Create Survey
+
+		$surveyForm = new SurveyForm();
+
+		$surveyForm->setScenario(SurveyForm::SCENARIO_CREATE);
+
+		$surveyForm->load($this->request->post());
+
+		$surveyForm->validateOrThrow();
+
+		$surveyDto = $surveyForm->getDto();
+
+		// Calls form
+
+		$callDtos = [];
+
+		foreach ($this->request->post('calls', []) as $call) {
+			$callForm = $this->makeCallForm($call);
+
+			$callDtos[] = $callForm->getDto();
+		}
+
+		if (ArrayHelper::empty($callDtos) && ArrayHelper::empty($surveyDto->call_ids)) {
+			return $this->error('Нельзя сохранить опрос без звонков.');
+		}
+
 		// Create Survey Question Answers
 
 		$answerDtos   = [];
@@ -130,19 +158,9 @@ class SurveyController extends AppController
 			$answerDtos[] = $answerDto;
 		}
 
-		// Create Survey
+		$model = $this->service->createWithSurveyQuestionAnswer($surveyDto, $answerDtos, $callDtos, $mediaDtosMap);
 
-		$surveyForm = new SurveyForm();
-
-		$surveyForm->setScenario(SurveyForm::SCENARIO_CREATE);
-
-		$surveyForm->load($this->request->post());
-
-		$surveyForm->validateOrThrow();
-
-		$model = $this->service->createWithSurveyQuestionAnswer($surveyForm->getDto(), $answerDtos, $mediaDtosMap);
-
-		return new SurveyShortResource($model);
+		return new SurveyResource($model);
 	}
 
 	/**
@@ -249,4 +267,20 @@ class SurveyController extends AppController
 
 		return $form;
 	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeCallForm(array $formData, string $scenario = CallForm::SCENARIO_CREATE): CallForm
+	{
+		$callForm = new CallForm();
+
+		$callForm->setScenario($scenario);
+		$callForm->load($formData);
+
+		$callForm->validateOrThrow();
+
+		return $callForm;
+	}
+
 }
