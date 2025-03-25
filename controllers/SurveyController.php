@@ -134,7 +134,7 @@ class SurveyController extends AppController
 			$callDtos[] = $callForm->getDto();
 		}
 
-		if (ArrayHelper::empty($callDtos) && ArrayHelper::empty($surveyDto->call_ids)) {
+		if (ArrayHelper::empty($callDtos) && ArrayHelper::empty($surveyDto->calls)) {
 			return $this->error('Нельзя сохранить опрос без звонков.');
 		}
 
