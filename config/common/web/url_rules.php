@@ -53,10 +53,15 @@ return
 			'controller'    => 'request',
 			'except'        => [],
 			'extraPatterns' => [
+				'GET,OPTIONS'                       => 'index',
 				'GET,OPTIONS company-requests/<id>' => 'company-requests',
-				'GET,OPTIONS search'                => 'search',
+				'POST,OPTIONS'                      => 'create',
 				'PATCH,OPTIONS disable/<id>'        => 'disable',
 				'PATCH,OPTIONS undisable/<id>'      => 'undisable',
+				'GET,OPTIONS <id>'                  => 'view',
+				'PUT,OPTIONS <id>'                  => 'update',
+
+
 			],
 		],
 		[
