@@ -29,7 +29,7 @@ class RequestRepository
 	public function findOneOrThrowWithRelations(int $id): Request
 	{
 		return Request::find()->byId($id)
-		              ->with(['consultant.userProfile', ''])
+		              ->with(['regions.info'])
 		              ->oneOrThrow();
 	}
 

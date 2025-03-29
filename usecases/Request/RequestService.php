@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\usecases\Request;
 
 use app\components\EventManager;
+use app\dto\Request\CloneRequestDto;
 use app\dto\Request\CreateRequestDto;
 use app\dto\Request\PassiveRequestDto;
 use app\dto\Request\RequestRelationsDto;
@@ -13,8 +14,10 @@ use app\dto\Timeline\CreateTimelineDto;
 use app\events\NotificationEvent;
 use app\events\Request\CreateRequestEvent;
 use app\exceptions\ValidationErrorHttpException;
+use app\helpers\ArrayHelper;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Notification;
 use app\models\Request;
@@ -31,6 +34,7 @@ use Throwable;
 use Yii;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
+use yii\db\ActiveRecord;
 
 class RequestService
 {
@@ -397,5 +401,65 @@ class RequestService
 	public function updateRelatedTimestamp(Request $request): void
 	{
 		$request->updateAttributes(['related_updated_at' => DateTimeHelper::nowf()]);
+	}
+
+	/**
+	 * @param array<AR|ActiveRecord> $relations
+	 *
+	 * @return array<string|int>
+	 */
+	private function mapRelations(array $relations, string $attribute): array
+	{
+		return ArrayHelper::map($relations, static fn($el) => $el->$attribute);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ValidationErrorHttpException
+	 * @throws Throwable
+	 */
+	public function clone(Request $request, CloneRequestDto $dto): Request
+	{
+		return $this->create(new CreateRequestDto([
+			'consultant_id' => $dto->consultant->id,
+
+			'company_id'                    => $request->company_id,
+			'name'                          => $request->name,
+			'description'                   => $request->description,
+			'contact_id'                    => $request->contact_id,
+			'dealType'                      => $request->dealType,
+			'minArea'                       => $request->minArea,
+			'maxArea'                       => $request->maxArea,
+			'minCeilingHeight'              => $request->minCeilingHeight,
+			'maxCeilingHeight'              => $request->maxCeilingHeight,
+			'distanceFromMKAD'              => $request->distanceFromMKAD,
+			'distanceFromMKADnotApplicable' => $request->distanceFromMKADnotApplicable,
+			'firstFloorOnly'                => $request->firstFloorOnly,
+			'expressRequest'                => $request->expressRequest,
+			'heated'                        => $request->heated,
+			'water'                         => $request->water,
+			'sewerage'                      => $request->sewerage,
+			'gaz'                           => $request->gaz,
+			'steam'                         => $request->steam,
+			'shelving'                      => $request->shelving,
+			'haveCranes'                    => $request->haveCranes,
+			'pricePerFloor'                 => $request->pricePerFloor,
+			'antiDustOnly'                  => $request->antiDustOnly,
+			'trainLine'                     => $request->trainLine,
+			'trainLineLength'               => $request->trainLineLength,
+			'electricity'                   => $request->electricity,
+			'unknownMovingDate'             => $request->unknownMovingDate,
+			'outside_mkad'                  => $request->outside_mkad,
+			'region_neardy'                 => $request->region_neardy,
+			'movingDate'                    => DateTimeHelper::tryFormat($request->movingDate),
+
+			'direction_ids'           => $this->mapRelations($request->directions, 'direction'),
+			'district_ids'            => $this->mapRelations($request->districts, 'district'),
+			'gate_types'              => $this->mapRelations($request->gateTypes, 'gate_type'),
+			'object_classes'          => $this->mapRelations($request->objectClasses, 'object_class'),
+			'object_type_ids'         => $this->mapRelations($request->objectTypes, 'object_type'),
+			'object_type_general_ids' => $this->mapRelations($request->objectTypesGeneral, 'type'),
+			'region_ids'              => $this->mapRelations($request->regions, 'region'),
+		]));
 	}
 }

@@ -27,63 +27,64 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "request".
  *
- * @property int                  $id
- * @property int                  $company_id                    [связь] ID компании
- * @property string               $name                          Название
- * @property int                  $dealType                      Тип сделки
- * @property int|null             $expressRequest                [флаг] Срочный запрос
- * @property int|null             $distanceFromMKAD              Удаленность от МКАД
- * @property int|null             $distanceFromMKADnotApplicable [флаг] Неприменимо
- * @property int                  $minArea                       Минимальная площадь пола
- * @property int                  $maxArea                       Максимальная площадь пола
- * @property int                  $minCeilingHeight              Минимальная высота потолков
- * @property int                  $maxCeilingHeight              максимальная высота потолков
- * @property int|null             $firstFloorOnly                [флаг] Только 1 этаж
- * @property int                  $heated                        [флаг] Отапливаемый
- * @property int|null             $antiDustOnly                  [флаг] Только антипыль
- * @property int|null             $trainLine                     [флаг] Ж/Д ветка
- * @property int|null             $trainLineLength               Длина Ж/Д
- * @property int                  $consultant_id                 [связь] ID консультанта
- * @property string|null          $description                   Описание
- * @property int|null             $pricePerFloor                 Цена за пол
- * @property int|null             $electricity                   Электричество
- * @property int|null             $haveCranes                    [флаг] Наличие кранов
- * @property int|null             $status                        [флаг] Статус
- * @property int|null             $passive_why
- * @property string|null          $passive_why_comment
- * @property string|null          $created_at
- * @property string|null          $updated_at
- * @property string|null          $movingDate                    Дата переезда
- * @property int|null             $unknownMovingDate             [флаг] Нет конкретики по сроку переезда/рассматривает постоянно
- * @property int|null             $water                         [флаг]
- * @property int|null             $sewerage                      [флаг]
- * @property int|null             $gaz                           [флаг]
- * @property int|null             $steam                         [флаг]
- * @property int|null             $shelving                      [флаг]
- * @property int|null             $outside_mkad                  [флаг] Вне мкад (если выбран регоин МОСКВА)
- * @property int|null             $region_neardy                 [флаг] Регионы рядом
- * @property int|null             $contact_id                    [связь] с контактом
- * @property string|null          $related_updated_at            дата последнего обновления связанных с запросом сущностей
+ * @property int                        $id
+ * @property int                        $company_id                    [связь] ID компании
+ * @property string                     $name                          Название
+ * @property int                        $dealType                      Тип сделки
+ * @property int|null                   $expressRequest                [флаг] Срочный запрос
+ * @property int|null                   $distanceFromMKAD              Удаленность от МКАД
+ * @property int|null                   $distanceFromMKADnotApplicable [флаг] Неприменимо
+ * @property int                        $minArea                       Минимальная площадь пола
+ * @property int                        $maxArea                       Максимальная площадь пола
+ * @property int                        $minCeilingHeight              Минимальная высота потолков
+ * @property int                        $maxCeilingHeight              максимальная высота потолков
+ * @property int|null                   $firstFloorOnly                [флаг] Только 1 этаж
+ * @property int                        $heated                        [флаг] Отапливаемый
+ * @property int|null                   $antiDustOnly                  [флаг] Только антипыль
+ * @property int|null                   $trainLine                     [флаг] Ж/Д ветка
+ * @property int|null                   $trainLineLength               Длина Ж/Д
+ * @property int                        $consultant_id                 [связь] ID консультанта
+ * @property string|null                $description                   Описание
+ * @property int|null                   $pricePerFloor                 Цена за пол
+ * @property int|null                   $electricity                   Электричество
+ * @property int|null                   $haveCranes                    [флаг] Наличие кранов
+ * @property int|null                   $status                        [флаг] Статус
+ * @property int|null                   $passive_why
+ * @property string|null                $passive_why_comment
+ * @property string|null                $created_at
+ * @property string|null                $updated_at
+ * @property string|null                $movingDate                    Дата переезда
+ * @property int|null                   $unknownMovingDate             [флаг] Нет конкретики по сроку переезда/рассматривает постоянно
+ * @property int|null                   $water                         [флаг]
+ * @property int|null                   $sewerage                      [флаг]
+ * @property int|null                   $gaz                           [флаг]
+ * @property int|null                   $steam                         [флаг]
+ * @property int|null                   $shelving                      [флаг]
+ * @property int|null                   $outside_mkad                  [флаг] Вне мкад (если выбран регоин МОСКВА)
+ * @property int|null                   $region_neardy                 [флаг] Регионы рядом
+ * @property int|null                   $contact_id                    [связь] с контактом
+ * @property string|null                $related_updated_at            дата последнего обновления связанных с запросом сущностей
  *
- * @property Company              $company
- * @property User                 $consultant
- * @property RequestDirection[]   $directions
- * @property RequestDistrict[]    $districts
- * @property RequestGateType[]    $gateTypes
- * @property RequestObjectClass[] $objectClasses
- * @property RequestObjectType[]  $objectTypes
- * @property RequestRegion[]      $regions
- * @property Timeline[]           $timelines
- * @property-read Timeline[]      $activeTimelines
- * @property-read Timeline        $mainTimeline
- * @property-read ?Contact        $contact
+ * @property Company                    $company
+ * @property User                       $consultant
+ * @property RequestDirection[]         $directions
+ * @property RequestDistrict[]          $districts
+ * @property RequestGateType[]          $gateTypes
+ * @property RequestObjectClass[]       $objectClasses
+ * @property RequestObjectType[]        $objectTypes
+ * @property RequestObjectTypeGeneral[] $objectTypesGeneral
+ * @property RequestRegion[]            $regions
+ * @property Timeline[]                 $timelines
+ * @property-read Timeline[]            $activeTimelines
+ * @property-read Timeline              $mainTimeline
+ * @property-read ?Contact              $contact
  */
 class Request extends AR
 {
 	public const STATUS_ACTIVE              = 1;
 	public const STATUS_PASSIVE             = 0;
 	public const STATUS_DONE                = 2;
-	public const DEAL_TYPE_LIST             = ['аренда', 'продажа', 'ответ-хранение', 'субаренда'];
+	public const DEAL_TYPE_LIST             = ['Аренда', 'Продажа', 'Ответ-хранение', 'Субаренда'];
 	public const DEAL_TYPE_RENT             = 0;
 	public const DEAL_TYPE_SALE             = 1;
 	public const DEAL_TYPE_RESPONSE_STORAGE = 2;

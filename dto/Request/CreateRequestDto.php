@@ -7,5 +7,4 @@ namespace app\dto\Request;
 class CreateRequestDto extends AbstractRequestDto
 {
 	public int $company_id;
-
 }

@@ -8,6 +8,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Request\RequestCloneForm;
 use app\models\forms\Request\RequestForm;
 use app\models\forms\Request\RequestPassiveForm;
 use app\models\RequestSearch;
@@ -20,6 +21,7 @@ use app\usecases\Request\RequestStatusService;
 use Throwable;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
+use yii\web\ForbiddenHttpException;
 
 /**
  * RequestController implements the CRUD actions for Request model.
@@ -151,5 +153,32 @@ class RequestController extends AppController
 		$this->requestStatusService->markAsActive($request);
 
 		return $this->success('Запрос переведен в актив');
+	}
+
+	/**
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws ValidationErrorHttpException
+	 */
+	public function actionClone($id): RequestFullResource
+	{
+		if (!$this->user->identity->isModeratorOrHigher()) {
+			throw new ForbiddenHttpException('У вас нет прав на клонирование запросов');
+		}
+
+		$request = $this->requestRepository->findOneOrThrowWithRelations($id);
+
+		$form = new RequestCloneForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$model = $this->requestService->clone($request, $form->getDto());
+
+		return new RequestFullResource($model);
 	}
 }

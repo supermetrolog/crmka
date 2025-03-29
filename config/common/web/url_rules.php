@@ -60,8 +60,7 @@ return
 				'PATCH,OPTIONS undisable/<id>'      => 'undisable',
 				'GET,OPTIONS <id>'                  => 'view',
 				'PUT,OPTIONS <id>'                  => 'update',
-
-
+				'POST,OPTIONS <id>/clone'           => 'clone',
 			],
 		],
 		[
@@ -91,14 +90,11 @@ return
 			'controller'    => ['timeline' => 'timeline'],
 			'except'        => [],
 			'extraPatterns' => [
-				'GET /'                            => 'index',
-				'PATCH update-step/<id>'           => 'update-step',
-				'OPTIONS update-step/<id>'         => 'options',
-				'POST,OPTIONS add-objects/<id>'    => 'add-objects',
+				'GET,OPTIONS'                      => 'index',
 				'GET,OPTIONS search'               => 'search',
+				'PATCH update-step/<id>'           => 'update-step',
 				'GET,OPTIONS action-comments/<id>' => 'action-comments',
-				'POST,OPTIONS send-objects'        => 'send-objects',
-				'POST,OPTIONS add-action-comments' => 'add-action-comments',
+				'POST,OPTIONS action-comment'      => 'add-action-comment'
 			],
 		],
 		[
