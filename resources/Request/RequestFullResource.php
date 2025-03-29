@@ -22,11 +22,13 @@ class RequestFullResource extends JsonResource
 		return ArrayHelper::merge(
 			RequestResource::make($this->resource)->toArray(),
 			[
-				'regions'       => RequestRegionResource::collection($this->resource->regions),
-				'directions'    => $this->resource->directions,
-				'districts'     => $this->resource->districts,
-				'objectTypes'   => $this->resource->objectTypes,
-				'objectClasses' => $this->resource->objectClasses
+				'regions'            => RequestRegionResource::collection($this->resource->regions),
+				'directions'         => $this->resource->directions,
+				'districts'          => $this->resource->districts,
+				'objectTypes'        => $this->resource->objectTypes,
+				'objectTypesGeneral' => $this->resource->objectTypesGeneral,
+				'objectClasses'      => $this->resource->objectClasses,
+				'gateTypes'          => $this->resource->gateTypes
 			]
 		);
 	}

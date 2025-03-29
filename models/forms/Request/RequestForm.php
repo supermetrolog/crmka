@@ -253,7 +253,7 @@ class RequestForm extends Form
 			);
 		}
 
-		return new UpdateRequestDto([
+		return new UpdateRequestDto(
 			ArrayHelper::merge(
 				$commonAttrs,
 				[
@@ -262,6 +262,6 @@ class RequestForm extends Form
 					'passive_why_comment' => $this->passive_why_comment,
 				]
 			)
-		]);
+		);
 	}
 }

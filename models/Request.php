@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\helpers\ArrayHelper;
 use app\helpers\NumberHelper;
 use app\helpers\StringHelper;
@@ -150,13 +149,6 @@ class Request extends AR
 		parent::init();
 	}
 
-	public function behaviors(): array
-	{
-		return [
-			CreateManyMiniModelsBehaviors::class
-		];
-	}
-
 	public static function tableName(): string
 	{
 		return 'request';
@@ -165,56 +157,29 @@ class Request extends AR
 	public function rules(): array
 	{
 		return [
-			[['company_id', 'dealType', 'minArea', 'maxArea', 'minCeilingHeight', 'consultant_id'], 'required'],
-			[['heated', 'antiDustOnly', 'expressRequest', 'firstFloorOnly', 'distanceFromMKADnotApplicable'], 'boolean'],
-			[['contact_id', 'region_neardy', 'outside_mkad', 'company_id', 'dealType', 'distanceFromMKAD', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'heated', 'status', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'passive_why', 'water', 'sewerage', 'gaz', 'steam', 'shelving'], 'integer'],
-			[['related_updated_at', 'created_at', 'updated_at', 'movingDate', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'firstFloorOnly', 'trainLine', 'trainLineLength', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate'], 'safe'],
+			[['name', 'passive_why_comment'], 'string', 'max' => 255],
 			[['description'], 'string'],
-			[['passive_why_comment', 'name'], 'string', 'max' => 255],
+			[['company_id', 'contact_id', 'consultant_id', 'dealType', 'minCeilingHeight', 'minArea', 'maxArea'], 'required'],
+			[
+				[
+					'outside_mkad', 'region_neardy', 'distanceFromMKADnotApplicable',
+					'firstFloorOnly', 'antiDustOnly', 'expressRequest',
+					'heated', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'trainLine', 'haveCranes',
+				],
+				'boolean'
+			],
+			[
+				[
+					'contact_id', 'company_id', 'consultant_id',
+					'dealType', 'status', 'pricePerFloor', 'passive_why', 'unknownMovingDate', 'electricity',
+					'distanceFromMKAD',
+					'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'trainLineLength'
+				], 'integer'
+			],
+			[['related_updated_at', 'created_at', 'updated_at', 'movingDate'], 'safe'],
 			[['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
 			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
-		];
-	}
-
-	public function attributeLabels(): array
-	{
-		return [
-			'id'                            => 'ID',
-			'company_id'                    => 'Company ID',
-			'dealType'                      => 'Deal Type',
-			'expressRequest'                => 'Express Request',
-			'distanceFromMKAD'              => 'Distance From Mkad',
-			'distanceFromMKADnotApplicable' => 'Distance From Mka Dnot Applicable',
-			'minArea'                       => 'Min Area',
-			'maxArea'                       => 'Max Area',
-			'minCeilingHeight'              => 'Min Ceiling Height',
-			'maxCeilingHeight'              => 'Max Ceiling Height',
-			'firstFloorOnly'                => 'First Floor Only',
-			'heated'                        => 'Heated',
-			'antiDustOnly'                  => 'Anti Dust Only',
-			'trainLine'                     => 'Train Line',
-			'trainLineLength'               => 'Train Line Length',
-			'consultant_id'                 => 'Consultant ID',
-			'description'                   => 'Description',
-			'pricePerFloor'                 => 'Price Per Floor',
-			'electricity'                   => 'Electricity',
-			'haveCranes'                    => 'Have Cranes',
-			'status'                        => 'Status',
-			'created_at'                    => 'Created At',
-			'updated_at'                    => 'Updated At',
-			'movingDate'                    => 'Moving Date',
-			'unknownMovingDate'             => 'Unknown Moving Date',
-			'passive_why'                   => 'PassiveWhy',
-			'passive_why_comment'           => 'PassiveWhyComment',
-			'water'                         => 'Water',
-			'gaz'                           => 'Gaz',
-			'sewerage'                      => 'Sewerage',
-			'steam'                         => 'Steam',
-			'shelving'                      => 'Shelving',
-			'outside_mkad'                  => 'Outside MKAD',
-			'region_neardy'                 => 'Region neardy',
-			'contact_id'                    => 'Contact ID',
-			'related_updated_at'            => 'Related Updated At',
+			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
 		];
 	}
 
@@ -232,35 +197,18 @@ class Request extends AR
 
 		$fields['format_name'] = fn() => $this->getFormatName();
 
-		$fields['movingDate'] = static function ($fields) {
-			if ($fields['movingDate']) {
-				return date('Y-m-d', strtotime($fields['movingDate']));
-			}
-
-			return $fields['movingDate'];
-		};
-
-		$fields['format_ceilingHeight'] = static function ($fields) {
-			$min = $fields['minCeilingHeight'];
-			$max = $fields['maxCeilingHeight'];
-
-			if ($min && $max) {
-				return "$min - $max";
-			}
-
-			return "от $min";
-		};
-
-		$fields['pricePerFloorMonth'] = static function ($fields) {
-			if (is_null($fields['pricePerFloor']) || $fields['pricePerFloor'] === 0) {
-				return 0;
-			}
-
-			return NumberHelper::round($fields['pricePerFloor'] / 12, 2);
-		};
-
+		$fields['pricePerFloorMonth'] = fn() => $this->getPricePerFloorMonth();
 
 		return $fields;
+	}
+
+	public function getPricePerFloorMonth(): float
+	{
+		if (is_null($this->pricePerFloor) || $this->pricePerFloor === 0) {
+			return 0;
+		}
+
+		return NumberHelper::round($this->pricePerFloor / 12, 2);
 	}
 
 	public function getTimelineProgress(): ?float
