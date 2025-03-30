@@ -153,6 +153,15 @@ class RequestSearch extends Form
 		$this->load($params);
 		$this->validateOrThrow();
 
+		if (!empty($this->all)) {
+			$query->andFilterWhere([
+				'or',
+				[Request::field('id') => $this->all],
+				['like', Company::field('nameEng'), $this->all],
+				['like', Company::field('nameRu'), $this->all]
+			]);
+		}
+
 		$query->andFilterWhere([
 			Request::field('id')                            => $this->id,
 			Request::field('company_id')                    => $this->company_id,
@@ -219,15 +228,6 @@ class RequestSearch extends Form
 		      ->andFilterWhere(['>=', Request::field('maxCeilingHeight'), $this->rangeMinCeilingHeight])
 		      ->andFilterWhere(['<=', Request::field('distanceFromMKAD'), $this->maxDistanceFromMKAD])
 		      ->andFilterWhere(['<=', Request::field('electricity'), $this->maxElectricity]);
-
-		if (!empty($this->all)) {
-			$query->andFilterWhere([
-				'or',
-				[Request::field('id') => $this->all],
-				['like', Company::field('nameEng'), $this->all],
-				['like', Company::field('nameRu'), $this->all]
-			]);
-		}
 
 		return $dataProvider;
 	}
