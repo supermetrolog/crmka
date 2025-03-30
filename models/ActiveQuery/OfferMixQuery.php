@@ -101,4 +101,16 @@ class OfferMixQuery extends oldDb\OfferMixQuery
 
 		return $this->andWhere([ObjectsBlock::tableName() . '.ad_avito' => 1]);
 	}
+
+	/** @param int|int[] $type */
+	public function byType($type): self
+	{
+		return $this->andWhere(['type_id' => $type]);
+	}
+
+	/** @param int|int[] $objectId */
+	public function byObjectId($objectId): self
+	{
+		return $this->andWhere(['object_id' => $objectId]);
+	}
 }

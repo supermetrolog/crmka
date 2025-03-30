@@ -251,6 +251,17 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 		return Json::decode($this->photos);
 	}
 
+	public function getThumb(): ?string
+	{
+		$photos = $this->getImages();
+
+		if ($photos) {
+			return Yii::$app->params['url']['objects'] . $photos[0];
+		}
+
+		return Yii::$app->params['url']['image_not_found'];
+	}
+
 	/**
 	 * @return float
 	 */
@@ -414,12 +425,30 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 		return $this->getMaxSalePrice();
 	}
 
-	/**
-	 * @return float
-	 */
+	public function getCalcPrice(): string
+	{
+		if ($this->isSaleType()) {
+			return $this->calcPriceGeneralForSale($this);
+		}
+
+		// TODO: Сделать цену для ответ-хранения
+
+		return $this->calcPriceGeneralForRent($this);
+	}
+
+	public function getMinArea(): float
+	{
+		return min($this->area_min, $this->area_max) ?? 0;
+	}
+
 	public function getMaxArea(): float
 	{
 		return max($this->area_min, $this->area_max) ?? 0;
+	}
+
+	public function getCalcAreaGeneral(): string
+	{
+		return (string)$this->calcMinMaxArea($this->getMinArea(), $this->getMaxArea());
 	}
 
 	/**

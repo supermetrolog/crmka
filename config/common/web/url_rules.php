@@ -92,7 +92,8 @@ return
 			'extraPatterns' => [
 				'GET,OPTIONS'                      => 'index',
 				'GET,OPTIONS search'               => 'search',
-				'PATCH update-step/<id>'           => 'update-step',
+				'GET,OPTIONS <id>'                 => 'view',
+				'PATCH,OPTIONS update-step/<id>'   => 'update-step',
 				'GET,OPTIONS action-comments/<id>' => 'action-comments',
 				'POST,OPTIONS action-comment'      => 'add-action-comment'
 			],
