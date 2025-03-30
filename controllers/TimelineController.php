@@ -2,80 +2,200 @@
 
 namespace app\controllers;
 
-use app\models\Timeline;
-use app\models\miniModels\TimelineStep;
-use yii\rest\ActiveController;
-use yii\web\NotFoundHttpException;
-use app\behaviors\BaseControllerBehaviors;
-use app\models\letter\CreateLetter;
-use app\models\letter\Letter;
-use app\models\miniModels\Email;
-use app\models\miniModels\Phone;
-use app\models\miniModels\TimelineActionComment;
-use app\models\SendPresentation;
-use app\models\timeline\AddActionComments;
-use app\services\queue\jobs\SendPresentationJob;
-use Yii;
-use yii\web\BadRequestHttpException;
+use app\exceptions\ValidationErrorHttpException;
+use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\ErrorResponse;
+use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Timeline\TimelineCommentForm;
+use app\models\forms\Timeline\TimelineStepCommentForm;
+use app\models\forms\Timeline\TimelineStepFeedbackForm;
+use app\models\forms\Timeline\TimelineStepForm;
+use app\models\forms\Timeline\TimelineStepObjectForm;
+use app\models\forms\Timeline\TimelineViewForm;
+use app\repositories\TimelineCommentRepository;
+use app\repositories\TimelineRepository;
+use app\repositories\TimelineStepRepository;
+use app\resources\Timeline\TimelineCommentResource;
+use app\resources\Timeline\TimelineFullResource;
+use app\resources\Timeline\TimelineViewResource;
+use app\usecases\Timeline\TimelineService;
+use ErrorException;
+use Throwable;
+use yii\web\ForbiddenHttpException;
 
-class TimelineController extends ActiveController
+class TimelineController extends AppController
 {
-    public $modelClass = 'app\models\Timeline';
+	private TimelineRepository        $timelineRepository;
+	private TimelineService           $timelineService;
+	private TimelineCommentRepository $timelineCommentRepository;
+	private TimelineStepRepository    $timelineStepRepository;
 
-    public const SEND_OBJECTS_EVENT = 'send_objects';
-    public function init()
-    {
-        $this->on(self::SEND_OBJECTS_EVENT, [Yii::$app->notify, 'sendMessage']);
-        parent::init();
-    }
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors();
-        return BaseControllerBehaviors::getBaseBehaviors($behaviors, ['index']);
-    }
+	public function __construct(
+		$id,
+		$module,
+		TimelineService $timelineService,
+		TimelineRepository $timelineRepository,
+		TimelineCommentRepository $timelineCommentRepository,
+		TimelineStepRepository $timelineStepRepository,
+		array $config = []
+	)
+	{
+		$this->timelineService           = $timelineService;
+		$this->timelineRepository        = $timelineRepository;
+		$this->timelineCommentRepository = $timelineCommentRepository;
+		$this->timelineStepRepository    = $timelineStepRepository;
 
-    public function actions()
-    {
-        $actions = parent::actions();
-        unset($actions['index']);
-        unset($actions['view']);
-        unset($actions['update']);
-        unset($actions['delete']);
-        return $actions;
-    }
-    public function actionUpdate($id)
-    {
-        return $id;
-    }
-    public function actionUpdateStep($id)
-    {
-        return TimelineStep::updateTimelineStep($id, Yii::$app->request->post());
-    }
-    public function actionIndex()
-    {
-        $consultant_id = Yii::$app->request->getQueryParam('consultant_id');
-        $request_id = Yii::$app->request->getQueryParam('request_id');
-        return Timeline::getTimeline($consultant_id, $request_id);
-    }
-    public function actionActionComments($id)
-    {
-        return TimelineActionComment::getTimelineComments($id);
-    }
-    public function actionAddActionComments()
-    {
-        $addActionComment = new AddActionComments(Yii::$app->request->post());
-        $addActionComment->add();
-        return [
-            'data' => true,
-            'message' => "Комментарий добавлен",
-        ];
-    }
-    protected function findModel($id)
-    {
-        if (($model = Timeline::findOne($id)) !== null) {
-            return $model;
-        }
+		parent::__construct($id, $module, $config);
+	}
 
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
+	/**
+	 * @throws ValidateException
+	 * @throws ErrorException
+	 */
+	public function actionIndex(): TimelineViewResource
+	{
+		$form = new TimelineViewForm();
+
+		$form->load($this->request->get());
+
+		$form->validateOrThrow();
+
+		$timeline         = $this->timelineRepository->findOneByRequestIdAndConsultantIdWithRelations($form->request_id, $form->consultant_id);
+		$requestTimelines = $this->timelineRepository->findAllByRequestId($form->request_id);
+
+		return new TimelineViewResource($timeline, $requestTimelines);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionView($id): TimelineFullResource
+	{
+		$timeline = $this->timelineRepository->findOneByIdWithRelationsOrThrow((int)$id);
+
+		return new TimelineFullResource($timeline);
+	}
+
+	public function actionSearch(): void
+	{
+		// TODO: Сделать поиск по таймлайнам с фильтрами + query
+	}
+
+	/**
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 */
+	public function actionUpdateStep($id): SuccessResponse
+	{
+		$step = $this->timelineStepRepository->findOneOrThrow((int)$id);
+
+		if ($step->timeline->consultant_id !== $this->user->id) {
+			throw new ForbiddenHttpException('У вас нет прав на обновление даннного таймлайна.');
+		}
+
+		$stepForm = new TimelineStepForm();
+		$stepForm->load($this->request->post());
+		$stepForm->validateOrThrow();
+
+		$commentDtos = [];
+
+		foreach ($this->request->post('comments', []) as $comment) {
+			$commentForm   = $this->makeStepCommentForm($comment);
+			$commentDtos[] = $commentForm->getDto();
+		}
+
+		$objectDtos = [];
+
+		foreach ($this->request->post('objects', []) as $object) {
+			$objectForm   = $this->makeStepObjectForm($object);
+			$objectDtos[] = $objectForm->getDto();
+		}
+
+		$feedbackDtos = [];
+
+		foreach ($this->request->post('feedback_ways', []) as $way) {
+			$feedbackForm   = $this->makeStepFeedbackForm($way);
+			$feedbackDtos[] = $feedbackForm->getDto();
+		}
+
+		$this->timelineService->updateStep($step, $stepForm->getDto(), $commentDtos, $objectDtos, $feedbackDtos);
+
+		return $this->success('Шаг успешно обновлен.');
+	}
+
+	/**
+	 * @return TimelineCommentResource[]|ErrorResponse
+	 * @throws ErrorException
+	 */
+	public function actionActionComments($id)
+	{
+		try {
+			$timeline = $this->timelineRepository->findOneOrThrow($id);
+
+			$comments = $this->timelineCommentRepository->findAllByTimelineId($timeline->id);
+
+			return TimelineCommentResource::collection($comments);
+		} catch (ModelNotFoundException $exception) {
+			return $this->error('Таймлайна с таким ID не существует', 404);
+		}
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws Throwable
+	 * @throws ValidationErrorHttpException
+	 */
+	public function actionAddActionComment(): TimelineCommentResource
+	{
+		$form = new TimelineCommentForm();
+
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$comment = $this->timelineService->createComment($form->getDto());
+
+		return new TimelineCommentResource($comment);
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeStepCommentForm(array $payload): TimelineStepCommentForm
+	{
+		$form = new TimelineStepCommentForm();
+		$form->load($payload);
+		$form->validateOrThrow();
+
+		return $form;
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeStepObjectForm(array $payload): TimelineStepObjectForm
+	{
+		$form = new TimelineStepObjectForm();
+		$form->load($payload);
+		$form->validateOrThrow();
+
+		return $form;
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeStepFeedbackForm(array $payload): TimelineStepFeedbackForm
+	{
+		$form = new TimelineStepFeedbackForm();
+		$form->load($payload);
+		$form->validateOrThrow();
+
+		return $form;
+	}
 }

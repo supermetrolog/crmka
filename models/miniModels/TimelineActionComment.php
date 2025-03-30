@@ -2,124 +2,83 @@
 
 namespace app\models\miniModels;
 
-use app\exceptions\ValidationErrorHttpException;
+use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\TimelineQuery;
+use app\models\letter\Letter;
 use app\models\Timeline;
-use IntlDateFormatter;
-use yii\helpers\ArrayHelper;
-use Yii;
-use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+
+// TODO: Добавить created_by_id для привязки сотрудников
 
 /**
  * This is the model class for table "timeline_action_comment".
  *
- * @property int $id
- * @property int $timeline_step_id [связь]
- * @property int $timeline_id [связь]
- * @property int $timeline_step_number номер степа
- * @property int $type тип коммента
- * @property int $letter_id [связь] с письмом (letter)
- * @property string $comment комментарий к действию
- * @property string $created_at
- * @property string|null $title
+ * @property int               $id
+ * @property int               $timeline_step_id     [связь]
+ * @property int               $timeline_id          [связь]
+ * @property int               $timeline_step_number номер степа
+ * @property int               $type                 тип коммента
+ * @property int               $letter_id            [связь] с письмом (letter)
+ * @property string            $comment              комментарий к действию
+ * @property string            $created_at
+ * @property ?string           $title
  *
- * @property TimelineStep $timelineStep
+ * @property-read TimelineStep $timelineStep
+ * @property-read Timeline     $timeline
+ * @property-read ?Letter      $letter
  */
-class TimelineActionComment extends \yii\db\ActiveRecord
+class TimelineActionComment extends AR
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return 'timeline_action_comment';
-    }
+	public const SYSTEM_COMMENT_TITLE = 'система';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['timeline_step_id', 'comment'], 'required'],
-            [['timeline_step_id', 'timeline_id', 'timeline_step_number', 'type', "letter_id"], 'integer'],
-            [['created_at'], 'safe'],
-            [['comment', 'title'], 'string'],
-            [['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStep::className(), 'targetAttribute' => ['timeline_step_id' => 'id']],
-        ];
-    }
+	public const TYPE_DEFAULT             = 1;
+	public const TYPE_NOTIFICATION        = 2;
+	public const TYPE_ALREADY_SEND_OFFERS = 3;
+	public const TYPE_SEND_OFFERS         = 4;
+	public const TYPE_DONE                = 5;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'timeline_step_id' => 'Timeline Step ID',
-            'comment' => 'Comment',
-            'created_at' => 'Created At',
-            'title' => 'Title',
-            'type' => 'Type',
-            'letter_id' => 'Letter ID',
-        ];
-    }
-    public function beforeSave($insert)
-    {
-        $this->comment = trim($this->comment);
-        return parent::beforeSave($insert);
-    }
-    public static function addActionComments($post_data)
-    {
-        if (!ArrayHelper::keyExists('newActionComments', $post_data)) {
-            return true;
-        }
-        $newActions = $post_data['newActionComments'];
-        foreach ($newActions as $action) {
-            $model = new TimelineActionComment();
-            if ($model->load($action, '') && $model->save()) {
-                continue;
-            }
-            throw new ValidationErrorHttpException($model->getErrorSummary(false));
-        }
-        return true;
-    }
-    public function fields()
-    {
-        $fields = parent::fields();
+	public static function tableName(): string
+	{
+		return 'timeline_action_comment';
+	}
 
-        $fields['created_at_format'] = function ($fields) {
-            return Yii::$app->formatter->format($fields['created_at'], 'date');
-        };
-        return $fields;
-    }
+	public function rules(): array
+	{
+		return [
+			[['timeline_step_id', 'comment'], 'required'],
+			[['timeline_step_id', 'timeline_id', 'timeline_step_number', 'type', "letter_id"], 'integer'],
+			[['created_at'], 'safe'],
+			[['comment', 'title'], 'string'],
+			[['timeline_step_id'], 'exist', 'skipOnError' => true, 'targetClass' => TimelineStep::class, 'targetAttribute' => ['timeline_step_id' => 'id']],
+		];
+	}
 
-    public static function getTimelineComments($timeline_id)
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => self::find()->where(['timeline_action_comment.timeline_id' => $timeline_id])->orderBy(['timeline_action_comment.created_at' => SORT_DESC]),
-            'pagination' => [
-                'pageSize' => 0
-            ]
-        ]);
-        return $dataProvider;
-    }
-    /**
-     * Gets query for [[TimelineStep]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTimelineStep()
-    {
-        return $this->hasOne(TimelineStep::className(), ['id' => 'timeline_step_id']);
-    }
-    /**
-     * Gets query for [[TimelineStep]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTimeline()
-    {
-        return $this->hasOne(Timeline::className(), ['id' => 'timeline_id']);
-    }
+	public function attributeLabels(): array
+	{
+		return [
+			'id'               => 'ID',
+			'timeline_step_id' => 'Timeline Step ID',
+			'comment'          => 'Comment',
+			'created_at'       => 'Created At',
+			'title'            => 'Title',
+			'type'             => 'Type',
+			'letter_id'        => 'Letter ID',
+		];
+	}
+
+	public function getTimelineStep(): ActiveQuery
+	{
+		return $this->hasOne(TimelineStep::class, ['id' => 'timeline_step_id']);
+	}
+
+	public function getTimeline(): TimelineQuery
+	{
+		/** @var TimelineQuery */
+		return $this->hasOne(Timeline::class, ['id' => 'timeline_id']);
+	}
+
+	public function getLetter(): ActiveQuery
+	{
+		return $this->hasOne(Letter::class, ['id' => 'letter_id']);
+	}
 }

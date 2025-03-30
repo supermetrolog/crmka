@@ -2,104 +2,179 @@
 
 namespace app\controllers;
 
-use Yii;
-use app\models\Request;
+use app\exceptions\ValidationErrorHttpException;
+use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
+use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Request\RequestCloneForm;
+use app\models\forms\Request\RequestForm;
+use app\models\forms\Request\RequestPassiveForm;
 use app\models\RequestSearch;
-use yii\rest\ActiveController;
-use yii\web\NotFoundHttpException;
-use app\behaviors\BaseControllerBehaviors;
-use app\models\request\RequestDisable;
-use app\models\request\RequestUnDisable;
-use app\models\Timeline;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use yii\filters\Cors;
+use app\repositories\RequestRepository;
+use app\resources\Request\RequestFullResource;
+use app\resources\Request\RequestSearchResource;
+use app\resources\Request\RequestWithProgressResource;
+use app\usecases\Request\RequestService;
+use Throwable;
+use yii\base\ErrorException;
+use yii\data\ActiveDataProvider;
+use yii\web\ForbiddenHttpException;
 
 /**
  * RequestController implements the CRUD actions for Request model.
  */
-class RequestController extends ActiveController
+class RequestController extends AppController
 {
-    public $modelClass = 'app\models\Request';
+	private RequestRepository $requestRepository;
+	private RequestService    $requestService;
 
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors();
-        $behaviors = BaseControllerBehaviors::getBaseBehaviors($behaviors, ['*']);
-        $behaviors['corsFilter'] = [
-            'class' => Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['*'],
-                'Access-Control-Request-Headers' => ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-                'Access-Control-Expose-Headers' => ['X-Pagination-Total-Count', 'X-Pagination-Page-Count', 'X-Pagination-Current-Page', 'X-Pagination-Per-Page', 'Link']
-            ],
-        ];
-        return $behaviors;
-    }
+	public function __construct(
+		$id,
+		$module,
+		RequestService $requestService,
+		RequestRepository $requestRepository,
+		array $config = []
+	)
+	{
+		$this->requestService    = $requestService;
+		$this->requestRepository = $requestRepository;
 
-    public function actions()
-    {
-        $actions = parent::actions();
-        unset($actions['index']);
-        unset($actions['view']);
-        unset($actions['create']);
-        unset($actions['delete']);
-        unset($actions['update']);
-        return $actions;
-    }
-    public function actionIndex()
-    {
-        $searchModel = new RequestSearch();
-        return $searchModel->search(Yii::$app->request->queryParams);
-    }
-    public function actionCompanyRequests($id)
-    {
-        return Request::getCompanyRequestsList($id);
-    }
-    public function actionView($id)
-    {
-        return Request::getRequestInfo($id);
-    }
-    public function actionCreate()
-    {
-        return Request::createRequest(Yii::$app->request->post());
-    }
-    public function actionUpdate($id)
-    {
-        return Request::updateRequest($this->findModel($id), Yii::$app->request->post());
-    }
-    public function actionSearch()
-    {
-        $search = new RequestSearch();
-        $searchByAttr['CompanySearch'] = Yii::$app->request->queryParams;
-        return $search->search($searchByAttr);
-    }
-    public function actionDisable($id)
-    {
-        $disableModel = new RequestDisable($this->findModel($id), Timeline::getActiveTimelineForRequest($id), Yii::$app->request->post());
-        $disableModel->disableRequestAndTimeline();
-        return [
-            'data' => true,
-            'message' => "Запрос переведен в пассив"
-        ];
-    }
-    public function actionUndisable($id)
-    {
-        $request = $this->findModel($id);
+		parent::__construct($id, $module, $config);
+	}
 
-        $disableModel = new RequestUnDisable($request, Timeline::getTimelineByRequestAndConsultantID($request->id, $request->consultant_id));
-        $disableModel->unDisableRequestAndTimeline();
-        return [
-            'data' => true,
-            'message' => "Запрос переведен в актив"
-        ];
-    }
-    protected function findModel($id)
-    {
-        if (($model = Request::findOne($id)) !== null) {
-            return $model;
-        }
+	/**
+	 * @throws ValidateException
+	 * @throws ErrorException
+	 */
+	public function actionIndex(): ActiveDataProvider
+	{
+		$searchModel = new RequestSearch();
 
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return RequestSearchResource::fromDataProvider($dataProvider);
+	}
+
+	/**
+	 * @return RequestWithProgressResource[]
+	 * @throws ErrorException
+	 */
+	public function actionCompanyRequests($id): array
+	{
+		$models = $this->requestRepository->findAllByCompanyIdWithRelations((int)$id);
+
+		return RequestWithProgressResource::collection($models);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionView($id): RequestWithProgressResource
+	{
+		$request = $this->requestRepository->findOneOrThrowWithRelations($id);
+
+		return new RequestWithProgressResource($request);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidationErrorHttpException
+	 */
+	public function actionCreate(): RequestFullResource
+	{
+		$form = new RequestForm();
+
+		$form->setScenario(RequestForm::SCENARIO_CREATE);
+
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$request = $this->requestService->create($form->getDto());
+
+		return new RequestFullResource($request);
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function actionUpdate($id): RequestFullResource
+	{
+		$request = $this->requestRepository->findOneOrThrow($id);
+
+		$form = new RequestForm();
+
+		$form->setScenario(RequestForm::SCENARIO_UPDATE);
+
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$request = $this->requestService->update($request, $form->getDto());
+
+		return new RequestFullResource($request);
+	}
+
+	/**
+	 * @throws Throwable
+	 * @throws ValidationErrorHttpException
+	 * @throws ModelNotFoundException
+	 */
+	public function actionDisable($id): SuccessResponse
+	{
+		$request = $this->requestRepository->findOneOrThrow($id);
+
+		$form = new RequestPassiveForm();
+
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$this->requestService->markAsPassive($request, $form->getDto());
+
+		return $this->success('Запрос переведен в пассив');
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 */
+	public function actionUndisable($id): SuccessResponse
+	{
+		$request = $this->requestRepository->findOneOrThrow($id);
+
+		$this->requestService->markAsActive($request);
+
+		return $this->success('Запрос переведен в актив');
+	}
+
+	/**
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws ValidationErrorHttpException
+	 */
+	public function actionClone($id): RequestFullResource
+	{
+		if (!$this->user->identity->isModeratorOrHigher()) {
+			throw new ForbiddenHttpException('У вас нет прав на клонирование запросов');
+		}
+
+		$request = $this->requestRepository->findOneOrThrowWithRelations($id);
+
+		$form = new RequestCloneForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$model = $this->requestService->clone($request, $form->getDto());
+
+		return new RequestFullResource($model);
+	}
 }

@@ -55,7 +55,10 @@ class RequestResource extends JsonResource
 			'outside_mkad'                  => $this->resource->outside_mkad,
 			'region_neardy'                 => $this->resource->region_neardy,
 			'contact_id'                    => $this->resource->contact_id,
-			'related_updated_at'            => $this->resource->related_updated_at
+			'related_updated_at'            => $this->resource->related_updated_at,
+
+			'format_name'           => $this->resource->getFormatName(),
+			'price_per_floor_month' => $this->resource->getPricePerFloorMonth()
 		];
 	}
 }

@@ -291,4 +291,9 @@ class Contact extends AR
 	{
 		return new ContactQuery(get_called_class());
 	}
+
+	public function isActive(): bool
+	{
+		return $this->status === self::STATUS_ACTIVE;
+	}
 }

@@ -3,6 +3,7 @@
 namespace app\models\miniModels;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\RequestQuery;
 use app\models\oldDb\location\Region;
 use app\models\Request;
 use yii\db\ActiveQuery;
@@ -10,27 +11,22 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "request_region".
  *
- * @property int     $id
- * @property int     $request_id
- * @property int     $region
+ * @property int         $id
+ * @property int         $request_id
+ * @property int         $region
  *
- * @property Request $request
+ * @property Request     $request
+ * @property-read Region $info
  */
 class RequestRegion extends AR
 {
 	public const MAIN_COLUMN = 'region';
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public static function tableName(): string
 	{
 		return 'request_region';
 	}
-
-	/**
-	 * {@inheritdoc}
-	 */
+	
 	public function rules(): array
 	{
 		return [
@@ -40,9 +36,6 @@ class RequestRegion extends AR
 		];
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function attributeLabels(): array
 	{
 		return [
@@ -52,21 +45,12 @@ class RequestRegion extends AR
 		];
 	}
 
-	/**
-	 * Gets query for [[Request]].
-	 *
-	 * @return ActiveQuery
-	 */
-	public function getRequest(): ActiveQuery
+	public function getRequest(): RequestQuery
 	{
+		/** @var RequestQuery */
 		return $this->hasOne(Request::class, ['id' => 'request_id']);
 	}
 
-	/**
-	 * Gets query for [[RequestRegions]].
-	 *
-	 * @return ActiveQuery
-	 */
 	public function getInfo(): ActiveQuery
 	{
 		return $this->hasOne(Region::class, ['id' => 'region']);
