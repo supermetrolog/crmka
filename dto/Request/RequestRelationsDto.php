@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace app\dto\Request;
 
-class RequestRelationsDto extends AbstractRequestDto
+use yii\base\BaseObject;
+
+class RequestRelationsDto extends BaseObject
 {
 	/** @var int[] */
 	public array $direction_ids = [];

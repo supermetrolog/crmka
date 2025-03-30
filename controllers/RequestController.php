@@ -17,7 +17,6 @@ use app\resources\Request\RequestFullResource;
 use app\resources\Request\RequestSearchResource;
 use app\resources\Request\RequestWithProgressResource;
 use app\usecases\Request\RequestService;
-use app\usecases\Request\RequestStatusService;
 use Throwable;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
@@ -28,22 +27,19 @@ use yii\web\ForbiddenHttpException;
  */
 class RequestController extends AppController
 {
-	private RequestRepository    $requestRepository;
-	private RequestService       $requestService;
-	private RequestStatusService $requestStatusService;
+	private RequestRepository $requestRepository;
+	private RequestService    $requestService;
 
 	public function __construct(
 		$id,
 		$module,
 		RequestService $requestService,
 		RequestRepository $requestRepository,
-		RequestStatusService $requestStatusService,
 		array $config = []
 	)
 	{
-		$this->requestService       = $requestService;
-		$this->requestRepository    = $requestRepository;
-		$this->requestStatusService = $requestStatusService;
+		$this->requestService    = $requestService;
+		$this->requestRepository = $requestRepository;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -136,7 +132,7 @@ class RequestController extends AppController
 		$form->load($this->request->post());
 		$form->validateOrThrow();
 
-		$this->requestStatusService->markAsPassive($request, $form->getDto());
+		$this->requestService->markAsPassive($request, $form->getDto());
 
 		return $this->success('Запрос переведен в пассив');
 	}
@@ -150,7 +146,7 @@ class RequestController extends AppController
 	{
 		$request = $this->requestRepository->findOneOrThrow($id);
 
-		$this->requestStatusService->markAsActive($request);
+		$this->requestService->markAsActive($request);
 
 		return $this->success('Запрос переведен в актив');
 	}

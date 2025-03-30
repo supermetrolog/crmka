@@ -112,7 +112,7 @@ class DateTimeHelper
 		return $dateTime->format($format);
 	}
 
-	public static function tryFormat(?DateTimeInterface $dateTime, string $format = 'Y-m-d H:i:s', string $fallback = null): ?string
+	public static function tryFormat(?DateTimeInterface $dateTime, string $format = 'Y-m-d H:i:s', ?string $fallback = null): ?string
 	{
 		if (is_null($dateTime)) {
 			return $fallback;

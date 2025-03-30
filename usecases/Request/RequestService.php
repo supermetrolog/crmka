@@ -11,15 +11,15 @@ use app\dto\Request\PassiveRequestDto;
 use app\dto\Request\RequestRelationsDto;
 use app\dto\Request\UpdateRequestDto;
 use app\dto\Timeline\CreateTimelineDto;
-use app\events\NotificationEvent;
 use app\events\Request\CreateRequestEvent;
+use app\events\Request\RequestActivatedEvent;
+use app\events\Request\RequestDeactivatedEvent;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\ArrayHelper;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\Notification;
 use app\models\Request;
 use app\models\Timeline;
 use app\usecases\Request\Relations\RequestDirectionRelationService;
@@ -31,7 +31,6 @@ use app\usecases\Request\Relations\RequestObjectTypeRelationService;
 use app\usecases\Request\Relations\RequestRegionRelationService;
 use app\usecases\Timeline\TimelineService;
 use Throwable;
-use Yii;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
 use yii\db\ActiveRecord;
@@ -300,24 +299,35 @@ class RequestService
 	}
 
 	/**
-	 * @throws SaveModelException
+	 * @throws SaveModelException|Throwable
 	 */
 	public function markAsActive(Request $request): void
 	{
-		if (!$request->isPassive()) {
+		if (!$request->isActive()) {
 			throw new InvalidArgumentException('Request is already active');
 		}
 
-		$request->status              = Request::STATUS_ACTIVE;
-		$request->passive_why         = null;
-		$request->passive_why_comment = null;
+		$tx = $this->transactionBeginner->begin();
 
-		$request->saveOrThrow();
+		try {
+			$request->status              = Request::STATUS_ACTIVE;
+			$request->passive_why         = null;
+			$request->passive_why_comment = null;
+
+			$request->saveOrThrow();
+
+			$this->eventManager->trigger(new RequestActivatedEvent($request));
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 	/**
-	 * @throws InvalidArgumentException
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function markAsPassive(Request $request, PassiveRequestDto $dto): void
 	{
@@ -325,11 +335,22 @@ class RequestService
 			throw new InvalidArgumentException('Request is already passive');
 		}
 
-		$request->status              = Request::STATUS_PASSIVE;
-		$request->passive_why         = $dto->passive_why;
-		$request->passive_why_comment = $dto->passive_why_comment;
+		$tx = $this->transactionBeginner->begin();
 
-		$request->saveOrThrow();
+		try {
+			$request->status              = Request::STATUS_PASSIVE;
+			$request->passive_why         = $dto->passive_why;
+			$request->passive_why_comment = $dto->passive_why_comment;
+
+			$request->saveOrThrow();
+
+			$this->eventManager->trigger(new RequestDeactivatedEvent($request));
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 
 	/**
