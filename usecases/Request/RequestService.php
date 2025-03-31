@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\usecases\Request;
 
 use app\components\EventManager;
+use app\dto\Request\ChangeRequestConsultantDto;
 use app\dto\Request\CloneRequestDto;
 use app\dto\Request\CreateRequestDto;
 use app\dto\Request\PassiveRequestDto;
@@ -485,5 +486,35 @@ class RequestService
 			'object_type_general_ids' => $this->mapRelations($request->objectTypesGeneral, 'type'),
 			'region_ids'              => $this->mapRelations($request->regions, 'region'),
 		]));
+	}
+
+	/**
+	 * @throws ErrorException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function changeConsultant(Request $request, ChangeRequestConsultantDto $dto): Request
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			if ($request->consultant_id === $dto->consultant->id) {
+				throw new InvalidArgumentException('Request is already assigned to consultant');
+			}
+
+			$request->consultant_id = $dto->consultant->id;
+			$request->saveOrThrow();
+
+			// TODO: Возможно вынести в event manager
+
+			$this->actualizeMainTimeline($request);
+
+			$tx->commit();
+
+			return $request;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 }

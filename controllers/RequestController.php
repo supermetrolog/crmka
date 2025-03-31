@@ -7,7 +7,9 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\Request\RequestChangeConsultantForm;
 use app\models\forms\Request\RequestCloneForm;
 use app\models\forms\Request\RequestForm;
 use app\models\forms\Request\RequestPassiveForm;
@@ -19,6 +21,7 @@ use app\resources\Request\RequestWithProgressResource;
 use app\usecases\Request\RequestService;
 use Throwable;
 use yii\base\ErrorException;
+use yii\base\InvalidArgumentException;
 use yii\data\ActiveDataProvider;
 use yii\web\ForbiddenHttpException;
 
@@ -176,5 +179,33 @@ class RequestController extends AppController
 		$model = $this->requestService->clone($request, $form->getDto());
 
 		return new RequestFullResource($model);
+	}
+
+	/**
+	 * @return RequestWithProgressResource|ErrorResponse
+	 *
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws ValidationErrorHttpException
+	 */
+	public function actionChangeConsultant($id)
+	{
+		$request = $this->requestRepository->findOneOrThrow($id);
+
+		$form = new RequestChangeConsultantForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		try {
+			$model = $this->requestService->changeConsultant($request, $form->getDto());
+
+			return new RequestWithProgressResource($model);
+		} catch (InvalidArgumentException $e) {
+			return $this->error('Консультант уже назначен на этот запрос');
+		}
 	}
 }
