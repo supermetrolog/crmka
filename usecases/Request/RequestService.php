@@ -306,7 +306,7 @@ class RequestService
 	 */
 	public function markAsActive(Request $request): void
 	{
-		if (!$request->isActive()) {
+		if ($request->isActive()) {
 			throw new InvalidArgumentException('Request is already active');
 		}
 
