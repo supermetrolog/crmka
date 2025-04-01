@@ -34,4 +34,12 @@ class RequestQuery extends AQ
 	{
 		return $this->andWhere([Request::field('status') => Request::STATUS_ACTIVE]);
 	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function byCompanyId(int $id): self
+	{
+		return $this->andWhere([Request::field('company_id') => $id]);
+	}
 }

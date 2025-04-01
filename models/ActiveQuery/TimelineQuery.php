@@ -37,4 +37,14 @@ class TimelineQuery extends AQ
 	{
 		return $this->andWhere([$this->field('status') => Timeline::STATUS_ACTIVE]);
 	}
+
+	public function byConsultantId(int $consultantId): self
+	{
+		return $this->andWhere([$this->field('consultant_id') => $consultantId]);
+	}
+
+	public function byRequestId(int $requestId): self
+	{
+		return $this->andWhere([$this->field('request_id') => $requestId]);
+	}
 }

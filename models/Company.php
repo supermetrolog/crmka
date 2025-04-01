@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\helpers\ArrayHelper;
 use app\helpers\StringHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
@@ -325,7 +326,7 @@ class Company extends AR
 	public function getContacts(): ActiveQuery
 	{
 		return $this->hasMany(Contact::class, ['company_id' => 'id'])
-		            ->andOnCondition([Contact::field('type') => Contact::DEFAULT_CONTACT_TYPE]);
+		            ->andOnCondition(['type' => Contact::DEFAULT_CONTACT_TYPE]);
 	}
 
 	/**
@@ -498,9 +499,41 @@ class Company extends AR
 		return $this->hasMany(CompanyActivityProfile::class, ['company_id' => 'id']);
 	}
 
-
 	public static function find(): CompanyQuery
 	{
 		return new CompanyQuery(static::class);
+	}
+
+	public function getObjectsCount(): int
+	{
+		return ArrayHelper::length($this->objects);
+	}
+
+	public function getContactsCount(): int
+	{
+		return ArrayHelper::length($this->contacts);
+	}
+
+	public function getActiveContactsCount(): int
+	{
+		return ArrayHelper::reduce(
+			$this->contacts,
+			static fn(int $sum, Contact $contact) => $sum + ($contact->isActive() ? 1 : 0),
+			0
+		);
+	}
+
+	public function getRequestsCount(): int
+	{
+		return ArrayHelper::length($this->requests);
+	}
+
+	public function getActiveRequestsCount(): int
+	{
+		return ArrayHelper::reduce(
+			$this->requests,
+			static fn(int $sum, Request $request) => $sum + ($request->isActive() ? 1 : 0),
+			0
+		);
 	}
 }

@@ -112,6 +112,15 @@ class DateTimeHelper
 		return $dateTime->format($format);
 	}
 
+	public static function tryFormat(?DateTimeInterface $dateTime, string $format = 'Y-m-d H:i:s', ?string $fallback = null): ?string
+	{
+		if (is_null($dateTime)) {
+			return $fallback;
+		}
+
+		return self::format($dateTime, $format);
+	}
+
 	public static function getDayEndTime(DateTimeInterface $dateTime): DateTimeInterface
 	{
 		return (clone $dateTime)->setTime(23, 59, 59);

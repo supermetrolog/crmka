@@ -53,10 +53,15 @@ return
 			'controller'    => 'request',
 			'except'        => [],
 			'extraPatterns' => [
-				'GET,OPTIONS company-requests/<id>' => 'company-requests',
-				'GET,OPTIONS search'                => 'search',
-				'PATCH,OPTIONS disable/<id>'        => 'disable',
-				'PATCH,OPTIONS undisable/<id>'      => 'undisable',
+				'GET,OPTIONS'                         => 'index',
+				'GET,OPTIONS company-requests/<id>'   => 'company-requests',
+				'POST,OPTIONS'                        => 'create',
+				'PATCH,OPTIONS disable/<id>'          => 'disable',
+				'PATCH,OPTIONS undisable/<id>'        => 'undisable',
+				'GET,OPTIONS <id>'                    => 'view',
+				'PUT,OPTIONS <id>'                    => 'update',
+				'POST,OPTIONS <id>/clone'             => 'clone',
+				'POST,OPTIONS <id>/change-consultant' => 'change-consultant',
 			],
 		],
 		[
@@ -86,14 +91,12 @@ return
 			'controller'    => ['timeline' => 'timeline'],
 			'except'        => [],
 			'extraPatterns' => [
-				'GET /'                            => 'index',
-				'PATCH update-step/<id>'           => 'update-step',
-				'OPTIONS update-step/<id>'         => 'options',
-				'POST,OPTIONS add-objects/<id>'    => 'add-objects',
+				'GET,OPTIONS'                      => 'index',
 				'GET,OPTIONS search'               => 'search',
+				'GET,OPTIONS <id>'                 => 'view',
+				'PATCH,OPTIONS update-step/<id>'   => 'update-step',
 				'GET,OPTIONS action-comments/<id>' => 'action-comments',
-				'POST,OPTIONS send-objects'        => 'send-objects',
-				'POST,OPTIONS add-action-comments' => 'add-action-comments',
+				'POST,OPTIONS action-comment'      => 'add-action-comment'
 			],
 		],
 		[
