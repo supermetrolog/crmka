@@ -22,6 +22,10 @@ use yii\db\ActiveQuery;
  */
 class ContactComment extends AR
 {
+	public bool $useSoftCreate = true;
+
+	// TODO: Добавить updated_at, т.к можно обновлять комментарии
+
 	/**
 	 * {@inheritdoc}
 	 */

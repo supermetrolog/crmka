@@ -32,6 +32,7 @@ class Media extends AR
 	public const CATEGORY_CHAT_MEMBER_MESSAGE    = 'chat_member_message';
 	public const CATEGORY_SURVEY_QUESTION_ANSWER = 'survey_question_answer';
 
+	protected bool $useSoftCreate = true;
 	protected bool $useSoftDelete = true;
 
 	public static function tableName(): string

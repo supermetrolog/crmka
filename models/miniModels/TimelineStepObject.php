@@ -36,6 +36,9 @@ use yii\db\ActiveQuery;
  */
 class TimelineStepObject extends AR
 {
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
+
 	public int $duplicate_count = 1;
 
 	public static function tableName(): string
