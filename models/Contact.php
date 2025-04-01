@@ -65,6 +65,9 @@ class Contact extends AR
 	public const POSITION_IS_KNOWN   = 0;
 	public const POSITION_IS_UNKNOWN = 1;
 
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
+
 	public function behaviors(): array
 	{
 		return [

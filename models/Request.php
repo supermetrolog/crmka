@@ -104,6 +104,9 @@ class Request extends AR
 	public const REQUEST_CREATED_EVENT = 'request_created_event';
 	public const REQUEST_UPDATED_EVENT = 'request_updated_event';
 
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
+
 	public static function getStatuses(): array
 	{
 		return [

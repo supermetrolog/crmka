@@ -37,6 +37,8 @@ class TimelineActionComment extends AR
 	public const TYPE_SEND_OFFERS         = 4;
 	public const TYPE_DONE                = 5;
 
+	protected bool $useSoftCreate = true;
+
 	public static function tableName(): string
 	{
 		return 'timeline_action_comment';

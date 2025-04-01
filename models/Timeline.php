@@ -44,6 +44,9 @@ class Timeline extends AR
 		];
 	}
 
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
+
 	public static function tableName(): string
 	{
 		return 'timeline';
