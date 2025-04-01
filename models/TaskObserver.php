@@ -23,6 +23,9 @@ use yii\db\ActiveQuery;
  */
 class TaskObserver extends AR
 {
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
+
 	public static function tableName(): string
 	{
 		return 'task_observer';

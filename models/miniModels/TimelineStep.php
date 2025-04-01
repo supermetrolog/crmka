@@ -30,7 +30,8 @@ use yii\db\ActiveQuery;
  */
 class TimelineStep extends AR
 {
-	public bool $useSoftUpdate = true;
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
 
 	public const MEETING_STEP_NUMBER    = 0;
 	public const OFFER_STEP_NUMBER      = 1;
