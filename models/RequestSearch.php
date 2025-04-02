@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\SQLHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\miniModels\RequestDirection;
@@ -154,11 +155,23 @@ class RequestSearch extends Form
 		$this->validateOrThrow();
 
 		if (!empty($this->all)) {
+			$query->joinWith(['company.contacts']);
+
 			$query->andFilterWhere([
 				'or',
 				[Request::field('id') => $this->all],
 				['like', Company::field('nameEng'), $this->all],
-				['like', Company::field('nameRu'), $this->all]
+				['like', Company::field('nameRu'), $this->all],
+				['like', Company::field('individual_full_name'), $this->all],
+				[
+					'like',
+					SQLHelper::concatWithCoalesce([
+						Contact::field('first_name'),
+						Contact::field('middle_name'),
+						Contact::field('last_name')
+					]),
+					$this->all
+				]
 			]);
 		}
 
