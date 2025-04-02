@@ -68,10 +68,10 @@ class RequestForm extends Form
 		return [
 			[['name', 'passive_why_comment'], 'string', 'max' => 255],
 			[['description'], 'string'],
-			[['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
-			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
-			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
-			[['company_id', 'contact_id', 'consultant_id', 'dealType', 'minCeilingHeight', 'minArea', 'maxArea'], 'required'],
+			[['company_id'], 'exist', 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
+			[['contact_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
+			[['consultant_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
+			[['company_id', 'consultant_id', 'dealType', 'minCeilingHeight', 'minArea', 'maxArea'], 'required'],
 			[
 				[
 					'outside_mkad', 'region_neardy', 'distanceFromMKADnotApplicable',

@@ -163,7 +163,7 @@ class Request extends AR
 		return [
 			[['name', 'passive_why_comment'], 'string', 'max' => 255],
 			[['description'], 'string'],
-			[['company_id', 'contact_id', 'consultant_id', 'dealType', 'minCeilingHeight', 'minArea', 'maxArea'], 'required'],
+			[['company_id', 'consultant_id', 'dealType', 'minCeilingHeight', 'minArea', 'maxArea'], 'required'],
 			[
 				[
 					'outside_mkad', 'region_neardy', 'distanceFromMKADnotApplicable',
