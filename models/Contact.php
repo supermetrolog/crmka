@@ -16,6 +16,7 @@ use app\models\miniModels\WayOfInforming;
 use app\models\miniModels\Website;
 use app\resources\Contact\Email\ContactEmailResource;
 use app\resources\Contact\Phone\ContactPhoneResource;
+use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
 /**
@@ -239,10 +240,11 @@ class Contact extends AR
 	 * Gets query for [[ContactComments]].
 	 *
 	 * @return ActiveQuery
+	 * @throws ErrorException
 	 */
 	public function getContactComments(): ActiveQuery
 	{
-		return $this->hasMany(ContactComment::class, ['contact_id' => 'id']);
+		return $this->hasMany(ContactComment::class, ['contact_id' => 'id'])->andOnCondition([ContactComment::field('deleted_at') => null]);
 	}
 
 	/**

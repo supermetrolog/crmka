@@ -47,8 +47,6 @@ class ChatMemberController extends AppController
 
 	public function actionIndex(): ActiveDataProvider
 	{
-		// TODO: Сделать разные поиски для разны типов моделей так как они будут сильно отличаться!
-
 		$searchModel = new ChatMemberSearch($this->searchStrategyFactory);
 
 		$searchModel->current_chat_member_id = $this->user->identity->chatMember->id;

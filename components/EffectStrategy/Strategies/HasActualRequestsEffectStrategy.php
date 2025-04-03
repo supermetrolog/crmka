@@ -62,7 +62,9 @@ class HasActualRequestsEffectStrategy extends AbstractEffectStrategy
 
 					$request = $this->requestRepository->findOneOrThrow($requestId);
 
-					$this->setRequestAsPassive($request);
+					if ($request->isActive()) {
+						$this->setRequestAsPassive($request);
+					}
 				}
 			}
 
@@ -75,6 +77,7 @@ class HasActualRequestsEffectStrategy extends AbstractEffectStrategy
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	private function setRequestAsPassive(Request $request): void
 	{
