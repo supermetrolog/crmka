@@ -93,6 +93,20 @@ class ArrayHelper
 		return null;
 	}
 
+	/**
+	 * @return ?mixed
+	 */
+	public static function findKey(array $array, callable $fn)
+	{
+		foreach ($array as $key => $value) {
+			if ($fn($value, $key)) {
+				return $key;
+			}
+		}
+
+		return null;
+	}
+
 	public static function diffByCallback(array $firstArray, array $secondArray, callable $fn): array
 	{
 		return array_udiff($firstArray, $secondArray, $fn);

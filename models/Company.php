@@ -326,7 +326,7 @@ class Company extends AR
 	public function getContacts(): ActiveQuery
 	{
 		return $this->hasMany(Contact::class, ['company_id' => 'id'])
-		            ->andOnCondition(['type' => Contact::DEFAULT_CONTACT_TYPE]);
+		            ->andOnCondition([Contact::field('type') => Contact::DEFAULT_CONTACT_TYPE]);
 	}
 
 	/**
