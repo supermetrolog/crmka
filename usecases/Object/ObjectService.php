@@ -15,7 +15,7 @@ class ObjectService
 	/**
 	 * @throws SaveModelException
 	 */
-	public function fixLandObjectPurposes(Objects $object): void
+	public function fixLandObjectPurposes(Objects $object, array $purposes = ["9", "14", "15", "26", "31", "32"]): void
 	{
 		if (!$object->isLand()) {
 			throw new InvalidArgumentException('Object is not land');
@@ -25,7 +25,7 @@ class ObjectService
 			throw new InvalidArgumentException('Object purposes are not empty');
 		}
 
-		$object->purposes = Json::encode(["9", "14", "15", "26", "31", "32"]);
+		$object->purposes = Json::encode($purposes);
 
 		$object->saveOrThrow(false);
 	}

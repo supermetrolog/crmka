@@ -2,59 +2,43 @@
 
 namespace app\controllers;
 
-use app\exceptions\ValidationErrorHttpException;
 use app\kernel\common\controller\AppController;
-use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\kernel\web\http\responses\ErrorResponse;
+use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
-use app\models\Objects;
-use app\repositories\ObjectRepository;
-use app\usecases\Object\ObjectService;
-use InvalidArgumentException;
+use app\models\forms\Utilities\UtilitiesFixPurposesForm;
+use app\usecases\Utilities\UtilitiesService;
 
 class UtilitiesController extends AppController
 {
-	private ObjectService    $objectService;
-	private ObjectRepository $objectRepository;
+    private UtilitiesService $service;
 
-	public function __construct(
-		$id,
-		$module,
-		ObjectService $objectService,
-		ObjectRepository $objectRepository,
-		array $config = []
-	)
-	{
-		$this->objectService    = $objectService;
-		$this->objectRepository = $objectRepository;
+    public function __construct(
+        $id,
+        $module,
+        UtilitiesService $service,
+        array $config = []
+    )
+    {
+        $this->service = $service;
 
-		parent::__construct($id, $module, $config);
-	}
+        parent::__construct($id, $module, $config);
+    }
 
-	/**
-	 * @return SuccessResponse|ErrorResponse
-	 * @throws ModelNotFoundException
-	 * @throws ValidationErrorHttpException
-	 * @throws SaveModelException
-	 */
-	public function actionFixLandObjectPurposes()
-	{
-		$objectId = $this->request->post('object_id');
+    /**
+     * @throws SaveModelException
+     * @throws ValidateException
+     */
+    public function actionFixLandObjectPurposes(): SuccessResponse
+    {
+        $form = new UtilitiesFixPurposesForm();
 
-		if (empty($objectId)) {
-			throw new ValidationErrorHttpException('Object id is empty');
-		}
+        $form->load($this->request->post());
 
-		/** @var Objects $object */
-		$object = $this->objectRepository->findOneOrThrow((int)$objectId);
+        $form->validateOrThrow();
 
-		try {
-			$this->objectService->fixLandObjectPurposes($object);
+        $this->service->fixLandObjectPurposes($form->getDto());
 
-			return $this->success();
-		} catch (InvalidArgumentException $e) {
-			return $this->error($e->getMessage());
-		}
-	}
+        return $this->success('Назначение успешно исправлено');
+    }
 }
