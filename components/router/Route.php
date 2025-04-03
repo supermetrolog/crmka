@@ -4,7 +4,6 @@ namespace app\components\router;
 
 use app\helpers\ArrayHelper;
 use Exception;
-use Yii;
 use yii\base\InvalidConfigException;
 
 class Route
@@ -37,13 +36,9 @@ class Route
 
     public function group(callable $callback): void
     {
-        try {
-            $callback();
+        $callback();
 
-            self::$currentController = null;
-        } catch (InvalidConfigException $th) {
-            Yii::error('Route::group() error: ' . $th->getMessage());
-        }
+        self::$currentController = null;
     }
 
     public function crud(): self
