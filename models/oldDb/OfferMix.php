@@ -2,6 +2,7 @@
 
 namespace app\models\oldDb;
 
+use app\helpers\ArrayHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\oldDb\OfferMixQuery;
@@ -727,10 +728,8 @@ class OfferMix extends AR
 
 	public function fields(): array
 	{
-		$fields                           = parent::fields();
-		$fields['last_update_format']     = function ($fields) {
-			return $fields['last_update'] ? Yii::$app->formatter->format($fields['last_update'], 'datetime') : null;
-		};
+		$fields = parent::fields();
+
 		$fields['is_fake']                = function ($fields) {
 			if ($this->type_id === self::MINI_TYPE_ID || !$this->miniOffersMix) {
 				return $this->is_fake;
@@ -915,13 +914,8 @@ class OfferMix extends AR
 	}
 
 
-	public static function normalizeDealType($dealType)
+	public static function normalizeDealType($dealType): ?int
 	{
-		// Тройное равно обязательно инача почему-то 0 == null
-		if ($dealType === null) {
-			return;
-		}
-
 //			Request::DEAL_TYPE_RENT             => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE, OfferMix::DEAL_TYPE_RESPONSE_STORAGE],
 		$dealTypes = [
 			Request::DEAL_TYPE_RENT             => OfferMix::DEAL_TYPE_RENT,
@@ -930,14 +924,11 @@ class OfferMix extends AR
 			Request::DEAL_TYPE_SUBLEASE         => OfferMix::DEAL_TYPE_SUBLEASE,
 		];
 
-		return $dealTypes[$dealType];
+		return $dealTypes[$dealType] ?? null;
 	}
 
-	public static function normalizeRegions($data)
+	public static function normalizeRegions($data): ?int
 	{
-		if ($data == null) {
-			return;
-		}
 		$array = [
 			1  => 1,
 			2  => 2,
@@ -970,14 +961,11 @@ class OfferMix extends AR
 		//     11 => 18,
 		//     10 => 17,
 		// ];
-		return $array[$data];
+		return $array[$data] ?? null;
 	}
 
-	public static function normalizeDistricts($data)
+	public static function normalizeDistricts($data): ?int
 	{
-		if ($data == null) {
-			return;
-		}
 		$array = [
 			0  => 1,
 			1  => 2,
@@ -992,14 +980,11 @@ class OfferMix extends AR
 			10 => 11,
 		];
 
-		return $array[$data];
+		return $array[$data] ?? null;
 	}
 
-	public static function normalizeDirections($data)
+	public static function normalizeDirections($data): ?int
 	{
-		if ($data == null) {
-			return;
-		}
 		$array = [
 			0 => 2,
 			1 => 3,
@@ -1011,27 +996,22 @@ class OfferMix extends AR
 			7 => 9,
 		];
 
-		return $array[$data];
+		return $array[$data] ?? null;
 	}
 
-	public static function normalizeAgentId($consultant_id)
+	public static function normalizeAgentId($consultantId)
 	{
-		if ($consultant_id == null) {
+		if (is_null($consultantId)) {
 			return null;
 		}
-		$newUsersArray = [];
-		foreach (self::USERS as $key => $value) {
-			$newUsersArray[$value] = $key;
-		}
 
-		return $newUsersArray[$consultant_id];
+		return ArrayHelper::findKey(self::USERS, static function ($el) use ($consultantId) {
+			return (int)$el === (int)$consultantId;
+		});
 	}
 
-	public static function normalizeObjectClasses($data)
+	public static function normalizeObjectClasses($data): ?int
 	{
-		if ($data == null) {
-			return;
-		}
 		$array = [
 			0 => 1,
 			1 => 2,
@@ -1039,14 +1019,11 @@ class OfferMix extends AR
 			3 => 4,
 		];
 
-		return $array[$data];
+		return $array[$data] ?? null;
 	}
 
-	public static function normalizeGateTypes($data)
+	public static function normalizeGateTypes($data): ?int
 	{
-		if ($data == null) {
-			return;
-		}
 		$array = [
 			0 => 1,
 			1 => 2,
@@ -1054,15 +1031,11 @@ class OfferMix extends AR
 			3 => 4,
 		];
 
-		return $array[$data];
+		return $array[$data] ?? null;
 	}
 
-	public static function normalizeObjectTypes($data)
+	public static function normalizeObjectTypes($data): ?int
 	{
-		if ($data === null) {
-			return;
-		}
-
 		$array = [
 			0  => 1,
 			1  => 3,
@@ -1100,7 +1073,7 @@ class OfferMix extends AR
 			33 => 33
 		];
 
-		return $array[$data];
+		return $array[$data] ?? null;
 	}
 
 	/**

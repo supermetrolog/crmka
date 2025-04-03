@@ -9,7 +9,7 @@ use yii\base\BaseObject;
 
 abstract class AbstractRequestDto extends BaseObject
 {
-	public int  $contact_id;
+	public ?int $contact_id;
 	public int  $consultant_id;
 	public int  $dealType;
 	public int  $minArea;

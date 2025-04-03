@@ -111,7 +111,8 @@ class TaskBuilder
 	protected function getEnd(): ?DateTimeInterface
 	{
 		if ($this->duration) {
-			$this->end = $this->getStart()->add(DateIntervalHelper::days($this->duration));
+			$start     = clone $this->getStart();
+			$this->end = $start->add(DateIntervalHelper::days($this->duration));
 		}
 
 		return $this->end;

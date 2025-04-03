@@ -2,8 +2,10 @@
 
 namespace app\models;
 
+use app\helpers\SQLHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\RequestDirection;
 use app\models\miniModels\RequestDistrict;
 use app\models\miniModels\RequestGateType;
@@ -75,6 +77,9 @@ class RequestSearch extends Form
 	public $directions         = [];
 	public $districts          = [];
 
+	public $consultant_ids          = [];
+	public $with_passive_consultant = false;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -83,6 +88,8 @@ class RequestSearch extends Form
 		return [
 			[['region_neardy', 'outside_mkad', 'id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
 			[['status', 'regions', 'directions', 'districts', 'description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectTypesGeneral', 'objectClasses', 'gateTypes'], 'safe'],
+			[['consultant_ids'], 'each', 'rule' => ['integer']],
+			[['with_passive_consultant'], 'boolean'],
 		];
 	}
 
@@ -153,14 +160,34 @@ class RequestSearch extends Form
 		$this->load($params);
 		$this->validateOrThrow();
 
+		if ($this->isFilterTrue($this->with_passive_consultant)) {
+			$query->innerJoinWith(['consultant' => function (UserQuery $query) {
+				$query->andWhere(['!=', User::field('status'), User::STATUS_ACTIVE]);
+			}]);
+		}
+
 		if (!empty($this->all)) {
+			$query->joinWith(['company.contacts']);
+
 			$query->andFilterWhere([
 				'or',
 				[Request::field('id') => $this->all],
 				['like', Company::field('nameEng'), $this->all],
-				['like', Company::field('nameRu'), $this->all]
+				['like', Company::field('nameRu'), $this->all],
+				['like', Company::field('individual_full_name'), $this->all],
+				[
+					'like',
+					SQLHelper::concatWithCoalesce([
+						Contact::field('first_name'),
+						Contact::field('middle_name'),
+						Contact::field('last_name')
+					]),
+					$this->all
+				]
 			]);
 		}
+
+		$query->andFilterWhere([Request::field('consultant_id') => $this->consultant_ids]);
 
 		$query->andFilterWhere([
 			Request::field('id')                            => $this->id,

@@ -483,8 +483,6 @@ class ChatMemberMessageService
 				$this->markMessageAsRead($unreadMessage, $fromChatMember);
 			}
 
-			$this->markChatAsLatestForMember($message->to_chat_member_id, $from_chat_member_id);
-
 			$tx->commit();
 		} catch (Throwable $th) {
 			$tx->rollBack();
