@@ -26,24 +26,6 @@ class Router implements RouterInterface
 		});
 	}
 
-	public function cacheTo(string $path): void
-	{
-		$routes = $this->build();
-
-		$export = var_export($routes, true);
-
-		$content = <<<PHP
-<?php
-
-// Автосгенерированный кеш маршрутов
-
-return {$export};
-
-PHP;
-
-		file_put_contents($path, $content);
-	}
-
 	public function toOpenApi(): void
 	{
 		// TODO: Сделать генерацию OpenAPI
