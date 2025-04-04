@@ -2,80 +2,74 @@
 
 namespace app\components\router;
 
+use app\components\router\Interfaces\GroupInterface;
 use app\helpers\ArrayHelper;
 use yii\rest\UrlRule;
 
-class Group
+class Group implements GroupInterface
 {
-    /** @var Route[] */
-    private array $rules = [];
+	/** @var Route[] */
+	private array $rules = [];
 
-    private array $except = [];
+	private string  $controller;
+	private bool    $pluralize = true;
+	private ?string $alias     = null;
 
-    private string $controller;
-    private bool $pluralize = true;
-    private ?string $alias = null;
+	public function __construct(string $controller)
+	{
+		$this->controller = $controller;
+	}
 
-    public function __construct(string $controller)
-    {
-        $this->controller = $controller;
-    }
+	public function addRule(RouteRule $rule): void
+	{
+		$this->rules[] = $rule;
+	}
 
-    public function addRule(RouteRule $rule): void
-    {
-        $this->rules[] = $rule;
-    }
+	public function disablePluralize(): void
+	{
+		$this->pluralize = false;
+	}
 
-    public function disablePluralize(): void
-    {
-        $this->pluralize = false;
-    }
+	public function build(): array
+	{
+		$definition = [
+			'class'      => UrlRule::class,
+			'controller' => $this->generateController(),
+			'pluralize'  => $this->pluralize
+		];
 
-    public function build(): array
-    {
-        return [
-            'class' => UrlRule::class,
-            'except' => $this->except,
-            'controller' => $this->generateController(),
-            'extraPatterns' => $this->generatePatterns(),
-            'pluralize' => $this->pluralize
-        ];
-    }
+		if (ArrayHelper::notEmpty($this->rules)) {
+			$definition['extraPatterns'] = $this->generatePatterns();
+		}
 
-    public function alias(string $alias): void
-    {
-        $this->alias = $alias;
-    }
+		return $definition;
+	}
 
-    public function crud(): void
-    {
-        $this->addRule(Route::get('/', 'index'));
-        $this->addRule(Route::get('<id>', 'view'));
-        $this->addRule(Route::post('/', 'create'));
-        $this->addRule(Route::put('<id>', 'update'));
-        $this->addRule(Route::delete('<id>', 'delete'));
-    }
+	public function alias(string $alias): void
+	{
+		$this->alias = $alias;
+	}
 
-    private function generatePatterns(): array
-    {
-        return ArrayHelper::reduce($this->rules, static function (array $rules, RouteRule $rule) {
-            $builtRule = $rule->build();
+	private function generatePatterns(): array
+	{
+		return ArrayHelper::reduce($this->rules, static function (array $rules, RouteRule $rule) {
+			$builtRule = $rule->build();
 
-            $builtRulePattern = key($builtRule);
+			$builtRulePattern = key($builtRule);
 
-            $rules[$builtRulePattern] = $builtRule[$builtRulePattern];
+			$rules[$builtRulePattern] = $builtRule[$builtRulePattern];
 
-            return $rules;
-        }, []);
-    }
+			return $rules;
+		}, []);
+	}
 
-    private function generateController()
-    {
-        if (is_null($this->alias)) {
-            return $this->controller;
-        }
+	private function generateController()
+	{
+		if (is_null($this->alias)) {
+			return $this->controller;
+		}
 
-        return [$this->alias => $this->controller];
-    }
+		return [$this->alias => $this->controller];
+	}
 
 }
