@@ -59,7 +59,8 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "yii\\composer\\Installer::postInstall"
+      "yii\\composer\\Installer::postInstall",
+      "php yii router/generate"
     ],
     "post-create-project-cmd": [
       "yii\\composer\\Installer::postCreateProject",

@@ -39,7 +39,6 @@ jobs:
           script: >-
             cd /home/user/web/api.pennylane.pro/public_html &&
             composer install &&
-            php yii router/generate &&
             php yii migrate --interactive=0 &&
             chown user:www-data -R /home/user/web/api.pennylane.pro/public_html/ &&
             chmod 775 -R /home/user/web/api.pennylane.pro/public_html/ &&
