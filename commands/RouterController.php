@@ -7,28 +7,33 @@ namespace app\commands;
 use app\components\router\RouteCacheDumper;
 use app\components\router\Router;
 use app\kernel\common\controller\ConsoleController;
+use Closure;
 use Yii;
 
 class RouterController extends ConsoleController
 {
+	private Router           $router;
 	private RouteCacheDumper $dumper;
 
-	public function __construct($id, $module, RouteCacheDumper $dumper, $config = [])
+	public string   $cacheFilePath;
+	private Closure $routerConfigDefinition;
+
+	public function __construct($id, $module, Router $router, RouteCacheDumper $dumper, $config = [])
 	{
+		$this->router = $router;
 		$this->dumper = $dumper;
+
+		$this->cacheFilePath          = Yii::$app->params['router']['cacheFilePath'];
+		$this->routerConfigDefinition = require Yii::$app->params['router']['routerConfigPath'];
+
 		parent::__construct($id, $module, $config);
 	}
 
 	public function actionGenerate(): void
 	{
-		$router = new Router();
+		($this->routerConfigDefinition)($this->router);
 
-		$definition = require Yii::getAlias('@app/config/common/web/routes.php');
-		$definition($router);
-
-		$path = Yii::getAlias('@app/config/common/web/url_rules.php');
-
-		$this->dumper->saveToFile($path, $router->build());
+		$this->dumper->saveToFile($this->cacheFilePath, $this->router->build());
 
 		$this->success('✅  Routes generated successfully.');
 	}
