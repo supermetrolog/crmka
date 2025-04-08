@@ -28,7 +28,7 @@ class TaskCommentForm extends Form
 		return [
 			[['task_id', 'created_by_id'], 'integer'],
 			[['task_id', 'created_by_id'], 'required', 'on' => self::SCENARIO_CREATE],
-			[['message'], 'string', 'max' => 511],
+			[['message'], 'string', 'max' => 1024],
 			[['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
 			[
 				['message', 'files', 'current_files'],
