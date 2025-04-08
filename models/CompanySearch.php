@@ -48,6 +48,9 @@ class CompanySearch extends Form
 	public $without_product_ranges  = false;
 	public $with_passive_consultant = false;
 	public $show_product_ranges;
+	public $requests_filter;
+	public $requests_area_min;
+	public $requests_area_max;
 
 	/**
 	 * {@inheritdoc}
@@ -59,6 +62,9 @@ class CompanySearch extends Form
 			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd', 'product_ranges'], 'safe'],
 			[['activity_group_ids', 'activity_profile_ids'], 'each', 'rule' => ['integer']],
 			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges'], 'boolean'],
+			['requests_filter', 'string'],
+			['requests_filter', 'in', 'range' => ['none', 'active', 'not-active', 'passive']],
+			[['requests_area_min', 'requests_area_max'], 'integer'],
 		];
 	}
 
@@ -227,6 +233,31 @@ class CompanySearch extends Form
 			}]);
 		}
 
+		if (!is_null($this->requests_filter)) {
+			switch ($this->requests_filter) {
+				case 'active':
+				{
+					$query->andHaving(['!=', 'active_requests_count', 0]);
+					break;
+				}
+				case 'not-active':
+				{
+					$query->andHaving(['active_requests_count' => 0]);
+					break;
+				}
+				case 'passive':
+				{
+					$query->andHaving('requests_count > active_requests_count');
+					break;
+				}
+				case 'none':
+				{
+					$query->andHaving(['requests_count' => 0]);
+					break;
+				}
+			}
+		}
+
 		$query->andFilterWhere([
 			Company::field('id')                                 => $this->id,
 			Company::field('noName')                             => $this->noName,
@@ -249,6 +280,12 @@ class CompanySearch extends Form
 		      ->andFilterWhere(['like', Company::field('formOfOrganization'), $this->formOfOrganization])
 		      ->andFilterWhere(['>=', Company::field('created_at'), $this->dateStart])
 		      ->andFilterWhere(['<=', Company::field('created_at'), $this->dateEnd]);
+
+		$query->andFilterWhere([
+			'and',
+			['<=', 'LEAST(request.maxArea, request.minArea)', $this->requests_area_max],
+			['>=', 'GREATEST(request.maxArea, request.minArea)', $this->requests_area_min],
+		]);
 
 
 		return $dataProvider;

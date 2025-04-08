@@ -2,144 +2,132 @@
 
 namespace app\components\router;
 
+use app\components\router\Interfaces\RouteInterface;
 use app\helpers\ArrayHelper;
-use Exception;
-use yii\base\InvalidConfigException;
+use Closure;
+use yii\base\InvalidCallException;
 
-class Route
+class Route implements RouteInterface
 {
-    /** @var Group[] */
-    private static array $groups = [];
-    private static ?string $currentController = null;
-    private static ?string $prefix = null;
+	private ?Group  $group   = null;
+	private ?string $prefix  = null;
+	private bool    $hasCrud = false;
 
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getCurrentGroup(): Group
-    {
-        if (is_null(self::$currentController)) {
-            throw new InvalidConfigException('Current controller is not set');
-        }
+	public static function controller(string $controller): self
+	{
+		$route = new self();
 
-        return self::$groups[self::$currentController];
-    }
+		$route->group = new Group($controller);
 
-    public static function controller(string $controller): self
-    {
-        self::$currentController = $controller;
+		return $route;
+	}
 
-        self::$groups[$controller] = new Group($controller);
+	public function group(Closure $callback): self
+	{
+		$callback($this);
 
-        return new self();
-    }
+		return $this;
+	}
 
-    public function group(callable $callback): void
-    {
-        $callback();
+	public function prefix(string $prefix, Closure $callback): self
+	{
+		$route        = new self();
+		$route->group = $this->group;
 
-        self::$currentController = null;
-    }
+		if (!is_null($this->prefix)) {
+			$route->prefix = $this->prefix . $prefix;
+		} else {
+			$route->prefix = $prefix;
+		}
 
-    public function crud(): self
-    {
-        $this->getCurrentGroup()->crud();
+		$callback($route);
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function alias(string $alias): self
-    {
-        $this->getCurrentGroup()->alias($alias);
+	public function alias(string $alias): self
+	{
+		$this->group->alias($alias);
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function disablePluralize(): self
-    {
-        $this->getCurrentGroup()->disablePluralize();
+	public function crud(array $only = []): self
+	{
+		if ($this->hasCrud) {
+			throw new InvalidCallException('Current Route already has CRUD rules');
+		}
 
-        return $this;
-    }
+		$defaults = [
+			'create' => ['methods' => [Method::POST, Method::OPTIONS], 'pattern' => '/', 'action' => 'create'],
+			'index'  => ['methods' => [Method::GET, Method::OPTIONS], 'pattern' => '/', 'action' => 'index'],
+			'update' => ['methods' => [Method::PUT, Method::OPTIONS], 'pattern' => '<id>', 'action' => 'update'],
+			'delete' => ['methods' => [Method::DELETE, Method::OPTIONS], 'pattern' => '<id>', 'action' => 'delete'],
+			'view'   => ['methods' => [Method::GET, Method::OPTIONS], 'pattern' => '<id>', 'action' => 'view'],
+		];
 
-    public static function buildTree(): array
-    {
-        return ArrayHelper::map(self::$groups, static function (Group $group) {
-            return $group->build();
-        });
-    }
+		if (ArrayHelper::notEmpty($only)) {
+			foreach ($only as $key) {
+				$this->addRule($defaults[$key]['methods'], $defaults[$key]['pattern'], $defaults[$key]['action']);
+			}
+		} else {
+			foreach ($defaults as $key => $value) {
+				$this->addRule($value['methods'], $value['pattern'], $value['action']);
+			}
+		}
 
-    /**
-     * @throws Exception
-     */
-    public static function addRoute(array $methods, string $pattern, ?string $action = null): RouteRule
-    {
-        if (is_null(self::$currentController)) {
-            throw new InvalidConfigException('Route::addRoute() must be called inside Route::group()');
-        }
+		$this->hasCrud = true;
 
-        $rule = new RouteRule($methods, self::normalizePattern($pattern), $action);
+		return $this;
+	}
 
-        self::$groups[self::$currentController]->addRule($rule);
+	public function disablePluralize(): self
+	{
+		$this->group->disablePluralize();
 
-        return $rule;
-    }
+		return $this;
+	}
 
-    private static function normalizePattern(string $pattern): string
-    {
-        if (is_null(self::$prefix)) {
-            return $pattern;
-        }
+	public function addRule(array $methods, string $pattern, ?string $action = null): RouteRule
+	{
+		$rule = new RouteRule($methods, $pattern, $action);
 
-        return self::$prefix . $pattern;
-    }
+		if (!is_null($this->prefix)) {
+			$rule->prefix($this->prefix);
+		}
 
-    /**
-     * @throws Exception
-     */
-    public static function get(string $pattern, ?string $action = null): RouteRule
-    {
-        return self::addRoute([Method::GET, Method::OPTIONS], $pattern, $action);
-    }
+		$this->group->addRule($rule);
 
-    /**
-     * @throws Exception
-     */
-    public static function post(string $pattern, ?string $action = null): RouteRule
-    {
-        return self::addRoute([Method::POST, Method::OPTIONS], $pattern, $action);
-    }
+		return $rule;
+	}
 
-    /**
-     * @throws Exception
-     */
-    public static function put(string $pattern, ?string $action = null): RouteRule
-    {
-        return self::addRoute([Method::PUT, Method::OPTIONS], $pattern, $action);
-    }
+	public function get(string $pattern = '/', ?string $action = null): RouteRule
+	{
+		return $this->addRule([Method::GET, Method::OPTIONS], $pattern, $action);
+	}
 
-    /**
-     * @throws Exception
-     */
-    public static function patch(string $pattern, ?string $action = null): RouteRule
-    {
-        return self::addRoute([Method::PATCH, Method::OPTIONS], $pattern, $action);
-    }
+	public function post(string $pattern = '/', ?string $action = null): RouteRule
+	{
+		return $this->addRule([Method::POST, Method::OPTIONS], $pattern, $action);
+	}
 
-    /**
-     * @throws Exception
-     */
-    public static function delete(string $pattern, ?string $action = null): RouteRule
-    {
-        return self::addRoute([Method::DELETE, Method::OPTIONS], $pattern, $action);
-    }
+	public function put(string $pattern = '/', ?string $action = null): RouteRule
+	{
+		return $this->addRule([Method::PUT, Method::OPTIONS], $pattern, $action);
+	}
 
-    public static function prefix(string $prefix, callable $callback): void
-    {
-        self::$prefix = $prefix;
+	public function patch(string $pattern = '/', ?string $action = null): RouteRule
+	{
+		return $this->addRule([Method::PATCH, Method::OPTIONS], $pattern, $action);
+	}
 
-        $callback();
+	public function delete(string $pattern = '/', ?string $action = null): RouteRule
+	{
+		return $this->addRule([Method::DELETE, Method::OPTIONS], $pattern, $action);
+	}
 
-        self::$prefix = null;
-    }
+	public function build(): array
+	{
+		return $this->group->build();
+	}
 }

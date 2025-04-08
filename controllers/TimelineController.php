@@ -10,6 +10,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Timeline\TimelineCommentForm;
+use app\models\forms\Timeline\TimelineForm;
 use app\models\forms\Timeline\TimelineStepCommentForm;
 use app\models\forms\Timeline\TimelineStepFeedbackForm;
 use app\models\forms\Timeline\TimelineStepForm;
@@ -82,6 +83,24 @@ class TimelineController extends AppController
 	public function actionSearch(): void
 	{
 		// TODO: Сделать поиск по таймлайнам с фильтрами + query
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function actionCreate(): TimelineFullResource
+	{
+		$form = new TimelineForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$timeline = $this->timelineService->create($form->getDto());
+
+		return new TimelineFullResource($timeline);
 	}
 
 	/**
