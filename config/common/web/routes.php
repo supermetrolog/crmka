@@ -100,6 +100,7 @@ return static function (RouterInterface $router) {
 		$route->get('<id>', 'view');
 		$route->get('action-comments/<id>', 'action-comments');
 
+		$route->post()->action('create');
 		$route->post('action-comment', 'add-action-comment');
 
 		$route->patch('update-step/<id>', 'update-step');
@@ -243,6 +244,7 @@ return static function (RouterInterface $router) {
 		$route->get()->action('index');
 		$route->get('counts');
 		$route->get('relations');
+		$route->get('statistic');
 
 		$route->post()->action('create');
 		$route->post('for-users', 'create-for-users');
