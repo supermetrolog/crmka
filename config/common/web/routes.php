@@ -244,6 +244,7 @@ return static function (RouterInterface $router) {
 		$route->get()->action('index');
 		$route->get('counts');
 		$route->get('relations');
+		$route->get('statistic');
 
 		$route->post()->action('create');
 		$route->post('for-users', 'create-for-users');
