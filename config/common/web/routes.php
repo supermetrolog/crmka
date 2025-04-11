@@ -269,7 +269,7 @@ return static function (RouterInterface $router) {
 
 			$route->prefix('comments/', static function (RouteInterface $route) {
 				$route->get()->action('comments');
-				$route->post()->action('create-comments');
+				$route->post()->action('create-comment');
 			});
 		});
 	});
