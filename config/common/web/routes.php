@@ -188,7 +188,6 @@ return static function (RouterInterface $router) {
 		$route->post('view-message/<id>', 'view-message');
 
 		$route->prefix('<id>/', static function (RouteInterface $route) {
-			$route->get()->action('view');
 			$route->put()->action('update');
 			$route->delete()->action('delete');
 		});

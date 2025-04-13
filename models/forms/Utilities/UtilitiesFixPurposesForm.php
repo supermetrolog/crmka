@@ -14,7 +14,7 @@ class UtilitiesFixPurposesForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['object_id', 'purposes'], 'required'],
+			[['object_id'], 'required'],
 			['object_id', 'integer'],
 			['object_id', 'exist', 'targetClass' => Objects::class, 'targetAttribute' => ['object_id' => 'id']],
 			['purposes', 'safe']
@@ -32,7 +32,7 @@ class UtilitiesFixPurposesForm extends Form
 	public function getDto(): FixObjectPurposesUtilitiesDto
 	{
 		return new FixObjectPurposesUtilitiesDto([
-			'object'   => Objects::find()->byId((int)$this->object_id),
+			'object'   => Objects::find()->andWhere(['id' => $this->object_id])->one(),
 			'purposes' => $this->purposes
 		]);
 	}
