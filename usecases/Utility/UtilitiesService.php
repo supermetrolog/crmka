@@ -24,6 +24,6 @@ class UtilitiesService
 	 */
 	public function fixLandObjectPurposes(FixObjectPurposesUtilitiesDto $dto): void
 	{
-		$this->objectService->fixLandObjectPurposes($dto->object);
+		$this->objectService->fixLandObjectPurposes($dto->object, $dto->purposes);
 	}
 }
