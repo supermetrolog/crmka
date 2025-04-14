@@ -7,7 +7,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Utilities\UtilitiesFixPurposesForm;
-use app\usecases\Utilities\UtilitiesService;
+use app\usecases\Utility\UtilitiesService;
 
 class UtilitiesController extends AppController
 {
