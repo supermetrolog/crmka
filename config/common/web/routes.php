@@ -68,8 +68,8 @@ return static function (RouterInterface $router) {
 
 		$route->post()->action('create');
 
-		$route->patch('disable');
-		$route->patch('undisable');
+		$route->patch('disable/<id>', 'disable');
+		$route->patch('undisable/<id>', 'undisable');
 
 		$route->prefix('<id>/', static function (RouteInterface $route) {
 			$route->get()->action('view');
