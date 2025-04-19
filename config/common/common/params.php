@@ -93,10 +93,11 @@ return [
 		]
 	],
 	'url'            => [
-		'objects'         => "https://pennylane.pro/",
-		'this_host'       => $common_thisHost,
-		'image_not_found' => "{$common_thisHost}images/no-image.jpg",
-		'empty_image'     => "{$common_thisHost}images/empty.jpg"
+		'objects'           => "https://pennylane.pro/",
+		'objects_watermark' => "https://pennylane.pro/system/controllers/photos/watermark.php/",
+		'this_host'         => $common_thisHost,
+		'image_not_found'   => "{$common_thisHost}images/no-image.jpg",
+		'empty_image'       => "{$common_thisHost}images/empty.jpg"
 	],
 	'media'          => [
 		'baseFolder' => '/uploads',
