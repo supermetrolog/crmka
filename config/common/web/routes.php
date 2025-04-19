@@ -291,4 +291,20 @@ return static function (RouterInterface $router) {
 		$route->post('fix-land-object-purposes');
 		$route->post('reassign-consultants-to-companies');
 	});
+
+	$router->controller('folder')->group(static function (RouteInterface $route) {
+		$route->get()->action('index');
+		$route->get('entities');
+
+		$route->post()->action('create');
+		$route->post('reorder');
+
+		$route->prefix('<id>/', static function (RouteInterface $route) {
+			$route->put()->action('update');
+			$route->delete()->action('delete');
+
+			$route->post('entities')->action('add-entities');
+			$route->delete('entities')->action('remove-entities');
+		});
+	});
 };

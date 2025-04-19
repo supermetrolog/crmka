@@ -76,4 +76,9 @@ class Form extends Model
 
 		return false;
 	}
+
+	protected function hasFilter($value): bool
+	{
+		return isset($value) && !is_null($value);
+	}
 }
