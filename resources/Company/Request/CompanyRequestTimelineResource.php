@@ -6,6 +6,7 @@ namespace app\resources\Company\Request;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Timeline;
+use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 
 class CompanyRequestTimelineResource extends JsonResource
 {
@@ -19,8 +20,9 @@ class CompanyRequestTimelineResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'id'    => $this->resource->id,
-			'steps' => CompanyRequestTimelineStepResource::collection($this->resource->timelineSteps)
+			'id'         => $this->resource->id,
+			'steps'      => CompanyRequestTimelineStepResource::collection($this->resource->timelineSteps),
+			'consultant' => UserShortResource::tryMakeArray($this->resource->consultant)
 		];
 	}
 }

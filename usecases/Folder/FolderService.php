@@ -24,7 +24,7 @@ class FolderService
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
-		FolderEntityService $entityService,
+		FolderEntityService $entityService
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
