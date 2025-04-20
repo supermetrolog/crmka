@@ -29,7 +29,8 @@
     "ext-dom": "*",
     "ext-intl": "*",
     "ext-zip": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "notamedia/yii2-sentry": "^1.7"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",
@@ -54,7 +55,8 @@
       "enabled": false
     },
     "allow-plugins": {
-      "yiisoft/yii2-composer": false
+      "yiisoft/yii2-composer": false,
+      "php-http/discovery": true
     }
   },
   "scripts": {
