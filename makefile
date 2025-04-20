@@ -15,7 +15,4 @@ build:
 restart: down up
 
 exec\:php:
-	docker-compose exec $(PHP_CONTAINER_NAME) $(ARGV)
-
-exec\:php\:bash:
-	make exec:php ARGV=bash
+	docker-compose exec $(PHP_CONTAINER_NAME) bash

@@ -43,13 +43,21 @@ return [
 				[
 					'class'    => 'airani\log\TelegramTarget',
 					'levels'   => ['error', 'warning'],
+					'logVars'  => [],
 					'botToken' => $secrets['tg_logger_bot']['token'], // bot token secret key
 					'chatId'   => $secrets['tg_logger_bot']['channel'], // chat id or channel username with @ like 12345 or @channel
 					'except'   => [
 						'yii\web\HttpException:401',
 						'yii\web\HttpException:404'
 					]
-				]
+				],
+				[
+					'class'         => 'notamedia\sentry\SentryTarget',
+					'dsn'           => $secrets['sentry']['dsn'],
+					'levels'        => ['error', 'warning'],
+					'context'       => true,
+					'clientOptions' => ['release' => 'stg']
+				],
 			]
 		],
 	]
