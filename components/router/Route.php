@@ -9,6 +9,7 @@ use yii\base\InvalidCallException;
 
 class Route implements RouteInterface
 {
+	private const prefixSeparator = '/';
 	private ?Group  $group   = null;
 	private ?string $prefix  = null;
 	private bool    $hasCrud = false;
@@ -35,7 +36,7 @@ class Route implements RouteInterface
 		$route->group = $this->group;
 
 		if (!is_null($this->prefix)) {
-			$route->prefix = $this->prefix . $prefix;
+			$route->prefix = $this->prefix . self::prefixSeparator . $prefix;
 		} else {
 			$route->prefix = $prefix;
 		}
