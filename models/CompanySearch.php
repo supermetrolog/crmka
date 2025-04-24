@@ -260,16 +260,7 @@ class CompanySearch extends Form
 		}
 
 		if ($this->hasFilter($this->folder_ids)) {
-			$query->innerJoin(FolderEntity::getTable(),
-				[
-					'AND',
-					FolderEntity::field('entity_id') . '=' . Company::field('id'),
-					FolderEntity::field('entity_type') . '= :type',
-				],
-				[':type' => Company::getMorphClass()],
-			);
-
-			$query->andWhere([FolderEntity::field('folder_id') => $this->folder_ids]);
+			$query->innerJoinWith(['folderEntities'], false)->andWhere([FolderEntity::field('folder_id') => $this->folder_ids]);
 		}
 
 		$query->andFilterWhere([
