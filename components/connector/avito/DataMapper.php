@@ -5,6 +5,7 @@ namespace app\components\connector\avito;
 use app\components\avito\AvitoFeedGenerator;
 use app\components\avito\AvitoValue;
 use app\components\interfaces\OfferInterface;
+use app\helpers\StringHelper;
 use InvalidArgumentException;
 use Yii;
 use yii\base\ErrorException;
@@ -12,6 +13,8 @@ use yii\helpers\ArrayHelper;
 
 class DataMapper
 {
+	private const WATERMARK_IMAGE_WIDTH = 1200;
+
 	/**
 	 * @param OfferInterface $offer
 	 *
@@ -32,12 +35,23 @@ class DataMapper
 				'tag'        => 'Image',
 				'value'      => '',
 				'attributes' => [
-					'url' => Yii::$app->params['url']['objects'] . $image
+					'url' => $this->generateWatermarkImageUrl($image)
 				]
 			];
 		}
 
 		return $images;
+	}
+
+	private function generateWatermarkImageUrl(string $image): string
+	{
+		if (!StringHelper::startWith($image, '/uploads/objects/')) {
+			return $image;
+		}
+
+		$imageUrl = StringHelper::after($image, '/uploads/objects/');
+
+		return Yii::$app->params['url']['objects_watermark'] . self::WATERMARK_IMAGE_WIDTH . '/' . $imageUrl;
 	}
 
 	/**

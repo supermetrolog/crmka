@@ -40,6 +40,9 @@ return [
         'token' => '###########:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
         'channel' => '@ChannelUsername'
     ],
+    'sentry' => [
+		'dsn' => 'xxxxxx',
+    ],
     // Доступы к RabbitMQ серверу
     'rabbit' => [
         'user' => 'user',
