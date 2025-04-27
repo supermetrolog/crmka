@@ -39,7 +39,7 @@ class m240330_102342_create_chat_member_table extends Migration
 
 		$this->table($tableName, [
 			'id' => $this->primaryKey(),
-		], $this->morph(), $this->timestamps());
+		], $this->morphBigInteger(), $this->timestamps());
 
 		$this->unique($tableName, ['model_type', 'model_id']);
 	}

@@ -51,6 +51,7 @@ class CompanySearch extends Form
 	public $requests_filter;
 	public $requests_area_min;
 	public $requests_area_max;
+	public $folder_ids;
 
 	/**
 	 * {@inheritdoc}
@@ -60,7 +61,7 @@ class CompanySearch extends Form
 		return [
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd', 'product_ranges'], 'safe'],
-			[['activity_group_ids', 'activity_profile_ids'], 'each', 'rule' => ['integer']],
+			[['activity_group_ids', 'activity_profile_ids', 'folder_ids'], 'each', 'rule' => ['integer']],
 			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges'], 'boolean'],
 			['requests_filter', 'string'],
 			['requests_filter', 'in', 'range' => ['none', 'active', 'not-active', 'passive']],
@@ -94,7 +95,7 @@ class CompanySearch extends Form
 		                          ->with([
 			                          'requests' => function ($query) {
 				                          $query->with(['timelines' => function (TimelineQuery $query) {
-					                          $query->with(['timelineSteps'])->active();
+					                          $query->with(['timelineSteps', 'consultant'])->active();
 				                          }]);
 			                          },
 			                          'logo',
@@ -256,6 +257,10 @@ class CompanySearch extends Form
 					break;
 				}
 			}
+		}
+
+		if ($this->hasFilter($this->folder_ids)) {
+			$query->innerJoinWith(['folderEntities'], false)->andWhere([FolderEntity::field('folder_id') => $this->folder_ids]);
 		}
 
 		$query->andFilterWhere([

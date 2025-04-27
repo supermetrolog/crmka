@@ -37,6 +37,25 @@ class Migration extends \yii\db\Migration
 		$type = $name . '_type';
 		$id   = $name . '_id';
 
+		$idColumn   = $this->integer()->unsigned();
+		$typeColumn = $this->string();
+
+		if (!$nullable) {
+			$typeColumn->notNull();
+			$idColumn->notNull();
+		}
+
+		return [
+			$type => $typeColumn,
+			$id   => $idColumn
+		];
+	}
+
+	public function morphBigInteger(string $name = 'model', bool $nullable = false): array
+	{
+		$type = $name . '_type';
+		$id   = $name . '_id';
+
 		$idColumn   = $this->bigInteger()->unsigned();
 		$typeColumn = $this->string();
 

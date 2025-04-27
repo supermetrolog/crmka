@@ -22,7 +22,7 @@ class m240330_114034_create_task_table extends Migration
 			'status'  => $this->tinyInteger()->notNull(),
 			'start'   => $this->timestamp(),
 			'end'     => $this->timestamp(),
-		], $this->morph('created_by'), $this->timestamps(), $this->softDelete());
+		], $this->morphBigInteger('created_by'), $this->timestamps(), $this->softDelete());
 
 		$this->index(
 			$tableName,
