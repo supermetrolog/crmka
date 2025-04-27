@@ -9,13 +9,11 @@ class m250414_121323_create_folder_entity_table extends Migration
 		$tableName = '{{%folder_entity}}';
 
 		$this->table($tableName, [
-			'id'          => $this->primaryKey(),
-			'folder_id'   => $this->integer()->notNull(),
-			'entity_id'   => $this->integer()->notNull(),
-			'entity_type' => $this->string()->notNull(),
-			'sort_order'  => $this->float(3)->notNull()->defaultValue(100),
-			'created_at'  => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP),
-		]);
+			'id'         => $this->primaryKey(),
+			'folder_id'  => $this->integer()->notNull(),
+			'sort_order' => $this->float(3)->notNull()->defaultValue(100),
+			'created_at' => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP),
+		], $this->morph('entity'));
 
 		$this->index($tableName, ['folder_id']);
 		$this->index($tableName, ['entity_id']);

@@ -20,7 +20,7 @@ class m240525_090140_create_media_table extends Migration
 			'extension'     => $this->string()->notNull(),
 			'path'          => $this->string()->notNull()->unique(),
 			'category'      => $this->string()->notNull(),
-		], $this->morph('model'), ['created_at' => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP)], $this->softDelete());
+		], $this->morphBigInteger('model'), ['created_at' => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP)], $this->softDelete());
 
 
 		$this->index(

@@ -27,7 +27,7 @@ class m241206_052705_create_task_history_table extends Migration
 			'task_id' => $this->integer()->notNull(),
 			'prev_id' => $this->integer()->null(),
 			'state'   => $this->json()->null(),
-		], $this->morph('created_by'), $this->timestamps(), $this->softDelete());
+		], $this->morphBigInteger('created_by'), $this->timestamps(), $this->softDelete());
 
 		$this->index($tableName, ['user_id']);
 		$this->index($tableName, ['created_by_type', 'created_by_id']);

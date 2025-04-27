@@ -19,7 +19,7 @@ class m240526_161617_create_mailing_table extends Migration
 			'channel_id' => $this->integer()->notNull(),
 			'subject'    => $this->string()->notNull(),
 			'message'    => $this->text()->notNull(),
-		], $this->morph('created_by'), $this->timestamps());
+		], $this->morphBigInteger('created_by'), $this->timestamps());
 
 		$this->index($tableName, ['channel_id']);
 		$this->index($tableName, ['created_by_type', 'created_by_id']);
