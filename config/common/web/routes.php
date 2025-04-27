@@ -27,7 +27,7 @@ return static function (RouterInterface $router) {
 		$route->post('logout');
 		$route->post('activity');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->get('sessions');
 
@@ -50,7 +50,7 @@ return static function (RouterInterface $router) {
 
 		$route->post()->action('create');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 
 			$route->put()->action('update');
@@ -71,7 +71,7 @@ return static function (RouterInterface $router) {
 		$route->patch('disable');
 		$route->patch('undisable');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->post('clone');
 			$route->post('change-consultant');
@@ -86,7 +86,7 @@ return static function (RouterInterface $router) {
 		$route->post()->action('create');
 		$route->post('create-comment');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->put()->action('update');
 		});
@@ -109,7 +109,7 @@ return static function (RouterInterface $router) {
 	$router->controller('notification')->group(static function (RouteInterface $route) {
 		$route->get()->action('index');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get('viewed-not-count');
 			$route->get('viewed-all');
 			$route->get('count');
@@ -119,7 +119,7 @@ return static function (RouterInterface $router) {
 	$router->controller('calllist')->group(static function (RouteInterface $route) {
 		$route->get()->action('index');
 
-		$route->prefix('<caller_id>/', static function (RouteInterface $route) {
+		$route->prefix('<caller_id>', static function (RouteInterface $route) {
 			$route->get('viewed-not-count');
 			$route->get('viewed-all');
 			$route->get('count');
@@ -164,7 +164,7 @@ return static function (RouterInterface $router) {
 		$route->post('pin-message');
 		$route->post('unpin-message');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->get('pinned-message');
 			$route->get('media');
@@ -187,7 +187,7 @@ return static function (RouterInterface $router) {
 		$route->post('create-notification/<id>', 'create-notification');
 		$route->post('view-message/<id>', 'view-message');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->put()->action('update');
 			$route->delete()->action('delete');
 		});
@@ -205,7 +205,7 @@ return static function (RouterInterface $router) {
 		$route->post()->action('create');
 		$route->post('with-survey-question-answer', 'create-with-survey-question-answer');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->get('with-questions', 'view-with-questions');
 
@@ -222,7 +222,7 @@ return static function (RouterInterface $router) {
 		$route->post('/', 'create');
 		$route->post('with-question-answer', 'create-with-question-answer');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->put()->action('update');
 			$route->delete()->action('delete');
@@ -249,7 +249,7 @@ return static function (RouterInterface $router) {
 		$route->post('for-users', 'create-for-users');
 		$route->post('change-status/<id>', 'change-status');
 
-		$route->prefix('<id>/', static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->put()->action('update');
 			$route->delete()->action('delete');
@@ -261,13 +261,13 @@ return static function (RouterInterface $router) {
 			$route->post('postpone');
 			$route->post('restore');
 
-			$route->prefix('files/', static function (RouteInterface $route) {
+			$route->prefix('files', static function (RouteInterface $route) {
 				$route->get()->action('files');
 				$route->post()->action('create-files');
 				$route->delete()->action('delete-files');
 			});
 
-			$route->prefix('comments/', static function (RouteInterface $route) {
+			$route->prefix('comments', static function (RouteInterface $route) {
 				$route->get()->action('comments');
 				$route->post()->action('create-comments');
 			});
@@ -289,5 +289,21 @@ return static function (RouterInterface $router) {
 	$router->controller('utilities')->disablePluralize()->group(static function (RouteInterface $route) {
 		$route->post('fix-land-object-purposes');
 		$route->post('reassign-consultants-to-companies');
+	});
+
+	$router->controller('folder')->group(static function (RouteInterface $route) {
+		$route->get()->action('index');
+		$route->get('entities');
+
+		$route->post()->action('create');
+		$route->post('reorder');
+
+		$route->prefix('<id>', static function (RouteInterface $route) {
+			$route->put()->action('update');
+			$route->delete()->action('delete');
+
+			$route->post('entities')->action('add-entities');
+			$route->delete('entities')->action('remove-entities');
+		});
 	});
 };

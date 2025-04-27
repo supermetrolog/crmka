@@ -11,6 +11,7 @@ use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
+use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ActiveQuery\RelationQuery;
@@ -85,6 +86,7 @@ use yii\db\Expression;
  * @property-read ?Call                    $lastCall
  * @property-read CompanyActivityGroup[]   $companyActivityGroups
  * @property-read CompanyActivityProfile[] $companyActivityProfiles
+ * @property-read FolderEntity[]           $folderEntities
  */
 class Company extends AR
 {
@@ -535,5 +537,14 @@ class Company extends AR
 			static fn(int $sum, Request $request) => $sum + ($request->isActive() ? 1 : 0),
 			0
 		);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFolderEntities(): FolderEntityQuery
+	{
+		/** @var FolderEntityQuery */
+		return $this->hasMany(FolderEntity::class, ['entity_id' => 'id'])->andOnCondition([FolderEntity::field('entity_type') => self::getMorphClass()]);
 	}
 }

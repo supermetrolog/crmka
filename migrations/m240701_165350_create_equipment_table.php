@@ -35,7 +35,7 @@ class m240701_165350_create_equipment_table extends Migration
 			'passive_type'    => $this->integer()->null(),
 			'passive_comment' => $this->text()->null(),
 			'archived_at'     => $this->timestamp()->null(),
-		], $this->morph('created_by'), $this->morphCol('equipment'), $this->timestamps(), $this->softDelete());
+		], $this->morphBigInteger('created_by'), $this->morphCol('equipment'), $this->timestamps(), $this->softDelete());
 
 		$this->index($tableName, ['company_id']);
 		$this->index($tableName, ['contact_id']);

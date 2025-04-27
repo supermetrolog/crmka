@@ -18,8 +18,8 @@ class m240504_102108_create_relations_table extends Migration
 			[
 				'id' => $this->primaryKey(),
 			],
-			$this->morph('first'),
-			$this->morph('second'),
+			$this->morphBigInteger('first'),
+			$this->morphBigInteger('second'),
 			$this->timestamps()
 		);
 	}

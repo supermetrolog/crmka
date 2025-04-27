@@ -14,11 +14,11 @@ class m240522_221408_create_reminder_table extends Migration
     {
 		$tableName = '{{%reminder}}';
 		$this->table($tableName, [
-			'id'        => $this->primaryKey(),
-			'user_id'   => $this->integer()->notNull(),
-			'message'   => $this->text()->notNull(),
-			'status'    => $this->tinyInteger()->notNull(),
-		], $this->morph('created_by'), ['notify_at' => $this->timestamp()->notNull()], $this->timestamps(), $this->softDelete(), $this->morphCol('reminder'));
+			'id'      => $this->primaryKey(),
+			'user_id' => $this->integer()->notNull(),
+			'message' => $this->text()->notNull(),
+			'status'  => $this->tinyInteger()->notNull(),
+		], $this->morphBigInteger('created_by'), ['notify_at' => $this->timestamp()->notNull()], $this->timestamps(), $this->softDelete(), $this->morphCol('reminder'));
 
 
 		$this->index(

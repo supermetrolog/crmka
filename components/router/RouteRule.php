@@ -7,6 +7,7 @@ use app\helpers\StringHelper;
 
 class RouteRule implements RouteRuleInterface
 {
+	private const prefixSeparator = '/';
 	private ?string $action;
 	private string  $pattern;
 	private array   $methods;
@@ -36,7 +37,7 @@ class RouteRule implements RouteRuleInterface
 	private function getNormalizedPattern(): string
 	{
 		if (!is_null($this->prefix)) {
-			$pattern = $this->prefix . $this->pattern;
+			$pattern = $this->prefix . self::prefixSeparator . $this->pattern;
 		} else {
 			$pattern = $this->pattern;
 		}

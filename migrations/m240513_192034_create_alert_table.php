@@ -17,7 +17,7 @@ class m240513_192034_create_alert_table extends Migration
 			'id'      => $this->primaryKey(),
 			'user_id' => $this->integer()->notNull(),
 			'message' => $this->text()->notNull(),
-		], $this->morph('created_by'), $this->timestamps(), $this->softDelete());
+		], $this->morphBigInteger('created_by'), $this->timestamps(), $this->softDelete());
 
 
 		$this->index(
