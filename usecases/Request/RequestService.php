@@ -308,7 +308,7 @@ class RequestService
 	public function markAsActive(Request $request): void
 	{
 		if ($request->isActive()) {
-			throw new InvalidArgumentException('Request is already active');
+			return;
 		}
 
 		$tx = $this->transactionBeginner->begin();
@@ -336,7 +336,7 @@ class RequestService
 	public function markAsPassive(Request $request, PassiveRequestDto $dto): void
 	{
 		if ($request->isPassive()) {
-			throw new InvalidArgumentException('Request is already passive');
+			return;
 		}
 
 		$tx = $this->transactionBeginner->begin();
@@ -363,7 +363,7 @@ class RequestService
 	public function markAsCompleted(Request $request): void
 	{
 		if ($request->isCompleted()) {
-			throw new InvalidArgumentException('Request is already completed');
+			return;
 		}
 
 		if ($request->isPassive()) {
