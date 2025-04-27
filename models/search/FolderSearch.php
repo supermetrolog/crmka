@@ -12,17 +12,17 @@ use yii\data\ActiveDataProvider;
 class FolderSearch extends Form
 {
 	public $id;
-	public $morph;
+	public $category;
 	public $user_id;
 
 	public function rules(): array
 	{
 		return [
 			[['id', 'user_id'], 'integer'],
-			['morph', 'string']
+			['category', 'string']
 		];
 	}
- 
+
 	/**
 	 * @throws ValidateException
 	 * @throws ErrorException
@@ -59,7 +59,7 @@ class FolderSearch extends Form
 		$query->andFilterWhere([
 			'and',
 			[Folder::field('user_id') => $this->user_id],
-			[Folder::field('morph') => $this->morph],
+			[Folder::field('category') => $this->category],
 		]);
 
 		return $dataProvider;

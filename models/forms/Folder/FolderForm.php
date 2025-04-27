@@ -18,16 +18,16 @@ class FolderForm extends Form
 	public $name;
 	public $color;
 	public $icon;
-	public $morph;
+	public $category;
 
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'name', 'morph'], 'required'],
+			[['user_id', 'name', 'category'], 'required'],
 			[['user_id'], 'integer'],
 			[['name', 'icon'], 'string', 'max' => 64],
 			[['color'], 'string', 'max' => 6, 'min' => 6],
-			[['morph'], 'string', 'max' => 255],
+			[['category'], 'string', 'max' => 255],
 			[['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
@@ -35,11 +35,11 @@ class FolderForm extends Form
 	public function attributeLabels(): array
 	{
 		return [
-			'user_id' => 'ID пользователя',
-			'name'    => 'Название',
-			'color'   => 'Цвет',
-			'icon'    => 'Иконка',
-			'morph'   => 'Связь с сущностями'
+			'user_id'  => 'ID пользователя',
+			'name'     => 'Название',
+			'color'    => 'Цвет',
+			'icon'     => 'Иконка',
+			'category' => 'Категория отображения'
 		];
 	}
 
@@ -52,7 +52,7 @@ class FolderForm extends Form
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common, 'user_id', 'morph'],
+			self::SCENARIO_CREATE => [...$common, 'user_id', 'category'],
 			self::SCENARIO_UPDATE => $common
 		];
 	}
@@ -64,11 +64,11 @@ class FolderForm extends Form
 	{
 		if ($this->getScenario() === self::SCENARIO_CREATE) {
 			return new CreateFolderDto([
-				'user'  => User::find()->byId((int)$this->user_id)->one(),
-				'name'  => $this->name,
-				'color' => $this->color,
-				'icon'  => $this->icon,
-				'morph' => $this->morph,
+				'user'     => User::find()->byId((int)$this->user_id)->one(),
+				'name'     => $this->name,
+				'color'    => $this->color,
+				'icon'     => $this->icon,
+				'category' => $this->category,
 			]);
 		}
 

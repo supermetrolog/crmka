@@ -42,7 +42,7 @@ class FolderService
 			'color'      => $dto->color,
 			'icon'       => $dto->icon,
 			'sort_order' => Folder::DEFAULT_SORT_ORDER,
-			'morph'      => $dto->morph
+			'category'   => $dto->category
 		]);
 
 		$folder->saveOrThrow();

@@ -15,11 +15,11 @@ class m250414_112633_create_folder_table extends Migration
 			'icon'       => $this->string(64)->null(),
 			'color'      => $this->string(6)->null(),
 			'sort_order' => $this->tinyInteger()->notNull()->defaultValue(1),
-			'morph'      => $this->string()->notNull()
+			'category'   => $this->string()->notNull()
 		], $this->timestamps(), $this->softDelete());
 
 		$this->index($tableName, ['user_id', 'sort_order']);
-		$this->index($tableName, ['morph']);
+		$this->index($tableName, ['category']);
 
 
 		$this->foreignKey(

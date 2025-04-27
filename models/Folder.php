@@ -15,7 +15,7 @@ use yii\base\ErrorException;
  * @property ?string              $icon
  * @property ?string              $color
  * @property integer              $sort_order
- * @property string               $morph
+ * @property string               $category
  * @property string               $created_at
  * @property string               $updated_at
  * @property ?string              $deleted_at
@@ -39,11 +39,11 @@ class Folder extends AR
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'name', 'morph'], 'required'],
+			[['user_id', 'name', 'category'], 'required'],
 			[['user_id', 'sort_order'], 'integer'],
 			[['name', 'icon'], 'string', 'max' => 64],
 			['color', 'string', 'max' => 6],
-			['morph', 'string'],
+			['category', 'string'],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 			[['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];

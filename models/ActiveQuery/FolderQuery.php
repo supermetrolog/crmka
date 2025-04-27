@@ -46,8 +46,8 @@ class FolderQuery extends AQ
 	/**
 	 * @throws ErrorException
 	 */
-	public function byMorph(string $morph): self
+	public function byCategory(string $category): self
 	{
-		return $this->andWhere([Folder::field('morph') => $morph]);
+		return $this->andWhere([Folder::field('category') => $category]);
 	}
 }

@@ -13,5 +13,5 @@ class CreateFolderDto extends BaseObject
 	public string  $name;
 	public ?string $color;
 	public ?string $icon;
-	public string  $morph;
+	public string  $category;
 } 

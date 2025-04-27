@@ -24,7 +24,7 @@ class FolderSearchResource extends JsonResource
 			'name'       => $this->resource->name,
 			'color'      => $this->resource->color,
 			'icon'       => $this->resource->icon,
-			'morph'      => $this->resource->morph,
+			'category'   => $this->resource->category,
 			'sort_order' => $this->resource->sort_order,
 			'created_at' => $this->resource->created_at,
 			'updated_at' => $this->resource->updated_at,

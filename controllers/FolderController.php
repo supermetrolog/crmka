@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\dto\Folder\EntityInFolderDto;
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
@@ -82,6 +83,7 @@ class FolderController extends AppController
 	 * @throws ForbiddenHttpException
 	 * @throws SaveModelException
 	 * @throws ValidateException
+	 * @throws ModelNotFoundException
 	 */
 	public function actionUpdate(int $id): FolderResource
 	{
