@@ -5,6 +5,7 @@ namespace app\models;
 use app\components\interfaces\OfferInterface;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ComplexQuery;
+use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\ObjectChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use Throwable;
@@ -13,8 +14,9 @@ use yii\base\ErrorException;
 use yii\helpers\Json;
 
 /**
- * @property ChatMember $chatMember
- * @property Complex    $complex
+ * @property ChatMember          $chatMember
+ * @property Complex             $complex
+ * @property-read FolderEntity[] $folderEntities
  */
 class OfferMix extends oldDb\OfferMix implements OfferInterface
 {
@@ -534,5 +536,16 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	public function isDeleted(): bool
 	{
 		return $this->deleted === self::DELETED_TRUE_VALUE;
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFolderEntities(): FolderEntityQuery
+	{
+		/** @var FolderEntityQuery */
+		return $this->hasMany(FolderEntity::class, ['entity_id' => 'id'])
+		            ->andOnCondition([FolderEntity::field('entity_type') => self::getMorphClass()])
+		            ->from(FolderEntity::getTable());
 	}
 }
