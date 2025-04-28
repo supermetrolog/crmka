@@ -144,6 +144,14 @@ class FolderService
 	}
 
 	/**
+	 * @throws \yii\base\ErrorException
+	 */
+	public function removeAllEntitiesFromFolder(Folder $folder): void
+	{
+		$this->entityService->deleteAllByFolderId($folder->id);
+	}
+
+	/**
 	 * @param ReorderFolderDto[] $dtos
 	 *
 	 * @throws Throwable
