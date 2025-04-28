@@ -33,15 +33,17 @@ class FolderEntity extends AR
 			Company::getMorphClass(),
 			Task::getMorphClass(),
 			Request::getMorphClass(),
+			OfferMix::getMorphClass()
 		];
 	}
 
 	public static function getMorphMap(): array
 	{
 		return [
-			Company::getMorphClass() => Company::class,
-			Task::getMorphClass()    => Task::class,
-			Request::getMorphClass() => Request::class,
+			Company::getMorphClass()  => Company::class,
+			Task::getMorphClass()     => Task::class,
+			Request::getMorphClass()  => Request::class,
+			OfferMix::getMorphClass() => OfferMix::class
 		];
 	}
 
