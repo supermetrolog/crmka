@@ -78,6 +78,7 @@ use yii\db\Expression;
  * @property-read Productrange[]           $productRanges
  * @property-read \app\models\Objects[]    $objects
  * @property-read Request[]                $requests
+ * @property-read Request[]                $activeRequests
  * @property-read Deal[]                   $deals
  * @property-read Deal[]                   $dealsRequestEmpty
  * @property-read CompanyFile[]            $files
@@ -107,6 +108,21 @@ class Company extends AR
 	public const COMPANY_CREATED_EVENT = 'company_created_event';
 	public const COMPANY_UPDATED_EVENT = 'company_updated_event';
 
+	public const PASSIVE_WHY_SUSPENDED = 0;
+	public const PASSIVE_WHY_BLOCKED   = 1;
+	public const PASSIVE_WHY_OTHER     = 2;
+
+	public static function getPassiveWhyOptions(): array
+	{
+		return [
+			self::PASSIVE_WHY_SUSPENDED,
+			self::PASSIVE_WHY_BLOCKED,
+			self::PASSIVE_WHY_OTHER,
+		];
+	}
+
+	public const STATUS_PASSIVE = 0;
+	public const STATUS_ACTIVE  = 1;
 
 	public function init(): void
 	{
@@ -546,5 +562,15 @@ class Company extends AR
 	{
 		/** @var FolderEntityQuery */
 		return $this->hasMany(FolderEntity::class, ['entity_id' => 'id'])->andOnCondition([FolderEntity::field('entity_type') => self::getMorphClass()]);
+	}
+
+	public function isPassive(): bool
+	{
+		return $this->status === self::STATUS_PASSIVE;
+	}
+
+	public function isActive(): bool
+	{
+		return $this->status === self::STATUS_ACTIVE;
 	}
 }

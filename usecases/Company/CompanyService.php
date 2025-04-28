@@ -12,8 +12,11 @@ use app\dto\Company\CompanyDto;
 use app\dto\Company\CompanyMediaDto;
 use app\dto\Company\CompanyMiniModelsDto;
 use app\dto\Company\CreateCompanyFileDto;
+use app\dto\Company\DisableCompanyDto;
 use app\dto\Media\CreateMediaDto;
 use app\events\Company\ChangeConsultantCompanyEvent;
+use app\events\Company\DisableCompanyEvent;
+use app\events\Company\EnableCompanyEvent;
 use app\events\NotificationEvent;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -521,6 +524,64 @@ class CompanyService
 			$deletedActivityGroups   = ArrayHelper::filter($currentActivityGroups, static fn(CompanyActivityGroup $group) => !isset($activityGroupIdsHashSet[$group->activity_group_id]));
 
 			$this->deleteActivityGroups($deletedActivityGroups);
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function markAsPassive(Company $company, DisableCompanyDto $dto): void
+	{
+		if ($company->isPassive()) {
+			return;
+		}
+
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$company->status = Company::STATUS_PASSIVE;
+
+			$company->passive_why         = $dto->passive_why;
+			$company->passive_why_comment = $dto->passive_why_comment;
+
+			$company->saveOrThrow();
+
+			$this->eventManager->trigger(new DisableCompanyEvent($company));
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function markAsActive(Company $company): void
+	{
+		if ($company->isActive()) {
+			return;
+		}
+
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$company->status = Company::STATUS_ACTIVE;
+
+			$company->passive_why         = null;
+			$company->passive_why_comment = null;
+
+			$company->saveOrThrow();
+
+			$this->eventManager->trigger(new EnableCompanyEvent($company));
 
 			$tx->commit();
 		} catch (Throwable $th) {

@@ -9,6 +9,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\CompanySearch;
 use app\models\forms\Company\CompanyContactsForm;
+use app\models\forms\Company\CompanyDisableForm;
 use app\models\forms\Company\CompanyForm;
 use app\models\forms\Company\CompanyLogoForm;
 use app\models\forms\Company\CompanyMediaForm;
@@ -239,5 +240,40 @@ class CompanyController extends AppController
 		$updatedLogo = $this->companyService->updateLogo($company, $form->logo);
 
 		return new MediaShortResource($updatedLogo);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function actionDisable(int $id): SuccessResponse
+	{
+		$company = $this->companyRepository->findModelById($id);
+
+		$form = new CompanyDisableForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->companyService->markAsPassive($company, $form->getDto());
+
+		return $this->success('Компания переведена в пассив');
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 */
+	public function actionEnable(int $id): SuccessResponse
+	{
+		$company = $this->companyRepository->findModelById($id);
+
+		$this->companyService->markAsActive($company);
+
+		return $this->success('Компания успешно восстановлена из архива');
 	}
 }
