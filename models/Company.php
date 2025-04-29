@@ -121,6 +121,17 @@ class Company extends AR
 		];
 	}
 
+	public const passiveWhyMap = [
+		self::PASSIVE_WHY_SUSPENDED => 'Временно приостановлено',
+		self::PASSIVE_WHY_BLOCKED   => 'Заблокировано модератором',
+		self::PASSIVE_WHY_OTHER     => 'Иное',
+	];
+
+	public static function resolvePassiveWhyOption(?int $code): string
+	{
+		return self::passiveWhyMap[$code] ?? 'Причина не указана';
+	}
+
 	public const STATUS_PASSIVE = 0;
 	public const STATUS_ACTIVE  = 1;
 

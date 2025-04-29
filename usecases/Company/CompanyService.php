@@ -536,7 +536,7 @@ class CompanyService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function markAsPassive(Company $company, DisableCompanyDto $dto): void
+	public function markAsPassive(Company $company, DisableCompanyDto $dto, ?User $initiator = null): void
 	{
 		if ($company->isPassive()) {
 			return;
@@ -552,7 +552,7 @@ class CompanyService
 
 			$company->saveOrThrow();
 
-			$this->eventManager->trigger(new DisableCompanyEvent($company));
+			$this->eventManager->trigger(new DisableCompanyEvent($company, $initiator));
 
 			$tx->commit();
 		} catch (Throwable $th) {
@@ -565,7 +565,7 @@ class CompanyService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function markAsActive(Company $company): void
+	public function markAsActive(Company $company, ?User $initiator = null): void
 	{
 		if ($company->isActive()) {
 			return;
@@ -581,7 +581,7 @@ class CompanyService
 
 			$company->saveOrThrow();
 
-			$this->eventManager->trigger(new EnableCompanyEvent($company));
+			$this->eventManager->trigger(new EnableCompanyEvent($company, $initiator));
 
 			$tx->commit();
 		} catch (Throwable $th) {

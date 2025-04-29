@@ -258,7 +258,7 @@ class CompanyController extends AppController
 
 		$form->validateOrThrow();
 
-		$this->companyService->markAsPassive($company, $form->getDto());
+		$this->companyService->markAsPassive($company, $form->getDto(), $this->user->identity);
 
 		return $this->success('Компания переведена в пассив');
 	}
@@ -272,7 +272,7 @@ class CompanyController extends AppController
 	{
 		$company = $this->companyRepository->findModelById($id);
 
-		$this->companyService->markAsActive($company);
+		$this->companyService->markAsActive($company, $this->user->identity);
 
 		return $this->success('Компания успешно восстановлена из архива');
 	}

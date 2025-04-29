@@ -19,6 +19,7 @@ use app\events\Task\UpdateTaskEvent;
 use app\events\Timeline\UpdateTimelineStepEvent;
 use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
 use app\listeners\Company\DeactivateCompanyRequestsListener;
+use app\listeners\Company\DisableCompanySystemChatMemberMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
 use app\listeners\Survey\UpdateSurveySystemChatMessageListener;
 use app\listeners\Task\AssignTaskListener;
@@ -96,6 +97,7 @@ return [
 		SyncTimelineOnRequestDeactivationListener::class
 	],
 	DisableCompanyEvent::class          => [
-		DeactivateCompanyRequestsListener::class
+		DeactivateCompanyRequestsListener::class,
+		DisableCompanySystemChatMemberMessageListener::class
 	]
 ];
