@@ -100,7 +100,7 @@ abstract class AbstractChatMemberSearchStrategy extends Form implements ChatMemb
 		                           ])
 		                           ->leftJoin(['cmm' => $messageQuery], ChatMember::getColumn('id') . '=' . 'cmm.to_chat_member_id')
 		                           ->leftJoin(['cmle' => $eventQuery], ChatMember::getColumn('id') . '=' . 'cmle.event_chat_member_id')
-		                           ->with(['lastCall.user.userProfile'])
+		                           ->with(['lastCall.user.userProfile', 'lastMessage.files', 'lastMessage.files', 'lastMessage.fromChatMember.user.userProfile'])
 		                           ->groupBy(ChatMember::field('id'));
 	}
 
@@ -125,8 +125,11 @@ abstract class AbstractChatMemberSearchStrategy extends Form implements ChatMemb
 	protected function createDataProvider(ChatMemberQuery $query): ActiveDataProvider
 	{
 		return new ActiveDataProvider([
-			'query' => $query,
-			'sort'  => [
+			'query'      => $query,
+			'pagination' => [
+				'pageSizeLimit' => [0, 30],
+			],
+			'sort'       => [
 				'enableMultiSort' => true,
 				'defaultOrder'    => [
 					'default' => SORT_DESC

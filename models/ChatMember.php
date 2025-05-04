@@ -37,6 +37,8 @@ use yii\db\ActiveQuery;
  * @property ChatMemberMessage                      $pinnedChatMemberMessage
  * @property Relation[]                             $relationFirst
  * @property Call[]                                 $calls
+ * @property-read ?ChatMemberMessage                $lastMessage
+ * @property-read ?Call                             $lastCall
  */
 class ChatMember extends AR
 {
@@ -210,6 +212,15 @@ class ChatMember extends AR
 	{
 		return $this->morphHasOneVia(Call::class, 'id', 'second')
 		            ->via('lastCallRelationFirst');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getLastMessage(): ChatMemberMessageQuery
+	{
+		/** @var ChatMemberMessageQuery */
+		return $this->hasOne(ChatMemberMessage::class, ['to_chat_member_id' => 'id'])->orderBy(ChatMemberMessage::field('id'));
 	}
 
 	public function isObjectChatMember(): bool
