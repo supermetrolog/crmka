@@ -6,11 +6,11 @@ use app\models\Company;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\search\ChatMember\Strategies\CompanyChatMemberSearchStrategy;
+use app\models\search\ChatMember\Strategies\GeneralChatMemberSearchStrategy;
 use app\models\search\ChatMember\Strategies\ObjectChatMemberSearchStrategy;
 use app\models\search\ChatMember\Strategies\RequestChatMemberSearchStrategy;
 use app\models\search\ChatMember\Strategies\UserChatMemberSearchStrategy;
 use app\models\User;
-use InvalidArgumentException;
 
 class ChatMemberSearchStrategyFactory
 {
@@ -26,7 +26,7 @@ class ChatMemberSearchStrategyFactory
 			case Request::getMorphClass():
 				return new RequestChatMemberSearchStrategy();
 			default:
-				throw new InvalidArgumentException("Unexpected ChatMember type: $type");
+				return new GeneralChatMemberSearchStrategy();
 		}
 	}
 }
