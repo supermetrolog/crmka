@@ -220,7 +220,9 @@ class ChatMember extends AR
 	public function getLastMessage(): ChatMemberMessageQuery
 	{
 		/** @var ChatMemberMessageQuery */
-		return $this->hasOne(ChatMemberMessage::class, ['to_chat_member_id' => 'id'])->orderBy(ChatMemberMessage::field('id'));
+		return $this->hasOne(ChatMemberMessage::class, ['to_chat_member_id' => 'id'])
+		            ->andOnCondition([ChatMemberMessage::field('deleted_at') => null])
+		            ->orderBy([ChatMemberMessage::field('id') => SORT_DESC]);
 	}
 
 	public function isObjectChatMember(): bool
