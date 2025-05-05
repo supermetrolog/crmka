@@ -306,6 +306,7 @@ return static function (RouterInterface $router) {
 			$route->delete()->action('delete');
 
 			$route->post('entities')->action('add-entities');
+			$route->post('clear')->action('clear-entities');
 			$route->delete('entities')->action('remove-entities');
 		});
 	});

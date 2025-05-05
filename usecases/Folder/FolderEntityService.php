@@ -8,6 +8,7 @@ use app\dto\Folder\FolderEntityDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\FolderEntity;
 use Throwable;
+use yii\base\ErrorException;
 use yii\db\StaleObjectException;
 
 class FolderEntityService
@@ -38,6 +39,14 @@ class FolderEntityService
 	public function delete(FolderEntity $entity): void
 	{
 		$entity->delete();
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function deleteAllByFolderId(int $folderId): void
+	{
+		FolderEntity::deleteAll([FolderEntity::field('folder_id') => $folderId]);
 	}
 
 	// TODO: Сортировка

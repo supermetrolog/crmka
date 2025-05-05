@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\AR\ManyToManyTrait\ManyToManyTrait;
+use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskCommentQuery;
@@ -16,32 +17,33 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "task".
  *
- * @property int                $id
- * @property int                $user_id
- * @property ?string            $message
- * @property string             $title
- * @property int                $status
- * @property string|null        $start
- * @property string|null        $end
- * @property string             $created_by_type
- * @property int                $created_by_id
- * @property string             $created_at
- * @property string             $updated_at
- * @property string             $deleted_at
- * @property string|null        $impossible_to
+ * @property int                 $id
+ * @property int                 $user_id
+ * @property ?string             $message
+ * @property string              $title
+ * @property int                 $status
+ * @property string|null         $start
+ * @property string|null         $end
+ * @property string              $created_by_type
+ * @property int                 $created_by_id
+ * @property string              $created_at
+ * @property string              $updated_at
+ * @property string              $deleted_at
+ * @property string|null         $impossible_to
  *
- * @property User               $user
- * @property User               $createdByUser
- * @property TaskTag[]          $tags
- * @property User               $createdBy
- * @property ChatMemberMessage  $chatMemberMessage
- * @property ChatMember         $chatMember
- * @property TaskComment        $lastComment
- * @property TaskObserver[]     $observers
- * @property TaskObserver       $targetUserObserver
- * @property-read ?TaskHistory  $lastHistory
- * @property-read TaskComment[] $lastComments
- * @property Media[]            $files
+ * @property User                $user
+ * @property User                $createdByUser
+ * @property TaskTag[]           $tags
+ * @property User                $createdBy
+ * @property ChatMemberMessage   $chatMemberMessage
+ * @property ChatMember          $chatMember
+ * @property TaskComment         $lastComment
+ * @property TaskObserver[]      $observers
+ * @property TaskObserver        $targetUserObserver
+ * @property-read ?TaskHistory   $lastHistory
+ * @property-read TaskComment[]  $lastComments
+ * @property Media[]             $files
+ * @property-read FolderEntity[] $folderEntities
  */
 class Task extends AR
 {
@@ -277,6 +279,15 @@ class Task extends AR
 	public function getTargetUserObserver(): ActiveQuery
 	{
 		return $this->hasOne(TaskObserver::class, ['user_id' => 'user_id', 'task_id' => 'id']);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFolderEntities(): FolderEntityQuery
+	{
+		/** @var FolderEntityQuery */
+		return $this->hasMany(FolderEntity::class, ['entity_id' => 'id'])->andOnCondition([FolderEntity::field('entity_type') => self::getMorphClass()]);
 	}
 
 	public function isViewed(): bool
