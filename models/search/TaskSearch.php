@@ -5,6 +5,7 @@ namespace app\models\search;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\TaskObserverQuery;
+use app\models\FolderEntity;
 use app\models\Task;
 use app\models\TaskObserver;
 use app\models\TaskTag;
@@ -29,14 +30,14 @@ class TaskSearch extends Form
 	public $observed;
 
 	public int $current_user_id;
-
+	public     $folder_ids = [];
 
 	public function rules(): array
 	{
 		return [
 			[['id', 'user_id', 'created_by_id', 'observer_id'], 'integer'],
 			[['deleted', 'expired', 'completed', 'multiple', 'observed'], 'boolean'],
-			['status', 'each', 'rule' => ['integer']],
+			[['status', 'folder_ids'], 'each', 'rule' => ['integer']],
 			[['message', 'start', 'end', 'created_by_type'], 'safe'],
 			['tag_ids', 'each', 'rule' => [
 				'exist',
@@ -182,6 +183,10 @@ class TaskSearch extends Form
 		// TODO: Фильтры по файлам, user, survey, comments, created_by..
 
 		$query->andFilterWhere(['in', TaskTag::xfield('id'), $this->tag_ids]);
+
+		if (!empty($this->folder_ids)) {
+			$query->innerJoinWith(['folderEntities'], false)->andWhere([FolderEntity::field('folder_id') => $this->folder_ids]);
+		}
 
 		return $dataProvider;
 	}

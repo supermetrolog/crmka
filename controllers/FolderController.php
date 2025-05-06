@@ -200,6 +200,27 @@ class FolderController extends AppController
 		return $this->success();
 	}
 
+
+	/**
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
+	 * @throws ForbiddenHttpException
+	 */
+	public function actionClearEntities(int $id): SuccessResponse
+	{
+		$folder = $this->folderRepository->findOneOrThrow($id);
+
+		$identity = $this->user->identity;
+
+		if ($folder->user_id !== $identity->id) {
+			throw new ForbiddenHttpException('У вас нет прав на управление этой папкой.');
+		}
+
+		$this->folderService->removeAllEntitiesFromFolder($folder);
+
+		return $this->success();
+	}
+
 	/**
 	 * @return EntityInFolderDto[]
 	 * @throws ValidateException

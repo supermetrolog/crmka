@@ -26,6 +26,7 @@ use app\resources\ChatMember\ChatMemberStatisticResource;
 use app\resources\ChatMemberMessage\ChatMemberMessageResource;
 use app\resources\Media\MediaResource;
 use app\usecases\ChatMember\ChatMemberService;
+use Exception;
 use Throwable;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
@@ -45,6 +46,9 @@ class ChatMemberController extends AppController
 		parent::__construct($id, $module, $config);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function actionIndex(): ActiveDataProvider
 	{
 		$searchModel = new ChatMemberSearch($this->searchStrategyFactory);

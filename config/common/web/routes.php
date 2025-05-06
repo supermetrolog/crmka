@@ -55,6 +55,9 @@ return static function (RouterInterface $router) {
 
 			$route->put()->action('update');
 
+			$route->post('disable');
+			$route->post('enable');
+
 			$route->post('logo', 'update-logo');
 			$route->delete('logo', 'delete-logo');
 
@@ -303,6 +306,7 @@ return static function (RouterInterface $router) {
 			$route->delete()->action('delete');
 
 			$route->post('entities')->action('add-entities');
+			$route->post('clear')->action('clear-entities');
 			$route->delete('entities')->action('remove-entities');
 		});
 	});

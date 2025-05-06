@@ -29,13 +29,15 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 
 	protected function applySpecificQuery(ChatMemberQuery $query, array $params): void
 	{
-		$query->joinWith(['company.categories'])
-		      ->with([
-			      'company.logo',
-			      'company.categories',
-			      'company.companyGroup',
-			      'company.consultant'
-		      ]);
+		$query->joinWith(['company.categories'])->with([
+			'company.logo',
+			'company.companyGroup',
+			'company.consultant.userProfile',
+			'company.contacts',
+			'company.requests',
+			'company.objects',
+			'company.companyActivityGroups', 'company.companyActivityProfiles'
+		]);
 	}
 
 	/**

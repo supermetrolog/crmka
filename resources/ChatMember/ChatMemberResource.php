@@ -15,6 +15,7 @@ use app\resources\ChatMember\ChatMemberModel\CompanyBaseResource;
 use app\resources\ChatMember\ChatMemberModel\ObjectChatMemberShortResource;
 use app\resources\ChatMember\ChatMemberModel\RequestShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\ChatMemberMessage\ChatMemberMessageInlineResource;
 use UnexpectedValueException;
 use yii\data\ActiveDataProvider;
 
@@ -30,14 +31,15 @@ class ChatMemberResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'id'         => $this->resource->id,
-			'model_type' => $this->resource->model_type,
-			'model_id'   => $this->resource->model_id,
-			'created_at' => $this->resource->created_at,
-			'updated_at' => $this->resource->updated_at,
-			'model'      => $this->getModel()->toArray(),
-			'last_call'  => CallResource::tryMakeArray($this->resource->lastCall),
-			'statistic'  => $this->getStatistic(),
+			'id'           => $this->resource->id,
+			'model_type'   => $this->resource->model_type,
+			'model_id'     => $this->resource->model_id,
+			'created_at'   => $this->resource->created_at,
+			'updated_at'   => $this->resource->updated_at,
+			'model'        => $this->getModel()->toArray(),
+			'last_call'    => CallResource::tryMakeArray($this->resource->lastCall),
+			'last_message' => ChatMemberMessageInlineResource::tryMakeArray($this->resource->lastMessage),
+			'statistic'    => $this->getStatistic(),
 		];
 	}
 
