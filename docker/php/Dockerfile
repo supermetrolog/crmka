@@ -4,6 +4,8 @@ FROM php:${DOCKER_PHP_VERSION}-fpm-alpine
 
 ARG DOCKER_PHP_ENABLE_XDEBUG='off'
 ARG TZ='UTC'
+ARG DOCKER_REDIS_VERSION='redis'
+ARG DOCKER_MONGODB_VERSION='mongodb'
 
 # https://wiki.alpinelinux.org/wiki/Setting_the_timezone
 RUN echo "${TZ}" && apk --update add tzdata && \
@@ -79,11 +81,11 @@ RUN php -m && \
     zip \
     calendar \
     pdo_mysql && \
-    pecl install redis && \
+    pecl install ${DOCKER_REDIS_VERSION} && \
     docker-php-ext-enable redis && \
     apk add --update --no-cache --virtual .docker-php-mongodb-dependencies \
     heimdal-dev && \
-    pecl install mongodb && \
+    pecl install ${DOCKER_MONGODB_VERSION} && \
     docker-php-ext-enable mongodb && \
     apk del .docker-php-mongodb-dependencies && \
     apk add --update --no-cache \
