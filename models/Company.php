@@ -575,6 +575,11 @@ class Company extends AR
 		return $this->hasMany(FolderEntity::class, ['entity_id' => 'id'])->andOnCondition([FolderEntity::field('entity_type') => self::getMorphClass()]);
 	}
 
+	public function getChatMemberPinnedMessage(): ?ChatMemberMessage
+	{
+		return $this->chatMember->pinnedChatMemberMessage ?? null;
+	}
+
 	public function isPassive(): bool
 	{
 		return $this->status === self::STATUS_PASSIVE;
