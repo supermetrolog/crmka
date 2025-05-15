@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\helpers\ArrayHelper;
 use app\helpers\DateTimeHelper;
 use app\helpers\JsonFieldNormalizer;
 use app\kernel\common\models\AQ\AQ;
@@ -304,6 +305,19 @@ class Objects extends oldDb\Objects
 	public function isLand(): bool
 	{
 		return $this->is_land === 1;
+	}
+
+	public function getFloorsCount(): int
+	{
+		if ($this->isLand()) {
+			return 0;
+		}
+
+		if (is_null($this->floors)) {
+			return ArrayHelper::length($this->getFloorBuildings());
+		}
+
+		return $this->floors;
 	}
 
 	public static function find(): AQ
