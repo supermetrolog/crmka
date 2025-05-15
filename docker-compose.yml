@@ -28,6 +28,8 @@ services:
       dockerfile: Dockerfile
       args:
         DOCKER_PHP_VERSION: '7.4'
+        DOCKER_MONGODB_VERSION: 'mongodb-1.20.1'
+        DOCKER_REDIS_VERSION: 'redis-6.1.0'
         DOCKER_PHP_ENABLE_XDEBUG: ${DOCKER_PHP_ENABLE_XDEBUG}
         DOCKER_PHP_XDEBUG_VERSION: ${DOCKER_PHP_XDEBUG_VERSION}
         TZ: ${WORKSPACE_TIMEZONE}
