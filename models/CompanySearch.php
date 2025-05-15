@@ -106,7 +106,8 @@ class CompanySearch extends Form
 			                          'categories',
 			                          'objects.offerMix.generalOffersMix',
 			                          'objects.objectFloors',
-			                          'lastCall'
+			                          'lastCall',
+			                          'chatMember.pinnedChatMemberMessage.fromChatMember.user.userProfile', 'chatMember.pinnedChatMemberMessage.files'
 		                          ])->groupBy(Company::field('id'));
 
 		$dataProvider = new ActiveDataProvider([

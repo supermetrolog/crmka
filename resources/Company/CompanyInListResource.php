@@ -8,6 +8,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Company;
 use app\resources\Call\CallShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\ChatMemberMessage\ChatMemberMessageInlineResource;
 use app\resources\Company\ActivityGroup\CompanyActivityGroupResource;
 use app\resources\Company\ActivityProfile\CompanyActivityProfileResource;
 use app\resources\Company\Category\CompanyCategoryResource;
@@ -69,7 +70,8 @@ class CompanyInListResource extends JsonResource
 			'objects'  => CompanyObjectResource::collection($this->resource->objects),
 			'requests' => CompanyRequestResource::collection($this->resource->requests),
 
-			'last_call' => CallShortResource::tryMakeArray($this->resource->lastCall),
+			'last_call'                  => CallShortResource::tryMakeArray($this->resource->lastCall),
+			'chat_member_pinned_message' => ChatMemberMessageInlineResource::tryMakeArray($this->resource->getChatMemberPinnedMessage()),
 
 			'objects_count'         => $this->resource->objects_count,
 			'requests_count'        => $this->resource->requests_count,
