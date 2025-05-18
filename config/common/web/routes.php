@@ -264,6 +264,9 @@ return static function (RouterInterface $router) {
 			$route->post('postpone');
 			$route->post('restore');
 
+			$route->post('relations', 'create-relations');
+			$route->delete('relations', 'delete-relations');
+
 			$route->prefix('files', static function (RouteInterface $route) {
 				$route->get()->action('files');
 				$route->post()->action('create-files');

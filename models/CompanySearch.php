@@ -6,6 +6,7 @@ use app\components\ExpressionBuilder\FieldExpressionBuilder;
 use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TimelineQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\Phone;
@@ -47,11 +48,13 @@ class CompanySearch extends Form
 
 	public $without_product_ranges  = false;
 	public $with_passive_consultant = false;
+	public $with_current_user_tasks = false;
 	public $show_product_ranges;
 	public $requests_filter;
 	public $requests_area_min;
 	public $requests_area_max;
 	public $folder_ids;
+	public $current_user_id;
 
 	/**
 	 * {@inheritdoc}
@@ -62,10 +65,10 @@ class CompanySearch extends Form
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd', 'product_ranges'], 'safe'],
 			[['activity_group_ids', 'activity_profile_ids', 'folder_ids'], 'each', 'rule' => ['integer']],
-			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges'], 'boolean'],
+			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges', 'with_current_user_tasks'], 'boolean'],
 			['requests_filter', 'string'],
 			['requests_filter', 'in', 'range' => ['none', 'active', 'not-active', 'passive']],
-			[['requests_area_min', 'requests_area_max'], 'integer'],
+			[['requests_area_min', 'requests_area_max', 'current_user_id'], 'integer'],
 		];
 	}
 
@@ -87,7 +90,7 @@ class CompanySearch extends Form
 			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
 			                          'active_requests_count' => 'COUNT(DISTINCT CASE WHEN request.status = 1 THEN request.id ELSE NULL END)',
 			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
-			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
+			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)'
 		                          ])
 		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects', 'productRanges', 'companyActivityGroups', 'companyActivityProfiles'])
 		                          ->joinWith(['chatMember cm'])
@@ -262,6 +265,18 @@ class CompanySearch extends Form
 
 		if ($this->hasFilter($this->folder_ids)) {
 			$query->innerJoinWith(['folderEntities'], false)->andWhere([FolderEntity::field('folder_id') => $this->folder_ids]);
+		}
+
+		if ($this->hasFilter($this->current_user_id)) {
+			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)']);
+
+			$query->joinWith(['tasks' => function (TaskQuery $subquery) {
+				$subquery->andOnCondition([
+					'and',
+					[Task::field('user_id') => $this->current_user_id],
+					['!=', Task::field('status'), Task::STATUS_DONE]
+				]);
+			}], false, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN');
 		}
 
 		$query->andFilterWhere([

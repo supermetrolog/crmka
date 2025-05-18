@@ -16,6 +16,7 @@ use app\models\forms\Task\TaskChangeStatusForm;
 use app\models\forms\Task\TaskCommentForm;
 use app\models\forms\Task\TaskForm;
 use app\models\forms\Task\TaskPostponeForm;
+use app\models\forms\Task\TaskRelationEntityLinkForm;
 use app\models\Media;
 use app\models\search\TaskSearch;
 use app\models\Task;
@@ -24,6 +25,7 @@ use app\repositories\TaskRepository;
 use app\resources\Media\MediaResource;
 use app\resources\Task\TaskCommentResource;
 use app\resources\Task\TaskHistoryViewResource;
+use app\resources\Task\TaskRelationEntityResource;
 use app\resources\Task\TaskRelationStatisticResource;
 use app\resources\Task\TaskResource;
 use app\resources\Task\TaskStatusStatisticResource;
@@ -476,6 +478,35 @@ class TaskController extends AppController
 		return new TaskResource($model);
 	}
 
+	/**
+	 * @return TaskRelationEntityResource[]
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws Exception
+	 *
+	 * @throws ModelNotFoundException
+	 */
+	public function actionCreateRelations(int $id): array
+	{
+		$task = $this->repository->findModelById($id);
+
+		$dtos = [];
+
+		foreach ($this->request->post('relations', []) as $element) {
+			$form = $this->makeRelationEntityLinkForm($element);
+
+			$dto = $form->getDto();
+
+			$dto->createdBy = $this->user->identity;
+
+			$dtos[] = $dto;
+		}
+
+		$entities = $this->taskService->linkEntities($task, $dtos);
+
+		return TaskRelationEntityResource::collection($entities);
+	}
+
 
 	/**
 	 * @throws ModelNotFoundException
@@ -513,6 +544,20 @@ class TaskController extends AppController
 		$form->model_type = $this->user->identity::getMorphClass();
 
 		$form->files = UploadedFile::getInstancesByName($name);
+
+		$form->validateOrThrow();
+
+		return $form;
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeRelationEntityLinkForm(array $payload): TaskRelationEntityLinkForm
+	{
+		$form = new TaskRelationEntityLinkForm();
+
+		$form->load($payload);
 
 		$form->validateOrThrow();
 

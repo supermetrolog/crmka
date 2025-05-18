@@ -10,6 +10,7 @@ use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskCommentQuery;
 use app\models\ActiveQuery\TaskHistoryQuery;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\ActiveQuery\TaskTaskTagQuery;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -290,6 +291,15 @@ class Task extends AR
 		return $this->hasMany(FolderEntity::class, ['entity_id' => 'id'])->andOnCondition([FolderEntity::field('entity_type') => self::getMorphClass()]);
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
+	public function getRelationEntities(): TaskRelationEntityQuery
+	{
+		/** @var TaskRelationEntityQuery */
+		return $this->hasMany(TaskRelationEntity::class, ['task_id' => 'id'])->andOnCondition([TaskRelationEntity::field('deleted_at') => null]);
+	}
+
 	public function isViewed(): bool
 	{
 		$targetUserObserver = $this->targetUserObserver;
@@ -333,5 +343,13 @@ class Task extends AR
 	public function getFilesCount(): int
 	{
 		return $this->getFiles()->count();
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getRelationsCount(): int
+	{
+		return $this->getRelationEntities()->count();
 	}
 }
