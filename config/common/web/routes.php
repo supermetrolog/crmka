@@ -267,7 +267,6 @@ return static function (RouterInterface $router) {
 			$route->prefix('relations', static function (RouteInterface $route) {
 				$route->get()->action('relations');
 				$route->post()->action('create-relations');
-				$route->delete()->action('delete-relations');
 			});
 
 			$route->prefix('files', static function (RouteInterface $route) {
@@ -282,6 +281,11 @@ return static function (RouterInterface $router) {
 			});
 		});
 	});
+
+	$router->controller('task-relation-entity')->group(static function (RouteInterface $route) {
+		$route->delete('<id>', 'delete');
+		$route->put('<id>', 'update');
+	})->disablePluralize();
 
 	$router->controller('task-tag')->group(static function (RouteInterface $route) {
 		$route->get('all');
