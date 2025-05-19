@@ -21,15 +21,17 @@ use app\models\Media;
 use app\models\search\TaskSearch;
 use app\models\Task;
 use app\repositories\TaskCommentRepository;
+use app\repositories\TaskRelationEntityRepository;
 use app\repositories\TaskRepository;
 use app\resources\Media\MediaResource;
 use app\resources\Task\TaskCommentResource;
 use app\resources\Task\TaskHistoryViewResource;
-use app\resources\Task\TaskRelationEntityResource;
 use app\resources\Task\TaskRelationStatisticResource;
 use app\resources\Task\TaskResource;
 use app\resources\Task\TaskStatusStatisticResource;
 use app\resources\Task\TaskWithRelationResource;
+use app\resources\TaskRelationEntity\TaskRelationEntityFullResource;
+use app\resources\TaskRelationEntity\TaskRelationEntityResource;
 use app\usecases\Task\AssignTaskService;
 use app\usecases\Task\ChangeTaskStatusService;
 use app\usecases\Task\CreateTaskCommentService;
@@ -51,17 +53,18 @@ use yii\web\UploadedFile;
 
 class TaskController extends AppController
 {
-	private CreateTaskService        $createTaskService;
-	private UpdateTaskService        $updateTaskService;
-	private TaskStateService         $taskStateService;
-	private ChangeTaskStatusService  $changeTaskStatusService;
-	private AssignTaskService        $assignTaskService;
-	private TaskRepository           $repository;
-	private CreateTaskCommentService $createTaskCommentService;
-	private TaskCommentRepository    $taskCommentRepository;
-	private ObserveTaskService       $observeTaskService;
-	private TaskHistoryService       $taskHistoryService;
-	private TaskService              $taskService;
+	private CreateTaskService            $createTaskService;
+	private UpdateTaskService            $updateTaskService;
+	private TaskStateService             $taskStateService;
+	private ChangeTaskStatusService      $changeTaskStatusService;
+	private AssignTaskService            $assignTaskService;
+	private TaskRepository               $repository;
+	private CreateTaskCommentService     $createTaskCommentService;
+	private TaskCommentRepository        $taskCommentRepository;
+	private ObserveTaskService           $observeTaskService;
+	private TaskHistoryService           $taskHistoryService;
+	private TaskService                  $taskService;
+	private TaskRelationEntityRepository $taskRelationEntityRepository;
 
 	public function __construct(
 		$id,
@@ -77,6 +80,7 @@ class TaskController extends AppController
 		ObserveTaskService $observeTaskService,
 		TaskHistoryService $taskHistoryService,
 		TaskService $taskService,
+		TaskRelationEntityRepository $taskRelationEntityRepository,
 		array $config = []
 	)
 	{
@@ -93,6 +97,8 @@ class TaskController extends AppController
 		$this->taskCommentRepository    = $taskCommentRepository;
 
 		$this->taskHistoryService = $taskHistoryService;
+
+		$this->taskRelationEntityRepository = $taskRelationEntityRepository;
 
 		$this->taskService = $taskService;
 
@@ -146,7 +152,7 @@ class TaskController extends AppController
 
 
 	/* @throws ErrorException */
-	public function actionRelations(): TaskRelationStatisticResource
+	public function actionRelationsStatistics(): TaskRelationStatisticResource
 	{
 		$user_id = $this->request->get('user_id');
 
@@ -479,6 +485,18 @@ class TaskController extends AppController
 	}
 
 	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionRelations(int $id): array
+	{
+		$task = $this->repository->findModelByIdWithDeleted($id);
+
+		$relations = $this->taskRelationEntityRepository->findAllByTaskIdWithRelations($task->id);
+
+		return TaskRelationEntityFullResource::collection($relations);
+	}
+
+	/**
 	 * @return TaskRelationEntityResource[]
 	 * @throws Throwable
 	 * @throws ValidateException
@@ -506,7 +524,6 @@ class TaskController extends AppController
 
 		return TaskRelationEntityResource::collection($entities);
 	}
-
 
 	/**
 	 * @throws ModelNotFoundException

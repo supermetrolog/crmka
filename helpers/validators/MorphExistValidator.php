@@ -22,8 +22,6 @@ class MorphExistValidator extends ExistValidator
 		if ($this->validateMorphClassExistence($model)) {
 			$this->targetClass = $this->getTargetMorphClass($model);
 
-			Yii::debug($this->validateValue((int)$model->$attribute));
-
 			$errors = $this->validateValue((int)$model->$attribute);
 
 			if (!is_null($errors)) {

@@ -245,7 +245,7 @@ return static function (RouterInterface $router) {
 	$router->controller('task')->group(static function (RouteInterface $route) {
 		$route->get()->action('index');
 		$route->get('counts');
-		$route->get('relations');
+		$route->get('relations-statistics');
 		$route->get('statistic');
 
 		$route->post()->action('create');
@@ -264,8 +264,11 @@ return static function (RouterInterface $router) {
 			$route->post('postpone');
 			$route->post('restore');
 
-			$route->post('relations', 'create-relations');
-			$route->delete('relations', 'delete-relations');
+			$route->prefix('relations', static function (RouteInterface $route) {
+				$route->get()->action('relations');
+				$route->post()->action('create-relations');
+				$route->delete()->action('delete-relations');
+			});
 
 			$route->prefix('files', static function (RouteInterface $route) {
 				$route->get()->action('files');

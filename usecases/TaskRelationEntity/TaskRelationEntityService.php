@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\usecases\TaskRelationEntity;
 
 use app\dto\Task\CreateTaskRelationEntityDto;
+use app\dto\TaskRelationEntity\UpdateTaskRelationEntityDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\TaskRelationEntity;
 use app\models\User;
@@ -51,15 +52,33 @@ class TaskRelationEntityService
 	}
 
 	/**
+	 * @throws SaveModelException
+	 */
+	public function update(TaskRelationEntity $entity, UpdateTaskRelationEntityDto $dto): TaskRelationEntity
+	{
+		$entity->load([
+			'comment' => $dto->comment
+		]);
+
+		$entity->saveOrThrow();
+
+		return $entity;
+	}
+
+	/**
 	 * @throws Throwable
 	 * @throws StaleObjectException
 	 */
 	public function delete(TaskRelationEntity $entity, ?User $initiator = null): void
 	{
+		if ($entity->isDeleted()) {
+			return;
+		}
+
 		if ($initiator) {
 			$entity->deleted_by_id = $initiator->id;
 		}
-		
+
 		$entity->delete();
 	}
 }

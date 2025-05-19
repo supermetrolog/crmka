@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\resources\Task;
+namespace app\resources\TaskRelationEntity;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\TaskRelationEntity;
@@ -10,7 +10,6 @@ use app\models\TaskRelationEntity;
 class TaskRelationEntityResource extends JsonResource
 {
 	private TaskRelationEntity $resource;
-
 	public function __construct(TaskRelationEntity $resource)
 	{
 		$this->resource = $resource;
