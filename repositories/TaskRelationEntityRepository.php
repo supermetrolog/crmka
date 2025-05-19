@@ -55,6 +55,7 @@ class TaskRelationEntityRepository
 				                         ]);
 			                         }
 		                         ])
+		                         ->notDeleted()
 		                         ->all();
 	}
 
