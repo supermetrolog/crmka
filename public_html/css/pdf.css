@@ -47,8 +47,8 @@ div.page-no-absolute:first-child {
 }
 
 span.danger {
-	color: #8E0606;
-	font-weight: bold;
+    color: rgb(153, 8, 6);
+    font-weight: bold;
 }
 
 tr {
@@ -73,9 +73,9 @@ table {
 }
 
 .title h3 {
-	border-bottom: 2px solid #8E0606;
-	text-transform: uppercase;
-	display: inline-block;
+    border-bottom: 2px solid rgb(153, 8, 6);
+    text-transform: uppercase;
+    display: inline-block;
 }
 
 .title .one {
@@ -116,13 +116,13 @@ table {
 }
 
 #header table td.logo .image {
-	width: 186px;
-	height: 30px;
+    width: 175px;
+    height: 35px;
 }
 
 #header table td. .image img {
-	width: 186px;
-	height: 30px;
+    width: 175px;
+    height: 35px;
 }
 
 #header table td.consultant {
@@ -139,12 +139,12 @@ table {
 } */
 
 #header table td.consultant div {
-	display: inline-block;
-	border-right: 1px solid #8E0606;
-	padding-right: 10px;
-	min-height: 35px;
-	height: 35px;
-	vertical-align: top;
+    display: inline-block;
+    border-right: 1px solid rgb(153, 8, 6);
+    padding-right: 10px;
+    min-height: 35px;
+    height: 35px;
+    vertical-align: top;
 }
 
 #header table td.consultant div.phones {
@@ -183,11 +183,11 @@ table {
 }
 
 #footer table {
-	border-top: 2px solid #8E0606;
-	margin-bottom: 0;
-	font-size: 9.5px;
-	max-height: 25px;
-	padding-top: 10px;
+    border-top: 2px solid rgb(153, 8, 6);
+    margin-bottom: 0;
+    font-size: 9.5px;
+    max-height: 25px;
+    padding-top: 10px;
 }
 
 #footer table td>div {
@@ -219,11 +219,11 @@ table {
 }
 
 #footer table td.contacts > div li i {
-	position: absolute;
-	font-size: 4px;
-	color: #8E0606;
-	top: 10px;
-	left: -6px;
+    position: absolute;
+    font-size: 4px;
+    color: rgb(153, 8, 6);
+    top: 10px;
+    left: -6px;
 }
 
 #footer table td.contacts>div li p {
@@ -416,20 +416,20 @@ table {
 }
 
 .main-info td.left .image .extra-info .object_id {
-	position: absolute;
-	top: 0;
-	left: 0;
-	background-color: #8E0606;
-	/* height: 20px; */
-	/* width: 80px; */
-	width: auto;
-	text-transform: uppercase;
-	font-size: 12px;
-	color: white;
-	padding: 5px 15px 5px 15px;
-	/* padding: 5px 0; */
-	vertical-align: middle;
-	z-index: 3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgb(153, 8, 6);
+    /* height: 20px; */
+    /* width: 80px; */
+    width: auto;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: white;
+    padding: 5px 15px 5px 15px;
+    /* padding: 5px 0; */
+    vertical-align: middle;
+    z-index: 3;
 }
 
 .main-info td.left .image .extra-info .object_id p {
@@ -494,15 +494,15 @@ table.digital-info-container {
 }
 
 .digital-info td.two div {
-	/* width: 300px; */
-	height: 78px;
-	outline: 1px solid #8E0606;
-	padding: 10px 15px;
-	padding-right: 0 !important;
-	margin-right: 4px;
-	max-width: 298px;
-	width: 298px;
-	min-width: 298px;
+    /* width: 300px; */
+    height: 78px;
+    outline: 1px solid rgb(153, 8, 6);
+    padding: 10px 15px;
+    padding-right: 0 !important;
+    margin-right: 4px;
+    max-width: 298px;
+    width: 298px;
+    min-width: 298px;
 }
 
 .digital-info td.three>div {
