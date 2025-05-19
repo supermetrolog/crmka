@@ -77,7 +77,8 @@ class CompanyInListResource extends JsonResource
 			'requests_count'        => $this->resource->requests_count,
 			'active_requests_count' => $this->resource->active_requests_count,
 			'contacts_count'        => $this->resource->contacts_count,
-			'active_contacts_count' => $this->resource->active_contacts_count
+			'active_contacts_count' => $this->resource->active_contacts_count,
+			'tasks_count'           => $this->resource->tasks_count
 		];
 	}
 }

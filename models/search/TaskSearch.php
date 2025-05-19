@@ -5,9 +5,11 @@ namespace app\models\search;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\TaskObserverQuery;
+use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\FolderEntity;
 use app\models\Task;
 use app\models\TaskObserver;
+use app\models\TaskRelationEntity;
 use app\models\TaskTag;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
@@ -16,6 +18,7 @@ use yii\db\Expression;
 class TaskSearch extends Form
 {
 	public $id;
+	public $ids = [];
 	public $user_id;
 	public $message;
 	public $status;
@@ -31,19 +34,23 @@ class TaskSearch extends Form
 
 	public int $current_user_id;
 	public     $folder_ids = [];
+	public     $relation_entity_type;
+	public     $relation_entity_id;
 
 	public function rules(): array
 	{
 		return [
-			[['id', 'user_id', 'created_by_id', 'observer_id'], 'integer'],
+			[['id', 'user_id', 'created_by_id', 'observer_id', 'relation_entity_id'], 'integer'],
 			[['deleted', 'expired', 'completed', 'multiple', 'observed'], 'boolean'],
-			[['status', 'folder_ids'], 'each', 'rule' => ['integer']],
+			[['status', 'folder_ids', 'ids'], 'each', 'rule' => ['integer']],
 			[['message', 'start', 'end', 'created_by_type'], 'safe'],
 			['tag_ids', 'each', 'rule' => [
 				'exist',
 				'targetClass'     => TaskTag::class,
 				'targetAttribute' => ['tag_ids' => 'id'],
-			]]
+			]],
+			['relation_entity_type', 'string'],
+			['relation_entity_type', 'in', 'range' => TaskRelationEntity::getAvailableEntityTypes()],
 		];
 	}
 
@@ -169,6 +176,18 @@ class TaskSearch extends Form
 			Task::getColumn('id')     => $this->id,
 			Task::getColumn('status') => $this->status
 		]);
+
+		if ($this->hasFilter($this->ids)) {
+			$query->andFilterWhere(['in', Task::field('id'), $this->ids]);
+		}
+
+		if ($this->hasFilter($this->relation_entity_id) && $this->hasFilter($this->relation_entity_type)) {
+			$query->innerJoinWith([
+				'relationEntities' => function (TaskRelationEntityQuery $subquery) {
+					$subquery->byEntityType($this->relation_entity_type)->byEntityId($this->relation_entity_id);
+				}
+			], false);
+		}
 
 
 		if (!empty($this->message)) {

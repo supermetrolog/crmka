@@ -33,7 +33,8 @@ class TaskWithRelationResource extends JsonResource
 				'last_comments'   => TaskCommentResource::collection($this->resource->lastComments),
 				'comments_count'  => $this->resource->getCommentsCount(),
 				'histories_count' => $this->resource->getHistoriesCount(),
-				'files_count'     => $this->resource->getFilesCount()
+				'files_count'     => $this->resource->getFilesCount(),
+				'relations_count' => $this->resource->getRelationsCount(),
 			]
 		);
 	}

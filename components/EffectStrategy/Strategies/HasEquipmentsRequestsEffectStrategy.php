@@ -16,7 +16,7 @@ use yii\base\Exception;
 
 class HasEquipmentsRequestsEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_MESSAGE_TEXT = '%s (#%s) хотят купить обрудование';
+	private const TASK_MESSAGE_TEXT = '%s (#%s) хотят купить оборудование';
 
 	private CreateEffectTaskService $effectTaskService;
 
