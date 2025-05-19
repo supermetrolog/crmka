@@ -9,6 +9,8 @@ use app\dto\Media\CreateMediaDto;
 use app\dto\Media\DeleteMediaDto;
 use app\dto\Relation\CreateRelationDto;
 use app\dto\Task\ChangeTaskStatusDto;
+use app\dto\Task\CreateTaskRelationEntityDto;
+use app\dto\Task\LinkTaskRelationEntityDto;
 use app\dto\Task\PostponeTaskDto;
 use app\dto\Task\UpdateTaskDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
@@ -23,11 +25,13 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Media;
 use app\models\Task;
 use app\models\TaskObserver;
+use app\models\TaskRelationEntity;
 use app\models\User;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
 use app\usecases\Relation\RelationService;
 use app\usecases\TaskObserver\TaskObserverService;
+use app\usecases\TaskRelationEntity\TaskRelationEntityService;
 use DateTimeInterface;
 use Exception;
 use Throwable;
@@ -45,6 +49,7 @@ class TaskService
 	private MediaService                 $mediaService;
 	private CreateMediaService           $createMediaService;
 	private EventManager                 $eventManager;
+	private TaskRelationEntityService    $taskRelationEntityService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -52,15 +57,17 @@ class TaskService
 		RelationService $relationService,
 		MediaService $mediaService,
 		CreateMediaService $createMediaService,
-		EventManager $eventManager
+		EventManager $eventManager,
+		TaskRelationEntityService $taskRelationEntityService
 	)
 	{
-		$this->transactionBeginner = $transactionBeginner;
-		$this->taskObserverService = $taskObserverService;
-		$this->relationService     = $relationService;
-		$this->mediaService        = $mediaService;
-		$this->createMediaService  = $createMediaService;
-		$this->eventManager        = $eventManager;
+		$this->transactionBeginner       = $transactionBeginner;
+		$this->taskObserverService       = $taskObserverService;
+		$this->relationService           = $relationService;
+		$this->mediaService              = $mediaService;
+		$this->createMediaService        = $createMediaService;
+		$this->eventManager              = $eventManager;
+		$this->taskRelationEntityService = $taskRelationEntityService;
 	}
 
 	/**
@@ -403,5 +410,39 @@ class TaskService
 			$tx->rollback();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @param LinkTaskRelationEntityDto[] $dtos
+	 *
+	 * @return TaskRelationEntity[]
+	 * @throws Throwable
+	 */
+	public function linkEntities(Task $task, array $dtos): array
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$entities = [];
+
+			foreach ($dtos as $dto) {
+				$entities[] = $this->taskRelationEntityService->link(new CreateTaskRelationEntityDto([
+					'task'         => $task,
+					'entityId'     => $dto->entityId,
+					'entityType'   => $dto->entityType,
+					'comment'      => $dto->comment,
+					'relationType' => $dto->relationType,
+					'createdBy'    => $dto->createdBy
+				]));
+			}
+
+			$tx->commit();
+
+			return $entities;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+
 	}
 }

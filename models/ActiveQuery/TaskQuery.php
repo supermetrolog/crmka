@@ -6,6 +6,7 @@ use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Task;
+use yii\base\ErrorException;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -90,5 +91,13 @@ class TaskQuery extends AQ
 	public function notImpossible(): self
 	{
 		return $this->andWhere(['!=', $this->field('status'), Task::STATUS_IMPOSSIBLE]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function byUserId(int $userId): self
+	{
+		return $this->andWhere([Task::field('user_id') => $userId]);
 	}
 }

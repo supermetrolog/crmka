@@ -16,10 +16,12 @@ use app\models\forms\Task\TaskChangeStatusForm;
 use app\models\forms\Task\TaskCommentForm;
 use app\models\forms\Task\TaskForm;
 use app\models\forms\Task\TaskPostponeForm;
+use app\models\forms\Task\TaskRelationEntityLinkForm;
 use app\models\Media;
 use app\models\search\TaskSearch;
 use app\models\Task;
 use app\repositories\TaskCommentRepository;
+use app\repositories\TaskRelationEntityRepository;
 use app\repositories\TaskRepository;
 use app\resources\Media\MediaResource;
 use app\resources\Task\TaskCommentResource;
@@ -28,6 +30,8 @@ use app\resources\Task\TaskRelationStatisticResource;
 use app\resources\Task\TaskResource;
 use app\resources\Task\TaskStatusStatisticResource;
 use app\resources\Task\TaskWithRelationResource;
+use app\resources\TaskRelationEntity\TaskRelationEntityFullResource;
+use app\resources\TaskRelationEntity\TaskRelationEntityResource;
 use app\usecases\Task\AssignTaskService;
 use app\usecases\Task\ChangeTaskStatusService;
 use app\usecases\Task\CreateTaskCommentService;
@@ -49,17 +53,18 @@ use yii\web\UploadedFile;
 
 class TaskController extends AppController
 {
-	private CreateTaskService        $createTaskService;
-	private UpdateTaskService        $updateTaskService;
-	private TaskStateService         $taskStateService;
-	private ChangeTaskStatusService  $changeTaskStatusService;
-	private AssignTaskService        $assignTaskService;
-	private TaskRepository           $repository;
-	private CreateTaskCommentService $createTaskCommentService;
-	private TaskCommentRepository    $taskCommentRepository;
-	private ObserveTaskService       $observeTaskService;
-	private TaskHistoryService       $taskHistoryService;
-	private TaskService              $taskService;
+	private CreateTaskService            $createTaskService;
+	private UpdateTaskService            $updateTaskService;
+	private TaskStateService             $taskStateService;
+	private ChangeTaskStatusService      $changeTaskStatusService;
+	private AssignTaskService            $assignTaskService;
+	private TaskRepository               $repository;
+	private CreateTaskCommentService     $createTaskCommentService;
+	private TaskCommentRepository        $taskCommentRepository;
+	private ObserveTaskService           $observeTaskService;
+	private TaskHistoryService           $taskHistoryService;
+	private TaskService                  $taskService;
+	private TaskRelationEntityRepository $taskRelationEntityRepository;
 
 	public function __construct(
 		$id,
@@ -75,6 +80,7 @@ class TaskController extends AppController
 		ObserveTaskService $observeTaskService,
 		TaskHistoryService $taskHistoryService,
 		TaskService $taskService,
+		TaskRelationEntityRepository $taskRelationEntityRepository,
 		array $config = []
 	)
 	{
@@ -91,6 +97,8 @@ class TaskController extends AppController
 		$this->taskCommentRepository    = $taskCommentRepository;
 
 		$this->taskHistoryService = $taskHistoryService;
+
+		$this->taskRelationEntityRepository = $taskRelationEntityRepository;
 
 		$this->taskService = $taskService;
 
@@ -144,7 +152,7 @@ class TaskController extends AppController
 
 
 	/* @throws ErrorException */
-	public function actionRelations(): TaskRelationStatisticResource
+	public function actionRelationsStatistics(): TaskRelationStatisticResource
 	{
 		$user_id = $this->request->get('user_id');
 
@@ -476,6 +484,46 @@ class TaskController extends AppController
 		return new TaskResource($model);
 	}
 
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionRelations(int $id): array
+	{
+		$task = $this->repository->findModelByIdWithDeleted($id);
+
+		$relations = $this->taskRelationEntityRepository->findAllByTaskIdWithRelations($task->id);
+
+		return TaskRelationEntityFullResource::collection($relations);
+	}
+
+	/**
+	 * @return TaskRelationEntityResource[]
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws Exception
+	 *
+	 * @throws ModelNotFoundException
+	 */
+	public function actionCreateRelations(int $id): array
+	{
+		$task = $this->repository->findModelById($id);
+
+		$dtos = [];
+
+		foreach ($this->request->post('relations', []) as $element) {
+			$form = $this->makeRelationEntityLinkForm($element);
+
+			$dto = $form->getDto();
+
+			$dto->createdBy = $this->user->identity;
+
+			$dtos[] = $dto;
+		}
+
+		$entities = $this->taskService->linkEntities($task, $dtos);
+
+		return TaskRelationEntityResource::collection($entities);
+	}
 
 	/**
 	 * @throws ModelNotFoundException
@@ -513,6 +561,20 @@ class TaskController extends AppController
 		$form->model_type = $this->user->identity::getMorphClass();
 
 		$form->files = UploadedFile::getInstancesByName($name);
+
+		$form->validateOrThrow();
+
+		return $form;
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeRelationEntityLinkForm(array $payload): TaskRelationEntityLinkForm
+	{
+		$form = new TaskRelationEntityLinkForm();
+
+		$form->load($payload);
 
 		$form->validateOrThrow();
 

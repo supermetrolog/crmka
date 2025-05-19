@@ -16,6 +16,8 @@ use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\RequestQuery;
+use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\miniModels\CompanyFile;
 use Yii;
 use yii\base\ErrorException;
@@ -88,6 +90,7 @@ use yii\db\Expression;
  * @property-read CompanyActivityGroup[]   $companyActivityGroups
  * @property-read CompanyActivityProfile[] $companyActivityProfiles
  * @property-read FolderEntity[]           $folderEntities
+ * @property-read Task[]                   $tasks
  */
 class Company extends AR
 {
@@ -573,6 +576,29 @@ class Company extends AR
 	{
 		/** @var FolderEntityQuery */
 		return $this->hasMany(FolderEntity::class, ['entity_id' => 'id'])->andOnCondition([FolderEntity::field('entity_type') => self::getMorphClass()]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getTaskRelationEntities(): TaskRelationEntityQuery
+	{
+		/** @var TaskRelationEntityQuery */
+		return $this->hasMany(TaskRelationEntity::class, ['entity_id' => 'id'])->andOnCondition([
+			TaskRelationEntity::field('entity_type') => self::getMorphClass(),
+			TaskRelationEntity::field('deleted_at')  => null
+		]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getTasks(): TaskQuery
+	{
+		/** @var TaskQuery */
+		return $this->hasMany(Task::class, ['id' => 'task_id'])
+		            ->via('taskRelationEntities')
+		            ->andOnCondition([Task::field('deleted_at') => null]);
 	}
 
 	public function getChatMemberPinnedMessage(): ?ChatMemberMessage
