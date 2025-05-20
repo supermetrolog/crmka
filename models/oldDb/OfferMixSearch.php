@@ -1333,22 +1333,24 @@ class OfferMixSearch extends Search
 		                           ->select(array_merge(
 			                           $this->getSelect(),
 			                           [
-				                           'last_call_rel_id'     => 'last_call_rel.id',
-				                           'unread_message_count' => 'COUNT(DISTINCT cmm.id)'
+				                           'last_call_rel_id'      => 'last_call_rel.id',
+				                           // 'unread_message_count' => 'COUNT(DISTINCT cmm.id)',
+				                           'complex_objects_count' => 'COUNT(DISTINCT cobj.id)',
 			                           ]
 		                           ))
 		                           ->joinForSearch(true)
 		                           ->joinWith(['chatMember cm'])
+		                           ->joinWith(['object.complexObjects cobj'], false)
 		                           ->leftJoinLastCallRelation()
-		                           ->leftJoin(['cmm' => $this->makeMessageQuery()],
-			                           'cmm.to_chat_member_id' . '=' . 'cm.id'
-		                           )
-		                           ->with([
-			                           'object.objectFloors',
-			                           'consultant.userProfile',
-			                           'object.offers',
-			                           'lastCall'
-		                           ])
+//		                           ->leftJoin(['cmm' => $this->makeMessageQuery()],
+//			                           'cmm.to_chat_member_id' . '=' . 'cm.id'
+//		                           )
+                                   ->with([
+				'object.objectFloors',
+				'consultant.userProfile',
+				'object.offers',
+				'lastCall'
+			])
 		                           ->groupBy($this->getField('id'));
 
 		$this->load($params, '');
