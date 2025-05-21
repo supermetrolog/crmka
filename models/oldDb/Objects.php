@@ -633,6 +633,10 @@ class Objects extends AR
 			return $this->getFormattedOfferMix($extraFields);
 		};
 
+		$extraFields['company'] = function ($extraFields) {
+			return $this->company;
+		};
+
 		return $extraFields;
 	}
 
@@ -646,6 +650,11 @@ class Objects extends AR
 	public function getComplex()
 	{
 		return $this->hasOne(Complex::class, ['id' => 'complex_id']);
+	}
+
+	public function getComplexObjects()
+	{
+		return $this->hasMany(Objects::class, ['complex_id' => 'complex_id']);
 	}
 
 	public function getBlocks()
