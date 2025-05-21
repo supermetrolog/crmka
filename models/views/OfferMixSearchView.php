@@ -41,14 +41,16 @@ use app\models\User;
  */
 class OfferMixSearchView extends OfferMix
 {
-	public int $unread_message_count = 0;
+	public int $unread_message_count  = 0;
+	public int $complex_objects_count = 0;
 
 
 	public function fields(): array
 	{
 		$fields = parent::fields();
 
-		$fields['unread_message_count'] = fn() => $this->unread_message_count;
+		$fields['unread_message_count']  = fn() => $this->unread_message_count;
+		$fields['complex_objects_count'] = fn() => $this->complex_objects_count;
 
 		return $fields;
 	}
