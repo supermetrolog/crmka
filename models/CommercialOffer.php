@@ -91,6 +91,8 @@ class CommercialOffer extends Offers
 			return $this->getSummaryBlock()->one();
 		};
 
+		$f['blocks'] = 'blocks';
+
 		return $f;
 	}
 
