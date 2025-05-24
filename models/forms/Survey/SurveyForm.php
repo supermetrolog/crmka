@@ -21,6 +21,7 @@ class SurveyForm extends Form
 
 	public $user_id;
 	public $contact_id;
+	public $version;
 	public $chat_member_id;
 	public $related_survey_id;
 	public $call_ids = [];
@@ -28,7 +29,8 @@ class SurveyForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'contact_id', 'chat_member_id'], 'required'],
+			[['user_id', 'contact_id', 'chat_member_id', 'version'], 'required'],
+			['version', 'string', 'max' => 3],
 			[['user_id', 'contact_id', 'chat_member_id', 'related_survey_id'], 'integer'],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
@@ -48,7 +50,7 @@ class SurveyForm extends Form
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common, 'call_ids'],
+			self::SCENARIO_CREATE => [...$common, 'call_ids', 'version'],
 			self::SCENARIO_UPDATE => [...$common],
 		];
 	}
@@ -66,7 +68,8 @@ class SurveyForm extends Form
 					'contact'           => Contact::find()->byId((int)$this->contact_id)->one(),
 					'chatMember'        => ChatMember::find()->byId((int)$this->chat_member_id)->one(),
 					'related_survey_id' => $this->related_survey_id,
-					'calls'             => Call::find()->byIds($this->call_ids)->all()
+					'calls'             => Call::find()->byIds($this->call_ids)->all(),
+					'version'           => $this->version
 				]);
 
 			default:
