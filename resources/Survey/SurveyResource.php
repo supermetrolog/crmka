@@ -26,6 +26,7 @@ class SurveyResource extends JsonResource
 			'id'                => $this->resource->id,
 			'user_id'           => $this->resource->user_id,
 			'contact_id'        => $this->resource->contact_id,
+			'version'           => $this->resource->version,
 			'created_at'        => $this->resource->created_at,
 			'related_survey_id' => $this->resource->related_survey_id,
 			'updated_at'        => $this->resource->updated_at,

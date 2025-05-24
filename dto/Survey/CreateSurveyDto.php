@@ -16,6 +16,7 @@ class CreateSurveyDto extends BaseObject
 	public Contact    $contact;
 	public ChatMember $chatMember;
 	public ?int       $related_survey_id = null;
+	public string     $version;
 
 	/** @var Call[] */
 	public array $calls = [];

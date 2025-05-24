@@ -64,7 +64,8 @@ class SurveyService
 			'user_id'           => $dto->user->id,
 			'contact_id'        => $dto->contact->id,
 			'chat_member_id'    => $dto->chatMember->id,
-			'related_survey_id' => $dto->related_survey_id
+			'related_survey_id' => $dto->related_survey_id,
+			'version'           => $dto->version
 		]);
 
 		$model->saveOrThrow();

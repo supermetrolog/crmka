@@ -23,6 +23,7 @@ use yii\db\ActiveQuery;
  * @property int                         $contact_id
  * @property int                         $chat_member_id
  * @property ?int                        $related_survey_id
+ * @property string                      $version
  * @property string                      $created_at
  * @property string                      $updated_at
  *
@@ -52,6 +53,7 @@ class Survey extends AR
 		return [
 			[['user_id', 'contact_id', 'chat_member_id'], 'required'],
 			[['user_id', 'contact_id', 'chat_member_id', 'related_survey_id'], 'integer'],
+			['version', 'string', 'max' => 3],
 			[['created_at', 'updated_at'], 'safe'],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
