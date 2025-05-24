@@ -218,6 +218,11 @@ return static function (RouterInterface $router) {
 		});
 	});
 
+	$router->controller('survey-draft')->group(static function (RouteInterface $route) {
+		$route->crud();
+		$route->get('chat-members/<id>', 'view-by-chat-member');
+	});
+
 	$router->controller('question')->group(static function (RouteInterface $route) {
 		$route->get()->action('index');
 		$route->get('with-question-answer', 'index-with-question-answer');
