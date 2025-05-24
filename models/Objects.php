@@ -222,7 +222,8 @@ class Objects extends oldDb\Objects
 	{
 		$f = parent::extraFields();
 
-		$f['purposesRecords'] = 'purposesRecords';
+		$f['purposesRecords']  = 'purposesRecords';
+		$f['commercialOffers'] = 'commercialOffers';
 
 		return $f;
 	}
