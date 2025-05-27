@@ -17,6 +17,7 @@ use app\dto\Notification\CreateNotificationDto;
 use app\dto\Relation\CreateRelationDto;
 use app\dto\Reminder\CreateReminderDto;
 use app\dto\Task\CreateTaskDto;
+use app\dto\Task\LinkTaskRelationEntityDto;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
@@ -316,18 +317,19 @@ class ChatMemberMessageService
 	}
 
 	/**
-	 * @param CreateMediaDto[] $mediaDtos
+	 * @param CreateMediaDto[]            $mediaDtos
+	 * @param LinkTaskRelationEntityDto[] $relationEntityDtos
 	 *
 	 * @throws SaveModelException
 	 * @throws Exception
 	 * @throws Throwable
 	 */
-	public function createTask(ChatMemberMessage $message, CreateTaskDto $createTaskDto, array $mediaDtos = []): Task
+	public function createTask(ChatMemberMessage $message, CreateTaskDto $createTaskDto, array $mediaDtos = [], array $relationEntityDtos = []): Task
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$task = $this->createTaskService->create($createTaskDto, $mediaDtos);
+			$task = $this->createTaskService->create($createTaskDto, $mediaDtos, $relationEntityDtos);
 
 			$this->linkRelation($message, Task::getMorphClass(), $task->id);
 
