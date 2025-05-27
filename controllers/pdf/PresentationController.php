@@ -51,7 +51,9 @@ class PresentationController extends Controller
 
 		$pdfManager = new PdfManager($options, $this->translate($model->getPresentationName()), $pdfTmpDir);
 
-		$html = $this->renderPartial('index', ['model' => $model]);
+		$title = $model->getPresentationTitle();
+
+		$html = $this->renderPartial('index', ['model' => $model, 'title' => $title]);
 
 		$pdfManager->loadHtml($html);
 		$pdfManager->setPaper('A4');

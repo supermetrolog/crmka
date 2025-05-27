@@ -50,6 +50,7 @@ $logo       = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" 
 $logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" width="120" height="24" />';
 
 /** @var OffersPdf $model */
+/** @var string $title */
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
@@ -57,9 +58,10 @@ $logoFooter = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" 
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
       rel="stylesheet">
+<link rel="icon" href="<?= $model->getHost() ?>/images/favicon.ico"/>
 <link rel="stylesheet" href="<?= $model->getHost() ?>/css/null.css">
 <link rel="stylesheet" href="<?= $model->getHost() ?>/css/pdf.css">
-<title>Презентация</title>
+<title><?= $title ?></title>
 <div id="header">
 	<table>
 		<tbody>
