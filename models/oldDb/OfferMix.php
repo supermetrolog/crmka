@@ -297,6 +297,14 @@ class OfferMix extends AR
 		4 => "sublease"
 	];
 
+	public const DEAL_TYPES_RU_STRING = [
+		1 => "Аренда",
+		2 => "Продажа",
+		3 => "Ответ. хранение",
+		4 => "Субаренда"
+	];
+
+
 	public const MINI_TYPE_ID    = 1;
 	public const GENERAL_TYPE_ID = 2;
 	public const OBJECT_TYPE_ID  = 3;

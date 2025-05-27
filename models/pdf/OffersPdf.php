@@ -2,6 +2,7 @@
 
 namespace app\models\pdf;
 
+use app\helpers\StringHelper;
 use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix;
 use app\models\UserProfile;
@@ -22,6 +23,8 @@ class OffersPdf extends Model
     public $host;
     /** @var UserProfile */
     public $userProfile;
+
+    private const TITLE_SEPARATOR = " | ";
 
     public function __construct($options, $host = null)
     {
@@ -64,6 +67,24 @@ class OffersPdf extends Model
         }
         $this->normalizeData();
     }
+
+    public function getPresentationTitle(): string
+    {
+        $objectId = $this->data->object_id;
+
+        $parts = ["Лот #$objectId", "PDF",];
+
+        $townName = $this->data->town_name;
+
+        if ($townName) {
+            $parts[] = StringHelper::ucFirst($townName);
+        }
+
+        $parts[] = OfferMix::DEAL_TYPES_RU_STRING[$this->data->deal_type];
+
+        return StringHelper::join(self::TITLE_SEPARATOR, ...$parts);
+    }
+
     private function validateOptions($options)
     {
         $_options = [
