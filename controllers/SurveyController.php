@@ -2,6 +2,9 @@
 
 namespace app\controllers;
 
+use app\exceptions\services\SurveyAlreadyCancelledException;
+use app\exceptions\services\SurveyAlreadyCompletedException;
+use app\exceptions\services\SurveyMissingContactException;
 use app\helpers\ArrayHelper;
 use app\helpers\TypeConverterHelper;
 use app\kernel\common\controller\AppController;
@@ -82,9 +85,22 @@ class SurveyController extends AppController
 		return new SurveyWithQuestionsResource($survey, $questions);
 	}
 
+	public function actionViewDraftByChatMemberId(int $id): ?SurveyWithQuestionsResource
+	{
+		$survey = $this->repository->findDraftByChatMemberIdAndUserId($id, $this->user->id);
+
+		if ($survey) {
+			$questions = $this->questionRepository->findAllBySurveyIdWithAnswers($survey->id);
+
+			return new SurveyWithQuestionsResource($survey, $questions);
+		}
+
+		return null;
+	}
+
 	/**
 	 * @return SurveyShortResource
-	 * @throws \Exception
+	 * @throws Exception
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
@@ -104,63 +120,41 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @return SurveyResource|ErrorResponse
-	 * @throws Throwable
-	 * @throws Exception
-	 * @throws ValidateException
+	 * @return SurveyShortResource|ErrorResponse
+	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 */
-	public function actionCreateWithSurveyQuestionAnswer()
+	public function actionComplete(int $id)
 	{
-		// Create Survey
+		$survey = $this->repository->findOneOrThrow($id);
 
-		$surveyForm = new SurveyForm();
+		try {
+			$model = $this->service->complete($survey);
 
-		$surveyForm->setScenario(SurveyForm::SCENARIO_CREATE);
-
-		$surveyForm->load($this->request->post());
-
-		$surveyForm->validateOrThrow();
-
-		$surveyDto = $surveyForm->getDto();
-
-		// Calls form
-
-		$callDtos = [];
-
-		foreach ($this->request->post('calls', []) as $call) {
-			$callForm = $this->makeCallForm($call);
-
-			$callDtos[] = $callForm->getDto();
+			return new SurveyShortResource($model);
+		} catch (SurveyMissingContactException $e) {
+			return $this->error('Нельзя завершить опрос без указания контакта.');
+		} catch (SurveyAlreadyCancelledException $e) {
+			return $this->error('Нельзя завершить опрос, который был отменен.');
 		}
+	}
 
-		if (ArrayHelper::empty($callDtos) && ArrayHelper::empty($surveyDto->calls)) {
-			return $this->error('Нельзя сохранить опрос без звонков.');
+	/**
+	 * @return SurveyShortResource|ErrorResponse
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 */
+	public function actionCancel(int $id)
+	{
+		$survey = $this->repository->findOneOrThrow($id);
+
+		try {
+			$model = $this->service->cancel($survey);
+
+			return new SurveyShortResource($model);
+		} catch (SurveyAlreadyCompletedException $e) {
+			return $this->error('Нельзя отменить опрос, который был завершен.');
 		}
-
-		// Create Survey Question Answers
-
-		$answerDtos   = [];
-		$mediaDtosMap = [];
-
-		foreach ($this->request->post('question_answers', []) as $key => $questionAnswer) {
-			$surveyQuestionAnswerForm = $this->makeQuestionAnswerForm($questionAnswer);
-			$answerDto                = $surveyQuestionAnswerForm->getDto();
-
-			if (ArrayHelper::keyExists($questionAnswer, 'file') && TypeConverterHelper::toBool($questionAnswer['file'])) {
-				$filesPath = "question_answers[$key][files]";
-
-				$mediaForm = $this->makeMediaForm(Media::CATEGORY_SURVEY_QUESTION_ANSWER, $filesPath);
-
-				$mediaDtosMap[$answerDto->question_answer_id] = $mediaForm->getDtos();
-			}
-
-			$answerDtos[] = $answerDto;
-		}
-
-		$model = $this->service->createWithSurveyQuestionAnswer($surveyDto, $answerDtos, $callDtos, $mediaDtosMap);
-
-		return new SurveyResource($model);
 	}
 
 	/**
@@ -188,12 +182,31 @@ class SurveyController extends AppController
 	/**
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
-	 * @throws Throwable
 	 * @throws ValidateException
+	 * @throws Exception
+	 * @throws Throwable
 	 */
 	public function actionUpdateWithSurveyQuestionAnswer(int $id): SurveyWithQuestionsResource
 	{
 		$survey = $this->repository->findOneOrThrow($id);
+
+		$surveyForm = new SurveyForm();
+
+		$surveyForm->setScenario(SurveyForm::SCENARIO_UPDATE);
+		$surveyForm->load($this->request->post());
+		$surveyForm->validateOrThrow();
+
+		$surveyDto = $surveyForm->getDto();
+
+		// Calls form
+
+		$callDtos = [];
+
+		foreach ($this->request->post('calls', []) as $call) {
+			$callForm = $this->makeCallForm($call);
+
+			$callDtos[] = $callForm->getDto();
+		}
 
 		$answerDtos   = [];
 		$mediaDtosMap = [];
@@ -213,7 +226,7 @@ class SurveyController extends AppController
 			$answerDtos[] = $answerDto;
 		}
 
-		$survey = $this->service->updateWithQuestionAnswer($survey, $answerDtos, $mediaDtosMap);
+		$survey = $this->service->updateWithQuestionAnswer($survey, $surveyDto, $answerDtos, $callDtos, $mediaDtosMap);
 
 		$questions = $this->questionRepository->findAllBySurveyIdWithAnswers($survey->id);
 

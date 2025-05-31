@@ -8,6 +8,7 @@ use app\components\EventManager;
 use app\dto\Media\CreateMediaDto;
 use app\dto\Task\CreateTaskDto;
 use app\dto\Task\CreateTaskForUsersDto;
+use app\dto\Task\LinkTaskRelationEntityDto;
 use app\dto\TaskObserver\CreateTaskObserverDto;
 use app\events\Task\CreateTaskEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -44,12 +45,13 @@ class CreateTaskService
 	}
 
 	/**
-	 * @param CreateMediaDto[] $mediaDtos
+	 * @param CreateMediaDto[]            $mediaDtos
+	 * @param LinkTaskRelationEntityDto[] $relationEntityDtos
 	 *
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function create(CreateTaskDto $dto, array $mediaDtos = []): Task
+	public function create(CreateTaskDto $dto, array $mediaDtos = [], array $relationEntityDtos = []): Task
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -73,6 +75,7 @@ class CreateTaskService
 			$this->taskService->linkRelationIfNeeded($task, Survey::getMorphClass(), $dto->surveyId);
 
 			$this->taskService->createFiles($task, $mediaDtos);
+			$this->taskService->linkEntities($task, $relationEntityDtos);
 
 			$this->createObservers($task, $dto);
 

@@ -14,6 +14,7 @@ use app\models\forms\Media\MediaForm;
 use app\models\forms\Notification\NotificationForm;
 use app\models\forms\Reminder\ReminderForm;
 use app\models\forms\Task\TaskForm;
+use app\models\forms\Task\TaskRelationEntityLinkForm;
 use app\models\Media;
 use app\models\search\ChatMemberMessageSearch;
 use app\resources\AlertResource;
@@ -190,10 +191,11 @@ class ChatMemberMessageController extends AppController
 	{
 		$message = $this->findModel($id, false);
 
-		$taskForm  = $this->makeTaskForm($this->request->post());
-		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK);
+		$taskForm           = $this->makeTaskForm($this->request->post());
+		$mediaForm          = $this->makeMediaForm(Media::CATEGORY_TASK);
+		$relationEntityDtos = $this->makeRelationEntityDtos($this->request->post('relations', []));
 
-		$task = $this->service->createTask($message, $taskForm->getDto(), $mediaForm->getDtos());
+		$task = $this->service->createTask($message, $taskForm->getDto(), $mediaForm->getDtos(), $relationEntityDtos);
 
 		return TaskResource::make($task);
 	}
@@ -371,5 +373,40 @@ class ChatMemberMessageController extends AppController
 		$taskForm->validateOrThrow();
 
 		return $taskForm;
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	private function makeRelationEntityLinkForm(array $payload): TaskRelationEntityLinkForm
+	{
+		$form = new TaskRelationEntityLinkForm();
+
+		$form->load($payload);
+
+		$form->validateOrThrow();
+
+		return $form;
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws \Exception
+	 */
+	private function makeRelationEntityDtos(array $payload): array
+	{
+		$dtos = [];
+
+		foreach ($payload as $element) {
+			$form = $this->makeRelationEntityLinkForm($element);
+
+			$dto = $form->getDto();
+
+			$dto->createdBy = $this->user->identity;
+
+			$dtos[] = $dto;
+		}
+
+		return $dtos;
 	}
 }

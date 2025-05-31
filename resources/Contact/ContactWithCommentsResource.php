@@ -7,6 +7,7 @@ namespace app\resources\Contact;
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Contact;
+use app\resources\Call\CallShortResource;
 use app\resources\Contact\Comment\ContactCommentResource;
 
 class ContactWithCommentsResource extends JsonResource
@@ -23,7 +24,8 @@ class ContactWithCommentsResource extends JsonResource
 		return ArrayHelper::merge(
 			ContactResource::make($this->resource)->toArray(),
 			[
-				'comments' => ContactCommentResource::collection($this->resource->contactComments)
+				'comments' => ContactCommentResource::collection($this->resource->contactComments),
+				'calls'    => CallShortResource::collection($this->resource->calls)
 			]
 		);
 	}

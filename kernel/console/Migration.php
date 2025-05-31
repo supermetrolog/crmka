@@ -153,6 +153,20 @@ class Migration extends \yii\db\Migration
 		$this->dropForeignKey($this->getForeignKeyName($table, $columns), $table);
 	}
 
+	public function addColumns(string $table, array $columns): void
+	{
+		foreach ($columns as $column => $definition) {
+			$this->addColumn($table, $column, $definition);
+		}
+	}
+
+	public function dropColumns(string $table, array $columns): void
+	{
+		foreach ($columns as $column) {
+			$this->dropColumn($table, $column);
+		}
+	}
+
 	private function getTableName(string $table): string
 	{
 		return $this->db->getTableSchema($table)->name;

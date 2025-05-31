@@ -181,7 +181,9 @@ class TaskController extends AppController
 
 		$mediaForm = $this->makeMediaForm(Media::CATEGORY_TASK);
 
-		$model = $this->createTaskService->create($form->getDto(), $mediaForm->getDtos());
+		$relationEntityDtos = $this->makeRelationEntityDtos($this->request->post('relations', []));
+
+		$model = $this->createTaskService->create($form->getDto(), $mediaForm->getDtos(), $relationEntityDtos);
 
 		return new TaskResource($model);
 	}
@@ -508,17 +510,7 @@ class TaskController extends AppController
 	{
 		$task = $this->repository->findModelById($id);
 
-		$dtos = [];
-
-		foreach ($this->request->post('relations', []) as $element) {
-			$form = $this->makeRelationEntityLinkForm($element);
-
-			$dto = $form->getDto();
-
-			$dto->createdBy = $this->user->identity;
-
-			$dtos[] = $dto;
-		}
+		$dtos = $this->makeRelationEntityDtos($this->request->post('relations', []));
 
 		$entities = $this->taskService->linkEntities($task, $dtos);
 
@@ -579,5 +571,26 @@ class TaskController extends AppController
 		$form->validateOrThrow();
 
 		return $form;
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws Exception
+	 */
+	private function makeRelationEntityDtos(array $payload): array
+	{
+		$dtos = [];
+
+		foreach ($payload as $element) {
+			$form = $this->makeRelationEntityLinkForm($element);
+
+			$dto = $form->getDto();
+
+			$dto->createdBy = $this->user->identity;
+
+			$dtos[] = $dto;
+		}
+
+		return $dtos;
 	}
 }
