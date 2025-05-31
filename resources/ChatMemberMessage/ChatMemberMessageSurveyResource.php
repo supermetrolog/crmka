@@ -26,14 +26,16 @@ class ChatMemberMessageSurveyResource extends JsonResource
 			'id'                => $this->resource->id,
 			'user_id'           => $this->resource->user_id,
 			'contact_id'        => $this->resource->contact_id,
-			'version'           => $this->resource->version,
+			'status'            => $this->resource->status,
+			'type'              => $this->resource->type,
 			'created_at'        => $this->resource->created_at,
 			'updated_at'        => $this->resource->updated_at,
+			'completed_at'      => $this->resource->completed_at,
 			'chat_member_id'    => $this->resource->chat_member_id,
 			'related_survey_id' => $this->resource->related_survey_id,
 
 			'user'        => UserShortResource::make($this->resource->user)->toArray(),
-			'contact'     => ContactShortResource::make($this->resource->contact)->toArray(),
+			'contact'     => ContactShortResource::tryMakeArray($this->resource->contact),
 			'chat_member' => ChatMemberBaseResource::make($this->resource->chatMember)->toArray(),
 		];
 	}

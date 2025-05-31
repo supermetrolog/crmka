@@ -23,12 +23,14 @@ use yii\db\ActiveQuery;
  * @property int                         $contact_id
  * @property int                         $chat_member_id
  * @property ?int                        $related_survey_id
- * @property string                      $version
+ * @property string                      $status
+ * @property string                      $type
  * @property string                      $created_at
  * @property string                      $updated_at
+ * @property string                      $completed_at
  *
- * @property Contact                     $contact
- * @property User                        $user
+ * @property-read ?Contact               $contact
+ * @property-read User                   $user
  * @property-read SurveyQuestionAnswer[] $surveyQuestionAnswers
  * @property-read QuestionAnswer[]       $questionAnswers
  * @property-read Question[]             $questions
@@ -43,6 +45,30 @@ class Survey extends AR
 	protected bool $useSoftUpdate = true;
 	protected bool $useSoftCreate = true;
 
+	public const STATUS_DRAFT     = 'draft';
+	public const STATUS_COMPLETED = 'completed';
+	public const STATUS_CANCELED  = 'canceled';
+
+	public static function getStatuses(): array
+	{
+		return [
+			self::STATUS_DRAFT,
+			self::STATUS_COMPLETED,
+			self::STATUS_CANCELED
+		];
+	}
+
+	public const TYPE_BASIC    = 'basic';
+	public const TYPE_ADVANCED = 'advanced';
+
+	public static function getTypes(): array
+	{
+		return [
+			self::TYPE_BASIC,
+			self::TYPE_ADVANCED
+		];
+	}
+
 	public static function tableName(): string
 	{
 		return 'survey';
@@ -53,23 +79,13 @@ class Survey extends AR
 		return [
 			[['user_id', 'contact_id', 'chat_member_id'], 'required'],
 			[['user_id', 'contact_id', 'chat_member_id', 'related_survey_id'], 'integer'],
-			['version', 'string', 'max' => 3],
-			[['created_at', 'updated_at'], 'safe'],
+			[['status', 'type'], 'string', 'max' => 16],
+			['status', 'in', 'range' => self::getStatuses()],
+			['type', 'in', 'range' => self::getTypes()],
+			[['created_at', 'updated_at', 'completed_at'], 'safe'],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
 			[['related_survey_id'], 'exist', 'skipOnError' => true, 'targetClass' => Survey::class, 'targetAttribute' => ['related_survey_id' => 'id']]
-		];
-	}
-
-	public function attributeLabels(): array
-	{
-		return [
-			'id'                => 'ID',
-			'user_id'           => 'User ID',
-			'contact_id'        => 'Contact ID',
-			'related_survey_id' => 'Related Survey ID',
-			'created_at'        => 'Created At',
-			'updated_at'        => 'Updated At',
 		];
 	}
 
@@ -178,6 +194,31 @@ class Survey extends AR
 
 	public static function find(): SurveyQuery
 	{
-		return new SurveyQuery(get_called_class());
+		return new SurveyQuery(static::class);
+	}
+
+	public function isDraft(): bool
+	{
+		return $this->status === self::STATUS_DRAFT;
+	}
+
+	public function isCompleted(): bool
+	{
+		return $this->status === self::STATUS_COMPLETED;
+	}
+
+	public function isCanceled(): bool
+	{
+		return $this->status === self::STATUS_CANCELED;
+	}
+
+	public function isAdvanced(): bool
+	{
+		return $this->type === self::TYPE_ADVANCED;
+	}
+
+	public function isBasic(): bool
+	{
+		return $this->type === self::TYPE_BASIC;
 	}
 }
