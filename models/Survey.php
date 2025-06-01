@@ -77,7 +77,7 @@ class Survey extends AR
 	public function rules(): array
 	{
 		return [
-			[['user_id', 'contact_id', 'chat_member_id'], 'required'],
+			[['user_id', 'chat_member_id'], 'required'],
 			[['user_id', 'contact_id', 'chat_member_id', 'related_survey_id'], 'integer'],
 			[['status', 'type'], 'string', 'max' => 16],
 			['status', 'in', 'range' => self::getStatuses()],

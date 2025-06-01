@@ -150,6 +150,7 @@ class Call extends \app\kernel\common\models\AR\AR
 	{
 		/** @var SurveyQuery */
 		return $this->morphHasManyVia(Survey::class, 'id', 'first')
+		            ->andOnCondition(['!=', Survey::field('status'), Survey::STATUS_DRAFT])
 		            ->via('relationSecond');
 	}
 }

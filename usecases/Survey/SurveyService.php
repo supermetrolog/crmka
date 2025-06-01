@@ -17,6 +17,7 @@ use app\events\Survey\UpdateSurveyEvent;
 use app\exceptions\services\SurveyAlreadyCancelledException;
 use app\exceptions\services\SurveyAlreadyCompletedException;
 use app\exceptions\services\SurveyMissingContactException;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -99,7 +100,9 @@ class SurveyService
 
 		try {
 
-			$survey->status = Survey::STATUS_COMPLETED;
+			$survey->status       = Survey::STATUS_COMPLETED;
+			$survey->completed_at = DateTimeHelper::nowf();
+			
 			$survey->saveOrThrow();
 
 			$this->eventManager->trigger(new CreateSurveyEvent($survey));

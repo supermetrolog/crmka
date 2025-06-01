@@ -79,7 +79,8 @@ class SurveyForm extends Form
 					'contact'           => $this->getContact(),
 					'chatMember'        => ChatMember::find()->byId((int)$this->chat_member_id)->one(),
 					'related_survey_id' => $this->related_survey_id,
-					'calls'             => Call::find()->byIds($this->call_ids)->all()
+					'calls'             => Call::find()->byIds($this->call_ids)->all(),
+					'type'              => $this->type
 				]);
 
 			default:

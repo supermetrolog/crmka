@@ -5,7 +5,7 @@ use app\kernel\console\Migration;
 /**
  * Class m250531_172115_change_user_id_column_in_survey_table
  */
-class m250531_172115_change_user_id_column_in_survey_table extends Migration
+class m250531_172115_change_contact_id_column_in_survey_table extends Migration
 {
 	/**
 	 * {@inheritdoc}
@@ -14,7 +14,7 @@ class m250531_172115_change_user_id_column_in_survey_table extends Migration
 	{
 		$table = 'survey';
 
-		$this->alterColumn($table, 'user_id', $this->integer()->null());
+		$this->alterColumn($table, 'contact_id', $this->integer()->null());
 	}
 
 	/**
@@ -24,6 +24,6 @@ class m250531_172115_change_user_id_column_in_survey_table extends Migration
 	{
 		$table = 'survey';
 
-		$this->alterColumn($table, 'user_id', $this->integer()->notNull());
+		$this->alterColumn($table, 'contact_id', $this->integer()->notNull());
 	}
 }

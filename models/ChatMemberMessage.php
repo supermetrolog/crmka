@@ -213,6 +213,7 @@ class ChatMemberMessage extends AR
 	{
 		/** @var SurveyQuery $query */
 		$query = $this->morphHasManyVia(Survey::class, 'id', 'second')
+		              ->andOnCondition(['!=', Survey::field('status'), Survey::STATUS_DRAFT])
 		              ->via('relationFirst');
 
 		return $query;
