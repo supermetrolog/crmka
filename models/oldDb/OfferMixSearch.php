@@ -946,8 +946,8 @@ class OfferMixSearch extends Search
 		      ->andFilterWhere(['like', 'parking_lorry_value', $this->parking_lorry_value])
 		      ->andFilterWhere(['like', 'parking_truck_value', $this->parking_truck_value])
 		      ->andFilterWhere(['like', 'description', $this->description])
-		      ->andFilterWhere(['<=', 'from_mkad', $this->approximateDistanceFromMKAD])
-		      ->andFilterWhere(['<=', 'from_mkad', $this->rangeMaxDistanceFromMKAD])
+		      ->andFilterWhere(['<=', 'c_industry_offers_mix.from_mkad', $this->approximateDistanceFromMKAD])
+		      ->andFilterWhere(['<=', 'c_industry_offers_mix.from_mkad', $this->rangeMaxDistanceFromMKAD])
 		      ->andFilterWhere(['>=', 'power_value', $this->rangeMinElectricity])
 		      ->andFilterWhere(['<=', 'power_value', $this->rangeMaxElectricity]);
 
