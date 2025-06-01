@@ -7,6 +7,7 @@ use app\kernel\common\models\Form\Form;
 use app\models\Contact;
 use app\models\Survey;
 use app\models\UserProfile;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 
 class SurveySearch extends Form
@@ -15,6 +16,8 @@ class SurveySearch extends Form
 	public $user_id;
 	public $contact_id;
 	public $chat_member_id;
+	public $type;
+	public $status;
 
 	public $search;
 
@@ -23,11 +26,13 @@ class SurveySearch extends Form
 		return [
 			[['id', 'user_id', 'contact_id', 'chat_member_id'], 'integer'],
 			[['search'], 'safe'],
+			[['status', 'type'], 'string', 'max' => 16],
 		];
 	}
 
 	/**
 	 * @throws ValidateException
+	 * @throws ErrorException
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
@@ -38,6 +43,9 @@ class SurveySearch extends Form
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort'  => [
+				'attributes' => ['id', 'user_id', 'contact_id', 'chat_member_id', 'status', 'type', 'created_at', 'updated_at', 'completed_at']
+			]
 		]);
 
 		$this->load($params);
@@ -49,6 +57,8 @@ class SurveySearch extends Form
 			Survey::field('user_id')        => $this->user_id,
 			Survey::field('contact_id')     => $this->contact_id,
 			Survey::field('chat_member_id') => $this->chat_member_id,
+			Survey::field('status')         => $this->status,
+			Survey::field('type')           => $this->type
 		]);
 
 		$query->andFilterWhere([

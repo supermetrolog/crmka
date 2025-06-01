@@ -48,4 +48,9 @@ class SurveyRepository
 		             ->with(['calls'])
 		             ->oneOrThrow();
 	}
+
+	public function findDraftByChatMemberIdAndUserId(int $chatMemberId, int $userId): ?Survey
+	{
+		return Survey::find()->draft()->byChatMemberId($chatMemberId)->byUserId($userId)->one();
+	}
 }
