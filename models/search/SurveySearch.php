@@ -43,6 +43,9 @@ class SurveySearch extends Form
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
+			'sort'  => [
+				'attributes' => ['id', 'user_id', 'contact_id', 'chat_member_id', 'status', 'type', 'created_at', 'updated_at', 'completed_at']
+			]
 		]);
 
 		$this->load($params);
