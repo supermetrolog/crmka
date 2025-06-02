@@ -7,6 +7,7 @@ use app\helpers\ArrayHelper as AppArrayHelper;
 use app\helpers\PersonNameHelper;
 use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\ContactComment;
@@ -51,6 +52,7 @@ use yii\db\ActiveQuery;
  * @property-read null|string      $fullName
  * @property-read ActiveQuery      $relatedContacts
  * @property-read Website[]        $websites
+ * @property-read Call[]           $calls
  */
 class Contact extends AR
 {
@@ -290,6 +292,15 @@ class Contact extends AR
 	public function getRelatedContacts(): ActiveQuery
 	{
 		return $this->hasMany(Contact::class, ['company_id' => 'company_id'])->andWhere(['!=', 'id', $this->id]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getCalls(): CallQuery
+	{
+		/** @var CallQuery */
+		return $this->hasMany(Call::class, ['contact_id' => 'id'])->andOnCondition([Call::field('deleted_at') => null]);
 	}
 
 	public static function find(): ContactQuery

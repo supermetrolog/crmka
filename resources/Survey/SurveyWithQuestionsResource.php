@@ -8,6 +8,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Question;
 use app\models\Survey;
 use app\resources\Call\CallResource;
+use app\resources\ChatMember\ChatMemberShortResource;
 use app\resources\Contact\ContactResource;
 use app\resources\QuestionAnswerResource;
 use app\resources\QuestionResource;
@@ -38,17 +39,21 @@ class SurveyWithQuestionsResource extends JsonResource
 			'id'                => $this->resource->id,
 			'user_id'           => $this->resource->user_id,
 			'contact_id'        => $this->resource->contact_id,
+			'status'            => $this->resource->status,
+			'type'              => $this->resource->type,
 			'created_at'        => $this->resource->created_at,
 			'updated_at'        => $this->resource->updated_at,
+			'completed_at'      => $this->resource->completed_at,
 			'chat_member_id'    => $this->resource->chat_member_id,
 			'related_survey_id' => $this->resource->related_survey_id,
 
 			'user'             => UserResource::make($this->resource->user)->toArray(),
-			'contact'          => ContactResource::make($this->resource->contact)->toArray(),
+			'contact'          => ContactResource::tryMakeArray($this->resource->contact),
 			'tasks'            => TaskResource::collection($this->resource->tasks),
 			'relatedSurvey'    => SurveyResource::tryMakeArray($this->resource->relatedSurvey),
 			'dependentSurveys' => SurveyResource::collection($this->resource->dependentSurveys),
 			'calls'            => CallResource::collection($this->resource->calls),
+			'chatMember'       => ChatMemberShortResource::tryMakeArray($this->resource->chatMember),
 
 			'questions' => $this->getQuestions(),
 		];

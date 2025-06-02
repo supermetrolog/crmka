@@ -14,6 +14,10 @@ use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
 use app\dto\SurveyQuestionAnswer\UpdateSurveyQuestionAnswerDto;
 use app\events\Survey\CreateSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
+use app\exceptions\services\SurveyAlreadyCancelledException;
+use app\exceptions\services\SurveyAlreadyCompletedException;
+use app\exceptions\services\SurveyMissingContactException;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -62,9 +66,11 @@ class SurveyService
 	{
 		$model = new Survey([
 			'user_id'           => $dto->user->id,
-			'contact_id'        => $dto->contact->id,
+			'contact_id'        => $dto->contact->id ?? null,
 			'chat_member_id'    => $dto->chatMember->id,
-			'related_survey_id' => $dto->related_survey_id
+			'related_survey_id' => $dto->related_survey_id,
+			'status'            => $dto->status,
+			'type'              => $dto->type
 		]);
 
 		$model->saveOrThrow();
@@ -73,44 +79,61 @@ class SurveyService
 	}
 
 	/**
-	 * @param CreateCallDto[]                 $callDtos
-	 * @param CreateSurveyQuestionAnswerDto[] $answerDtos
-	 * @param array<CreateMediaDto[]>         $mediaDtosMap
-	 *
-	 * @throws SaveModelException|Throwable
+	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
-	public function createWithSurveyQuestionAnswer(CreateSurveyDto $dto, array $answerDtos = [], array $callDtos = [], array $mediaDtosMap = []): Survey
+	public function complete(Survey $survey): Survey
 	{
+		if ($survey->isCompleted()) {
+			return $survey;
+		}
+
+		if ($survey->isCanceled()) {
+			throw new SurveyAlreadyCancelledException('Cancelled Survey cannot be completed');
+		}
+
+		if (is_null($survey->contact_id)) {
+			throw new SurveyMissingContactException('Survey has no contact');
+		}
+
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$survey = $this->create($dto);
 
-			$event = new CreateSurveyEvent($survey);
+			$survey->status       = Survey::STATUS_COMPLETED;
+			$survey->completed_at = DateTimeHelper::nowf();
+			
+			$survey->saveOrThrow();
 
-			foreach ($answerDtos as $answerDto) {
-				$this->createSurveyQuestionAnswer($survey, $answerDto, $mediaDtosMap[$answerDto->question_answer_id] ?? []);
-			}
+			$this->eventManager->trigger(new CreateSurveyEvent($survey));
 
-			foreach ($callDtos as $callDto) {
-				$this->createCall($survey, $callDto);
-			}
-
-			foreach ($dto->calls as $call) {
-				$this->linkCall($survey, $call);
-				$this->chatMemberService->linkCall($survey->chatMember, $call);
-			}
-
-			$this->eventManager->trigger($event);
 			$tx->commit();
-
-			$survey->refresh();
 
 			return $survey;
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
 		}
+
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function cancel(Survey $survey): Survey
+	{
+		if ($survey->isCanceled()) {
+			return $survey;
+		}
+
+		if ($survey->isCompleted()) {
+			throw new SurveyAlreadyCompletedException('Completed Survey cannot be canceled');
+		}
+
+		$survey->status = Survey::STATUS_CANCELED;
+		$survey->saveOrThrow();
+
+		return $survey;
 	}
 
 	/**
@@ -133,10 +156,7 @@ class SurveyService
 	public function update(Survey $model, UpdateSurveyDto $dto): Survey
 	{
 		$model->load([
-			'user_id'           => $dto->user->id,
-			'contact_id'        => $dto->contact->id,
-			'chat_member_id'    => $dto->chatMember->id,
-			'related_survey_id' => $dto->related_survey_id
+			'contact_id' => $dto->contact->id ?? null
 		]);
 
 		$model->saveOrThrow();
@@ -145,17 +165,25 @@ class SurveyService
 	}
 
 	/**
-	 * @param array<CreateMediaDto[]> $mediaDtosMap
+	 * @param CreateSurveyQuestionAnswerDto[] $answerDtos
+	 * @param CreateCallDto[]                 $callDtos
+	 * @param array<CreateMediaDto[]>         $mediaDtosMap
 	 *
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function updateWithQuestionAnswer(Survey $survey, array $answerDtos = [], array $mediaDtosMap = []): Survey
+	public function updateWithQuestionAnswer(
+		Survey $survey,
+		UpdateSurveyDto $surveyDto,
+		array $answerDtos = [],
+		array $callDtos = [],
+		array $mediaDtosMap = []
+	): Survey
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$event = new UpdateSurveyEvent($survey);
+			$this->update($survey, $surveyDto);
 
 			foreach ($answerDtos as $answerDto) {
 				$this->updateOrCreateSurveyQuestionAnswer(
@@ -165,9 +193,19 @@ class SurveyService
 				);
 			}
 
+			foreach ($callDtos as $callDto) {
+				$this->createCall($survey, $callDto);
+			}
+
+			foreach ($surveyDto->calls as $call) {
+				$this->linkCall($survey, $call);
+				$this->chatMemberService->linkCall($survey->chatMember, $call);
+			}
+
 			$survey->saveOrThrow();
 
-			$this->eventManager->trigger($event);
+			$this->eventManager->trigger(new UpdateSurveyEvent($survey));
+
 			$tx->commit();
 
 			return $survey;

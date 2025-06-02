@@ -50,6 +50,10 @@ class UpdateSurveySystemChatMessageListener implements EventListenerInterface
 	{
 		$survey = $event->getSurvey();
 
+		if (!$survey->isCompleted()) {
+			return;
+		}
+
 		$message = $this->chatMemberMessageService->getSystemMessageBySurveyIdAndTemplateAndChatMemberId(
 			$survey->id,
 			ChatMemberMessage::SURVEY_TEMPLATE,

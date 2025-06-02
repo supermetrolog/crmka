@@ -43,6 +43,10 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 		$survey     = $event->getSurvey();
 		$chatMember = $event->getChatMember();
 
+		if (!$survey->isCompleted()) {
+			return;
+		}
+
 		$message = CreateSurveyChatMemberSystemMessage::create()
 		                                              ->setSurvey($survey)
 		                                              ->toMessage();

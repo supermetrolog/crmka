@@ -22,8 +22,11 @@ class SurveyShortResource extends JsonResource
 			'id'                => $this->resource->id,
 			'user_id'           => $this->resource->user_id,
 			'contact_id'        => $this->resource->contact_id,
+			'type'              => $this->resource->type,
+			'status'            => $this->resource->status,
 			'created_at'        => $this->resource->created_at,
 			'updated_at'        => $this->resource->updated_at,
+			'completed_at'      => $this->resource->completed_at,
 			'chat_member_id'    => $this->resource->chat_member_id,
 			'related_survey_id' => $this->resource->related_survey_id
 		];

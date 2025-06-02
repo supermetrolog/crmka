@@ -206,11 +206,14 @@ return static function (RouterInterface $router) {
 		$route->get()->action('index');
 
 		$route->post()->action('create');
-		$route->post('with-survey-question-answer', 'create-with-survey-question-answer');
+		$route->get('draft-by-chat-member/<id>', 'view-draft-by-chat-member-id');
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->get('with-questions', 'view-with-questions');
+
+			$route->post('complete');
+			$route->post('cancel');
 
 			$route->put()->action('update');
 			$route->put('with-survey-question-answer', 'update-with-survey-question-answer');
