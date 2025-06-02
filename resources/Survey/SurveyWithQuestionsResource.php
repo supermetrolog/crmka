@@ -8,6 +8,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Question;
 use app\models\Survey;
 use app\resources\Call\CallResource;
+use app\resources\ChatMember\ChatMemberShortResource;
 use app\resources\Contact\ContactResource;
 use app\resources\QuestionAnswerResource;
 use app\resources\QuestionResource;
@@ -52,6 +53,7 @@ class SurveyWithQuestionsResource extends JsonResource
 			'relatedSurvey'    => SurveyResource::tryMakeArray($this->resource->relatedSurvey),
 			'dependentSurveys' => SurveyResource::collection($this->resource->dependentSurveys),
 			'calls'            => CallResource::collection($this->resource->calls),
+			'chatMember'       => ChatMemberShortResource::tryMakeArray($this->resource->chatMember),
 
 			'questions' => $this->getQuestions(),
 		];
