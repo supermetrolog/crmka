@@ -27,6 +27,7 @@ use yii\db\ActiveQuery;
  * @property string                      $type
  * @property string                      $created_at
  * @property string                      $updated_at
+ * @property string                      $deleted_at
  * @property string                      $completed_at
  *
  * @property-read ?Contact               $contact
@@ -44,6 +45,7 @@ class Survey extends AR
 {
 	protected bool $useSoftUpdate = true;
 	protected bool $useSoftCreate = true;
+	protected bool $useSoftDelete = true;
 
 	public const STATUS_DRAFT     = 'draft';
 	public const STATUS_COMPLETED = 'completed';
@@ -82,7 +84,7 @@ class Survey extends AR
 			[['status', 'type'], 'string', 'max' => 16],
 			['status', 'in', 'range' => self::getStatuses()],
 			['type', 'in', 'range' => self::getTypes()],
-			[['created_at', 'updated_at', 'completed_at'], 'safe'],
+			[['created_at', 'updated_at', 'completed_at', 'deleted_at'], 'safe'],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
 			[['related_survey_id'], 'exist', 'skipOnError' => true, 'targetClass' => Survey::class, 'targetAttribute' => ['related_survey_id' => 'id']]

@@ -51,6 +51,6 @@ class SurveyRepository
 
 	public function findDraftByChatMemberIdAndUserId(int $chatMemberId, int $userId): ?Survey
 	{
-		return Survey::find()->draft()->byChatMemberId($chatMemberId)->byUserId($userId)->one();
+		return Survey::find()->draft()->byChatMemberId($chatMemberId)->byUserId($userId)->notDeleted()->one();
 	}
 }
