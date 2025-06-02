@@ -43,6 +43,7 @@ class SurveyWithQuestionsResource extends JsonResource
 			'type'              => $this->resource->type,
 			'created_at'        => $this->resource->created_at,
 			'updated_at'        => $this->resource->updated_at,
+			'deleted_at'        => $this->resource->deleted_at,
 			'completed_at'      => $this->resource->completed_at,
 			'chat_member_id'    => $this->resource->chat_member_id,
 			'related_survey_id' => $this->resource->related_survey_id,
