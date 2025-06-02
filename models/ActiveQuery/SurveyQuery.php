@@ -3,6 +3,7 @@
 namespace app\models\ActiveQuery;
 
 use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Survey;
 use yii\db\ActiveRecord;
@@ -14,6 +15,8 @@ use yii\db\ActiveRecord;
  */
 class SurveyQuery extends AQ
 {
+	use SoftDeleteTrait;
+
 	/**
 	 * @return Survey[]|ActiveRecord[]
 	 */

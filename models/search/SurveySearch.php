@@ -39,7 +39,8 @@ class SurveySearch extends Form
 		$query = Survey::find()
 		               ->joinWith('user.userProfile')
 		               ->joinWith('contact')
-		               ->with(['chatMember']);
+		               ->with(['chatMember'])
+		               ->notDeleted();
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
