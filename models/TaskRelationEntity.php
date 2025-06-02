@@ -52,7 +52,8 @@ class TaskRelationEntity extends AR
 			Company::getMorphClass(),
 			Task::getMorphClass(),
 			Request::getMorphClass(),
-			Contact::getMorphClass()
+			Contact::getMorphClass(),
+			Survey::getMorphClass()
 		];
 
 		// TODO: OfferMix, Object, Equipment, Call, Survey etc
@@ -64,7 +65,8 @@ class TaskRelationEntity extends AR
 			Company::getMorphClass() => Company::class,
 			Task::getMorphClass()    => Task::class,
 			Request::getMorphClass() => Request::class,
-			Contact::getMorphClass() => Contact::class
+			Contact::getMorphClass() => Contact::class,
+			Survey::getMorphClass()  => Survey::class
 		];
 	}
 
