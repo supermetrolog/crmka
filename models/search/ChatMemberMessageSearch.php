@@ -106,9 +106,9 @@ class ChatMemberMessageSearch extends Form
 		$query->andFilterWhere(['like', ChatMemberMessage::field('message'), $this->message]);
 
 		if (!empty($this->survey_id)) {
-			$query->joinWith(['surveys surveys' => function (SurveyQuery $subQuery) {
-				$subQuery->andWhere(['surveys.id' => $this->survey_id]);
-			}])->andWhere(['surveys.id' => $this->survey_id]);
+			$query->innerJoinWith(['surveys surveys' => function (SurveyQuery $subQuery) {
+				$subQuery->andWhere(['surveys.id' => $this->survey_id])->andWhere(['surveys.deleted_at' => null]);
+			}]);
 		}
 
 		return $dataProvider;
