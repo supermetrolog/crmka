@@ -8,6 +8,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\RequestQuery;
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\TaskRelationEntity;
 
@@ -53,6 +54,25 @@ class TaskRelationEntityRepository
 					                         'observers.user.userProfile',
 					                         'targetUserObserver'
 				                         ]);
+			                         },
+			                         'offerMix'    => function ($query) {
+				                         $query->with(['company']);
+			                         },
+			                         'object'      => function ($query) {
+				                         $query->with(['company']);
+			                         },
+			                         'survey'      => function (SurveyQuery $query) {
+				                         $query->with(['user.userProfile', 'contact', 'calls'])
+				                               ->with([
+					                               'chatMember.objectChatMember.object.company',
+					                               'chatMember.objectChatMember.object.consultant',
+					                               'chatMember.objectChatMember.object.offers', 'chatMember.company.categories',
+					                               'chatMember.company.companyGroup',
+					                               'chatMember.company.consultant.userProfile',
+					                               'chatMember.company.categories',
+					                               'chatMember.company.companyActivityGroups',
+					                               'chatMember.company.companyActivityProfiles',
+				                               ]);
 			                         }
 		                         ])
 		                         ->notDeleted()
