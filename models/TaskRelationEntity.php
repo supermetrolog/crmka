@@ -5,11 +5,14 @@ namespace app\models;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
+use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ActiveQuery\RequestQuery;
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\ActiveQuery\UserQuery;
 use InvalidArgumentException;
+use yii\db\ActiveQuery;
 
 /**
  * @property int                               $id
@@ -32,6 +35,9 @@ use InvalidArgumentException;
  * @property-read ?Company                     $company
  * @property-read ?Request                     $request
  * @property-read Task|Contact|Company|Request $entity
+ * @property-read OfferMix                     $offerMix
+ * @property-read Objects                      $object
+ * @property-read Survey                       $survey
  */
 class TaskRelationEntity extends AR
 {
@@ -53,7 +59,9 @@ class TaskRelationEntity extends AR
 			Task::getMorphClass(),
 			Request::getMorphClass(),
 			Contact::getMorphClass(),
-			Survey::getMorphClass()
+			Survey::getMorphClass(),
+			OfferMix::getMorphClass(),
+			Objects::getMorphClass()
 		];
 
 		// TODO: OfferMix, Object, Equipment, Call, Survey etc
@@ -62,11 +70,13 @@ class TaskRelationEntity extends AR
 	public static function getEntityMorphMap(): array
 	{
 		return [
-			Company::getMorphClass() => Company::class,
-			Task::getMorphClass()    => Task::class,
-			Request::getMorphClass() => Request::class,
-			Contact::getMorphClass() => Contact::class,
-			Survey::getMorphClass()  => Survey::class
+			Company::getMorphClass()  => Company::class,
+			Task::getMorphClass()     => Task::class,
+			Request::getMorphClass()  => Request::class,
+			Contact::getMorphClass()  => Contact::class,
+			Survey::getMorphClass()   => Survey::class,
+			OfferMix::getMorphClass() => OfferMix::class,
+			Objects::getMorphClass()  => Objects::class
 		];
 	}
 
@@ -103,32 +113,54 @@ class TaskRelationEntity extends AR
 		return $this->hasOne(User::class, ['id' => 'deleted_by_id']);
 	}
 
+	public function morphBelongTo($class, string $column = 'id', string $morphColumn = 'entity', string $ownerColumn = 'morph'): ActiveQuery
+	{
+		return parent::morphBelongTo($class, $column, $morphColumn);
+	}
+
 	public function getCompany(): CompanyQuery
 	{
 		/** @var CompanyQuery */
-		return $this->morphBelongTo(Company::class, 'id', 'entity');
+		return $this->morphBelongTo(Company::class);
 	}
 
 	public function getRequest(): RequestQuery
 	{
 		/** @var RequestQuery */
-		return $this->morphBelongTo(Request::class, 'id', 'entity');
+		return $this->morphBelongTo(Request::class);
 	}
 
 	public function getContact(): ContactQuery
 	{
 		/** @var ContactQuery */
-		return $this->morphBelongTo(Contact::class, 'id', 'entity');
+		return $this->morphBelongTo(Contact::class);
 	}
 
 	public function getRelatedTask(): TaskQuery
 	{
 		/** @var TaskQuery */
-		return $this->morphBelongTo(Task::class, 'id', 'entity');
+		return $this->morphBelongTo(Task::class);
 	}
 
+	public function getOfferMix(): OfferMixQuery
+	{
+		/** @var OfferMixQuery */
+		return $this->morphBelongTo(OfferMix::class);
+	}
 
-	/** @return Task|Contact|Company|Request */
+	public function getObject(): ActiveQuery
+	{
+		/** @var ActiveQuery */
+		return $this->morphBelongTo(Objects::class);
+	}
+
+	public function getSurvey(): SurveyQuery
+	{
+		/** @var SurveyQuery */
+		return $this->morphBelongTo(Survey::class);
+	}
+
+	/** @return Task|Contact|Company|Request|OfferMix|Objects|Survey */
 	public function getEntity()
 	{
 		switch ($this->entity_type) {
@@ -140,6 +172,12 @@ class TaskRelationEntity extends AR
 				return $this->contact;
 			case Task::getMorphClass():
 				return $this->relatedTask;
+			case OfferMix::getMorphClass():
+				return $this->offerMix;
+			case Objects::getMorphClass():
+				return $this->object;
+			case Survey::getMorphClass():
+				return $this->survey;
 			default:
 				throw new InvalidArgumentException("Unexpected TaskRelationEntity type: " . $this->entity_type);
 		}

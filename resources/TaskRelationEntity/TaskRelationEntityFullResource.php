@@ -8,9 +8,13 @@ use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Company;
 use app\models\Contact;
+use app\models\Objects;
+use app\models\OfferMix;
 use app\models\Request;
+use app\models\Survey;
 use app\models\Task;
 use app\models\TaskRelationEntity;
+use app\resources\Survey\SurveyResource;
 use app\resources\Task\TaskResource;
 
 class TaskRelationEntityFullResource extends JsonResource
@@ -49,6 +53,18 @@ class TaskRelationEntityFullResource extends JsonResource
 
 		if ($entity instanceof Task) {
 			return new TaskResource($entity);
+		}
+
+		if ($entity instanceof Survey) {
+			return new SurveyResource($entity);
+		}
+
+		if ($entity instanceof OfferMix) {
+			return new TaskRelationEntityOfferMixResource($entity);
+		}
+
+		if ($entity instanceof Objects) {
+			return new TaskRelationEntityObjectResource($entity);
 		}
 
 		return $this->resource->entity;
