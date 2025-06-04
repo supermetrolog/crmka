@@ -12,9 +12,10 @@ class m250604_210953_add_morph_column_in_c_industry_table extends Migration
 	 */
 	public function safeUp()
 	{
-		$this->db = Yii::$app->db_old;
-
-		$this->addMorphColumn('c_industry');
+		// TODO: Фиксануть на проде таблицу и раскоментить
+//		$this->db = Yii::$app->db_old;
+//
+//		$this->addMorphColumn('c_industry');
 	}
 
 	/**
