@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\exceptions\services\SurveyAlreadyCancelledException;
 use app\exceptions\services\SurveyAlreadyCompletedException;
+use app\exceptions\services\SurveyDraftAlreadyExistsException;
 use app\exceptions\services\SurveyMissingContactException;
 use app\helpers\ArrayHelper;
 use app\helpers\TypeConverterHelper;
@@ -99,12 +100,12 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @return SurveyShortResource
+	 * @return SurveyShortResource|ErrorResponse
 	 * @throws Exception
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
-	public function actionCreate(): SurveyShortResource
+	public function actionCreate()
 	{
 		$form = new SurveyForm();
 
@@ -114,9 +115,13 @@ class SurveyController extends AppController
 
 		$form->validateOrThrow();
 
-		$model = $this->service->create($form->getDto());
+		try {
+			$model = $this->service->create($form->getDto());
 
-		return new SurveyShortResource($model);
+			return new SurveyShortResource($model);
+		} catch (SurveyDraftAlreadyExistsException $e) {
+			return $this->error('Черновик опроса этой компании уже существует. Проверьте в списке черновиков');
+		}
 	}
 
 	/**
