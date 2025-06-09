@@ -18,7 +18,7 @@ class SurveySearch extends Form
 	public $chat_member_id;
 	public $type;
 	public $status;
-
+	public $statuses = [];
 	public $search;
 
 	public function rules(): array
@@ -26,6 +26,7 @@ class SurveySearch extends Form
 		return [
 			[['id', 'user_id', 'contact_id', 'chat_member_id'], 'integer'],
 			[['search'], 'safe'],
+			['statuses', 'each', 'rule' => ['string', 'max' => 16]],
 			[['status', 'type'], 'string', 'max' => 16],
 		];
 	}
@@ -61,6 +62,10 @@ class SurveySearch extends Form
 			Survey::field('status')         => $this->status,
 			Survey::field('type')           => $this->type
 		]);
+		
+		if ($this->hasFilter($this->statuses)) {
+			$query->andFilterWhere(['in', Survey::field('status'), $this->statuses]);
+		}
 
 		$query->andFilterWhere([
 			'or',
