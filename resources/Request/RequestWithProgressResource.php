@@ -9,6 +9,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Request;
 use app\resources\ChatMember\ChatMemberModel\CompanyShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
+use app\resources\Timeline\TimelineFullResource;
 
 class RequestWithProgressResource extends JsonResource
 {
@@ -26,7 +27,8 @@ class RequestWithProgressResource extends JsonResource
 			[
 				'company'           => CompanyShortResource::tryMakeArray($this->resource->company),
 				'consultant'        => UserShortResource::tryMakeArray($this->resource->consultant),
-				'timeline_progress' => $this->resource->getTimelineProgress()
+				'timeline_progress' => $this->resource->getTimelineProgress(),
+				'timeline'          => TimelineFullResource::tryMakeArray($this->resource->mainTimeline)
 			]
 		);
 	}

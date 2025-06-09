@@ -16,6 +16,7 @@ use app\events\Survey\CreateSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\exceptions\services\SurveyAlreadyCancelledException;
 use app\exceptions\services\SurveyAlreadyCompletedException;
+use app\exceptions\services\SurveyDraftAlreadyExistsException;
 use app\exceptions\services\SurveyMissingContactException;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -25,6 +26,7 @@ use app\models\Call;
 use app\models\Relation;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
+use app\repositories\SurveyRepository;
 use app\usecases\Call\CreateCallService;
 use app\usecases\ChatMember\ChatMemberService;
 use app\usecases\Relation\RelationService;
@@ -41,6 +43,7 @@ class SurveyService
 	private CreateCallService             $createCallService;
 	private RelationService               $relationService;
 	private ChatMemberService             $chatMemberService;
+	private SurveyRepository              $repository;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -48,7 +51,8 @@ class SurveyService
 		EventManager $eventManager,
 		CreateCallService $createCallService,
 		RelationService $relationService,
-		ChatMemberService $chatMemberService
+		ChatMemberService $chatMemberService,
+		SurveyRepository $repository
 	)
 	{
 		$this->transactionBeginner         = $transactionBeginner;
@@ -57,6 +61,7 @@ class SurveyService
 		$this->createCallService           = $createCallService;
 		$this->relationService             = $relationService;
 		$this->chatMemberService           = $chatMemberService;
+		$this->repository                  = $repository;
 	}
 
 	/**
@@ -64,6 +69,10 @@ class SurveyService
 	 */
 	public function create(CreateSurveyDto $dto): Survey
 	{
+		if ($dto->status === Survey::STATUS_DRAFT && $this->repository->findDraftByChatMemberIdAndUserId($dto->chatMember->id, $dto->user->id)) {
+			throw new SurveyDraftAlreadyExistsException('Draft already exists');
+		}
+
 		$model = new Survey([
 			'user_id'           => $dto->user->id,
 			'contact_id'        => $dto->contact->id ?? null,
@@ -102,7 +111,7 @@ class SurveyService
 
 			$survey->status       = Survey::STATUS_COMPLETED;
 			$survey->completed_at = DateTimeHelper::nowf();
-			
+
 			$survey->saveOrThrow();
 
 			$this->eventManager->trigger(new CreateSurveyEvent($survey));
