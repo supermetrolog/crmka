@@ -15,6 +15,7 @@ use app\models\forms\Request\RequestForm;
 use app\models\forms\Request\RequestPassiveForm;
 use app\models\RequestSearch;
 use app\repositories\RequestRepository;
+use app\resources\Company\Request\CompanyRequestFullResource;
 use app\resources\Request\RequestFullResource;
 use app\resources\Request\RequestSearchResource;
 use app\resources\Request\RequestWithProgressResource;
@@ -68,7 +69,7 @@ class RequestController extends AppController
 	{
 		$models = $this->requestRepository->findAllByCompanyIdWithRelations((int)$id);
 
-		return RequestWithProgressResource::collection($models);
+		return CompanyRequestFullResource::collection($models);
 	}
 
 	/**

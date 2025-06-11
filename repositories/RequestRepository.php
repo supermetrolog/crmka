@@ -54,7 +54,10 @@ class RequestRepository
 			              'consultant.userProfile',
 			              'contact.emails', 'contact.phones',
 			              'directions', 'districts', 'gateTypes', 'objectClasses', 'objectTypes', 'objectTypesGeneral', 'regions.info',
-			              'deal.company', 'deal.competitor', 'deal.consultant.userProfile', 'deal.offer.generalOffersMix'
+			              'deal.company', 'deal.competitor', 'deal.consultant.userProfile', 'deal.offer.generalOffersMix',
+			              'mainTimeline.timelineSteps.timelineStepObjects', 'mainTimeline.timelineSteps.timelineStepObjects',
+			              'mainTimeline.consultant.userProfile', 'mainTimeline.timelineActionComments',
+			              'mainTimeline.timelineSteps.timelineStepFeedbackways'
 		              ])
 		              ->byCompanyId($id)
 		              ->orderBy([Request::field('created_at') => SORT_DESC])
