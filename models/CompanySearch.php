@@ -7,7 +7,6 @@ use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\TaskQuery;
-use app\models\ActiveQuery\TimelineQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\Phone;
 use app\models\views\CompanySearchView;
@@ -96,11 +95,7 @@ class CompanySearch extends Form
 		                          ->joinWith(['chatMember cm'])
 		                          ->leftJoinLastCallRelation()
 		                          ->with([
-			                          'requests' => function ($query) {
-				                          $query->with(['timelines' => function (TimelineQuery $query) {
-					                          $query->with(['timelineSteps', 'consultant'])->active();
-				                          }]);
-			                          },
+			                          'requests',
 			                          'logo',
 			                          'companyGroup',
 			                          'consultant.userProfile',
