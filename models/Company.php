@@ -117,6 +117,7 @@ class Company extends AR
 	public const PASSIVE_WHY_SUSPENDED = 0;
 	public const PASSIVE_WHY_BLOCKED   = 1;
 	public const PASSIVE_WHY_OTHER     = 2;
+	public const PASSIVE_WHY_DESTROYED = 3;
 
 	public static function getPassiveWhyOptions(): array
 	{
@@ -124,6 +125,7 @@ class Company extends AR
 			self::PASSIVE_WHY_SUSPENDED,
 			self::PASSIVE_WHY_BLOCKED,
 			self::PASSIVE_WHY_OTHER,
+			self::PASSIVE_WHY_DESTROYED,
 		];
 	}
 
@@ -131,6 +133,7 @@ class Company extends AR
 		self::PASSIVE_WHY_SUSPENDED => 'Временно приостановлено',
 		self::PASSIVE_WHY_BLOCKED   => 'Заблокировано модератором',
 		self::PASSIVE_WHY_OTHER     => 'Иное',
+		self::PASSIVE_WHY_DESTROYED => 'Компания ликвидирована',
 	];
 
 	public static function resolvePassiveWhyOption(?int $code): string
