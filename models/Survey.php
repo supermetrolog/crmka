@@ -5,12 +5,14 @@ namespace app\models;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
+use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\QuestionAnswerQuery;
 use app\models\ActiveQuery\QuestionQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\TaskRelationEntityQuery;
 use Exception;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -40,6 +42,7 @@ use yii\db\ActiveQuery;
  * @property-read ?Survey                $relatedSurvey
  * @property-read Survey[]               $dependentSurveys
  * @property-read Call[]                 $calls
+ * @property-read ChatMemberMessage      $chatMemberMessage
  */
 class Survey extends AR
 {
@@ -154,12 +157,20 @@ class Survey extends AR
 	/**
 	 * @throws ErrorException
 	 */
+	public function getTaskRelationEntities(): TaskRelationEntityQuery
+	{
+		/** @var TaskRelationEntityQuery */
+		return $this->morphHasMany(TaskRelationEntity::class, 'id', 'entity')
+		            ->andOnCondition([TaskRelationEntity::field('deleted_at') => null]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
 	public function getTasks(): TaskQuery
 	{
 		/** @var TaskQuery */
-		return $this->morphHasManyVia(Task::class, 'id', 'first')
-		            ->andOnCondition([Task::field('deleted_at') => null])
-		            ->via('relationSecond');
+		return $this->hasMany(Task::class, ['id' => 'task_id'])->via('taskRelationEntities')->andOnCondition([Task::field('deleted_at') => null]);
 	}
 
 	/**
@@ -192,6 +203,15 @@ class Survey extends AR
 		/** @var CallQuery */
 		return $this->morphHasManyVia(Call::class, 'id', 'second')
 		            ->via('relationFirst');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getChatMemberMessage(): ChatMemberMessageQuery
+	{
+		/** @var ChatMemberMessageQuery */
+		return $this->morphHasOneVia(ChatMemberMessage::class, 'id', 'first')->via('relationSecond');
 	}
 
 	public static function find(): SurveyQuery

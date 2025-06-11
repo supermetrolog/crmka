@@ -17,6 +17,7 @@ use app\resources\Company\Group\CompanyGroupResource;
 use app\resources\Company\Object\CompanyObjectResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Company\Request\CompanyRequestResource;
+use app\resources\Company\Survey\CompanySurveyResource;
 
 class CompanyInListResource extends JsonResource
 {
@@ -70,8 +71,10 @@ class CompanyInListResource extends JsonResource
 			'objects'  => CompanyObjectResource::collection($this->resource->objects),
 			'requests' => CompanyRequestResource::collection($this->resource->requests),
 
-			'last_call'                  => CallShortResource::tryMakeArray($this->resource->lastCall),
+			'last_call' => CallShortResource::tryMakeArray($this->resource->lastCall),
+
 			'chat_member_pinned_message' => ChatMemberMessageInlineResource::tryMakeArray($this->resource->getChatMemberPinnedMessage()),
+			'last_survey'                => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
 
 			'objects_count'         => $this->resource->objects_count,
 			'requests_count'        => $this->resource->requests_count,
