@@ -552,7 +552,7 @@ class CompanyService
 
 			$company->saveOrThrow();
 
-			$this->eventManager->trigger(new DisableCompanyEvent($company, $initiator));
+			$this->eventManager->trigger(new DisableCompanyEvent($company, $dto, $initiator));
 
 			$tx->commit();
 		} catch (Throwable $th) {

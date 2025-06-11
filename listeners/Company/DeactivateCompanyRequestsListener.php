@@ -7,6 +7,7 @@ use app\events\Company\DisableCompanyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
+use app\models\Company;
 use app\models\Request;
 use app\usecases\Request\RequestService;
 use Throwable;
@@ -32,10 +33,20 @@ class DeactivateCompanyRequestsListener implements EventListenerInterface
 	 */
 	public function handle(Event $event): void
 	{
+		if ($event->getDto()->disable_requests) {
+			$this->disableRequests($event->getCompany());
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function disableRequests(Company $company): void
+	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$company        = $event->getCompany();
 			$activeRequests = $company->activeRequests;
 
 			foreach ($activeRequests as $request) {
