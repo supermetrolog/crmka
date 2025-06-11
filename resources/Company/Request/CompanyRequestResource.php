@@ -23,8 +23,7 @@ class CompanyRequestResource extends JsonResource
 			'status'      => $this->resource->status,
 			'created_at'  => $this->resource->created_at,
 			'updated_at'  => $this->resource->updated_at,
-			'format_name' => $this->resource->getFormatName(),
-			'timelines'   => CompanyRequestTimelineResource::collection($this->resource->timelines)
+			'format_name' => $this->resource->getFormatName()
 		];
 	}
 }

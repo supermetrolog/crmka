@@ -21,8 +21,11 @@ class CompanyRequestTimelineResource extends JsonResource
 	{
 		return [
 			'id'         => $this->resource->id,
+			'created_at' => $this->resource->created_at,
+			'updated_at' => $this->resource->updated_at,
+			'status'     => $this->resource->status,
 			'steps'      => CompanyRequestTimelineStepResource::collection($this->resource->timelineSteps),
-			'consultant' => UserShortResource::tryMakeArray($this->resource->consultant)
+			'consultant' => UserShortResource::tryMakeArray($this->resource->consultant),
 		];
 	}
 }
