@@ -92,6 +92,9 @@ return static function (RouterInterface $router) {
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->put()->action('update');
+
+			$route->post('disable');
+			$route->post('enable');
 		});
 	});
 

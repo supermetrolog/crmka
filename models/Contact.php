@@ -56,6 +56,36 @@ use yii\db\ActiveQuery;
  */
 class Contact extends AR
 {
+	public const PASSIVE_WHY_PHONES_NOT_ACTUAL      = 0;
+	public const PASSIVE_WHY_NOT_WORKING_IN_COMPANY = 1;
+	public const PASSIVE_WHY_BLOCKED                = 2;
+	public const PASSIVE_WHY_OTHER                  = 3;
+	public const PASSIVE_WHY_COMPANY_DISABLED       = 4;
+
+	public static function getPassiveWhyOptions(): array
+	{
+		return [
+			self::PASSIVE_WHY_PHONES_NOT_ACTUAL,
+			self::PASSIVE_WHY_NOT_WORKING_IN_COMPANY,
+			self::PASSIVE_WHY_BLOCKED,
+			self::PASSIVE_WHY_OTHER,
+			self::PASSIVE_WHY_COMPANY_DISABLED,
+		];
+	}
+
+	public const passiveWhyMap = [
+		self::PASSIVE_WHY_PHONES_NOT_ACTUAL      => 'Телефоны не актуальны',
+		self::PASSIVE_WHY_NOT_WORKING_IN_COMPANY => 'Не работает в компании',
+		self::PASSIVE_WHY_BLOCKED                => 'Заблокировано модератором',
+		self::PASSIVE_WHY_OTHER                  => 'Другое',
+		self::PASSIVE_WHY_COMPANY_DISABLED       => 'Компания архивирована',
+	];
+
+	public static function resolvePassiveWhyOption(?int $code): string
+	{
+		return self::passiveWhyMap[$code] ?? 'Причина не указана';
+	}
+
 	public const GENERAL_CONTACT_FIRST_NAME = 'Общий контакт';
 	public const GENERAL_CONTACT_TYPE       = 1;
 	public const DEFAULT_CONTACT_TYPE       = 0;
@@ -306,6 +336,11 @@ class Contact extends AR
 	public static function find(): ContactQuery
 	{
 		return new ContactQuery(get_called_class());
+	}
+
+	public function isPassive(): bool
+	{
+		return $this->status === self::STATUS_PASSIVE;
 	}
 
 	public function isActive(): bool

@@ -18,6 +18,7 @@ use app\events\Task\RestoreTaskEvent;
 use app\events\Task\UpdateTaskEvent;
 use app\events\Timeline\UpdateTimelineStepEvent;
 use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
+use app\listeners\Company\DeactivateCompanyContactsListener;
 use app\listeners\Company\DeactivateCompanyRequestsListener;
 use app\listeners\Company\DisableCompanySystemChatMemberMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
@@ -98,6 +99,7 @@ return [
 	],
 	DisableCompanyEvent::class          => [
 		DeactivateCompanyRequestsListener::class,
+		DeactivateCompanyContactsListener::class,
 		DisableCompanySystemChatMemberMessageListener::class
 	]
 ];

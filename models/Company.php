@@ -94,6 +94,7 @@ use yii\db\Expression;
  * @property-read FolderEntity[]           $folderEntities
  * @property-read Task[]                   $tasks
  * @property-read ?Survey                  $lastSurvey
+ * @property-read Contact[]                $activeContacts
  */
 class Company extends AR
 {
