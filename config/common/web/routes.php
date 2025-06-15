@@ -58,11 +58,18 @@ return static function (RouterInterface $router) {
 			$route->post('disable');
 			$route->post('enable');
 
+			$route->post('pin-message');
+			$route->post('create-pinned-message');
+
 			$route->post('logo', 'update-logo');
 			$route->delete('logo', 'delete-logo');
 
 			$route->delete()->action('delete');
 		});
+	});
+
+	$router->controller('company-pinned-message')->group(static function (RouteInterface $route) {
+		$route->delete('<id>', 'delete');
 	});
 
 	$router->controller('request')->group(static function (RouteInterface $route) {

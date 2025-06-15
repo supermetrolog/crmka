@@ -6,13 +6,16 @@ namespace app\usecases\Company;
 
 use app\components\EventManager;
 use app\components\Media\SaveMediaErrorException;
+use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\Company\CompanyActivityGroupDto;
 use app\dto\Company\CompanyActivityProfileDto;
 use app\dto\Company\CompanyDto;
 use app\dto\Company\CompanyMediaDto;
 use app\dto\Company\CompanyMiniModelsDto;
+use app\dto\Company\CompanyPinnedMessageDto;
 use app\dto\Company\CreateCompanyFileDto;
 use app\dto\Company\DisableCompanyDto;
+use app\dto\Company\PinMessageCompanyDto;
 use app\dto\Media\CreateMediaDto;
 use app\events\Company\ChangeConsultantCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
@@ -25,11 +28,13 @@ use app\models\Category;
 use app\models\Company;
 use app\models\CompanyActivityGroup;
 use app\models\CompanyActivityProfile;
+use app\models\CompanyPinnedMessage;
 use app\models\Media;
 use app\models\miniModels\CompanyFile;
 use app\models\Notification;
 use app\models\Productrange;
 use app\models\User;
+use app\usecases\ChatMember\ChatMemberMessageService;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
 use ErrorException;
@@ -53,6 +58,9 @@ class CompanyService
 
 	private MediaService $mediaService;
 
+	private CompanyPinnedMessageService $companyPinnedMessageService;
+	private ChatMemberMessageService    $chatMemberMessageService;
+
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		CompanyFileService $companyFileService,
@@ -60,7 +68,9 @@ class CompanyService
 		MediaService $mediaService,
 		EventManager $eventManager,
 		CompanyActivityGroupService $companyActivityGroupService,
-		CompanyActivityProfileService $companyActivityProfileService
+		CompanyActivityProfileService $companyActivityProfileService,
+		CompanyPinnedMessageService $companyPinnedMessageService,
+		ChatMemberMessageService $chatMemberMessageService
 	)
 	{
 		$this->transactionBeginner           = $transactionBeginner;
@@ -70,6 +80,8 @@ class CompanyService
 		$this->eventManager                  = $eventManager;
 		$this->companyActivityGroupService   = $companyActivityGroupService;
 		$this->companyActivityProfileService = $companyActivityProfileService;
+		$this->companyPinnedMessageService   = $companyPinnedMessageService;
+		$this->chatMemberMessageService      = $chatMemberMessageService;
 	}
 
 	/**
@@ -584,6 +596,43 @@ class CompanyService
 			$this->eventManager->trigger(new EnableCompanyEvent($company, $initiator));
 
 			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function pinMessage(Company $company, PinMessageCompanyDto $dto): CompanyPinnedMessage
+	{
+		return $this->companyPinnedMessageService->create(new CompanyPinnedMessageDto([
+			'company' => $company,
+			'message' => $dto->message,
+			'user'    => $dto->user,
+		]));
+	}
+
+	/**
+	 * @throws Throwable
+	 */
+	public function createPinnedMessage(Company $company, CreateChatMemberMessageDto $dto): CompanyPinnedMessage
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$chatMemberMessage = $this->chatMemberMessageService->create($dto);
+
+			$pinnedMessage = $this->pinMessage($company, new PinMessageCompanyDto([
+				'message' => $chatMemberMessage,
+				'user'    => $dto->from->user
+			]));
+
+			$tx->commit();
+
+			return $pinnedMessage;
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;

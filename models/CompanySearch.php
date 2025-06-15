@@ -118,6 +118,7 @@ class CompanySearch extends Form
 			                          'lastSurvey.tasks.observers.user.userProfile', 'lastSurvey.tasks.targetUserObserver',
 			                          'lastSurvey.chatMemberMessage.fromChatMember.user.userProfile',
 			                          'lastSurvey.chatMemberMessage.files',
+			                          'pinnedMessages.chatMemberMessage.fromChatMember.user.userProfile', 'pinnedMessages.chatMemberMessage.files',
 		                          ])->groupBy(Company::field('id'));
 
 		$this->load($params);

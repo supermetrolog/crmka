@@ -8,13 +8,13 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Company;
 use app\resources\Call\CallShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
-use app\resources\ChatMemberMessage\ChatMemberMessageInlineResource;
 use app\resources\Company\ActivityGroup\CompanyActivityGroupResource;
 use app\resources\Company\ActivityProfile\CompanyActivityProfileResource;
 use app\resources\Company\Category\CompanyCategoryResource;
 use app\resources\Company\Contact\CompanyContactResource;
 use app\resources\Company\Group\CompanyGroupResource;
 use app\resources\Company\Object\CompanyObjectResource;
+use app\resources\Company\PinnedMessage\CompanyPinnedMessageResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Company\Request\CompanyRequestResource;
 use app\resources\Company\Survey\CompanySurveyResource;
@@ -73,8 +73,10 @@ class CompanyInListResource extends JsonResource
 
 			'last_call' => CallShortResource::tryMakeArray($this->resource->lastCall),
 
-			'chat_member_pinned_message' => ChatMemberMessageInlineResource::tryMakeArray($this->resource->getChatMemberPinnedMessage()),
-			'last_survey'                => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
+			'pinned_messages' => CompanyPinnedMessageResource::collection($this->resource->pinnedMessages),
+			'last_survey'     => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
+
+			'chat_member_id' => $this->resource->chatMember->id ?? null,
 
 			'objects_count'         => $this->resource->objects_count,
 			'requests_count'        => $this->resource->requests_count,

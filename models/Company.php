@@ -10,6 +10,7 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\CompanyPinnedMessageQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\FolderEntityQuery;
@@ -95,6 +96,7 @@ use yii\db\Expression;
  * @property-read Task[]                   $tasks
  * @property-read ?Survey                  $lastSurvey
  * @property-read Contact[]                $activeContacts
+ * @property-read CompanyPinnedMessage[]   $pinnedMessages
  */
 class Company extends AR
 {
@@ -617,7 +619,16 @@ class Company extends AR
 	public function getLastSurvey(): SurveyQuery
 	{
 		/** @var SurveyQuery */
-		return $this->hasOne(Survey::class, ['chat_member_id' => 'id'])->via('chatMember')->orderBy(['created_at' => SORT_DESC]);
+		return $this->hasOne(Survey::class, ['chat_member_id' => 'id'])
+		            ->via('chatMember')
+		            ->andWhere(['!=', 'status', Survey::STATUS_DRAFT])
+		            ->orderBy(['created_at' => SORT_DESC]);
+	}
+
+	public function getPinnedMessages(): CompanyPinnedMessageQuery
+	{
+		/** @var CompanyPinnedMessageQuery */
+		return $this->hasMany(CompanyPinnedMessage::class, ['company_id' => 'id'])->orderBy(['id' => SORT_DESC]);
 	}
 
 	public function getChatMemberPinnedMessage(): ?ChatMemberMessage
