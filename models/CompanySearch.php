@@ -112,7 +112,7 @@ class CompanySearch extends Form
 			                          'objects.offerMix.generalOffersMix',
 			                          'objects.objectFloors',
 			                          'lastCall',
-			                          'chatMember.pinnedChatMemberMessage.fromChatMember.user.userProfile', 'chatMember.pinnedChatMemberMessage.files', 'chatMember',
+			                          'chatMember',
 			                          'lastSurvey.user.userProfile', 'lastSurvey.contact', 'lastSurvey.calls',
 			                          'lastSurvey.tasks.tags', 'lastSurvey.tasks.createdByUser.userProfile', 'lastSurvey.tasks.user.userProfile',
 			                          'lastSurvey.tasks.observers.user.userProfile', 'lastSurvey.tasks.targetUserObserver',
