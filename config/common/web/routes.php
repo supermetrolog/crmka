@@ -68,7 +68,7 @@ return static function (RouterInterface $router) {
 		});
 	});
 
-	$router->controller('company-pinned-message')->group(static function (RouteInterface $route) {
+	$router->controller('entity-pinned-message')->group(static function (RouteInterface $route) {
 		$route->delete('<id>', 'delete');
 	});
 

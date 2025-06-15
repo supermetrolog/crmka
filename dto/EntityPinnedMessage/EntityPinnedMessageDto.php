@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace app\dto\Company;
+namespace app\dto\EntityPinnedMessage;
 
 use app\models\ChatMemberMessage;
-use app\models\Company;
 use app\models\User;
 use yii\base\BaseObject;
 
-class CompanyPinnedMessageDto extends BaseObject
+class EntityPinnedMessageDto extends BaseObject
 {
-	public Company           $company;
+	public int    $entity_id;
+	public string $entity_type;
+
 	public User              $user;
 	public ChatMemberMessage $message;
 } 

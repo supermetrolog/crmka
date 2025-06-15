@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace app\actions\Company;
 
-use app\dto\Company\CompanyPinnedMessageDto;
+use app\dto\EntityPinnedMessage\EntityPinnedMessageDto;
 use app\kernel\common\actions\Action;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ChatMemberMessage;
 use app\models\Company;
-use app\models\CompanyPinnedMessage;
-use app\usecases\Company\CompanyPinnedMessageService;
+use app\models\EntityPinnedMessage;
+use app\usecases\EntityPinnedMessage\EntityPinnedMessageService;
 use yii\base\ErrorException;
 
 class TransferCompanyPinnedMessagesAction extends Action
 {
-	private CompanyPinnedMessageService $service;
+	private EntityPinnedMessageService $service;
 
 	public function __construct(
 		$id,
 		$controller,
-		CompanyPinnedMessageService $service,
+		EntityPinnedMessageService $service,
 		array $config = []
 	)
 	{
@@ -37,7 +37,7 @@ class TransferCompanyPinnedMessagesAction extends Action
 	 */
 	public function run(): void
 	{
-		$this->info('Start transfer company comments from ChatMemberPinned to CompanyPinnedMessage');
+		$this->info('Start transfer company comments from ChatMemberPinned to EntityPinnedMessage');
 
 		$query = ChatMemberMessage::find()
 		                          ->alias('cmm')
@@ -45,8 +45,8 @@ class TransferCompanyPinnedMessagesAction extends Action
 			                          $query->andWhere('tcm.model_type = :type', [':type' => Company::getMorphClass()])
 			                                ->andWhere('tcm.pinned_chat_member_message_id = cmm.id');
 		                          }], false)
-		                          ->leftJoin(['cpm' => CompanyPinnedMessage::getTable()], 'cpm.chat_member_message_id = cmm.id')
-		                          ->with(['toChatMember', 'fromChatMember.user', 'toChatMember.company'])
+		                          ->leftJoin(['cpm' => EntityPinnedMessage::getTable()], 'cpm.chat_member_message_id = cmm.id')
+		                          ->with(['toChatMember', 'fromChatMember.user'])
 		                          ->andWhere('cmm.deleted_at is null')
 		                          ->andWhere('cpm.id is null');
 
@@ -62,10 +62,11 @@ class TransferCompanyPinnedMessagesAction extends Action
 
 		/** @var ChatMemberMessage $message */
 		foreach ($query->each() as $message) {
-			$pinned = $this->service->create(new CompanyPinnedMessageDto([
-					'company' => $message->toChatMember->company,
-					'message' => $message,
-					'user'    => $message->fromChatMember->user
+			$pinned = $this->service->create(new EntityPinnedMessageDto([
+					'entity_id'   => $message->toChatMember->model_id,
+					'entity_type' => $message->toChatMember->model_type,
+					'message'     => $message,
+					'user'        => $message->fromChatMember->user
 				])
 			);
 

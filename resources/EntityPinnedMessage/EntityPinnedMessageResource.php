@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace app\resources\Company\PinnedMessage;
+namespace app\resources\EntityPinnedMessage;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\CompanyPinnedMessage;
+use app\models\EntityPinnedMessage;
 use app\resources\ChatMemberMessage\ChatMemberMessageInlineResource;
 
-class CompanyPinnedMessageResource extends JsonResource
+class EntityPinnedMessageResource extends JsonResource
 {
-	private CompanyPinnedMessage $resource;
+	private EntityPinnedMessage $resource;
 
-	public function __construct(CompanyPinnedMessage $resource)
+	public function __construct(EntityPinnedMessage $resource)
 	{
 		$this->resource = $resource;
 	}
@@ -21,7 +21,8 @@ class CompanyPinnedMessageResource extends JsonResource
 	{
 		return [
 			'id'                     => $this->resource->id,
-			'company_id'             => $this->resource->company_id,
+			'entity_id'              => $this->resource->entity_id,
+			'entity_type'            => $this->resource->entity_type,
 			'chat_member_message_id' => $this->resource->chat_member_message_id,
 			'created_by_id'          => $this->resource->created_by_id,
 			'created_at'             => $this->resource->created_at,

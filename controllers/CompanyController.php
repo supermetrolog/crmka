@@ -21,7 +21,7 @@ use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
 use app\resources\Company\CompanyViewResource;
 use app\resources\Company\CreatedCompanyResource;
-use app\resources\Company\PinnedMessage\CompanyPinnedMessageResource;
+use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
 use app\resources\Media\MediaShortResource;
 use app\resources\ProductRange\ProductRangeResource;
 use app\usecases\Company\CompanyService;
@@ -284,7 +284,7 @@ class CompanyController extends AppController
 	 * @throws ModelNotFoundException
 	 * @throws Throwable
 	 */
-	public function actionPinMessage(int $id): CompanyPinnedMessageResource
+	public function actionPinMessage(int $id): EntityPinnedMessageResource
 	{
 		$company = $this->companyRepository->findModelById($id);
 
@@ -298,7 +298,7 @@ class CompanyController extends AppController
 
 		$message = $this->companyService->pinMessage($company, $form->getDto());
 
-		return new CompanyPinnedMessageResource($message);
+		return new EntityPinnedMessageResource($message);
 	}
 
 	/**
@@ -306,12 +306,12 @@ class CompanyController extends AppController
 	 * @throws ModelNotFoundException
 	 * @throws Throwable
 	 */
-	public function actionCreatePinnedMessage(int $id): CompanyPinnedMessageResource
+	public function actionCreatePinnedMessage(int $id): EntityPinnedMessageResource
 	{
 		$company = $this->companyRepository->findModelById($id);
 
 		$form = new ChatMemberMessageForm();
-		$form->setScenario('scenario_create');
+		$form->setScenario(ChatMemberMessageForm::SCENARIO_CREATE);
 
 		$form->load($this->request->post());
 
@@ -322,6 +322,6 @@ class CompanyController extends AppController
 
 		$message = $this->companyService->createPinnedMessage($company, $form->getDto());
 
-		return new CompanyPinnedMessageResource($message);
+		return new EntityPinnedMessageResource($message);
 	}
 }

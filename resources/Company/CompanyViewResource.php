@@ -15,9 +15,9 @@ use app\resources\Company\Category\CompanyCategoryResource;
 use app\resources\Company\Contact\CompanyGeneralContactResource;
 use app\resources\Company\File\CompanyFileResource;
 use app\resources\Company\Group\CompanyGroupResource;
-use app\resources\Company\PinnedMessage\CompanyPinnedMessageResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Contact\ContactResource;
+use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
 use app\resources\Media\MediaShortResource;
 
 class CompanyViewResource extends JsonResource
@@ -45,7 +45,7 @@ class CompanyViewResource extends JsonResource
 				'last_call'         => CallResource::tryMakeArray($this->resource->lastCall),
 				'activity_groups'   => CompanyActivityGroupResource::collection($this->resource->companyActivityGroups),
 				'activity_profiles' => CompanyActivityProfileResource::collection($this->resource->companyActivityProfiles),
-				'pinned_messages'   => CompanyPinnedMessageResource::collection($this->resource->pinnedMessages),
+				'pinned_messages'   => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
 
 				'dealsRequestEmpty'     => $this->resource->dealsRequestEmpty,
 				'objects_count'         => $this->resource->objects_count,

@@ -4,7 +4,7 @@ namespace app\listeners\Survey;
 
 use app\components\EffectStrategy\Factory\EffectStrategyFactory;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
-use app\dto\Company\CompanyPinnedMessageDto;
+use app\dto\EntityPinnedMessage\EntityPinnedMessageDto;
 use app\events\Survey\CompleteSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -15,7 +15,7 @@ use app\models\ChatMemberMessage;
 use app\models\Company;
 use app\models\Survey;
 use app\usecases\ChatMember\ChatMemberMessageService;
-use app\usecases\Company\CompanyPinnedMessageService;
+use app\usecases\EntityPinnedMessage\EntityPinnedMessageService;
 use Throwable;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
@@ -27,16 +27,16 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 	private const SURVEY_DEFAULT_MESSAGE = 'Без важных комментариев..';
 
 	private ChatMemberMessageService     $chatMemberMessageService;
-	private CompanyPinnedMessageService  $companyPinnedMessageService;
+	private EntityPinnedMessageService   $entityPinnedMessageService;
 	private EffectStrategyFactory        $effectStrategyFactory;
 	private TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(ChatMemberMessageService $chatMemberMessageService, CompanyPinnedMessageService $companyPinnedMessageService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
+	public function __construct(ChatMemberMessageService $chatMemberMessageService, EntityPinnedMessageService $entityPinnedMessageService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
 	{
-		$this->chatMemberMessageService    = $chatMemberMessageService;
-		$this->companyPinnedMessageService = $companyPinnedMessageService;
-		$this->effectStrategyFactory       = $effectStrategyFactory;
-		$this->transactionBeginner         = $transactionBeginner;
+		$this->chatMemberMessageService   = $chatMemberMessageService;
+		$this->entityPinnedMessageService = $entityPinnedMessageService;
+		$this->effectStrategyFactory      = $effectStrategyFactory;
+		$this->transactionBeginner        = $transactionBeginner;
 	}
 
 	/**
@@ -93,8 +93,8 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 	 */
 	private function pinMessageToCompany(Company $company, ChatMemberMessage $message): void
 	{
-		$this->companyPinnedMessageService->create(
-			new CompanyPinnedMessageDto([
+		$this->entityPinnedMessageService->create(
+			new EntityPinnedMessageDto([
 				'company' => $company,
 				'message' => $message,
 				'user'    => $message->fromChatMember->user

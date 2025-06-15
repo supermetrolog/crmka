@@ -10,9 +10,9 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
-use app\models\ActiveQuery\CompanyPinnedMessageQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
+use app\models\ActiveQuery\EntityPinnedMessageQuery;
 use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
@@ -96,7 +96,7 @@ use yii\db\Expression;
  * @property-read Task[]                   $tasks
  * @property-read ?Survey                  $lastSurvey
  * @property-read Contact[]                $activeContacts
- * @property-read CompanyPinnedMessage[]   $pinnedMessages
+ * @property-read EntityPinnedMessage[]    $pinnedMessages
  */
 class Company extends AR
 {
@@ -625,10 +625,13 @@ class Company extends AR
 		            ->orderBy(['created_at' => SORT_DESC]);
 	}
 
-	public function getPinnedMessages(): CompanyPinnedMessageQuery
+	/**
+	 * @throws ErrorException
+	 */
+	public function getPinnedMessages(): EntityPinnedMessageQuery
 	{
-		/** @var CompanyPinnedMessageQuery */
-		return $this->hasMany(CompanyPinnedMessage::class, ['company_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+		/** @var EntityPinnedMessageQuery */
+		return $this->morphHasMany(EntityPinnedMessage::class, 'id', 'entity')->orderBy(['id' => SORT_DESC]);
 	}
 
 	public function getChatMemberPinnedMessage(): ?ChatMemberMessage

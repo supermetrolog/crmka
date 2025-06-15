@@ -14,10 +14,10 @@ use app\resources\Company\Category\CompanyCategoryResource;
 use app\resources\Company\Contact\CompanyContactResource;
 use app\resources\Company\Group\CompanyGroupResource;
 use app\resources\Company\Object\CompanyObjectResource;
-use app\resources\Company\PinnedMessage\CompanyPinnedMessageResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Company\Request\CompanyRequestResource;
 use app\resources\Company\Survey\CompanySurveyResource;
+use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
 
 class CompanyInListResource extends JsonResource
 {
@@ -73,7 +73,7 @@ class CompanyInListResource extends JsonResource
 
 			'last_call' => CallShortResource::tryMakeArray($this->resource->lastCall),
 
-			'pinned_messages' => CompanyPinnedMessageResource::collection($this->resource->pinnedMessages),
+			'pinned_messages' => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
 			'last_survey'     => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
 
 			'chat_member_id' => $this->resource->chatMember->id ?? null,

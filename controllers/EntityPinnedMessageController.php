@@ -5,22 +5,22 @@ namespace app\controllers;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\web\http\responses\SuccessResponse;
-use app\repositories\CompanyPinnedMessageRepository;
-use app\usecases\Company\CompanyPinnedMessageService;
+use app\repositories\EntityPinnedMessageRepository;
+use app\usecases\EntityPinnedMessage\EntityPinnedMessageService;
 use Throwable;
 use yii\base\ErrorException;
 use yii\db\StaleObjectException;
 
-class CompanyPinnedMessageController extends AppController
+class EntityPinnedMessageController extends AppController
 {
-	private CompanyPinnedMessageService    $service;
-	private CompanyPinnedMessageRepository $repository;
+	private EntityPinnedMessageService    $service;
+	private EntityPinnedMessageRepository $repository;
 
 	public function __construct(
 		$id,
 		$module,
-		CompanyPinnedMessageService $service,
-		CompanyPinnedMessageRepository $repository,
+		EntityPinnedMessageService $service,
+		EntityPinnedMessageRepository $repository,
 		array $config = []
 	)
 	{
@@ -42,6 +42,6 @@ class CompanyPinnedMessageController extends AppController
 
 		$this->service->delete($comment);
 
-		return new SuccessResponse('Сообщение откреплено от компании');
+		return new SuccessResponse('Сообщение откреплено');
 	}
 }

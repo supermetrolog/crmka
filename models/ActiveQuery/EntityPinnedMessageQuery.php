@@ -7,32 +7,32 @@ namespace app\models\ActiveQuery;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
-use app\models\CompanyPinnedMessage;
+use app\models\EntityPinnedMessage;
 
-class CompanyPinnedMessageQuery extends AQ
+class EntityPinnedMessageQuery extends AQ
 {
 	use SoftDeleteTrait;
 
 	/**
-	 * @return CompanyPinnedMessage[]
+	 * @return EntityPinnedMessage[]
 	 */
 	public function all($db = null): array
 	{
 		return parent::all($db);
 	}
 
-	public function one($db = null): ?CompanyPinnedMessage
+	public function one($db = null): ?EntityPinnedMessage
 	{
-		/** @var ?CompanyPinnedMessage */
+		/** @var ?EntityPinnedMessage */
 		return parent::one($db);
 	}
 
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	public function oneOrThrow($db = null): CompanyPinnedMessage
+	public function oneOrThrow($db = null): EntityPinnedMessage
 	{
-		/** @var CompanyPinnedMessage */
+		/** @var EntityPinnedMessage */
 		return parent::oneOrThrow($db);
 	}
 }

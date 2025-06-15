@@ -12,10 +12,10 @@ use app\dto\Company\CompanyActivityProfileDto;
 use app\dto\Company\CompanyDto;
 use app\dto\Company\CompanyMediaDto;
 use app\dto\Company\CompanyMiniModelsDto;
-use app\dto\Company\CompanyPinnedMessageDto;
 use app\dto\Company\CreateCompanyFileDto;
 use app\dto\Company\DisableCompanyDto;
 use app\dto\Company\PinMessageCompanyDto;
+use app\dto\EntityPinnedMessage\EntityPinnedMessageDto;
 use app\dto\Media\CreateMediaDto;
 use app\events\Company\ChangeConsultantCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
@@ -28,13 +28,14 @@ use app\models\Category;
 use app\models\Company;
 use app\models\CompanyActivityGroup;
 use app\models\CompanyActivityProfile;
-use app\models\CompanyPinnedMessage;
+use app\models\EntityPinnedMessage;
 use app\models\Media;
 use app\models\miniModels\CompanyFile;
 use app\models\Notification;
 use app\models\Productrange;
 use app\models\User;
 use app\usecases\ChatMember\ChatMemberMessageService;
+use app\usecases\EntityPinnedMessage\EntityPinnedMessageService;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
 use ErrorException;
@@ -58,8 +59,8 @@ class CompanyService
 
 	private MediaService $mediaService;
 
-	private CompanyPinnedMessageService $companyPinnedMessageService;
-	private ChatMemberMessageService    $chatMemberMessageService;
+	private EntityPinnedMessageService $entityPinnedMessageService;
+	private ChatMemberMessageService   $chatMemberMessageService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -69,7 +70,7 @@ class CompanyService
 		EventManager $eventManager,
 		CompanyActivityGroupService $companyActivityGroupService,
 		CompanyActivityProfileService $companyActivityProfileService,
-		CompanyPinnedMessageService $companyPinnedMessageService,
+		EntityPinnedMessageService $entityPinnedMessageService,
 		ChatMemberMessageService $chatMemberMessageService
 	)
 	{
@@ -80,7 +81,7 @@ class CompanyService
 		$this->eventManager                  = $eventManager;
 		$this->companyActivityGroupService   = $companyActivityGroupService;
 		$this->companyActivityProfileService = $companyActivityProfileService;
-		$this->companyPinnedMessageService   = $companyPinnedMessageService;
+		$this->entityPinnedMessageService    = $entityPinnedMessageService;
 		$this->chatMemberMessageService      = $chatMemberMessageService;
 	}
 
@@ -606,19 +607,20 @@ class CompanyService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function pinMessage(Company $company, PinMessageCompanyDto $dto): CompanyPinnedMessage
+	public function pinMessage(Company $company, PinMessageCompanyDto $dto): EntityPinnedMessage
 	{
-		return $this->companyPinnedMessageService->create(new CompanyPinnedMessageDto([
-			'company' => $company,
-			'message' => $dto->message,
-			'user'    => $dto->user,
+		return $this->entityPinnedMessageService->create(new EntityPinnedMessageDto([
+			'entity_id'   => $company->id,
+			'entity_type' => $company::getMorphClass(),
+			'message'     => $dto->message,
+			'user'        => $dto->user,
 		]));
 	}
 
 	/**
 	 * @throws Throwable
 	 */
-	public function createPinnedMessage(Company $company, CreateChatMemberMessageDto $dto): CompanyPinnedMessage
+	public function createPinnedMessage(Company $company, CreateChatMemberMessageDto $dto): EntityPinnedMessage
 	{
 		$tx = $this->transactionBeginner->begin();
 
