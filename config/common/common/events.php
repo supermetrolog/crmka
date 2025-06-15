@@ -4,7 +4,7 @@ use app\events\Company\ChangeConsultantCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
 use app\events\Request\RequestActivatedEvent;
 use app\events\Request\RequestDeactivatedEvent;
-use app\events\Survey\CreateSurveyEvent;
+use app\events\Survey\CompleteSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\events\Task\AssignTaskEvent;
 use app\events\Task\ChangeStatusTaskEvent;
@@ -39,7 +39,7 @@ use app\listeners\Timeline\SyncTimelineOnRequestDeactivationListener;
 use app\listeners\Timeline\UpdateRequestRelationTimestampListener;
 
 return [
-	CreateSurveyEvent::class            => [
+	CompleteSurveyEvent::class          => [
 		CreateSurveySystemChatMessageListener::class
 	],
 	UpdateSurveyEvent::class            => [

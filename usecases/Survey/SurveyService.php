@@ -12,7 +12,7 @@ use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
 use app\dto\SurveyQuestionAnswer\UpdateSurveyQuestionAnswerDto;
-use app\events\Survey\CreateSurveyEvent;
+use app\events\Survey\CompleteSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\exceptions\services\SurveyAlreadyCancelledException;
 use app\exceptions\services\SurveyAlreadyCompletedException;
@@ -79,7 +79,8 @@ class SurveyService
 			'chat_member_id'    => $dto->chatMember->id,
 			'related_survey_id' => $dto->related_survey_id,
 			'status'            => $dto->status,
-			'type'              => $dto->type
+			'type'              => $dto->type,
+			'comment'           => $dto->comment
 		]);
 
 		$model->saveOrThrow();
@@ -114,7 +115,7 @@ class SurveyService
 
 			$survey->saveOrThrow();
 
-			$this->eventManager->trigger(new CreateSurveyEvent($survey));
+			$this->eventManager->trigger(new CompleteSurveyEvent($survey));
 
 			$tx->commit();
 
@@ -165,7 +166,8 @@ class SurveyService
 	public function update(Survey $model, UpdateSurveyDto $dto): Survey
 	{
 		$model->load([
-			'contact_id' => $dto->contact->id ?? null
+			'contact_id' => $dto->contact->id ?? null,
+			'comment'    => $dto->comment
 		]);
 
 		$model->saveOrThrow();

@@ -4,15 +4,18 @@ namespace app\listeners\Survey;
 
 use app\components\EffectStrategy\Factory\EffectStrategyFactory;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
-use app\events\Survey\CreateSurveyEvent;
+use app\dto\Company\CompanyPinnedMessageDto;
+use app\events\Survey\CompleteSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
+use app\models\ChatMember;
 use app\models\ChatMemberMessage;
+use app\models\Company;
 use app\models\Survey;
-use app\services\ChatMemberSystemMessage\CreateSurveyChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
+use app\usecases\Company\CompanyPinnedMessageService;
 use Throwable;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
@@ -21,48 +24,43 @@ use yii\di\NotInstantiableException;
 
 class CreateSurveySystemChatMessageListener implements EventListenerInterface
 {
+	private const SURVEY_DEFAULT_MESSAGE = 'Без важных комментариев..';
+
 	private ChatMemberMessageService     $chatMemberMessageService;
+	private CompanyPinnedMessageService  $companyPinnedMessageService;
 	private EffectStrategyFactory        $effectStrategyFactory;
 	private TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(ChatMemberMessageService $chatMemberMessageService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
+	public function __construct(ChatMemberMessageService $chatMemberMessageService, CompanyPinnedMessageService $companyPinnedMessageService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
 	{
-		$this->chatMemberMessageService = $chatMemberMessageService;
-		$this->effectStrategyFactory    = $effectStrategyFactory;
-		$this->transactionBeginner      = $transactionBeginner;
+		$this->chatMemberMessageService    = $chatMemberMessageService;
+		$this->companyPinnedMessageService = $companyPinnedMessageService;
+		$this->effectStrategyFactory       = $effectStrategyFactory;
+		$this->transactionBeginner         = $transactionBeginner;
 	}
 
 	/**
-	 * @param CreateSurveyEvent $event
+	 * @param CompleteSurveyEvent $event
 	 *
 	 * @throws Throwable
 	 * @throws SaveModelException
 	 */
 	public function handle(Event $event): void
 	{
-		$survey     = $event->getSurvey();
-		$chatMember = $event->getChatMember();
+		$survey = $event->getSurvey();
 
 		if (!$survey->isCompleted()) {
 			return;
 		}
 
-		$message = CreateSurveyChatMemberSystemMessage::create()
-		                                              ->setSurvey($survey)
-		                                              ->toMessage();
-
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$dto = new CreateChatMemberSystemMessageDto([
-				'message'    => $message,
-				'to'         => $chatMember,
-				'surveyIds'  => [$survey->id],
-				'contactIds' => [$survey->contact_id],
-				'template'   => ChatMemberMessage::SURVEY_TEMPLATE
-			]);
+			$message = $this->createSystemMessage($survey, $survey->chatMember);
 
-			$message = $this->chatMemberMessageService->createSystemMessage($dto);
+			if (!empty($survey->comment)) {
+				$this->pinMessageToCompany($survey->chatMember->company, $message);
+			}
 
 			$this->handleEffects($survey, $message);
 
@@ -71,6 +69,37 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 			$tx->rollback();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function createSystemMessage(Survey $survey, ChatMember $chatMember): ChatMemberMessage
+	{
+		$dto = new CreateChatMemberSystemMessageDto([
+			'message'    => $survey->comment ?? self::SURVEY_DEFAULT_MESSAGE,
+			'to'         => $chatMember,
+			'surveyIds'  => [$survey->id],
+			'contactIds' => [$survey->contact_id],
+			'template'   => ChatMemberMessage::SURVEY_TEMPLATE
+		]);
+
+		return $this->chatMemberMessageService->createSystemMessage($dto);
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	private function pinMessageToCompany(Company $company, ChatMemberMessage $message): void
+	{
+		$this->companyPinnedMessageService->create(
+			new CompanyPinnedMessageDto([
+				'company' => $company,
+				'message' => $message,
+				'user'    => $message->fromChatMember->user
+			])
+		);
 	}
 
 	/**

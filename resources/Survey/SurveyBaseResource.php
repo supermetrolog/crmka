@@ -24,6 +24,7 @@ class SurveyBaseResource extends JsonResource
 			'contact_id'        => $this->resource->contact_id,
 			'status'            => $this->resource->status,
 			'type'              => $this->resource->type,
+			'comment'           => $this->resource->comment,
 			'created_at'        => $this->resource->created_at,
 			'related_survey_id' => $this->resource->related_survey_id,
 			'updated_at'        => $this->resource->updated_at,

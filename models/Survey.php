@@ -27,6 +27,7 @@ use yii\db\ActiveQuery;
  * @property ?int                        $related_survey_id
  * @property string                      $status
  * @property string                      $type
+ * @property ?string                     $comment
  * @property string                      $created_at
  * @property string                      $updated_at
  * @property string                      $deleted_at
@@ -85,6 +86,7 @@ class Survey extends AR
 			[['user_id', 'chat_member_id'], 'required'],
 			[['user_id', 'contact_id', 'chat_member_id', 'related_survey_id'], 'integer'],
 			[['status', 'type'], 'string', 'max' => 16],
+			[['comment'], 'string', 'max' => 1024],
 			['status', 'in', 'range' => self::getStatuses()],
 			['type', 'in', 'range' => self::getTypes()],
 			[['created_at', 'updated_at', 'completed_at', 'deleted_at'], 'safe'],

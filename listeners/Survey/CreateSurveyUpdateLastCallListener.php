@@ -3,7 +3,7 @@
 namespace app\listeners\Survey;
 
 use app\dto\Call\CreateCallDto;
-use app\events\Survey\CreateSurveyEvent;
+use app\events\Survey\CompleteSurveyEvent;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ChatMember;
@@ -24,7 +24,7 @@ class CreateSurveyUpdateLastCallListener implements EventListenerInterface
 	}
 
 	/**
-	 * @param CreateSurveyEvent $event
+	 * @param CompleteSurveyEvent $event
 	 *
 	 * @throws Throwable
 	 * @throws SaveModelException
