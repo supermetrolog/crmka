@@ -64,7 +64,7 @@ class TaskRelationEntity extends AR
 			Objects::getMorphClass()
 		];
 
-		// TODO: OfferMix, Object, Equipment, Call, Survey etc
+		// TODO: Equipment, Call
 	}
 
 	public static function getEntityMorphMap(): array

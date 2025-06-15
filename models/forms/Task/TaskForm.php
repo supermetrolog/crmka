@@ -22,15 +22,17 @@ class TaskForm extends Form
 	public const SCENARIO_CREATE           = 'scenario_create';
 	public const SCENARIO_UPDATE           = 'scenario_update';
 
-	public $user_ids      = [];
+	public $user_ids = [];
 	public $user_id;
 	public $created_by_type;
 	public $created_by_id;
 	public $message;
 	public $title;
-	public $status;
+	public $status   = Task::STATUS_CREATED;
 	public $start;
 	public $end;
+	public $type     = Task::TYPE_DEFAULT;
+
 	public $tag_ids       = [];
 	public $observer_ids  = [];
 	public $survey_id;
@@ -43,6 +45,7 @@ class TaskForm extends Form
 			[['user_id', 'status', 'created_by_id', 'survey_id'], 'integer'],
 			[['message'], 'string'],
 			[['title'], 'string', 'max' => 255, 'min' => 16],
+			['type', 'string'],
 			[['start', 'end'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],
 			['status', 'in', 'range' => Task::getStatuses()],
@@ -78,7 +81,8 @@ class TaskForm extends Form
 			'tag_ids'       => 'Тэги',
 			'observer_ids'  => 'Наблюдители',
 			'survey_id'     => 'ID опроса',
-			'current_files' => 'Текущие файлы'
+			'current_files' => 'Текущие файлы',
+			'type'          => 'Тип задачи',
 		];
 	}
 
@@ -95,8 +99,8 @@ class TaskForm extends Form
 		];
 
 		return [
-			self::SCENARIO_CREATE           => [...$common, 'created_by_id', 'created_by_type', 'user_id', 'survey_id'],
-			self::SCENARIO_CREATE_FOR_USERS => [...$common, 'created_by_id', 'created_by_type', 'user_ids', 'survey_id'],
+			self::SCENARIO_CREATE           => [...$common, 'created_by_id', 'created_by_type', 'user_id', 'survey_id', 'type'],
+			self::SCENARIO_CREATE_FOR_USERS => [...$common, 'created_by_id', 'created_by_type', 'user_ids', 'survey_id', 'type'],
 			self::SCENARIO_UPDATE           => [...$common, 'user_id', 'current_files'],
 		];
 	}
@@ -119,7 +123,8 @@ class TaskForm extends Form
 				'created_by_id'   => $this->created_by_id,
 				'tagIds'          => $this->tag_ids,
 				'observerIds'     => $this->observer_ids,
-				'surveyId'        => $this->survey_id
+				'surveyId'        => $this->survey_id,
+				'type'            => $this->type
 			]);
 		}
 
@@ -135,7 +140,8 @@ class TaskForm extends Form
 				'created_by_id'   => $this->created_by_id,
 				'tagIds'          => $this->tag_ids,
 				'observerIds'     => $this->observer_ids,
-				'surveyId'        => $this->survey_id
+				'surveyId'        => $this->survey_id,
+				'type'            => $this->type
 			]);
 		}
 
