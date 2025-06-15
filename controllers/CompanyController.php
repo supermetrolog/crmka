@@ -8,17 +8,20 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\CompanySearch;
+use app\models\forms\ChatMember\ChatMemberMessageForm;
 use app\models\forms\Company\CompanyContactsForm;
 use app\models\forms\Company\CompanyDisableForm;
 use app\models\forms\Company\CompanyForm;
 use app\models\forms\Company\CompanyLogoForm;
 use app\models\forms\Company\CompanyMediaForm;
 use app\models\forms\Company\CompanyMiniModelsForm;
+use app\models\forms\Company\CompanyPinMessageForm;
 use app\repositories\CompanyRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
 use app\resources\Company\CompanyViewResource;
 use app\resources\Company\CreatedCompanyResource;
+use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
 use app\resources\Media\MediaShortResource;
 use app\resources\ProductRange\ProductRangeResource;
 use app\usecases\Company\CompanyService;
@@ -39,7 +42,6 @@ class CompanyController extends AppController
 	private CompanyRepository $companyRepository;
 
 	private CompanyService $companyService;
-
 
 	public function __construct(
 		$id,
@@ -275,5 +277,51 @@ class CompanyController extends AppController
 		$this->companyService->markAsActive($company, $this->user->identity);
 
 		return $this->success('Компания успешно восстановлена из архива');
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 */
+	public function actionPinMessage(int $id): EntityPinnedMessageResource
+	{
+		$company = $this->companyRepository->findModelById($id);
+
+		$form = new CompanyPinMessageForm();
+
+		$form->load($this->request->post());
+
+		$form->user = $this->user->identity;
+
+		$form->validateOrThrow();
+
+		$message = $this->companyService->pinMessage($company, $form->getDto());
+
+		return new EntityPinnedMessageResource($message);
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 */
+	public function actionCreatePinnedMessage(int $id): EntityPinnedMessageResource
+	{
+		$company = $this->companyRepository->findModelById($id);
+
+		$form = new ChatMemberMessageForm();
+		$form->setScenario(ChatMemberMessageForm::SCENARIO_CREATE);
+
+		$form->load($this->request->post());
+
+		$form->from_chat_member_id = $this->user->identity->chatMember->id;
+		$form->to_chat_member_id   = $company->chatMember->id;
+
+		$form->validateOrThrow();
+
+		$message = $this->companyService->createPinnedMessage($company, $form->getDto());
+
+		return new EntityPinnedMessageResource($message);
 	}
 }

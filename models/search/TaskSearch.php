@@ -22,6 +22,9 @@ class TaskSearch extends Form
 	public $user_id;
 	public $message;
 	public $status;
+	public $type;
+	public $start_after;
+	public $start_before;
 	public $created_by_id;
 	public $observer_id;
 	public $deleted;
@@ -43,13 +46,13 @@ class TaskSearch extends Form
 			[['id', 'user_id', 'created_by_id', 'observer_id', 'relation_entity_id'], 'integer'],
 			[['deleted', 'expired', 'completed', 'multiple', 'observed'], 'boolean'],
 			[['status', 'folder_ids', 'ids'], 'each', 'rule' => ['integer']],
-			[['message', 'start', 'end', 'created_by_type'], 'safe'],
+			[['message', 'start', 'end', 'created_by_type', 'start_after', 'start_before'], 'safe'],
 			['tag_ids', 'each', 'rule' => [
 				'exist',
 				'targetClass'     => TaskTag::class,
 				'targetAttribute' => ['tag_ids' => 'id'],
 			]],
-			['relation_entity_type', 'string'],
+			[['relation_entity_type', 'type'], 'string'],
 			['relation_entity_type', 'in', 'range' => TaskRelationEntity::getAvailableEntityTypes()],
 		];
 	}
@@ -174,8 +177,10 @@ class TaskSearch extends Form
 
 		$query->andFilterWhere([
 			Task::getColumn('id')     => $this->id,
-			Task::getColumn('status') => $this->status
-		]);
+			Task::getColumn('status') => $this->status,
+			Task::field('type')       => $this->type
+		])->andFilterWhere(['>=', Task::field('start'), $this->start_after])
+		      ->andFilterWhere(['<=', Task::field('start'), $this->start_before]);
 
 		if ($this->hasFilter($this->ids)) {
 			$query->andFilterWhere(['in', Task::field('id'), $this->ids]);

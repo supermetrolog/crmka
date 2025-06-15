@@ -349,22 +349,23 @@ class ChatMemberMessageService
 	}
 
 	/**
-	 * @param CreateTaskDto[] $createTaskDtos
+	 * @param CreateTaskDto[]                    $createTaskDtos
+	 * @param array<LinkTaskRelationEntityDto>[] $relationEntityDtos
 	 *
 	 * @return Task[]
 	 * @throws SaveModelException
 	 * @throws Exception
 	 * @throws Throwable
 	 */
-	public function createTasks(ChatMemberMessage $message, array $createTaskDtos): array
+	public function createTasks(ChatMemberMessage $message, array $createTaskDtos, array $relationEntityDtos = []): array
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
 			$tasks = [];
 
-			foreach ($createTaskDtos as $dto) {
-				$task = $this->createTaskService->create($dto);
+			foreach ($createTaskDtos as $key => $dto) {
+				$task = $this->createTaskService->create($dto, [], $relationEntityDtos[$key]);
 
 				$this->linkRelation($message, Task::getMorphClass(), $task->id);
 

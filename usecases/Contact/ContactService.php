@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\usecases\Contact;
 
 use app\dto\Contact\CreateContactDto;
+use app\dto\Contact\DisableContactDto;
 use app\dto\Contact\UpdateContactDto;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -181,5 +182,59 @@ class ContactService
 	public function delete(Contact $model): void
 	{
 		$model->delete();
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function markAsPassive(Contact $contact, DisableContactDto $dto): void
+	{
+		if ($contact->isPassive()) {
+			return;
+		}
+
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$contact->status = Contact::STATUS_PASSIVE;
+
+			$contact->passive_why         = $dto->passive_why;
+			$contact->passive_why_comment = $dto->passive_why_comment;
+
+			$contact->saveOrThrow();
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function markAsActive(Contact $contact): void
+	{
+		if ($contact->isActive()) {
+			return;
+		}
+
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$contact->status = Contact::STATUS_ACTIVE;
+
+			$contact->passive_why         = null;
+			$contact->passive_why_comment = null;
+
+			$contact->saveOrThrow();
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
 	}
 }

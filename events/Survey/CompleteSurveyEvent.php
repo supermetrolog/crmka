@@ -6,7 +6,7 @@ use app\events\AbstractEvent;
 use app\models\ChatMember;
 use app\models\Survey;
 
-class CreateSurveyEvent extends AbstractEvent
+class CompleteSurveyEvent extends AbstractEvent
 {
 	public Survey $survey;
 

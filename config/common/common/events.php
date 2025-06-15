@@ -4,7 +4,7 @@ use app\events\Company\ChangeConsultantCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
 use app\events\Request\RequestActivatedEvent;
 use app\events\Request\RequestDeactivatedEvent;
-use app\events\Survey\CreateSurveyEvent;
+use app\events\Survey\CompleteSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\events\Task\AssignTaskEvent;
 use app\events\Task\ChangeStatusTaskEvent;
@@ -18,6 +18,7 @@ use app\events\Task\RestoreTaskEvent;
 use app\events\Task\UpdateTaskEvent;
 use app\events\Timeline\UpdateTimelineStepEvent;
 use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
+use app\listeners\Company\DeactivateCompanyContactsListener;
 use app\listeners\Company\DeactivateCompanyRequestsListener;
 use app\listeners\Company\DisableCompanySystemChatMemberMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
@@ -38,7 +39,7 @@ use app\listeners\Timeline\SyncTimelineOnRequestDeactivationListener;
 use app\listeners\Timeline\UpdateRequestRelationTimestampListener;
 
 return [
-	CreateSurveyEvent::class            => [
+	CompleteSurveyEvent::class          => [
 		CreateSurveySystemChatMessageListener::class
 	],
 	UpdateSurveyEvent::class            => [
@@ -98,6 +99,7 @@ return [
 	],
 	DisableCompanyEvent::class          => [
 		DeactivateCompanyRequestsListener::class,
+		DeactivateCompanyContactsListener::class,
 		DisableCompanySystemChatMemberMessageListener::class
 	]
 ];

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\repositories;
 
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\ActiveQuery\CallQuery;
 use app\models\Contact;
 
@@ -20,5 +21,13 @@ class ContactRepository
 		              ])
 		              ->byCompanyId($companyId)
 		              ->all();
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function findOneOrThrow(int $id): Contact
+	{
+		return Contact::find()->byId($id)->oneOrThrow();
 	}
 }

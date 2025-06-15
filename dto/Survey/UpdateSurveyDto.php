@@ -11,6 +11,7 @@ use yii\base\BaseObject;
 class UpdateSurveyDto extends BaseObject
 {
 	public ?Contact $contact;
+	public ?string  $comment;
 
 	/** @var Call[] */
 	public array $calls = [];

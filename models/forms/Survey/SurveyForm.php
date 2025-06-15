@@ -23,6 +23,7 @@ class SurveyForm extends Form
 	public $contact_id;
 	public $chat_member_id;
 	public $type;
+	public $comment;
 	public $related_survey_id;
 	public $call_ids = [];
 
@@ -32,6 +33,7 @@ class SurveyForm extends Form
 			[['user_id', 'chat_member_id', 'type'], 'required'],
 			[['user_id', 'contact_id', 'chat_member_id', 'related_survey_id'], 'integer'],
 			[['type'], 'string', 'max' => 16],
+			[['comment'], 'string', 'max' => 1024],
 			[['type'], 'in', 'range' => Survey::getTypes()],
 			[['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			[['contact_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
@@ -50,14 +52,15 @@ class SurveyForm extends Form
 			'related_survey_id' => 'ID связанного опроса',
 			'call_ids'          => 'ID звонков',
 			'type'              => 'Тип опроса',
+			'comment'           => 'Комментарий',
 		];
 	}
 
 	public function scenarios(): array
 	{
 		return [
-			self::SCENARIO_CREATE => ['call_ids', 'type', 'related_survey_id', 'chat_member_id', 'user_id', 'contact_id'],
-			self::SCENARIO_UPDATE => ['contact_id', 'call_ids'],
+			self::SCENARIO_CREATE => ['call_ids', 'type', 'related_survey_id', 'chat_member_id', 'user_id', 'contact_id', 'comment'],
+			self::SCENARIO_UPDATE => ['contact_id', 'call_ids', 'comment'],
 		];
 	}
 
@@ -80,13 +83,15 @@ class SurveyForm extends Form
 					'chatMember'        => ChatMember::find()->byId((int)$this->chat_member_id)->one(),
 					'related_survey_id' => $this->related_survey_id,
 					'calls'             => Call::find()->byIds($this->call_ids)->all(),
-					'type'              => $this->type
+					'type'              => $this->type,
+					'comment'           => $this->comment
 				]);
 
 			default:
 				return new UpdateSurveyDto([
 					'contact' => $this->getContact(),
-					'calls'   => Call::find()->byIds($this->call_ids)->all()
+					'calls'   => Call::find()->byIds($this->call_ids)->all(),
+					'comment' => $this->comment
 				]);
 		}
 	}

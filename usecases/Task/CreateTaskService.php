@@ -65,6 +65,7 @@ class CreateTaskService
 				'end'             => $dto->end ? $dto->end->format('Y-m-d H:i:s') : null,
 				'created_by_type' => $dto->created_by_type,
 				'created_by_id'   => $dto->created_by_id,
+				'type'            => $dto->type
 			]);
 
 			$task->saveOrThrow();
@@ -109,6 +110,7 @@ class CreateTaskService
 					'message'         => $dto->message,
 					'status'          => $dto->status,
 					'start'           => $dto->start,
+					'type'            => $dto->type,
 					'end'             => $dto->end,
 					'created_by_type' => $dto->created_by_type,
 					'created_by_id'   => $dto->created_by_id,

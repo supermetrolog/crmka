@@ -2,26 +2,26 @@
 
 namespace app\listeners\Company;
 
-use app\dto\Request\PassiveRequestDto;
+use app\dto\Contact\DisableContactDto;
 use app\events\Company\DisableCompanyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\Company;
-use app\models\Request;
-use app\usecases\Request\RequestService;
+use app\models\Contact;
+use app\usecases\Contact\ContactService;
 use Throwable;
 use yii\base\Event;
 
 
-class DeactivateCompanyRequestsListener implements EventListenerInterface
+class DeactivateCompanyContactsListener implements EventListenerInterface
 {
-	private RequestService               $requestService;
+	private ContactService               $contactService;
 	private TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(RequestService $requestService, TransactionBeginnerInterface $transactionBeginner)
+	public function __construct(ContactService $contactService, TransactionBeginnerInterface $transactionBeginner)
 	{
-		$this->requestService      = $requestService;
+		$this->contactService      = $contactService;
 		$this->transactionBeginner = $transactionBeginner;
 	}
 
@@ -33,8 +33,8 @@ class DeactivateCompanyRequestsListener implements EventListenerInterface
 	 */
 	public function handle(Event $event): void
 	{
-		if ($event->getDto()->disable_requests) {
-			$this->disableRequests($event->getCompany());
+		if ($event->getDto()->disable_contacts) {
+			$this->disableContacts($event->getCompany());
 		}
 	}
 
@@ -42,15 +42,15 @@ class DeactivateCompanyRequestsListener implements EventListenerInterface
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function disableRequests(Company $company): void
+	private function disableContacts(Company $company): void
 	{
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$activeRequests = $company->activeRequests;
+			$contacts = $company->activeContacts;
 
-			foreach ($activeRequests as $request) {
-				$this->disableRequest($request);
+			foreach ($contacts as $contact) {
+				$this->disableContact($contact);
 			}
 
 			$tx->commit();
@@ -64,11 +64,13 @@ class DeactivateCompanyRequestsListener implements EventListenerInterface
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function disableRequest(Request $request): void
+	private function disableContact(Contact $contact): void
 	{
-		$this->requestService->markAsPassive($request, new PassiveRequestDto([
-			'passive_why'         => Request::PASSIVE_WHY_OTHER,
-			'passive_why_comment' => null
-		]));
+		$this->contactService->markAsPassive(
+			$contact,
+			new DisableContactDto([
+				'passive_why' => Contact::PASSIVE_WHY_COMPANY_DISABLED
+			])
+		);
 	}
 }

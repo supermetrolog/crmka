@@ -8,14 +8,17 @@ use app\helpers\StringHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
+use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
+use app\models\ActiveQuery\EntityPinnedMessageQuery;
 use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\RequestQuery;
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\miniModels\CompanyFile;
@@ -91,6 +94,9 @@ use yii\db\Expression;
  * @property-read CompanyActivityProfile[] $companyActivityProfiles
  * @property-read FolderEntity[]           $folderEntities
  * @property-read Task[]                   $tasks
+ * @property-read ?Survey                  $lastSurvey
+ * @property-read Contact[]                $activeContacts
+ * @property-read EntityPinnedMessage[]    $pinnedMessages
  */
 class Company extends AR
 {
@@ -114,6 +120,7 @@ class Company extends AR
 	public const PASSIVE_WHY_SUSPENDED = 0;
 	public const PASSIVE_WHY_BLOCKED   = 1;
 	public const PASSIVE_WHY_OTHER     = 2;
+	public const PASSIVE_WHY_DESTROYED = 3;
 
 	public static function getPassiveWhyOptions(): array
 	{
@@ -121,6 +128,7 @@ class Company extends AR
 			self::PASSIVE_WHY_SUSPENDED,
 			self::PASSIVE_WHY_BLOCKED,
 			self::PASSIVE_WHY_OTHER,
+			self::PASSIVE_WHY_DESTROYED,
 		];
 	}
 
@@ -128,6 +136,7 @@ class Company extends AR
 		self::PASSIVE_WHY_SUSPENDED => 'Временно приостановлено',
 		self::PASSIVE_WHY_BLOCKED   => 'Заблокировано модератором',
 		self::PASSIVE_WHY_OTHER     => 'Иное',
+		self::PASSIVE_WHY_DESTROYED => 'Компания ликвидирована',
 	];
 
 	public static function resolvePassiveWhyOption(?int $code): string
@@ -519,6 +528,12 @@ class Company extends AR
 		            ->via('lastCallRelationFirst');
 	}
 
+	public function getLastChatMemberMessage(): ChatMemberMessageQuery
+	{
+		/** @var ChatMemberMessageQuery */
+		return $this->hasOne(ChatMemberMessage::class, ['to_chat_member_id' => 'id'])->via('cm')->orderBy(['id' => SORT_DESC]);
+	}
+
 	public function getCompanyActivityGroups(): AQ
 	{
 		/** @var AQ */
@@ -599,6 +614,24 @@ class Company extends AR
 		return $this->hasMany(Task::class, ['id' => 'task_id'])
 		            ->via('taskRelationEntities')
 		            ->andOnCondition([Task::field('deleted_at') => null]);
+	}
+
+	public function getLastSurvey(): SurveyQuery
+	{
+		/** @var SurveyQuery */
+		return $this->hasOne(Survey::class, ['chat_member_id' => 'id'])
+		            ->via('chatMember')
+		            ->andWhere(['!=', 'status', Survey::STATUS_DRAFT])
+		            ->orderBy(['created_at' => SORT_DESC]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getPinnedMessages(): EntityPinnedMessageQuery
+	{
+		/** @var EntityPinnedMessageQuery */
+		return $this->morphHasMany(EntityPinnedMessage::class, 'id', 'entity')->orderBy(['id' => SORT_DESC]);
 	}
 
 	public function getChatMemberPinnedMessage(): ?ChatMemberMessage
