@@ -16,6 +16,7 @@ class CreateSurveyDto extends BaseObject
 	public User       $user;
 	public ?Contact   $contact;
 	public ChatMember $chatMember;
+	public ?string    $comment;
 	public ?int       $related_survey_id = null;
 
 	public string $status = Survey::STATUS_DRAFT;

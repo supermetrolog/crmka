@@ -3,7 +3,7 @@
 namespace app\listeners\Survey;
 
 use app\components\EffectStrategy\Factory\EffectStrategyFactory;
-use app\events\Survey\CreateSurveyEvent;
+use app\events\Survey\CompleteSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
@@ -41,7 +41,7 @@ class UpdateSurveySystemChatMessageListener implements EventListenerInterface
 	}
 
 	/**
-	 * @param CreateSurveyEvent $event
+	 * @param CompleteSurveyEvent $event
 	 *
 	 * @throws Throwable
 	 * @throws SaveModelException

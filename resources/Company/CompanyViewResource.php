@@ -17,6 +17,7 @@ use app\resources\Company\File\CompanyFileResource;
 use app\resources\Company\Group\CompanyGroupResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Contact\ContactResource;
+use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
 use app\resources\Media\MediaShortResource;
 
 class CompanyViewResource extends JsonResource
@@ -33,23 +34,25 @@ class CompanyViewResource extends JsonResource
 		return ArrayHelper::merge(
 			CompanyBaseResource::make($this->resource)->toArray(),
 			[
-				'contacts'              => ContactResource::collection($this->resource->contacts),
-				'generalContact'        => CompanyGeneralContactResource::tryMakeArray($this->resource->generalContact),
-				'categories'            => CompanyCategoryResource::collection($this->resource->categories),
-				'productRanges'         => CompanyProductRangeResource::collection($this->resource->productRanges),
-				'companyGroup'          => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
-				'files'                 => CompanyFileResource::collection($this->resource->files),
-				'logo'                  => MediaShortResource::tryMakeArray($this->resource->logo),
-				'consultant'            => UserShortResource::tryMakeArray($this->resource->consultant),
-				'last_call'             => CallResource::tryMakeArray($this->resource->lastCall),
-				'activity_groups'       => CompanyActivityGroupResource::collection($this->resource->companyActivityGroups),
-				'activity_profiles'     => CompanyActivityProfileResource::collection($this->resource->companyActivityProfiles),
+				'contacts'          => ContactResource::collection($this->resource->contacts),
+				'generalContact'    => CompanyGeneralContactResource::tryMakeArray($this->resource->generalContact),
+				'categories'        => CompanyCategoryResource::collection($this->resource->categories),
+				'productRanges'     => CompanyProductRangeResource::collection($this->resource->productRanges),
+				'companyGroup'      => CompanyGroupResource::tryMakeArray($this->resource->companyGroup),
+				'files'             => CompanyFileResource::collection($this->resource->files),
+				'logo'              => MediaShortResource::tryMakeArray($this->resource->logo),
+				'consultant'        => UserShortResource::tryMakeArray($this->resource->consultant),
+				'last_call'         => CallResource::tryMakeArray($this->resource->lastCall),
+				'activity_groups'   => CompanyActivityGroupResource::collection($this->resource->companyActivityGroups),
+				'activity_profiles' => CompanyActivityProfileResource::collection($this->resource->companyActivityProfiles),
+				'pinned_messages'   => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
+
 				'dealsRequestEmpty'     => $this->resource->dealsRequestEmpty,
 				'objects_count'         => $this->resource->objects_count,
 				'requests_count'        => $this->resource->requests_count,
 				'active_requests_count' => $this->resource->active_requests_count,
 				'contacts_count'        => $this->resource->contacts_count,
-				'active_contacts_count' => $this->resource->active_contacts_count
+				'active_contacts_count' => $this->resource->active_contacts_count,
 			]
 		);
 	}

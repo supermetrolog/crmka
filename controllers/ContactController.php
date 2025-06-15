@@ -4,12 +4,14 @@ namespace app\controllers;
 
 use app\exceptions\ValidationErrorHttpException;
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\Contact;
 use app\models\ContactSearch;
 use app\models\forms\Contact\ContactCommentForm;
+use app\models\forms\Contact\ContactDisableForm;
 use app\models\forms\Contact\ContactForm;
 use app\repositories\ContactRepository;
 use app\resources\Contact\Comment\ContactCommentResource;
@@ -159,6 +161,41 @@ class ContactController extends AppController
 		$comment = $this->contactCommentService->create($form->getDto());
 
 		return new ContactCommentResource($comment);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function actionDisable(int $id): SuccessResponse
+	{
+		$contact = $this->repository->findOneOrThrow($id);
+
+		$form = new ContactDisableForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->contactService->markAsPassive($contact, $form->getDto());
+
+		return $this->success('Контакт переведен в пассив');
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 */
+	public function actionEnable(int $id): SuccessResponse
+	{
+		$contact = $this->repository->findOneOrThrow($id);
+
+		$this->contactService->markAsActive($contact);
+
+		return $this->success('Контакт успешно восстановлен из архива');
 	}
 
 	/**
