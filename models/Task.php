@@ -25,6 +25,7 @@ use yii\db\ActiveQuery;
  * @property int                 $status
  * @property string|null         $start
  * @property string|null         $end
+ * @property string              $type
  * @property string              $created_by_type
  * @property int                 $created_by_id
  * @property string              $created_at
@@ -58,6 +59,22 @@ class Task extends AR
 	public const STATUS_DONE         = 3;
 	public const STATUS_IMPOSSIBLE   = 4;
 
+	public const TYPE_DEFAULT          = self::TYPE_BASE;
+	public const TYPE_BASE             = 'base';
+	public const TYPE_SCHEDULED_CALL   = 'scheduled_call';
+	public const TYPE_REQUEST_HANDLING = 'request_handling';
+	public const TYPE_CONTACT_HANDLING = 'contact_handling';
+
+	public static function getTypes(): array
+	{
+		return [
+			self::TYPE_BASE,
+			self::TYPE_SCHEDULED_CALL,
+			self::TYPE_REQUEST_HANDLING,
+			self::TYPE_CONTACT_HANDLING,
+		];
+	}
+
 
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
@@ -74,6 +91,7 @@ class Task extends AR
 			[['user_id', 'title', 'status', 'created_by_type', 'created_by_id'], 'required'],
 			[['user_id', 'status', 'created_by_id'], 'integer'],
 			[['message'], 'string'],
+			['type', 'in', 'range' => self::getTypes()],
 			[['title'], 'string', 'max' => self::TITLE_MAX_LENGTH, 'min' => 16],
 			[['start', 'end', 'created_at', 'updated_at', 'impossible_to'], 'safe'],
 			[['created_by_type'], 'string', 'max' => 255],

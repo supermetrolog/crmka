@@ -29,6 +29,7 @@ class TaskResource extends JsonResource
 			'status'          => $this->resource->status,
 			'start'           => $this->resource->start,
 			'end'             => $this->resource->end,
+			'type'            => $this->resource->type,
 			'created_by_type' => $this->resource->created_by_type,
 			'created_by_id'   => $this->resource->created_by_id,
 			'created_at'      => $this->resource->created_at,

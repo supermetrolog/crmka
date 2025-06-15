@@ -2,6 +2,8 @@
 
 namespace app\controllers\ChatMember;
 
+use app\dto\Task\LinkTaskRelationEntityDto;
+use app\helpers\ArrayHelper;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
@@ -210,14 +212,17 @@ class ChatMemberMessageController extends AppController
 	{
 		$message = $this->findModel($id, false);
 
-		$taskDtos = [];
+		$taskDtos           = [];
+		$relationEntityDtos = [];
 
 		foreach ($this->request->post('tasks', []) as $taskData) {
 			$taskForm   = $this->makeTaskForm($taskData);
 			$taskDtos[] = $taskForm->getDto();
+
+			$relationEntityDtos[] = $this->makeRelationEntityDtos(ArrayHelper::getValue($taskData, 'relations', []));
 		}
 
-		$tasks = $this->service->createTasks($message, $taskDtos);
+		$tasks = $this->service->createTasks($message, $taskDtos, $relationEntityDtos);
 
 		return TaskResource::collection($tasks);
 	}
@@ -390,6 +395,7 @@ class ChatMemberMessageController extends AppController
 	}
 
 	/**
+	 * @return LinkTaskRelationEntityDto[]
 	 * @throws ValidateException
 	 * @throws \Exception
 	 */

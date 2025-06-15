@@ -12,6 +12,7 @@ class CreateTaskForUsersDto extends BaseObject
 {
 	public ?string            $message;
 	public string             $title;
+	public string             $type;
 	public int                $status;
 	public ?DateTimeInterface $start    = null;
 	public ?DateTimeInterface $end      = null;
