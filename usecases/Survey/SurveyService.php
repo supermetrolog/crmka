@@ -140,7 +140,9 @@ class SurveyService
 			throw new SurveyAlreadyCompletedException('Completed Survey cannot be canceled');
 		}
 
-		$survey->status = Survey::STATUS_CANCELED;
+		$survey->status       = Survey::STATUS_CANCELED;
+		$survey->completed_at = DateTimeHelper::nowf();
+		
 		$survey->saveOrThrow();
 
 		return $survey;

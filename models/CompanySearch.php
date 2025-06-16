@@ -12,6 +12,7 @@ use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\CommercialOfferQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\RequestQuery;
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\Phone;
@@ -269,74 +270,81 @@ class CompanySearch extends Form
 	{
 		return [
 			'created_at',
-			'updated_at',
+			'updated_at'              => [
+				'asc'  => [
+					'COALESCE(company.updated_at, company.created_at)' => SORT_ASC
+				],
+				'desc' => [
+					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
+				]
+			],
 			'nameRu',
 			'rating',
 			'status',
 			'last_survey_created_at'  => [
 				'asc'  => [
-					new Expression('survey.created_at IS NOT NULL DESC'),
-					'survey.created_at'  => SORT_ASC,
-					'company.updated_at' => SORT_ASC
+					new Expression('ls.last_survey_completed_at IS NOT NULL DESC'),
+					"COALESCE(ls.last_survey_completed_at, ls.last_survey_created_at)" => SORT_ASC,
+					'COALESCE(company.updated_at, company.created_at)'                 => SORT_ASC
 				],
 				'desc' => [
-					'survey.created_at'  => SORT_DESC,
-					'company.updated_at' => SORT_DESC
+					"COALESCE(ls.last_survey_completed_at, ls.last_survey_created_at)" => SORT_DESC,
+					'COALESCE(company.updated_at, company.created_at)'                 => SORT_DESC
 				]
 			],
 			'last_message_created_at' => [
 				'asc'  => [
-					new Expression('lcmm.created_at IS NOT NULL DESC'),
-					'lcmm.created_at'    => SORT_ASC,
-					'company.updated_at' => SORT_ASC
+					new Expression('lcmm.last_message_created_at IS NOT NULL DESC'),
+					'lcmm.last_message_created_at'                     => SORT_ASC,
+					'COALESCE(company.updated_at, company.created_at)' => SORT_ASC
 				],
 				'desc' => [
-					'lcmm.created_at'    => SORT_DESC,
-					'company.updated_at' => SORT_DESC
+					'lcmm.last_message_created_at'                     => SORT_DESC,
+					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
 				]
 			],
 			'last_task_created_at'    => [
 				'asc'  => [
 					new Expression('lt.last_task_created_at IS NOT NULL DESC'),
-					'lt.last_task_created_at' => SORT_ASC,
-					'company.updated_at'      => SORT_ASC
+					'lt.last_task_created_at'                          => SORT_ASC,
+					'COALESCE(company.updated_at, company.created_at)' => SORT_ASC
 				],
 				'desc' => [
-					'lt.last_task_created_at' => SORT_DESC,
-					'company.updated_at'      => SORT_DESC
+					'lt.last_task_created_at'                          => SORT_DESC,
+					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
 				]
 			],
 			'last_request_created_at' => [
 				'asc'  => [
 					new Expression('lr.last_request_created_at IS NOT NULL DESC'),
-					'lr.last_request_created_at' => SORT_ASC,
-					'company.updated_at'         => SORT_ASC
+					'lr.last_request_created_at'                       => SORT_ASC,
+					'COALESCE(company.updated_at, company.created_at)' => SORT_ASC
 				],
 				'desc' => [
-					'lr.last_request_created_at' => SORT_DESC,
-					'company.updated_at'         => SORT_DESC
+					'lr.last_request_created_at'                       => SORT_DESC,
+					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
 				]
 			],
 			'last_object_created_at'  => [
 				'asc'  => [
 					new Expression('lob.last_object_created_at IS NOT NULL DESC'),
-					'lob.last_object_created_at' => SORT_ASC,
-					'company.updated_at'         => SORT_ASC
+					'lob.last_object_created_at'                       => SORT_ASC,
+					'COALESCE(company.updated_at, company.created_at)' => SORT_ASC
 				],
 				'desc' => [
-					'lob.last_object_created_at' => SORT_DESC,
-					'company.updated_at'         => SORT_DESC
+					'lob.last_object_created_at'                       => SORT_DESC,
+					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
 				]
 			],
 			'last_offer_updated_at'   => [
 				'asc'  => [
 					new Expression('lof.id IS NOT NULL DESC'),
 					"COALESCE(lof.last_offer_updated_at, lof.last_offer_created_at)" => SORT_ASC,
-					'company.updated_at'                                             => SORT_ASC
+					'COALESCE(company.updated_at, company.created_at)'               => SORT_ASC
 				],
 				'desc' => [
 					"COALESCE(lof.last_offer_updated_at, lof.last_offer_created_at)" => SORT_DESC,
-					'company.updated_at'                                             => SORT_DESC
+					'COALESCE(company.updated_at, company.created_at)'               => SORT_DESC
 				]
 			],
 			'requests'                => [
@@ -408,7 +416,7 @@ class CompanySearch extends Form
 	private function getJoinMap(): array
 	{
 		return [
-			'last_survey_created_at'  => fn(CompanyQuery $query) => $query->joinWith(['lastSurvey'], false),
+			'last_survey_created_at'  => fn(CompanyQuery $query) => $query->leftJoin(['ls' => $this->makeLastSurveyQuery()], 'ls.chat_member_id = cm.id'),
 			'last_message_created_at' => fn(CompanyQuery $query) => $query->leftJoin(['lcmm' => $this->makeLastChatMemberMessageQuery()], 'lcmm.to_chat_member_id = cm.id'),
 			'last_task_created_at'    => fn(CompanyQuery $query) => $query->leftJoin(['lt' => $this->makeLastTaskQuery()], 'lt.company_id = company.id'),
 			'last_request_created_at' => fn(CompanyQuery $query) => $query->leftJoin(['lr' => $this->makeLastRequestQuery()], 'lr.company_id = company.id'),
@@ -436,9 +444,8 @@ class CompanySearch extends Form
 	{
 		return ChatMemberMessage::find()
 		                        ->from(ChatMemberMessage::getTable())
-		                        ->select(['id', 'to_chat_member_id', 'created_at', 'deleted_at'])
+		                        ->select(['id', 'to_chat_member_id', 'last_message_created_at' => 'MAX(created_at)', 'deleted_at'])
 		                        ->groupBy(['to_chat_member_id'])
-		                        ->orderBy(['id' => SORT_DESC])
 		                        ->notDeleted();
 	}
 
@@ -504,5 +511,22 @@ class CompanySearch extends Form
 			                      'last_offer_created_at' => 'MAX(publ_time)',
 		                      ])
 		                      ->groupBy('company_id');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	private function makeLastSurveyQuery(): SurveyQuery
+	{
+		return Survey::find()
+		             ->from(Survey::getTable())
+		             ->select([
+			             'id',
+			             'chat_member_id',
+			             'last_survey_created_at'   => 'MAX(created_at)',
+			             'last_survey_completed_at' => 'MAX(completed_at)',
+		             ])
+		             ->andWhere(['!=', Survey::field('status'), Survey::STATUS_DRAFT])
+		             ->groupBy('chat_member_id');
 	}
 }
