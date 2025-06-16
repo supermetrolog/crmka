@@ -95,9 +95,10 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 	{
 		$this->entityPinnedMessageService->create(
 			new EntityPinnedMessageDto([
-				'company' => $company,
-				'message' => $message,
-				'user'    => $message->fromChatMember->user
+				'entity_id'   => $company->id,
+				'entity_type' => $company::getMorphClass(),
+				'message'     => $message,
+				'user'        => $message->fromChatMember->user
 			])
 		);
 	}
