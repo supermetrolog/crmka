@@ -83,7 +83,7 @@ class EntityPinnedMessage extends AR
 			case Objects::getMorphClass():
 				return $this->object;
 			default:
-				throw new InvalidArgumentException("Unexpected TaskRelationEntity type: " . $this->entity_type);
+				throw new InvalidArgumentException("Unexpected EntityPinnedMessage type: " . $this->entity_type);
 		}
 	}
 

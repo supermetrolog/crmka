@@ -64,6 +64,7 @@ class Task extends AR
 	public const TYPE_SCHEDULED_CALL   = 'scheduled_call';
 	public const TYPE_REQUEST_HANDLING = 'request_handling';
 	public const TYPE_CONTACT_HANDLING = 'contact_handling';
+	public const TYPE_OBJECT_HANDLING  = 'object_handling';
 
 	public static function getTypes(): array
 	{
@@ -72,6 +73,7 @@ class Task extends AR
 			self::TYPE_SCHEDULED_CALL,
 			self::TYPE_REQUEST_HANDLING,
 			self::TYPE_CONTACT_HANDLING,
+			self::TYPE_OBJECT_HANDLING,
 		];
 	}
 

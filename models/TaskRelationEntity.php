@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\BlockQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\OfferMixQuery;
@@ -38,6 +39,7 @@ use yii\db\ActiveQuery;
  * @property-read OfferMix                     $offerMix
  * @property-read Objects                      $object
  * @property-read Survey                       $survey
+ * @property-read Block                        $block
  */
 class TaskRelationEntity extends AR
 {
@@ -61,7 +63,8 @@ class TaskRelationEntity extends AR
 			Contact::getMorphClass(),
 			Survey::getMorphClass(),
 			OfferMix::getMorphClass(),
-			Objects::getMorphClass()
+			Objects::getMorphClass(),
+			Block::getMorphClass()
 		];
 
 		// TODO: Equipment, Call
@@ -76,7 +79,8 @@ class TaskRelationEntity extends AR
 			Contact::getMorphClass()  => Contact::class,
 			Survey::getMorphClass()   => Survey::class,
 			OfferMix::getMorphClass() => OfferMix::class,
-			Objects::getMorphClass()  => Objects::class
+			Objects::getMorphClass()  => Objects::class,
+			Block::getMorphClass()    => Block::class
 		];
 	}
 
@@ -160,6 +164,12 @@ class TaskRelationEntity extends AR
 		return $this->morphBelongTo(Survey::class);
 	}
 
+	public function getBlock(): BlockQuery
+	{
+		/** @var BlockQuery */
+		return $this->morphBelongTo(Block::class);
+	}
+
 	/** @return Task|Contact|Company|Request|OfferMix|Objects|Survey */
 	public function getEntity()
 	{
@@ -178,6 +188,8 @@ class TaskRelationEntity extends AR
 				return $this->object;
 			case Survey::getMorphClass():
 				return $this->survey;
+			case Block::getMorphClass():
+				return $this->block;
 			default:
 				throw new InvalidArgumentException("Unexpected TaskRelationEntity type: " . $this->entity_type);
 		}
