@@ -7,6 +7,7 @@ use app\components\EffectStrategy\EffectStrategyInterface;
 use app\components\EffectStrategy\Strategies\CompaniesOnObjectIdentifiedEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyDoesNotWantToSellEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyRequestsChangesEffectStrategy;
+use app\components\EffectStrategy\Strategies\CompanyRequestsCreatedEffectStrategy;
 use app\components\EffectStrategy\Strategies\CompanyWantsToSellMustBeEditedEffectStrategy;
 use app\components\EffectStrategy\Strategies\HasActualRequestsEffectStrategy;
 use app\components\EffectStrategy\Strategies\HasEquipmentsOffersEffectStrategy;
@@ -34,7 +35,8 @@ class EffectStrategyFactory implements EffectStrategyFactoryInterface
 		EffectKind::HAS_EQUIPMENTS_REQUESTS              => HasEquipmentsRequestsEffectStrategy::class,
 		EffectKind::HAS_NEW_REQUESTS                     => HasNewRequestsEffectStrategy::class,
 		EffectKind::HAS_NEW_OFFERS                       => HasNewOffersEffectStrategy::class,
-		EffectKind::CURRENT_REQUESTS_STEP                => CompanyRequestsChangesEffectStrategy::class
+		EffectKind::CURRENT_REQUESTS_STEP                => CompanyRequestsChangesEffectStrategy::class,
+		EffectKind::CREATED_REQUESTS_STEP                => CompanyRequestsCreatedEffectStrategy::class,
 
 	];
 
