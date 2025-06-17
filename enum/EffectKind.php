@@ -25,4 +25,5 @@ class EffectKind
 	public const HAS_NEW_REQUESTS = 'has-new-requests';
 
 	public const CURRENT_REQUESTS_STEP = 'current-requests-step';
+	public const CREATED_REQUESTS_STEP = 'created-requests-step';
 }
