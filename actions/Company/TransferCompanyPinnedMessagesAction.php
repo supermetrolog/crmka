@@ -70,7 +70,7 @@ class TransferCompanyPinnedMessagesAction extends Action
 				])
 			);
 
-			$this->commentf('Transfer pinned message #%d to company #%d', $message->id, $pinned->company_id);
+			$this->commentf('Transfer pinned message #%d to company #%d', $message->id, $pinned->entity_id);
 		}
 
 		$this->infof('Complete. Transferred %d pinned messages', $query->count());
