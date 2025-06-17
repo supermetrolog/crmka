@@ -12,7 +12,7 @@ class LinkTaskRelationEntityDto extends BaseObject
 	public int     $entityId;
 	public string  $entityType;
 	public string  $relationType;
-	public ?string $comment;
+	public ?string $comment = null;
 
-	public ?User $createdBy;
+	public ?User $createdBy = null;
 }
