@@ -22,5 +22,7 @@ class EffectKind
 	public const HAS_EQUIPMENTS_REQUESTS_DESCRIPTION = 'has-equipments-requests-description';
 
 	public const HAS_NEW_OFFERS   = 'has-new-offers';
-	public const HAS_NEW_REQUESTS = 'has-new-requests'; 
+	public const HAS_NEW_REQUESTS = 'has-new-requests';
+
+	public const CURRENT_REQUESTS_STEP = 'current-requests-step';
 }
