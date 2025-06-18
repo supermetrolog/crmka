@@ -8,7 +8,6 @@ use app\components\EffectStrategy\Service\CreateEffectSystemMessageService;
 use app\dto\Request\PassiveRequestDto;
 use app\dto\Task\LinkTaskRelationEntityDto;
 use app\helpers\ArrayHelper;
-use app\helpers\DateTimeHelper;
 use app\helpers\TypeConverterHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
@@ -126,12 +125,10 @@ class CompanyRequestsChangesEffectStrategy extends AbstractEffectStrategy
 
 			if ($answer === self::ANSWER_REQUEST_MUST_BE_DISABLED && !$request->isPassive()) {
 				$this->disableRequest($request, $payload, $survey);
-
-				return;
-			}
-
-			if ($answer === self::ANSWER_REQUEST_MUST_BE_EDITED) {
-				$this->createEditingTask($request, $payload, $survey);
+			} else {
+				if ($answer === self::ANSWER_REQUEST_MUST_BE_EDITED) {
+					$this->createEditingTask($request, $payload, $survey);
+				}
 			}
 
 			$tx->commit();
@@ -187,8 +184,6 @@ class CompanyRequestsChangesEffectStrategy extends AbstractEffectStrategy
 			$taskDto = $this->taskBuilderFactory->createEffectBuilder()
 			                                    ->setType(Task::TYPE_REQUEST_HANDLING)
 			                                    ->setCreatedBy($survey->user)
-			                                    ->setStart(DateTimeHelper::now())
-			                                    ->setDuration(7)
 			                                    ->setTitle($this->getEditingTaskTitle($request))
 			                                    ->setMessage(ArrayHelper::getValue($payload, 'description'))
 			                                    ->build();
