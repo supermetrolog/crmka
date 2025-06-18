@@ -3,9 +3,13 @@
 namespace app\models\oldDb;
 
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\ObjectChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
+use app\models\ChatMember;
 use app\models\Company;
 use app\models\Deal;
+use app\models\ObjectChatMember;
 use app\models\OfferMix;
 use app\models\oldDb\OfferMix as OfferMixOld;
 use app\resources\Offer\ShortMixedOfferInObjectResource;
@@ -18,238 +22,240 @@ use yii\helpers\HtmlPurifier;
 /**
  * This is the model class for table "c_industry".
  *
- * @property int         $id                     Идентификатор
- * @property string      $title
- * @property int|null    $location_id            Айди местоположения
- * @property int         $last_update
- * @property int|null    $is_land
- * @property string|null $buildings_on_territory_id
- * @property int|null    $buildings_on_territory
- * @property string|null $buildings_on_territory_description
- * @property int|null    $first_line
- * @property int|null    $complex_id             Айди комплекса
- * @property int|null    $contact_id             Собственник
- * @property int|null    $company_id             Компания собственник
- * @property string|null $owners                 Собственники
- * @property int|null    $author_id              Автор поста(кто создал внес)
- * @property int|null    $type
- * @property string|null $object_type            Тип объекта
- * @property string|null $floors_building        Этажи
- * @property string|null $object_type2
- * @property int|null    $status_id              Результат/Статус
- * @property int|null    $status_rent
- * @property int|null    $status_sale
- * @property int|null    $status_safe
- * @property int|null    $status_subrent
- * @property int|null    $onsite_noprice
- * @property string|null $purpose_warehouse      Назначение склада
- * @property string      $purposes
- * @property int         $floor_type             Тип покрытия
- * @property int|null    $firefighting_type      Пожаротушение система
- * @property int         $object_class           Класс объекта
- * @property int         $region                 Регион
- * @property int         $district               Район
- * @property int         $direction              Направление
- * @property int         $village                Населенный пункт
- * @property int         $highway                Шоссе
- * @property int         $highway_secondary      Дублирующее шоссе
- * @property int|null    $from_mkad              От МКАД
- * @property int         $metro                  Метро
- * @property string|null $address                Адрес
- * @property string|null $cadastral_number       Кадастровый номер
- * @property string|null $yandex_address         Адрес формата Яндекс
- * @property int|null    $area_field_full        Площадь участка
- * @property int|null    $area_building          Общая площадь
- * @property int|null    $area_floor_full        Общая площадь пола
- * @property int|null    $area_office_full       Офисные помещения
- * @property int|null    $area_tech_full
- * @property int|null    $land                   Участок (вспомогательное)
- * @property int|null    $land_length            Длина участка
- * @property int|null    $land_width             Ширина участка
- * @property string|null $dsection               Габариты участка
- * @property int|null    $barrier                Шлагбаум
- * @property int|null    $fence_around_perimeter Забор по периметру
- * @property int|null    $finishing              Готовность к въезду
- * @property int|null    $l_category             Категория земли
- * @property int|null    $l_function             Разрешенное использование
- * @property int|null    $l_property             Вид права
- * @property int|null    $floors                 Этажность
- * @property int|null    $deposit                Величина депозита
- * @property int|null    $pledge                 Залог
- * @property int|null    $prepay_subrent
- * @property int         $facing_type            Внешняя отделка
- * @property string|null $elevators              Пассажирские лифты
- * @property string|null $cranes_gantry          Козловые краны
- * @property string|null $cranes_railway         Железнодорожные краны
- * @property int|null    $cranes_runways         Подкрановые пути
- * @property int         $railway                Ж/д ветка
- * @property int|null    $railway_value          Ж/д ветка протяженность
- * @property int         $nooffice               Нет офисов
- * @property int         $phone_line             Есть ли Телефония
- * @property string      $telecommunications     Телекоммуникации
- * @property int|null    $year_build             Год постройки
- * @property int|null    $year_repair            Год реконструкции
- * @property int         $guard                  Охрана
- * @property int|null    $entry_territory        Въезд на территорию (Тип)
- * @property int|null    $entry_territory_type
- * @property string|null $parking_car_type       Парковка легковая какая
- * @property string|null $parking_lorry_type     Парковка грузовичка какая
- * @property string|null $parking_truck_type     Парковка грузовая какая
- * @property string|null $comments               Комментарии
- * @property string|null $description            Описание
- * @property string|null $description_auto       Описание авто
- * @property string|null $infrastructure         Инфраструктура
- * @property int         $gas                    Газ
- * @property int         $ttk_mkad
- * @property string      $parking                Парковка
- * @property int         $parking_car            Парковка легковая
- * @property int         $parking_car_value      Парковка легковая цена
- * @property int         $parking_lorry          Парковка грузовичка
- * @property int         $parking_lorry_value    Парковка грузовичка цена
- * @property int         $parking_truck          Парковка грузовая
- * @property int         $parking_truck_value    Парковка грузовая цена
- * @property int         $steam                  Пар
- * @property int         $deposit_former         Страховой депозит
- * @property int         $is_prepay
- * @property int         $agent_visited          Брокер был на объекте
- * @property int         $agent_visited_sale
- * @property int         $agent_visited_safe
- * @property int         $agent_visited_subrent
- * @property float|null  $power                  Электричество доступно
- * @property float|null  $power_all              Электричество всего
- * @property float|null  $power_available
- * @property int|null    $gas_value              Газ сколько кубов
- * @property int         $steam_value
- * @property int         $water                  Водоснабжение
- * @property int         $water_value            Водоснабжение объем
- * @property int         $sewage                 Канализация
- * @property int|null    $sewage_central         Канализация центральная
- * @property int|null    $sewage_central_value   Канализация центральная объем
- * @property int|null    $sewage_rain            Канализация ливневая
- * @property int         $heating                Отопление
- * @property int|null    $heating_central
- * @property int         $ventilation            Вентиляция/кондиционирование
- * @property string|null $internet_type          Интернет
- * @property int|null    $internet
- * @property string|null $safety_systems         Системы безопасности
- * @property string|null $deal_type_help         Тип сделки (вспомогательное)
- * @property int         $sale_price             Стоимость (продажи полной)
- * @property int         $sale_price_metr        Стоимость (продажи, за кв.м.)
- * @property int         $rent_price             Стоимость (аренды, за кв.м. в год)
- * @property int         $subrent_price
- * @property int         $rent_price_safe        Стоимость (аренды, за 1 паллетоместо)
- * @property int         $office_price           Стоимость (офисов)
- * @property int         $price_mezzanine        Стоимость (мезонин)
- * @property string|null $rent_inc               Стоимость включает - аренда
- * @property string|null $rent_inc_safe          Стоимость включает - ответ-хранение
- * @property string|null $rent_inc_office        Стоимость включает - офисы
- * @property int|null    $tax_form               Система налогов
- * @property string|null $inc_services           Включенные КУ
- * @property string|null $incs_currency          Стоимость включает (аренды, за кв.м. в год)
- * @property int         $result                 Результат
- * @property int         $result_sale
- * @property int         $result_safe
- * @property int         $result_subrent
- * @property int         $result_who             Кем
- * @property float       $longitude              Долгота
- * @property float       $latitude               Широта
- * @property int         $agent_id               Агент
- * @property int         $agent_sale             Агент по продаже
- * @property int         $agent_safe             Агент по ответ хр
- * @property int         $agent_subrent          Агент по субаренде
- * @property int         $onsite                 На сайте
- * @property int         $contract               Договор подписан
- * @property int         $onsite_top             Спецпредложение
- * @property int         $electricity_included   Электричество и вода отдельно
- * @property int         $deleted                Удален
- * @property string|null $slcomments             Служебный комментарий
- * @property int|null    $openstage              Открытые площадки
- * @property string|null $_calc_rent_payinc
- * @property string|null $_calc_safe_payinc
- * @property string|null $_calc_sale_payinc
- * @property string|null $_calc_subrent_payinc
- * @property float|null  $owner_pays_howmuch     Договоренность о комиссии с собственником - АРЕНДА
- * @property float|null  $owner_pays_howmuch_sale
- * @property float|null  $owner_pays_howmuch_safe
- * @property float|null  $owner_pays_howmuch_subrent
- * @property float|null  $owner_pays_howmuch_4client
- * @property float|null  $owner_pays_howmuch_4client_sale
- * @property float|null  $owner_pays_howmuch_4client_safe
- * @property float|null  $owner_pays_howmuch_4client_subrent
- * @property string|null $contract_date          Действие договора до
- * @property int|null    $bargain_rent           Возможен торг - аренда
- * @property int|null    $bargain_sale           Возможен торг - продажа
- * @property int|null    $bargain_office         Возможен торг - офисы
- * @property int|null    $bargain_safe           Возможен торг - ответ-хранение
- * @property int|null    $from_metro             От метро сколько
- * @property int         $from_metro_value       От метро как
- * @property int         $railway_station        Ближайшая железнодорожная станция
- * @property int         $from_station           От станции  на чем
- * @property int         $from_station_value     От станции
- * @property int         $from_busstop
- * @property int         $from_busstop_value
- * @property int         $entrance_type
- * @property int         $plain_type             Вид права
- * @property string      $area_mezzanine_full
- * @property int         $safe_price_rack
- * @property int         $safe_price_rack_oversized
- * @property int         $safe_price_cell
- * @property int         $safe_price_floor_oversized
- * @property string      $photo
- * @property string      $videos
- * @property int         $publ_time
- * @property int         $activity
- * @property int         $order_row
- * @property int|null    $video_control
- * @property int|null    $access_control
- * @property int|null    $security_alert
- * @property int|null    $fire_alert
- * @property int|null    $smoke_exhaust
- * @property int|null    $canteen
- * @property int|null    $hostel
- * @property int|null    $street_area
- * @property int|null    $own_type
- * @property string|null $building_layouts
- * @property string|null $building_presentations
- * @property string|null $building_contracts
- * @property string|null $building_property_documents
- * @property string|null $photos_360
- * @property string|null $import_sale_cian
- * @property string|null $import_sale_free
- * @property string|null $import_sale_yandex
- * @property string|null $import_rent_cian
- * @property string|null $import_rent_free
- * @property string|null $import_rent_yandex
- * @property string|null $import_sale_cian_premium
- * @property string|null $import_rent_cian_premium
- * @property string|null $import_sale_cian_top3
- * @property string|null $import_rent_cian_top3
- * @property string|null $import_sale_cian_hl
- * @property string|null $import_rent_cian_hl
- * @property int|null    $fence
- * @property string|null $field_allow_usage
- * @property int|null    $land_category
- * @property int|null    $status
- * @property int|null    $status_reason
- * @property string|null $status_description
- * @property int|null    $own_type_land
- * @property int|null    $area_outside
- * @property int|null    $description_complex
- * @property int|null    $description_manual_use
- * @property int|null    $gas_near
- * @property int|null    $mkad_ttk_between
- * @property int|null    $empty_line
- * @property int|null    $title_empty_main
- * @property int|null    $title_empty_communications
- * @property int|null    $title_empty_security
- * @property int|null    $title_empty_railway
- * @property int|null    $title_empty_infrastructure
- * @property int|null    $landscape_type
- * @property int|null    $land_use_restrictions
- * @property string|null $cadastral_number_land
- * @property int|null    $documents_old
- * @property int|null    $test_only
- * @property Offers[]    $offers
+ * @property int                     $id                     Идентификатор
+ * @property string                  $title
+ * @property int|null                $location_id            Айди местоположения
+ * @property int                     $last_update
+ * @property int|null                $is_land
+ * @property string|null             $buildings_on_territory_id
+ * @property int|null                $buildings_on_territory
+ * @property string|null             $buildings_on_territory_description
+ * @property int|null                $first_line
+ * @property int|null                $complex_id             Айди комплекса
+ * @property int|null                $contact_id             Собственник
+ * @property int|null                $company_id             Компания собственник
+ * @property string|null             $owners                 Собственники
+ * @property int|null                $author_id              Автор поста(кто создал внес)
+ * @property int|null                $type
+ * @property string|null             $object_type            Тип объекта
+ * @property string|null             $floors_building        Этажи
+ * @property string|null             $object_type2
+ * @property int|null                $status_id              Результат/Статус
+ * @property int|null                $status_rent
+ * @property int|null                $status_sale
+ * @property int|null                $status_safe
+ * @property int|null                $status_subrent
+ * @property int|null                $onsite_noprice
+ * @property string|null             $purpose_warehouse      Назначение склада
+ * @property string                  $purposes
+ * @property int                     $floor_type             Тип покрытия
+ * @property int|null                $firefighting_type      Пожаротушение система
+ * @property int                     $object_class           Класс объекта
+ * @property int                     $region                 Регион
+ * @property int                     $district               Район
+ * @property int                     $direction              Направление
+ * @property int                     $village                Населенный пункт
+ * @property int                     $highway                Шоссе
+ * @property int                     $highway_secondary      Дублирующее шоссе
+ * @property int|null                $from_mkad              От МКАД
+ * @property int                     $metro                  Метро
+ * @property string|null             $address                Адрес
+ * @property string|null             $cadastral_number       Кадастровый номер
+ * @property string|null             $yandex_address         Адрес формата Яндекс
+ * @property int|null                $area_field_full        Площадь участка
+ * @property int|null                $area_building          Общая площадь
+ * @property int|null                $area_floor_full        Общая площадь пола
+ * @property int|null                $area_office_full       Офисные помещения
+ * @property int|null                $area_tech_full
+ * @property int|null                $land                   Участок (вспомогательное)
+ * @property int|null                $land_length            Длина участка
+ * @property int|null                $land_width             Ширина участка
+ * @property string|null             $dsection               Габариты участка
+ * @property int|null                $barrier                Шлагбаум
+ * @property int|null                $fence_around_perimeter Забор по периметру
+ * @property int|null                $finishing              Готовность к въезду
+ * @property int|null                $l_category             Категория земли
+ * @property int|null                $l_function             Разрешенное использование
+ * @property int|null                $l_property             Вид права
+ * @property int|null                $floors                 Этажность
+ * @property int|null                $deposit                Величина депозита
+ * @property int|null                $pledge                 Залог
+ * @property int|null                $prepay_subrent
+ * @property int                     $facing_type            Внешняя отделка
+ * @property string|null             $elevators              Пассажирские лифты
+ * @property string|null             $cranes_gantry          Козловые краны
+ * @property string|null             $cranes_railway         Железнодорожные краны
+ * @property int|null                $cranes_runways         Подкрановые пути
+ * @property int                     $railway                Ж/д ветка
+ * @property int|null                $railway_value          Ж/д ветка протяженность
+ * @property int                     $nooffice               Нет офисов
+ * @property int                     $phone_line             Есть ли Телефония
+ * @property string                  $telecommunications     Телекоммуникации
+ * @property int|null                $year_build             Год постройки
+ * @property int|null                $year_repair            Год реконструкции
+ * @property int                     $guard                  Охрана
+ * @property int|null                $entry_territory        Въезд на территорию (Тип)
+ * @property int|null                $entry_territory_type
+ * @property string|null             $parking_car_type       Парковка легковая какая
+ * @property string|null             $parking_lorry_type     Парковка грузовичка какая
+ * @property string|null             $parking_truck_type     Парковка грузовая какая
+ * @property string|null             $comments               Комментарии
+ * @property string|null             $description            Описание
+ * @property string|null             $description_auto       Описание авто
+ * @property string|null             $infrastructure         Инфраструктура
+ * @property int                     $gas                    Газ
+ * @property int                     $ttk_mkad
+ * @property string                  $parking                Парковка
+ * @property int                     $parking_car            Парковка легковая
+ * @property int                     $parking_car_value      Парковка легковая цена
+ * @property int                     $parking_lorry          Парковка грузовичка
+ * @property int                     $parking_lorry_value    Парковка грузовичка цена
+ * @property int                     $parking_truck          Парковка грузовая
+ * @property int                     $parking_truck_value    Парковка грузовая цена
+ * @property int                     $steam                  Пар
+ * @property int                     $deposit_former         Страховой депозит
+ * @property int                     $is_prepay
+ * @property int                     $agent_visited          Брокер был на объекте
+ * @property int                     $agent_visited_sale
+ * @property int                     $agent_visited_safe
+ * @property int                     $agent_visited_subrent
+ * @property float|null              $power                  Электричество доступно
+ * @property float|null              $power_all              Электричество всего
+ * @property float|null              $power_available
+ * @property int|null                $gas_value              Газ сколько кубов
+ * @property int                     $steam_value
+ * @property int                     $water                  Водоснабжение
+ * @property int                     $water_value            Водоснабжение объем
+ * @property int                     $sewage                 Канализация
+ * @property int|null                $sewage_central         Канализация центральная
+ * @property int|null                $sewage_central_value   Канализация центральная объем
+ * @property int|null                $sewage_rain            Канализация ливневая
+ * @property int                     $heating                Отопление
+ * @property int|null                $heating_central
+ * @property int                     $ventilation            Вентиляция/кондиционирование
+ * @property string|null             $internet_type          Интернет
+ * @property int|null                $internet
+ * @property string|null             $safety_systems         Системы безопасности
+ * @property string|null             $deal_type_help         Тип сделки (вспомогательное)
+ * @property int                     $sale_price             Стоимость (продажи полной)
+ * @property int                     $sale_price_metr        Стоимость (продажи, за кв.м.)
+ * @property int                     $rent_price             Стоимость (аренды, за кв.м. в год)
+ * @property int                     $subrent_price
+ * @property int                     $rent_price_safe        Стоимость (аренды, за 1 паллетоместо)
+ * @property int                     $office_price           Стоимость (офисов)
+ * @property int                     $price_mezzanine        Стоимость (мезонин)
+ * @property string|null             $rent_inc               Стоимость включает - аренда
+ * @property string|null             $rent_inc_safe          Стоимость включает - ответ-хранение
+ * @property string|null             $rent_inc_office        Стоимость включает - офисы
+ * @property int|null                $tax_form               Система налогов
+ * @property string|null             $inc_services           Включенные КУ
+ * @property string|null             $incs_currency          Стоимость включает (аренды, за кв.м. в год)
+ * @property int                     $result                 Результат
+ * @property int                     $result_sale
+ * @property int                     $result_safe
+ * @property int                     $result_subrent
+ * @property int                     $result_who             Кем
+ * @property float                   $longitude              Долгота
+ * @property float                   $latitude               Широта
+ * @property int                     $agent_id               Агент
+ * @property int                     $agent_sale             Агент по продаже
+ * @property int                     $agent_safe             Агент по ответ хр
+ * @property int                     $agent_subrent          Агент по субаренде
+ * @property int                     $onsite                 На сайте
+ * @property int                     $contract               Договор подписан
+ * @property int                     $onsite_top             Спецпредложение
+ * @property int                     $electricity_included   Электричество и вода отдельно
+ * @property int                     $deleted                Удален
+ * @property string|null             $slcomments             Служебный комментарий
+ * @property int|null                $openstage              Открытые площадки
+ * @property string|null             $_calc_rent_payinc
+ * @property string|null             $_calc_safe_payinc
+ * @property string|null             $_calc_sale_payinc
+ * @property string|null             $_calc_subrent_payinc
+ * @property float|null              $owner_pays_howmuch     Договоренность о комиссии с собственником - АРЕНДА
+ * @property float|null              $owner_pays_howmuch_sale
+ * @property float|null              $owner_pays_howmuch_safe
+ * @property float|null              $owner_pays_howmuch_subrent
+ * @property float|null              $owner_pays_howmuch_4client
+ * @property float|null              $owner_pays_howmuch_4client_sale
+ * @property float|null              $owner_pays_howmuch_4client_safe
+ * @property float|null              $owner_pays_howmuch_4client_subrent
+ * @property string|null             $contract_date          Действие договора до
+ * @property int|null                $bargain_rent           Возможен торг - аренда
+ * @property int|null                $bargain_sale           Возможен торг - продажа
+ * @property int|null                $bargain_office         Возможен торг - офисы
+ * @property int|null                $bargain_safe           Возможен торг - ответ-хранение
+ * @property int|null                $from_metro             От метро сколько
+ * @property int                     $from_metro_value       От метро как
+ * @property int                     $railway_station        Ближайшая железнодорожная станция
+ * @property int                     $from_station           От станции  на чем
+ * @property int                     $from_station_value     От станции
+ * @property int                     $from_busstop
+ * @property int                     $from_busstop_value
+ * @property int                     $entrance_type
+ * @property int                     $plain_type             Вид права
+ * @property string                  $area_mezzanine_full
+ * @property int                     $safe_price_rack
+ * @property int                     $safe_price_rack_oversized
+ * @property int                     $safe_price_cell
+ * @property int                     $safe_price_floor_oversized
+ * @property string                  $photo
+ * @property string                  $videos
+ * @property int                     $publ_time
+ * @property int                     $activity
+ * @property int                     $order_row
+ * @property int|null                $video_control
+ * @property int|null                $access_control
+ * @property int|null                $security_alert
+ * @property int|null                $fire_alert
+ * @property int|null                $smoke_exhaust
+ * @property int|null                $canteen
+ * @property int|null                $hostel
+ * @property int|null                $street_area
+ * @property int|null                $own_type
+ * @property string|null             $building_layouts
+ * @property string|null             $building_presentations
+ * @property string|null             $building_contracts
+ * @property string|null             $building_property_documents
+ * @property string|null             $photos_360
+ * @property string|null             $import_sale_cian
+ * @property string|null             $import_sale_free
+ * @property string|null             $import_sale_yandex
+ * @property string|null             $import_rent_cian
+ * @property string|null             $import_rent_free
+ * @property string|null             $import_rent_yandex
+ * @property string|null             $import_sale_cian_premium
+ * @property string|null             $import_rent_cian_premium
+ * @property string|null             $import_sale_cian_top3
+ * @property string|null             $import_rent_cian_top3
+ * @property string|null             $import_sale_cian_hl
+ * @property string|null             $import_rent_cian_hl
+ * @property int|null                $fence
+ * @property string|null             $field_allow_usage
+ * @property int|null                $land_category
+ * @property int|null                $status
+ * @property int|null                $status_reason
+ * @property string|null             $status_description
+ * @property int|null                $own_type_land
+ * @property int|null                $area_outside
+ * @property int|null                $description_complex
+ * @property int|null                $description_manual_use
+ * @property int|null                $gas_near
+ * @property int|null                $mkad_ttk_between
+ * @property int|null                $empty_line
+ * @property int|null                $title_empty_main
+ * @property int|null                $title_empty_communications
+ * @property int|null                $title_empty_security
+ * @property int|null                $title_empty_railway
+ * @property int|null                $title_empty_infrastructure
+ * @property int|null                $landscape_type
+ * @property int|null                $land_use_restrictions
+ * @property string|null             $cadastral_number_land
+ * @property int|null                $documents_old
+ * @property int|null                $test_only
+ * @property Offers[]                $offers
+ * @property-read ChatMember[]       $chatMembers
+ * @property-read ObjectChatMember[] $objectChatMembers
  */
 class Objects extends AR
 {
@@ -697,5 +703,26 @@ class Objects extends AR
 		$query->andWhere([OfferMix::field('type_id') => OfferMixOld::GENERAL_TYPE_ID]);
 
 		return $query;
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getObjectChatMembers(): ObjectChatMemberQuery
+	{
+		/** @var ObjectChatMemberQuery */
+		return $this->hasMany(ObjectChatMember::class, ['object_id' => 'id'])->from(ObjectChatMember::getTable());
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getChatMembers(): ChatMemberQuery
+	{
+		/** @var ChatMemberQuery */
+		return $this->hasMany(ChatMember::class, ['model_id' => 'id'])
+		            ->andOnCondition(['model_type' => ObjectChatMember::getMorphClass()])
+		            ->via('objectChatMembers')
+		            ->from(ChatMember::getTable());
 	}
 }
