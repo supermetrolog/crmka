@@ -12,6 +12,7 @@ use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
 use app\dto\SurveyQuestionAnswer\UpdateSurveyQuestionAnswerDto;
+use app\events\Survey\CancelSurveyEvent;
 use app\events\Survey\CompleteSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\exceptions\services\SurveyAlreadyCancelledException;
@@ -129,6 +130,7 @@ class SurveyService
 
 	/**
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function cancel(Survey $survey): Survey
 	{
@@ -140,12 +142,23 @@ class SurveyService
 			throw new SurveyAlreadyCompletedException('Completed Survey cannot be canceled');
 		}
 
-		$survey->status       = Survey::STATUS_CANCELED;
-		$survey->completed_at = DateTimeHelper::nowf();
-		
-		$survey->saveOrThrow();
+		$tx = $this->transactionBeginner->begin();
 
-		return $survey;
+		try {
+			$survey->status       = Survey::STATUS_CANCELED;
+			$survey->completed_at = DateTimeHelper::nowf();
+
+			$survey->saveOrThrow();
+
+			$this->eventManager->trigger(new CancelSurveyEvent($survey));
+
+			$tx->commit();
+
+			return $survey;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 
 	/**
