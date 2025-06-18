@@ -16,21 +16,20 @@ use app\models\Company;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;
-use app\models\Task;
 use app\models\TaskRelationEntity;
 use app\usecases\Task\CreateTaskService;
 use Throwable;
 use yii\base\Exception;
 
-class CompanyRequestsCreatedEffectStrategy extends AbstractEffectStrategy
+class CompanyOffersCreatedEffectStrategy extends AbstractEffectStrategy
 {
-	private const TASK_TITLE_TEMPLATE = 'Новый запрос (%s) от компании "%s"';
-	private const DEAL_TYPES_MAP      = [
-		1 => 'Аренда',
-		2 => 'Продажа',
-		3 => 'Ответ-хранение',
-		4 => 'Субаренда',
-		5 => 'Строительство',
+	private const TASK_TITLE_TEMPLATE = 'Внести строение, комп. "%s"';
+
+	private const CLASS_NAMES_MAP = [
+		1 => 'A',
+		2 => 'B',
+		3 => 'C',
+		4 => 'D',
 	];
 
 	private TaskBuilderFactory           $taskBuilderFactory;
@@ -76,7 +75,7 @@ class CompanyRequestsCreatedEffectStrategy extends AbstractEffectStrategy
 
 		try {
 			foreach ($jsonData as $payload) {
-				$this->createRequestTask($payload, $survey);
+				$this->createOfferTask($payload, $survey);
 			}
 
 			$tx->commit();
@@ -91,14 +90,13 @@ class CompanyRequestsCreatedEffectStrategy extends AbstractEffectStrategy
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 */
-	private function createRequestTask(array $payload, Survey $survey): void
+	private function createOfferTask(array $payload, Survey $survey): void
 	{
 		$company = $survey->chatMember->company;
 
 		$taskDto = $this->taskBuilderFactory->createEffectBuilder()
-		                                    ->setType(Task::TYPE_REQUEST_HANDLING)
 		                                    ->setCreatedBy($survey->user)
-		                                    ->setTitle($this->parsePayloadToTitle($payload, $company))
+		                                    ->setTitle($this->getTaskTitle($company))
 		                                    ->setMessage($this->parsePayloadToMessage($payload))
 		                                    ->build();
 
@@ -113,12 +111,9 @@ class CompanyRequestsCreatedEffectStrategy extends AbstractEffectStrategy
 	/**
 	 * @throws \Exception
 	 */
-	private function parsePayloadToTitle(array $payload, Company $company): string
+	private function getTaskTitle(Company $company): string
 	{
-		$dealType     = ArrayHelper::getValue($payload, 'deal_type');
-		$dealTypeName = $this->resolveDealTypeName(TypeConverterHelper::toInt($dealType));
-
-		return sprintf(self::TASK_TITLE_TEMPLATE, $dealTypeName, $company->getShortName());
+		return sprintf(self::TASK_TITLE_TEMPLATE, $company->getShortName());
 	}
 
 
@@ -127,37 +122,26 @@ class CompanyRequestsCreatedEffectStrategy extends AbstractEffectStrategy
 	 */
 	private function parsePayloadToMessage(array $payload): string
 	{
-		$areaMin     = ArrayHelper::getValue($payload, 'area_min');
-		$areaMax     = ArrayHelper::getValue($payload, 'area_max');
-		$dealType    = ArrayHelper::getValue($payload, 'deal_type');
-		$isExpress   = ArrayHelper::getValue($payload, 'express', false);
-		$location    = ArrayHelper::getValue($payload, 'location', 'Локация не указана');
+		$address     = ArrayHelper::getValue($payload, 'address');
+		$area        = ArrayHelper::getValue($payload, 'area');
+		$class       = ArrayHelper::getValue($payload, 'class');
+		$isLand      = TypeConverterHelper::toBool(ArrayHelper::getValue($payload, 'is_land', false));
 		$description = ArrayHelper::getValue($payload, 'description');
 
 		$parts = [];
 
-		if ($dealType) {
-			$parts[] = $this->resolveDealTypeName(TypeConverterHelper::toInt($dealType));
+		$parts[] = $isLand ? 'Участок' : 'Строение';
+
+		if (!$isLand) {
+			$parts[] = $this->resolveClassName(TypeConverterHelper::toInt($class)) . ' класс';
 		}
 
-		if (TypeConverterHelper::toBool($isExpress)) {
-			$parts[] = 'Экспресс';
+		if ($area) {
+			$parts[] = $area . ' м2';
 		}
 
-		if ($areaMin && $areaMax) {
-			$parts[] = 'От ' . $areaMin . ' до ' . $areaMax . ' м2';
-		} else {
-			if ($areaMin) {
-				$parts[] = 'От ' . $areaMin . ' м2';
-			} else {
-				if ($areaMax) {
-					$parts[] = 'До ' . $areaMax . ' м2';
-				}
-			}
-		}
-
-		if ($location) {
-			$parts[] = StringHelper::ucFirst($location);
+		if ($address) {
+			$parts[] = StringHelper::ucFirst($address);
 		}
 
 		if ($description) {
@@ -179,8 +163,8 @@ class CompanyRequestsCreatedEffectStrategy extends AbstractEffectStrategy
 		]);
 	}
 
-	private function resolveDealTypeName(int $dealTypeId): string
+	private function resolveClassName(int $classId): string
 	{
-		return self::DEAL_TYPES_MAP[$dealTypeId];
+		return self::CLASS_NAMES_MAP[$classId];
 	}
 }

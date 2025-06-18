@@ -29,7 +29,7 @@ class TaskBuilder
 	protected array              $tagIds                 = [];
 	protected array              $observerIds            = [];
 	protected ?int               $surveyQuestionAnswerId = null;
-	protected ?string            $type                   = null;
+	protected string             $type                   = Task::TYPE_DEFAULT;
 
 	protected UserRepository $userRepository;
 
