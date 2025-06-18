@@ -26,4 +26,6 @@ class EffectKind
 
 	public const CURRENT_REQUESTS_STEP = 'current-requests-step';
 	public const CREATED_REQUESTS_STEP = 'created-requests-step';
+	public const CURRENT_OFFERS_STEP   = 'current-offers-step';
+	public const CREATED_OFFERS_STEP   = 'created-offers-step';
 }
