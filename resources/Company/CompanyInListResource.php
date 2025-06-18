@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\resources\Company;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Company;
+use app\models\views\CompanySearchView;
 use app\resources\Call\CallShortResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Company\ActivityGroup\CompanyActivityGroupResource;
@@ -21,9 +21,9 @@ use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
 
 class CompanyInListResource extends JsonResource
 {
-	private Company $resource;
+	private CompanySearchView $resource;
 
-	public function __construct(Company $resource)
+	public function __construct(CompanySearchView $resource)
 	{
 		$this->resource = $resource;
 	}
@@ -73,8 +73,9 @@ class CompanyInListResource extends JsonResource
 
 			'last_call' => CallShortResource::tryMakeArray($this->resource->lastCall),
 
-			'pinned_messages' => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
-			'last_survey'     => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
+			'pinned_messages'  => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
+			'last_survey'      => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
+			'has_survey_draft' => $this->resource->has_survey_draft,
 
 			'chat_member_id' => $this->resource->chatMember->id ?? null,
 
