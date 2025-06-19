@@ -1,7 +1,7 @@
 body {
-	padding-top: 1.5cm;
-	padding-bottom: 0cm;
-	font-family: Montserrat;
+    padding-top: 1.5cm;
+    padding-bottom: 0cm;
+    font-family: Montserrat;
 }
 
 hr {
@@ -47,8 +47,8 @@ div.page-no-absolute:first-child {
 }
 
 span.danger {
-	color: #8E0606;
-	font-weight: bold;
+    color: rgb(153, 8, 6);
+    font-weight: bold;
 }
 
 tr {
@@ -73,9 +73,9 @@ table {
 }
 
 .title h3 {
-	border-bottom: 2px solid #8E0606;
-	text-transform: uppercase;
-	display: inline-block;
+    border-bottom: 2px solid rgb(153, 8, 6);
+    text-transform: uppercase;
+    display: inline-block;
 }
 
 .title .one {
@@ -106,23 +106,23 @@ table {
 /* *********** HEADER ************ */
 
 #header {
-	position: fixed;
-	top: 0cm;
-	left: 0cm;
-	right: 0cm;
-	height: 1.5cm;
-	z-index: 999;
-	padding-left: 3px;
+    position: fixed;
+    top: 0cm;
+    left: 0cm;
+    right: 0cm;
+    height: 1.5cm;
+    z-index: 999;
+    padding-left: 3px;
 }
 
 #header table td.logo .image {
-	width: 186px;
-	height: 30px;
+    width: 175px;
+    height: 35px;
 }
 
 #header table td. .image img {
-	width: 186px;
-	height: 30px;
+    width: 175px;
+    height: 35px;
 }
 
 #header table td.consultant {
@@ -139,12 +139,12 @@ table {
 } */
 
 #header table td.consultant div {
-	display: inline-block;
-	border-right: 1px solid #8E0606;
-	padding-right: 10px;
-	min-height: 35px;
-	height: 35px;
-	vertical-align: top;
+    display: inline-block;
+    border-right: 1px solid rgb(153, 8, 6);
+    padding-right: 10px;
+    min-height: 35px;
+    height: 35px;
+    vertical-align: top;
 }
 
 #header table td.consultant div.phones {
@@ -156,15 +156,15 @@ table {
 }
 
 #header table td.consultant .phones {
-	text-align: left;
+    text-align: left;
 }
 
 #header table td.consultant > div p.name {
-	font-size: 14px;
-	vertical-align: top;
+    font-size: 14px;
+    vertical-align: top;
 }
 
-#header table td.consultant>div p.position {
+#header table td.consultant > div p.position {
     font-size: 9px;
     vertical-align: top;
     line-height: 2px;
@@ -183,78 +183,78 @@ table {
 }
 
 #footer table {
-	border-top: 2px solid #8E0606;
-	margin-bottom: 0;
-	font-size: 9.5px;
-	max-height: 25px;
-	padding-top: 10px;
+    border-top: 2px solid rgb(153, 8, 6);
+    margin-bottom: 0;
+    font-size: 9.5px;
+    max-height: 25px;
+    padding-top: 10px;
 }
 
-#footer table td>div {
+#footer table td > div {
     height: 25px;
     max-height: 25px;
 }
 
-#footer table td.contacts>div {
+#footer table td.contacts > div {
     width: 650px;
 }
 
-#footer table td.contacts>div ul {
+#footer table td.contacts > div ul {
     padding: 0;
     margin: 0;
 }
 
-#footer table td.contacts>div li {
+#footer table td.contacts > div li {
     display: inline-block;
     position: relative;
     margin-right: 4px;
 }
 
 #footer table td.contacts > div li {
-	margin-right: 10px;
+    margin-right: 10px;
 }
 
 #footer table td.contacts > div li:first-child {
-	margin-right: 20px;
+    margin-right: 20px;
 }
 
 #footer table td.contacts > div li i {
-	position: absolute;
-	font-size: 4px;
-	color: #8E0606;
-	top: 10px;
-	left: -6px;
+    position: absolute;
+    font-size: 4px;
+    color: rgb(153, 8, 6);
+    top: 10px;
+    left: -6px;
 }
 
-#footer table td.contacts>div li p {
+#footer table td.contacts > div li p {
     color: rgb(53, 53, 53);
     letter-spacing: 0px;
 }
 
-#footer table td.contacts>div li p a {
+#footer table td.contacts > div li p a {
     color: #6397da;
 }
 
-#footer table td.contacts>div li b {
+#footer table td.contacts > div li b {
     color: black;
 }
 
 #footer table td.image > div {
-	max-height: 18px;
-	height: 18px;
+    max-height: 24px;
+    height: 24px;
 }
 
 #footer table td.image > div .logo {
-	width: 120px;
-	max-height: 28px;
-	height: 18px;
-	margin-top: -8px;
-	margin-left: -25px;
+    width: 120px;
+    max-height: 28px;
+    height: 24px;
+    margin-top: -8px;
+    margin-left: -25px;
 }
 
 #footer table td.image > div img {
-	max-height: 18px;
-	width: 120px;
+    max-height: 24px;
+    width: 120px;
 }
 
 .page-number {
@@ -347,19 +347,19 @@ table {
 }
 
 .main-info td.left .image img {
-    max-width: 495pxpx;
-    width: 495pxpx;
+    max-width: 495 pxpx;
+    width: 495 pxpx;
     max-height: 375px;
     height: 375px;
 }
 
 .main-info td.right .image {
-	max-height: 375px;
-	/* height: 373px; */
-	width: 240px;
-	max-width: 240px;
-	outline: 1px solid #ccc;
-	margin-left: 5px;
+    max-height: 375px;
+    /* height: 373px; */
+    width: 240px;
+    max-width: 240px;
+    outline: 1px solid #ccc;
+    margin-left: 5px;
 }
 
 .main-info td.right .image img {
@@ -416,28 +416,28 @@ table {
 }
 
 .main-info td.left .image .extra-info .object_id {
-	position: absolute;
-	top: 0;
-	left: 0;
-	background-color: #8E0606;
-	/* height: 20px; */
-	/* width: 80px; */
-	width: auto;
-	text-transform: uppercase;
-	font-size: 12px;
-	color: white;
-	padding: 5px 15px 5px 15px;
-	/* padding: 5px 0; */
-	vertical-align: middle;
-	z-index: 3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgb(153, 8, 6);
+    /* height: 20px; */
+    /* width: 80px; */
+    width: auto;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: white;
+    padding: 5px 15px 5px 15px;
+    /* padding: 5px 0; */
+    vertical-align: middle;
+    z-index: 3;
 }
 
 .main-info td.left .image .extra-info .object_id p {
-	margin: 0;
-	padding: 0;
-	vertical-align: middle;
-	position: relative;
-	z-index: 4;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    position: relative;
+    z-index: 4;
 }
 
 .main-info td.left .image .extra-info .object_id p b {
@@ -447,17 +447,17 @@ table {
 }
 
 .main-info td.left .image .extra-info .object_id::before {
-	content: '';
-	background: inherit;
-	width: 24px;
-	height: 24px;
-	display: block;
-	position: absolute;
-	right: -12.2px;
-	top: 5px;
-	transform: rotate(45deg);
-	border-radius: 0 0 0 2px;
-	z-index: 2;
+    content: '';
+    background: inherit;
+    width: 24px;
+    height: 24px;
+    display: block;
+    position: absolute;
+    right: -12.2px;
+    top: 5px;
+    transform: rotate(45deg);
+    border-radius: 0 0 0 2px;
+    z-index: 2;
 }
 
 
@@ -479,7 +479,7 @@ table.digital-info-container {
     min-width: 240px;
 }
 
-.digital-info td>div {
+.digital-info td > div {
     vertical-align: middle;
 }
 
@@ -494,18 +494,18 @@ table.digital-info-container {
 }
 
 .digital-info td.two div {
-	/* width: 300px; */
-	height: 78px;
-	outline: 1px solid #8E0606;
-	padding: 10px 15px;
-	padding-right: 0 !important;
-	margin-right: 4px;
-	max-width: 298px;
-	width: 298px;
-	min-width: 298px;
+    /* width: 300px; */
+    height: 78px;
+    outline: 1px solid rgb(153, 8, 6);
+    padding: 10px 15px;
+    padding-right: 0 !important;
+    margin-right: 4px;
+    max-width: 298px;
+    width: 298px;
+    min-width: 298px;
 }
 
-.digital-info td.three>div {
+.digital-info td.three > div {
     /* width: 227px; */
     /* margin-left: 4px; */
     height: 108px;
@@ -558,10 +558,10 @@ table.digital-info-container {
 }
 
 .digital-info td.three .items td > div {
-	width: 100%;
-	height: 48.5px;
-	font-weight: normal;
-	text-align: center;
+    width: 100%;
+    height: 48.5px;
+    font-weight: normal;
+    text-align: center;
 }
 
 .digital-info td.three .items {
@@ -574,12 +574,12 @@ table.digital-info-container {
     vertical-align: middle;
 }
 
-.digital-info td.three .items td>div p {
+.digital-info td.three .items td > div p {
     line-height: 4px;
     font-size: 10px;
 }
 
-.digital-info td.three .items .item>div {
+.digital-info td.three .items .item > div {
     width: 78px;
     min-width: 78px;
     max-width: 78px;
@@ -627,17 +627,17 @@ table.digital-info-container {
     padding: 0;
 }
 
-.photos td>div {
+.photos td > div {
     width: 245px;
     height: 170px;
 }
 
-.photos td.two>div {
+.photos td.two > div {
     /* width: 243px; */
     margin: 0 5px;
 }
 
-.photos td>div img {
+.photos td > div img {
     width: 100%;
     height: 100%;
 }
@@ -662,7 +662,7 @@ table.digital-info-container {
     text-align: left;
 }
 
-.division-options tr td>div>p {
+.division-options tr td > div > p {
     font-size: 9px;
     font-weight: normal;
     line-height: 8px;
@@ -736,7 +736,7 @@ table.digital-info-container {
     height: 170px;
 }
 
-.after-parameters .container>div {
+.after-parameters .container > div {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -778,7 +778,7 @@ table.digital-info-container {
     height: 170px;
 }
 
-.banner>div {
+.banner > div {
     position: absolute;
     top: -1px;
     bottom: 0;
@@ -823,7 +823,7 @@ table.digital-info-container {
     width: 187px;
 }
 
-.params-new tr td>div {
+.params-new tr td > div {
     padding: 3px;
     max-width: 187px;
 }
@@ -836,53 +836,53 @@ table.digital-info-container {
     padding-left: 20px;
 }
 
-.params-new tr td.two>div p {
+.params-new tr td.two > div p {
     font-weight: bold;
     color: black;
 }
 
-.params-new tr td.four>div p {
+.params-new tr td.four > div p {
     font-weight: bold;
     color: black;
 }
 
-.params-new td>div p {
+.params-new td > div p {
     color: rgb(119, 119, 119);
     font-size: 11px;
     vertical-align: middle;
 }
 
-.params-new td>div.params-title p {
+.params-new td > div.params-title p {
     color: #a9b0d8;
     font-weight: bold;
     font-size: 11px;
 }
 
-.params-new td>div.params-title {
+.params-new td > div.params-title {
     background-color: white !important;
 }
 
-.params-new td>div p b {
+.params-new td > div p b {
     color: black;
 }
 
-.params-new td>div p.blue {
+.params-new td > div p.blue {
     color: #6397da;
     text-decoration: underline;
 }
 
-.params-new td>div p.blue b {
+.params-new td > div p.blue b {
     color: #6397da;
 }
 
-.params-new.even td>div {
+.params-new.even td > div {
     background-color: #f0f0f0;
 }
 
-.params-new .even td>div {
+.params-new .even td > div {
     background-color: #f0f0f0;
 }
 
 .c_two .digital-info .items {
-	margin-top: 7px;
+    margin-top: 7px;
 }

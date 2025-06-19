@@ -78,8 +78,8 @@ return static function (RouterInterface $router) {
 
 		$route->post()->action('create');
 
-		$route->patch('disable');
-		$route->patch('undisable');
+		$route->patch('disable/<id>', 'disable');
+		$route->patch('undisable/<id>', 'undisable');
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
@@ -290,7 +290,7 @@ return static function (RouterInterface $router) {
 
 			$route->prefix('comments', static function (RouteInterface $route) {
 				$route->get()->action('comments');
-				$route->post()->action('create-comments');
+				$route->post()->action('create-comment');
 			});
 		});
 	});

@@ -51,7 +51,7 @@ class DataMapper
 
 		$imageUrl = StringHelper::after($image, '/uploads/objects/');
 
-		return Yii::$app->params['url']['objects_watermark'] . self::WATERMARK_IMAGE_WIDTH . '/' . $imageUrl;
+		return Yii::$app->params['url']['objects_watermark'] . self::WATERMARK_IMAGE_WIDTH . '/' . $imageUrl . '?v=2';
 	}
 
 	/**
