@@ -29,6 +29,7 @@ class TaskBuilder
 	protected array              $tagIds                 = [];
 	protected array              $observerIds            = [];
 	protected ?int               $surveyQuestionAnswerId = null;
+	protected string             $type                   = Task::TYPE_DEFAULT;
 
 	protected UserRepository $userRepository;
 
@@ -217,6 +218,13 @@ class TaskBuilder
 		return $this->surveyQuestionAnswerId;
 	}
 
+	public function setType(string $type): self
+	{
+		$this->type = $type;
+
+		return $this;
+	}
+
 	public function validateOrThrow(): void
 	{
 		if (is_null($this->duration) && is_null($this->end)) {
@@ -259,7 +267,8 @@ class TaskBuilder
 			'created_by_type'        => $this->getCreatedByType(),
 			'tagIds'                 => $this->tagIds,
 			'observerIds'            => $this->observerIds,
-			'surveyQuestionAnswerId' => $this->getSurveyQuestionAnswerId()
+			'surveyQuestionAnswerId' => $this->getSurveyQuestionAnswerId(),
+			'type'                   => $this->type
 		]);
 	}
 }

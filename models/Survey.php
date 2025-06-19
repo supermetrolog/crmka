@@ -44,6 +44,7 @@ use yii\db\ActiveQuery;
  * @property-read Survey[]               $dependentSurveys
  * @property-read Call[]                 $calls
  * @property-read ChatMemberMessage      $chatMemberMessage
+ * @property-read ?Call                  $mainCall
  */
 class Survey extends AR
 {
@@ -204,6 +205,17 @@ class Survey extends AR
 	{
 		/** @var CallQuery */
 		return $this->morphHasManyVia(Call::class, 'id', 'second')
+		            ->via('relationFirst');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getMainCall(): ?CallQuery
+	{
+		/** @var CallQuery */
+		return $this->morphHasOneVia(Call::class, 'id', 'second')
+		            ->andOnCondition([Call::field('contact_id') => $this->contact_id])
 		            ->via('relationFirst');
 	}
 

@@ -13,4 +13,6 @@ class CompanySearchView extends Company
 	public int  $contacts_count        = 0;
 	public int  $active_contacts_count = 0;
 	public int  $tasks_count           = 0;
+
+	public bool $has_survey_draft = false;
 }

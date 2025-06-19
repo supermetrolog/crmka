@@ -287,6 +287,7 @@ use yii\db\Connection;
  * @property int|null    $barrier
  * @property int         $ad_avito
  * @property string|null $ad_avito_date_start
+ * @property string      $morph
  */
 class ObjectsBlock extends AR
 {

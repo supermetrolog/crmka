@@ -96,10 +96,12 @@ class CompanySearch extends Form
 			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
 			                          'active_requests_count' => 'COUNT(DISTINCT CASE WHEN request.status = 1 THEN request.id ELSE NULL END)',
 			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
-			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)'
+			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
+			                          'has_survey_draft'      => '(sd.id is not null)'
 		                          ])
 		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects', 'productRanges', 'companyActivityGroups', 'companyActivityProfiles'])
 		                          ->joinWith(['chatMember cm'])
+		                          ->leftJoin(['sd' => Survey::getTable()], ['and', ['sd.status' => Survey::STATUS_DRAFT, 'sd.deleted_at' => null], 'sd.chat_member_id = cm.id'])
 		                          ->leftJoinLastCallRelation()
 		                          ->with([
 			                          'requests',
@@ -113,7 +115,9 @@ class CompanySearch extends Form
 			                          'objects.objectFloors',
 			                          'lastCall',
 			                          'chatMember',
-			                          'lastSurvey.user.userProfile', 'lastSurvey.contact', 'lastSurvey.calls',
+			                          'lastSurvey.user.userProfile', 'lastSurvey.calls',
+			                          'lastSurvey.contact.emails', 'lastSurvey.contact.websites', 'lastSurvey.contact.phones',
+			                          'lastSurvey.contact.consultant.userProfile', 'lastSurvey.contact.wayOfInformings',
 			                          'lastSurvey.tasks.tags', 'lastSurvey.tasks.createdByUser.userProfile', 'lastSurvey.tasks.user.userProfile',
 			                          'lastSurvey.tasks.observers.user.userProfile', 'lastSurvey.tasks.targetUserObserver',
 			                          'lastSurvey.chatMemberMessage.fromChatMember.user.userProfile',
