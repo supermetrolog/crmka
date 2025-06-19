@@ -96,12 +96,10 @@ class CompanySearch extends Form
 			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
 			                          'active_requests_count' => 'COUNT(DISTINCT CASE WHEN request.status = 1 THEN request.id ELSE NULL END)',
 			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
-			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
-			                          'has_survey_draft'      => '(sd.id is not null)'
+			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)'
 		                          ])
 		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects', 'productRanges', 'companyActivityGroups', 'companyActivityProfiles'])
 		                          ->joinWith(['chatMember cm'])
-		                          ->leftJoin(['sd' => Survey::getTable()], ['and', ['sd.status' => Survey::STATUS_DRAFT, 'sd.deleted_at' => null], 'sd.chat_member_id = cm.id'])
 		                          ->leftJoinLastCallRelation()
 		                          ->with([
 			                          'requests',
@@ -198,7 +196,7 @@ class CompanySearch extends Form
 		}
 
 		if ($this->hasFilter($this->current_user_id)) {
-			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)']);
+			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)', 'has_survey_draft' => '(sd.id is not null)']);
 
 			$query->joinWith(['tasks' => function (TaskQuery $subquery) {
 				$subquery->andOnCondition([
@@ -206,7 +204,12 @@ class CompanySearch extends Form
 					[Task::field('user_id') => $this->current_user_id],
 					['!=', Task::field('status'), Task::STATUS_DONE]
 				]);
-			}], false, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN');
+			}], false, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN')
+			      ->leftJoin(
+				      ['sd' => Survey::getTable()],
+				      ['and', ['sd.status' => Survey::STATUS_DRAFT, 'sd.deleted_at' => null], 'sd.chat_member_id = cm.id', 'sd.user_id = :user_id'],
+				      ['user_id' => $this->current_user_id]
+			      );
 		}
 
 		$query->andFilterWhere([
