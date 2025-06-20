@@ -14,7 +14,7 @@ class m250617_233456_add_morph_column_in_c_industry_blocks_table extends Migrati
 	{
 		$this->db = Yii::$app->db_old;
 
-		$this->addMorphColumn('c_industry_blocks');
+//		$this->addMorphColumn('c_industry_blocks');
 	}
 
 	/**
@@ -24,6 +24,6 @@ class m250617_233456_add_morph_column_in_c_industry_blocks_table extends Migrati
 	{
 		$this->db = Yii::$app->db_old;
 
-		$this->dropMorphColumn('c_industry_blocks');
+//		$this->dropMorphColumn('c_industry_blocks');
 	}
 }
