@@ -616,12 +616,15 @@ class Company extends AR
 		            ->andOnCondition([Task::field('deleted_at') => null]);
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function getLastSurvey(): SurveyQuery
 	{
 		/** @var SurveyQuery */
 		return $this->hasOne(Survey::class, ['chat_member_id' => 'id'])
 		            ->via('chatMember')
-		            ->andWhere(['!=', 'status', Survey::STATUS_DRAFT])
+		            ->andWhere(['!=', Survey::field('status'), Survey::STATUS_DRAFT])
 		            ->orderBy(['created_at' => SORT_DESC]);
 	}
 
