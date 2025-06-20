@@ -114,7 +114,9 @@ class CompanySearch extends Form
 			                          'objects.objectFloors',
 			                          'lastCall',
 			                          'chatMember',
-			                          'lastSurvey.user.userProfile', 'lastSurvey.contact', 'lastSurvey.calls',
+			                          'lastSurvey.user.userProfile', 'lastSurvey.calls',
+			                          'lastSurvey.contact.emails', 'lastSurvey.contact.websites', 'lastSurvey.contact.phones',
+			                          'lastSurvey.contact.consultant.userProfile', 'lastSurvey.contact.wayOfInformings',
 			                          'lastSurvey.tasks.tags', 'lastSurvey.tasks.createdByUser.userProfile', 'lastSurvey.tasks.user.userProfile',
 			                          'lastSurvey.tasks.observers.user.userProfile', 'lastSurvey.tasks.targetUserObserver',
 			                          'lastSurvey.chatMemberMessage.fromChatMember.user.userProfile',
@@ -195,7 +197,7 @@ class CompanySearch extends Form
 		}
 
 		if ($this->hasFilter($this->current_user_id)) {
-			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)']);
+			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)', 'has_survey_draft' => '(sd.id is not null)']);
 
 			$query->joinWith(['tasks' => function (TaskQuery $subquery) {
 				$subquery->andOnCondition([
@@ -203,7 +205,12 @@ class CompanySearch extends Form
 					[Task::field('user_id') => $this->current_user_id],
 					['!=', Task::field('status'), Task::STATUS_DONE]
 				]);
-			}], false, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN');
+			}], false, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN')
+			      ->leftJoin(
+				      ['sd' => Survey::getTable()],
+				      ['and', ['sd.status' => Survey::STATUS_DRAFT, 'sd.deleted_at' => null], 'sd.chat_member_id = cm.id', 'sd.user_id = :user_id'],
+				      ['user_id' => $this->current_user_id]
+			      );
 		}
 
 		$query->andFilterWhere([
