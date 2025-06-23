@@ -293,4 +293,25 @@ class ArrayHelper
 	{
 		return YiiArrayHelper::getValue($array, $key, $defaultValue);
 	}
+
+	public static function every(array $array, callable $callable): bool
+	{
+		foreach ($array as $item) {
+			if (!$callable($item)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static function any(array $array, callable $callable): bool
+	{
+		return !self::every($array, static fn($e) => !$callable($e));
+	}
+
+	public static function slice(array $array, int $offset, ?int $length, bool $preserve_keys = false): array
+	{
+		return array_slice($array, $offset, $length, $preserve_keys);
+	}
 }
