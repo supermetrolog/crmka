@@ -2,12 +2,14 @@
 
 namespace app\listeners\Survey;
 
+use app\components\EffectStrategy\Factory\EffectStrategyFactory;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\dto\EntityPinnedMessage\EntityPinnedMessageDto;
 use app\events\Survey\CompleteSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
+use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Company;
@@ -16,6 +18,8 @@ use app\usecases\ChatMember\ChatMemberMessageService;
 use app\usecases\EntityPinnedMessage\EntityPinnedMessageService;
 use Throwable;
 use yii\base\Event;
+use yii\base\InvalidConfigException;
+use yii\di\NotInstantiableException;
 
 
 class CreateCancelledSurveySystemChatMessageListener implements EventListenerInterface
@@ -24,12 +28,14 @@ class CreateCancelledSurveySystemChatMessageListener implements EventListenerInt
 
 	private ChatMemberMessageService     $chatMemberMessageService;
 	private EntityPinnedMessageService   $entityPinnedMessageService;
+	private EffectStrategyFactory        $effectStrategyFactory;
 	private TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(ChatMemberMessageService $chatMemberMessageService, EntityPinnedMessageService $entityPinnedMessageService, TransactionBeginnerInterface $transactionBeginner)
+	public function __construct(ChatMemberMessageService $chatMemberMessageService, EntityPinnedMessageService $entityPinnedMessageService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
 	{
 		$this->chatMemberMessageService   = $chatMemberMessageService;
 		$this->entityPinnedMessageService = $entityPinnedMessageService;
+		$this->effectStrategyFactory      = $effectStrategyFactory;
 		$this->transactionBeginner        = $transactionBeginner;
 	}
 
@@ -55,6 +61,8 @@ class CreateCancelledSurveySystemChatMessageListener implements EventListenerInt
 			if (!empty($survey->comment)) {
 				$this->pinMessageToCompany($survey->chatMember->company, $message);
 			}
+
+			$this->handleEffects($survey, $message);
 
 			$tx->commit();
 		} catch (Throwable $th) {
@@ -92,5 +100,27 @@ class CreateCancelledSurveySystemChatMessageListener implements EventListenerInt
 				'user'        => $message->fromChatMember->user
 			])
 		);
+	}
+
+	/**
+	 * @throws NotInstantiableException
+	 * @throws InvalidConfigException
+	 */
+	public function handleEffects(Survey $survey, ChatMemberMessage $message): void
+	{
+		$questionAnswers = $survey->getQuestionAnswers()
+		                          ->with(['effects', 'surveyQuestionAnswer' => function (SurveyQuestionAnswerQuery $query) use ($survey) {
+			                          $query->bySurveyId($survey->id);
+		                          }])
+		                          ->all();
+
+		foreach ($questionAnswers as $answer) {
+			foreach ($answer->effects as $effect) {
+				if ($effect->isActive() && $this->effectStrategyFactory->hasStrategy($effect->kind)) {
+					$this->effectStrategyFactory->createStrategy($effect->kind)
+					                            ->handle($survey, $answer, $message);
+				}
+			}
+		}
 	}
 }
