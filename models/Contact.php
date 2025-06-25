@@ -61,6 +61,7 @@ class Contact extends AR
 	public const PASSIVE_WHY_BLOCKED                = 2;
 	public const PASSIVE_WHY_OTHER                  = 3;
 	public const PASSIVE_WHY_COMPANY_DISABLED       = 4;
+	public const PASSIVE_WHY_NOT_EXISTS             = 5;
 
 	public static function getPassiveWhyOptions(): array
 	{
@@ -70,6 +71,7 @@ class Contact extends AR
 			self::PASSIVE_WHY_BLOCKED,
 			self::PASSIVE_WHY_OTHER,
 			self::PASSIVE_WHY_COMPANY_DISABLED,
+			self::PASSIVE_WHY_NOT_EXISTS,
 		];
 	}
 
@@ -79,6 +81,7 @@ class Contact extends AR
 		self::PASSIVE_WHY_BLOCKED                => 'Заблокировано модератором',
 		self::PASSIVE_WHY_OTHER                  => 'Другое',
 		self::PASSIVE_WHY_COMPANY_DISABLED       => 'Компания архивирована',
+		self::PASSIVE_WHY_NOT_EXISTS             => 'Номер не существует',
 	];
 
 	public static function resolvePassiveWhyOption(?int $code): string
