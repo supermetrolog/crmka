@@ -132,7 +132,7 @@ class CompanyOffersCreatedEffectStrategy extends AbstractEffectStrategy
 
 		$parts[] = $isLand ? 'Участок' : 'Строение';
 
-		if (!$isLand) {
+		if (!$isLand && !empty($class)) {
 			$parts[] = $this->resolveClassName(TypeConverterHelper::toInt($class)) . ' класс';
 		}
 
