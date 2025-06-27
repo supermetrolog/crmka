@@ -333,4 +333,13 @@ return static function (RouterInterface $router) {
 			$route->delete('entities')->action('remove-entities');
 		});
 	});
+
+	$router->controller('user-tour')->group(static function (RouteInterface $route) {
+		$route->get('history');
+		$route->get('status');
+
+		$route->post('viewed');
+		
+		$route->post('<id>/reset', 'reset');
+	});
 };
