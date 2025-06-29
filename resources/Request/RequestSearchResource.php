@@ -6,15 +6,15 @@ namespace app\resources\Request;
 
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Request;
+use app\models\views\RequestSearchView;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Contact\ContactShortResource;
 
 class RequestSearchResource extends JsonResource
 {
-	private Request $resource;
+	private RequestSearchView $resource;
 
-	public function __construct(Request $resource)
+	public function __construct(RequestSearchView $resource)
 	{
 		$this->resource = $resource;
 	}
@@ -27,7 +27,9 @@ class RequestSearchResource extends JsonResource
 				'company'           => RequestSearchCompanyResource::tryMakeArray($this->resource->company),
 				'contact'           => ContactShortResource::tryMakeArray($this->resource->contact),
 				'consultant'        => UserShortResource::tryMakeArray($this->resource->consultant),
-				'timeline_progress' => $this->resource->getTimelineProgress()
+				'timeline_progress' => $this->resource->getTimelineProgress(),
+				'tasks_count'       => $this->resource->tasks_count,
+				'has_survey_draft'  => $this->resource->has_survey_draft,
 			]
 		);
 	}

@@ -10,7 +10,10 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\DealQuery;
+use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\RequestQuery;
+use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\ActiveQuery\TimelineQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\RequestDirection;
@@ -326,6 +329,38 @@ class Request extends AR
 	{
 		/** @var ChatMemberQuery */
 		return $this->morphHasOne(ChatMember::class);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getTaskRelationEntities(): TaskRelationEntityQuery
+	{
+		/** @var TaskRelationEntityQuery */
+		return $this->hasMany(TaskRelationEntity::class, ['entity_id' => 'id'])->andOnCondition([
+			TaskRelationEntity::field('entity_type') => self::getMorphClass(),
+			TaskRelationEntity::field('deleted_at')  => null
+		]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getTasks(): TaskQuery
+	{
+		/** @var TaskQuery */
+		return $this->hasMany(Task::class, ['id' => 'task_id'])
+		            ->via('taskRelationEntities')
+		            ->andOnCondition([Task::field('deleted_at') => null]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getFolderEntities(): FolderEntityQuery
+	{
+		/** @var FolderEntityQuery */
+		return $this->hasMany(FolderEntity::class, ['entity_id' => 'id'])->andOnCondition([FolderEntity::field('entity_type') => self::getMorphClass()]);
 	}
 
 	public static function find(): RequestQuery
