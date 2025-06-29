@@ -6,6 +6,7 @@ namespace app\resources\ChatMember\ChatMemberModel;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Request;
+use app\resources\Request\RequestRegionResource;
 
 class RequestShortResource extends JsonResource
 {
@@ -27,7 +28,7 @@ class RequestShortResource extends JsonResource
 			'minArea'          => $this->resource->minArea,
 			'maxArea'          => $this->resource->maxArea,
 			'distanceFromMKAD' => $this->resource->distanceFromMKAD,
-			'regions'          => $this->resource->regions,
+			'regions'          => RequestRegionResource::collection($this->resource->regions),
 			'directions'       => $this->resource->directions,
 			'districts'        => $this->resource->districts,
 			'objectTypes'      => $this->resource->objectTypes,
