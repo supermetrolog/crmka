@@ -49,8 +49,8 @@ class SurveyRepository
 		             ->oneOrThrow();
 	}
 
-	public function findDraftByChatMemberIdAndUserId(int $chatMemberId, int $userId): ?Survey
+	public function findPendingByChatMemberIdAndUserId(int $chatMemberId, int $userId): ?Survey
 	{
-		return Survey::find()->draft()->byChatMemberId($chatMemberId)->byUserId($userId)->notDeleted()->one();
+		return Survey::find()->pending()->byChatMemberId($chatMemberId)->byUserId($userId)->notDeleted()->one();
 	}
 }

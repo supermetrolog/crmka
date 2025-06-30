@@ -56,6 +56,8 @@ class RequestController extends AppController
 	{
 		$searchModel = new RequestSearch();
 
+		$searchModel->current_user_id = $this->user->id;
+
 		$dataProvider = $searchModel->search($this->request->get());
 
 		return RequestSearchResource::fromDataProvider($dataProvider);
@@ -165,10 +167,6 @@ class RequestController extends AppController
 	 */
 	public function actionClone($id): RequestFullResource
 	{
-		if (!$this->user->identity->isModeratorOrHigher()) {
-			throw new ForbiddenHttpException('У вас нет прав на клонирование запросов');
-		}
-
 		$request = $this->requestRepository->findOneOrThrowWithRelations($id);
 
 		$form = new RequestCloneForm();

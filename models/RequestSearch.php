@@ -5,6 +5,7 @@ namespace app\models;
 use app\helpers\SQLHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\RequestDirection;
 use app\models\miniModels\RequestDistrict;
@@ -13,6 +14,7 @@ use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestObjectTypeGeneral;
 use app\models\miniModels\RequestRegion;
+use app\models\views\RequestSearchView;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -79,6 +81,9 @@ class RequestSearch extends Form
 
 	public $consultant_ids          = [];
 	public $with_passive_consultant = false;
+	public $with_current_user_tasks = false;
+	public $folder_ids;
+	public $current_user_id;
 
 	/**
 	 * {@inheritdoc}
@@ -88,8 +93,8 @@ class RequestSearch extends Form
 		return [
 			[['region_neardy', 'outside_mkad', 'id', 'company_id', 'dealType', 'expressRequest', 'distanceFromMKAD', 'distanceFromMKADnotApplicable', 'minArea', 'maxArea', 'minCeilingHeight', 'maxCeilingHeight', 'firstFloorOnly', 'heated', 'trainLine', 'trainLineLength', 'consultant_id', 'pricePerFloor', 'electricity', 'haveCranes', 'unknownMovingDate', 'antiDustOnly', 'passive_why', 'rangeMinPricePerFloor', 'rangeMaxPricePerFloor', 'rangeMinArea', 'rangeMaxArea', 'rangeMinCeilingHeight', 'rangeMaxCeilingHeight', 'maxDistanceFromMKAD', 'water', 'sewerage', 'gaz', 'steam', 'shelving', 'maxElectricity'], 'integer'],
 			[['status', 'regions', 'directions', 'districts', 'description', 'created_at', 'updated_at', 'movingDate', 'passive_why_comment', 'all', 'dateStart', 'dateEnd', 'objectTypes', 'objectTypesGeneral', 'objectClasses', 'gateTypes'], 'safe'],
-			[['consultant_ids'], 'each', 'rule' => ['integer']],
-			[['with_passive_consultant'], 'boolean'],
+			[['consultant_ids', 'folder_ids'], 'each', 'rule' => ['integer']],
+			[['with_passive_consultant', 'with_current_user_tasks'], 'boolean'],
 		];
 	}
 
@@ -99,15 +104,16 @@ class RequestSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = Request::find()->distinct()
-		                ->joinWith(['objectTypesGeneral', 'objectTypes', 'objectClasses', 'gateTypes', 'directions', 'districts', 'regions'])
-		                ->with([
-			                'consultant.userProfile',
-			                'directions', 'districts', 'regions.info',
-			                'contact.emails', 'contact.phones',
-			                'company.requests', 'company.contacts', 'company.objects',
-			                'mainTimeline.doneTimelineSteps'
-		                ]);
+		$query = RequestSearchView::find()->select([Request::field('*')])
+		                          ->joinWith(['objectTypesGeneral', 'objectTypes', 'objectClasses', 'gateTypes', 'directions', 'districts', 'regions'])
+		                          ->joinWith(['company.chatMember ccm'], false)
+		                          ->with([
+			                          'consultant.userProfile',
+			                          'directions', 'districts', 'regions.info',
+			                          'contact.emails', 'contact.phones',
+			                          'company.requests', 'company.contacts', 'company.objects',
+			                          'mainTimeline.doneTimelineSteps'
+		                          ])->groupBy(Request::field('id'));
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
@@ -159,6 +165,27 @@ class RequestSearch extends Form
 
 		$this->load($params);
 		$this->validateOrThrow();
+
+		if ($this->hasFilter($this->folder_ids)) {
+			$query->innerJoinWith(['folderEntities'], false)->andWhere([FolderEntity::field('folder_id') => $this->folder_ids]);
+		}
+
+		if ($this->hasFilter($this->current_user_id)) {
+			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)', 'has_pending_survey' => '(sd.id is not null)', 'pending_survey_status' => 'sd.status']);
+
+			$query->joinWith(['tasks' => function (TaskQuery $subquery) {
+				$subquery->andOnCondition([
+					'and',
+					[Task::field('user_id') => $this->current_user_id],
+					['!=', Task::field('status'), Task::STATUS_DONE]
+				]);
+			}], false, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN')
+			      ->leftJoin(
+				      ['sd' => Survey::getTable()],
+				      ['and', ['sd.status' => [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED], 'sd.deleted_at' => null], 'sd.chat_member_id = ccm.id', 'sd.user_id = :user_id'],
+				      ['user_id' => $this->current_user_id]
+			      );
+		}
 
 		if ($this->isFilterTrue($this->with_passive_consultant)) {
 			$query->innerJoinWith(['consultant' => function (UserQuery $query) {
