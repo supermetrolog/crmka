@@ -216,7 +216,7 @@ return static function (RouterInterface $router) {
 		$route->get()->action('index');
 
 		$route->post()->action('create');
-		$route->get('draft-by-chat-member/<id>', 'view-draft-by-chat-member-id');
+		$route->get('pending-by-chat-member/<id>', 'view-pending-by-chat-member-id');
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
@@ -224,6 +224,8 @@ return static function (RouterInterface $router) {
 
 			$route->post('complete');
 			$route->post('cancel');
+			$route->post('delay');
+			$route->post('continue');
 
 			$route->put()->action('update');
 			$route->put('with-survey-question-answer', 'update-with-survey-question-answer');
@@ -339,7 +341,7 @@ return static function (RouterInterface $router) {
 		$route->get('status');
 
 		$route->post('viewed');
-		
+
 		$route->post('<id>/reset', 'reset');
 	});
 };

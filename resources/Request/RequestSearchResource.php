@@ -24,12 +24,13 @@ class RequestSearchResource extends JsonResource
 		return ArrayHelper::merge(
 			RequestFullResource::make($this->resource)->toArray(),
 			[
-				'company'           => RequestSearchCompanyResource::tryMakeArray($this->resource->company),
-				'contact'           => ContactShortResource::tryMakeArray($this->resource->contact),
-				'consultant'        => UserShortResource::tryMakeArray($this->resource->consultant),
-				'timeline_progress' => $this->resource->getTimelineProgress(),
-				'tasks_count'       => $this->resource->tasks_count,
-				'has_survey_draft'  => $this->resource->has_survey_draft,
+				'company'               => RequestSearchCompanyResource::tryMakeArray($this->resource->company),
+				'contact'               => ContactShortResource::tryMakeArray($this->resource->contact),
+				'consultant'            => UserShortResource::tryMakeArray($this->resource->consultant),
+				'timeline_progress'     => $this->resource->getTimelineProgress(),
+				'tasks_count'           => $this->resource->tasks_count,
+				'has_pending_survey'    => $this->resource->has_pending_survey,
+				'pending_survey_status' => $this->resource->pending_survey_status,
 			]
 		);
 	}

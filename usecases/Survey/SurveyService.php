@@ -17,6 +17,7 @@ use app\events\Survey\CompleteSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\exceptions\services\SurveyAlreadyCancelledException;
 use app\exceptions\services\SurveyAlreadyCompletedException;
+use app\exceptions\services\SurveyAlreadyDelayedException;
 use app\exceptions\services\SurveyDraftAlreadyExistsException;
 use app\exceptions\services\SurveyMissingContactException;
 use app\helpers\DateTimeHelper;
@@ -70,7 +71,7 @@ class SurveyService
 	 */
 	public function create(CreateSurveyDto $dto): Survey
 	{
-		if ($dto->status === Survey::STATUS_DRAFT && $this->repository->findDraftByChatMemberIdAndUserId($dto->chatMember->id, $dto->user->id)) {
+		if ($dto->status === Survey::STATUS_DRAFT && $this->repository->findPendingByChatMemberIdAndUserId($dto->chatMember->id, $dto->user->id)) {
 			throw new SurveyDraftAlreadyExistsException('Draft already exists');
 		}
 
@@ -101,6 +102,10 @@ class SurveyService
 
 		if ($survey->isCanceled()) {
 			throw new SurveyAlreadyCancelledException('Cancelled Survey cannot be completed');
+		}
+
+		if ($survey->isDelayed()) {
+			throw new SurveyAlreadyDelayedException('Delayed Survey cannot be completed');
 		}
 
 		if (is_null($survey->contact_id)) {
@@ -142,6 +147,10 @@ class SurveyService
 			throw new SurveyAlreadyCompletedException('Completed Survey cannot be canceled');
 		}
 
+		if ($survey->isDelayed()) {
+			throw new SurveyAlreadyDelayedException('Delayed Survey cannot be canceled');
+		}
+
 		$tx = $this->transactionBeginner->begin();
 
 		try {
@@ -159,6 +168,52 @@ class SurveyService
 			$tx->rollBack();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function delay(Survey $survey): Survey
+	{
+		if ($survey->isDelayed()) {
+			return $survey;
+		}
+
+		if ($survey->isCompleted()) {
+			throw new SurveyAlreadyCompletedException('Completed Survey cannot be canceled');
+		}
+
+		if ($survey->isCanceled()) {
+			throw new SurveyAlreadyCancelledException('Canceled Survey cannot be canceled');
+		}
+
+		$survey->status = Survey::STATUS_DELAYED;
+		$survey->saveOrThrow();
+
+		return $survey;
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function continue(Survey $survey): Survey
+	{
+		if ($survey->isDraft()) {
+			return $survey;
+		}
+
+		if ($survey->isCompleted()) {
+			throw new SurveyAlreadyCompletedException('Completed Survey cannot be continued');
+		}
+
+		if ($survey->isCanceled()) {
+			throw new SurveyAlreadyCancelledException('Canceled Survey cannot be continued');
+		}
+
+		$survey->status = Survey::STATUS_DRAFT;
+		$survey->saveOrThrow();
+
+		return $survey;
 	}
 
 	/**

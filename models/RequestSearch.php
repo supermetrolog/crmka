@@ -171,7 +171,7 @@ class RequestSearch extends Form
 		}
 
 		if ($this->hasFilter($this->current_user_id)) {
-			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)', 'has_survey_draft' => '(sd.id is not null)']);
+			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)', 'has_pending_survey' => '(sd.id is not null)', 'pending_survey_status' => 'sd.status']);
 
 			$query->joinWith(['tasks' => function (TaskQuery $subquery) {
 				$subquery->andOnCondition([
@@ -182,7 +182,7 @@ class RequestSearch extends Form
 			}], false, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN')
 			      ->leftJoin(
 				      ['sd' => Survey::getTable()],
-				      ['and', ['sd.status' => Survey::STATUS_DRAFT, 'sd.deleted_at' => null], 'sd.chat_member_id = ccm.id', 'sd.user_id = :user_id'],
+				      ['and', ['sd.status' => [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED], 'sd.deleted_at' => null], 'sd.chat_member_id = ccm.id', 'sd.user_id = :user_id'],
 				      ['user_id' => $this->current_user_id]
 			      );
 		}
