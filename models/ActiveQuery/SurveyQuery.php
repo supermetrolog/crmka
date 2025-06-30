@@ -47,6 +47,14 @@ class SurveyQuery extends AQ
 		return $this->andWhere([$this->field('status') => $status]);
 	}
 
+	/**
+	 * @param int[] $status
+	 */
+	public function byStatuses(array $status): self
+	{
+		return $this->andWhere([$this->field('status') => $status]);
+	}
+
 	public function byType(string $type): self
 	{
 		return $this->andWhere([$this->field('type') => $type]);
@@ -60,6 +68,11 @@ class SurveyQuery extends AQ
 	public function completed(): self
 	{
 		return $this->byStatus(Survey::STATUS_COMPLETED);
+	}
+
+	public function pending(): self
+	{
+		return $this->byStatuses([Survey::STATUS_DRAFT, Survey::STATUS_DELAYED]);
 	}
 
 	public function byChatMemberId(int $chatMemberId): self

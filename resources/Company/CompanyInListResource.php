@@ -73,9 +73,10 @@ class CompanyInListResource extends JsonResource
 
 			'last_call' => CallShortResource::tryMakeArray($this->resource->lastCall),
 
-			'pinned_messages'  => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
-			'last_survey'      => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
-			'has_survey_draft' => $this->resource->has_survey_draft,
+			'pinned_messages'       => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
+			'last_survey'           => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
+			'has_pending_survey'    => $this->resource->has_pending_survey,
+			'pending_survey_status' => $this->resource->pending_survey_status,
 
 			'chat_member_id' => $this->resource->chatMember->id ?? null,
 

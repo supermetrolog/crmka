@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\exceptions\services\SurveyAlreadyCancelledException;
 use app\exceptions\services\SurveyAlreadyCompletedException;
+use app\exceptions\services\SurveyAlreadyDelayedException;
 use app\exceptions\services\SurveyDraftAlreadyExistsException;
 use app\exceptions\services\SurveyMissingContactException;
 use app\helpers\ArrayHelper;
@@ -28,6 +29,7 @@ use app\resources\Survey\SurveyWithQuestionsResource;
 use app\usecases\Survey\SurveyService;
 use Exception;
 use Throwable;
+use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\UploadedFile;
@@ -56,6 +58,7 @@ class SurveyController extends AppController
 
 	/**
 	 * @throws ValidateException
+	 * @throws ErrorException
 	 */
 	public function actionIndex(): ActiveDataProvider
 	{
@@ -86,9 +89,9 @@ class SurveyController extends AppController
 		return new SurveyWithQuestionsResource($survey, $questions);
 	}
 
-	public function actionViewDraftByChatMemberId(int $id): ?SurveyWithQuestionsResource
+	public function actionViewPendingByChatMemberId(int $id): ?SurveyWithQuestionsResource
 	{
-		$survey = $this->repository->findDraftByChatMemberIdAndUserId($id, $this->user->id);
+		$survey = $this->repository->findPendingByChatMemberIdAndUserId($id, $this->user->id);
 
 		if ($survey) {
 			$questions = $this->questionRepository->findAllBySurveyIdWithAnswers($survey->id);
@@ -125,9 +128,9 @@ class SurveyController extends AppController
 	}
 
 	/**
-	 * @return SurveyShortResource|ErrorResponse
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function actionComplete(int $id)
 	{
@@ -141,13 +144,15 @@ class SurveyController extends AppController
 			return $this->error('Нельзя завершить опрос без указания контакта.');
 		} catch (SurveyAlreadyCancelledException $e) {
 			return $this->error('Нельзя завершить опрос, который был отменен.');
+		} catch (SurveyAlreadyDelayedException $e) {
+			return $this->error('Нельзя завершить опрос, который был отложен.');
 		}
 	}
 
 	/**
-	 * @return SurveyShortResource|ErrorResponse
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 */
 	public function actionCancel(int $id)
 	{
@@ -159,6 +164,41 @@ class SurveyController extends AppController
 			return new SurveyShortResource($model);
 		} catch (SurveyAlreadyCompletedException $e) {
 			return $this->error('Нельзя отменить опрос, который был завершен.');
+		}
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function actionDelay(int $id)
+	{
+		$survey = $this->repository->findOneOrThrow($id);
+
+		try {
+			$model = $this->service->delay($survey);
+
+			return new SurveyShortResource($model);
+		} catch (SurveyAlreadyCompletedException|SurveyAlreadyCancelledException $e) {
+			return $this->error('Нельзя отложить опрос, который был завершен.');
+		}
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 */
+	public function actionContinue(int $id)
+	{
+		$survey = $this->repository->findOneOrThrow($id);
+
+		try {
+			$model = $this->service->continue($survey);
+
+			return new SurveyShortResource($model);
+		} catch (SurveyAlreadyCompletedException|SurveyAlreadyCancelledException $e) {
+			return $this->error('Нельзя продолжить опрос, который был завершен.');
 		}
 	}
 

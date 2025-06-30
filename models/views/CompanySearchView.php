@@ -14,5 +14,6 @@ class CompanySearchView extends Company
 	public int  $active_contacts_count = 0;
 	public int  $tasks_count           = 0;
 
-	public bool $has_survey_draft = false;
+	public bool    $has_pending_survey    = false;
+	public ?string $pending_survey_status = null;
 }

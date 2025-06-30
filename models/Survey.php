@@ -55,13 +55,15 @@ class Survey extends AR
 	public const STATUS_DRAFT     = 'draft';
 	public const STATUS_COMPLETED = 'completed';
 	public const STATUS_CANCELED  = 'canceled';
+	public const STATUS_DELAYED   = 'delayed';
 
 	public static function getStatuses(): array
 	{
 		return [
 			self::STATUS_DRAFT,
 			self::STATUS_COMPLETED,
-			self::STATUS_CANCELED
+			self::STATUS_CANCELED,
+			self::STATUS_DELAYED
 		];
 	}
 
@@ -246,6 +248,11 @@ class Survey extends AR
 	public function isCanceled(): bool
 	{
 		return $this->status === self::STATUS_CANCELED;
+	}
+
+	public function isDelayed(): bool
+	{
+		return $this->status === self::STATUS_DELAYED;
 	}
 
 	public function isAdvanced(): bool
