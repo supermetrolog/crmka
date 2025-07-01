@@ -13,6 +13,7 @@ use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\Phone;
 use app\models\search\expressions\CompanySearchExpressions;
 use app\models\views\CompanySearchView;
@@ -53,6 +54,7 @@ class CompanySearch extends Form
 	public $activity_profile_ids = [];
 
 	public $without_product_ranges  = false;
+	public $without_surveys         = false;
 	public $with_passive_consultant = false;
 	public $with_current_user_tasks = false;
 	public $show_product_ranges;
@@ -71,7 +73,7 @@ class CompanySearch extends Form
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd', 'product_ranges'], 'safe'],
 			[['activity_group_ids', 'activity_profile_ids', 'folder_ids'], 'each', 'rule' => ['integer']],
-			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges', 'with_current_user_tasks'], 'boolean'],
+			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges', 'with_current_user_tasks', 'without_surveys'], 'boolean'],
 			['requests_filter', 'string'],
 			['requests_filter', 'in', 'range' => ['none', 'active', 'not-active', 'passive']],
 			[['requests_area_min', 'requests_area_max', 'current_user_id'], 'integer'],
@@ -164,6 +166,13 @@ class CompanySearch extends Form
 			$query->innerJoinWith(['consultant' => function (UserQuery $query) {
 				$query->andWhere(['!=', User::field('status'), User::STATUS_ACTIVE]);
 			}]);
+		}
+
+		if ($this->isFilterTrue($this->without_surveys)) {
+			$query->leftJoin(
+				['surveys' => Survey::find()->notDeleted()->byStatuses([Survey::STATUS_CANCELED, Survey::STATUS_COMPLETED])->groupBy(['chat_member_id'])],
+				'surveys.chat_member_id = cm.id'
+			)->andWhere(['surveys.id' => null]);
 		}
 
 		if (!is_null($this->requests_filter)) {
