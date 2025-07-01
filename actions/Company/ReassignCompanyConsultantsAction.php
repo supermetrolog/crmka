@@ -29,13 +29,7 @@ class ReassignCompanyConsultantsAction extends Action
 {
 	// Active consultants usernames must be sorted by companies count (asc)
 	private const ACTIVE_CONSULTANT_USERNAMES = [
-		"karpushin",
-		"matveev",
-		"andrianov",
-		"balashov",
-		"otdelencev",
-		"igorkaz",
-		"mandryka"
+		"a.brusensky@mail.ru"
 	];
 
 	// Company category can be changed if needed
@@ -43,6 +37,13 @@ class ReassignCompanyConsultantsAction extends Action
 		Category::CATEGORY_CLIENT,
 		Category::CATEGORY_OWNER,
 	];
+
+	private const REASSIGN_STRATEGY_INACTIVE_CONSULTANTS = 'inactive';
+	private const REASSIGN_STRATEGY_SYSTEM_CONSULTANT    = 'system';
+
+	private const CURRENT_REASSIGN_STRATEGY = self::REASSIGN_STRATEGY_SYSTEM_CONSULTANT;
+
+	private const MAX_COMPANIES_TO_ASSIGN = 300;
 
 	private UserRepository               $userRepository;
 	private TransactionBeginnerInterface $transactionBeginner;
@@ -72,7 +73,10 @@ class ReassignCompanyConsultantsAction extends Action
 		$this->printCompanyFilters();
 		$this->delimiter();
 
-		$companiesCountToAssign = (int)$this->createNotAssignedCompaniesQuery()->count();
+		$companiesCount = (int)$this->createNotAssignedCompaniesQuery()->count();
+
+		$companiesCountToAssign = min($companiesCount, self::MAX_COMPANIES_TO_ASSIGN);
+
 
 		if ($companiesCountToAssign > 0) {
 			$this->infof('Not assigned companies count with selected filters: %d', $companiesCountToAssign);
@@ -267,6 +271,7 @@ class ReassignCompanyConsultantsAction extends Action
 	private function createCompaniesQuery(): CompanyQuery
 	{
 		return Company::find()
+		              ->active()
 		              ->innerJoinWith(['requests' => function (RequestQuery $query) {
 			              return $query->andOnCondition([Request::field('status') => Request::STATUS_ACTIVE]);
 		              }], false)
@@ -276,12 +281,29 @@ class ReassignCompanyConsultantsAction extends Action
 		              ->groupBy(Company::field('id'));
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	private function createNotAssignedCompaniesQuery(): CompanyQuery
 	{
-		return $this->createCompaniesQuery()
-		            ->innerJoinWith(['consultant' => function (UserQuery $query) {
-			            return $query->andOnCondition(['!=', User::field('status'), User::STATUS_ACTIVE]);
-		            }], false);
+		switch (self::CURRENT_REASSIGN_STRATEGY) {
+			case self::REASSIGN_STRATEGY_INACTIVE_CONSULTANTS:
+			{
+				return $this->createCompaniesQuery()
+				            ->innerJoinWith(['consultant' => function (UserQuery $query) {
+					            return $query->andOnCondition(['!=', User::field('status'), User::STATUS_ACTIVE]);
+				            }], false);
+			}
+			case self::REASSIGN_STRATEGY_SYSTEM_CONSULTANT:
+			{
+				return $this->createCompaniesQuery()
+				            ->innerJoinWith(['consultant' => function (UserQuery $query) {
+					            return $query->andOnCondition([User::field('role') => User::ROLE_SYSTEM]);
+				            }], false);
+			}
+		}
+
+		throw new ErrorException('Unknown reassign strategy');
 	}
 
 	private function getAverageCompaniesCountPerConsultant(): int
