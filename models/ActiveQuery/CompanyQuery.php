@@ -59,4 +59,20 @@ class CompanyQuery extends AQ
 
 		return $this;
 	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function byStatus(int $status): self
+	{
+		return $this->andWhere([Company::field('status') => $status]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function active(): self
+	{
+		return $this->byStatus(Company::STATUS_ACTIVE);
+	}
 }
