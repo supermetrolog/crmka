@@ -13,6 +13,7 @@ use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\Phone;
 use app\models\search\expressions\CompanySearchExpressions;
 use app\models\views\CompanySearchView;

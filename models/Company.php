@@ -21,6 +21,7 @@ use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskRelationEntityQuery;
+use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\CompanyFile;
 use Yii;
 use yii\base\ErrorException;
@@ -344,13 +345,9 @@ class Company extends AR
 		return $this->hasOne(Companygroup::class, ['id' => 'companyGroup_id']);
 	}
 
-	/**
-	 * Gets query for [[Consultant]].
-	 *
-	 * @return ActiveQuery
-	 */
-	public function getConsultant(): ActiveQuery
+	public function getConsultant(): UserQuery
 	{
+		/** @var UserQuery */
 		return $this->hasOne(User::class, ['id' => 'consultant_id']);
 	}
 
