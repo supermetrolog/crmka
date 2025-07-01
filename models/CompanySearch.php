@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use app\components\ExpressionBuilder\FieldExpressionBuilder;
 use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\helpers\ArrayHelper;
 use app\kernel\common\models\AQ\AQ;
@@ -14,8 +13,8 @@ use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
-use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\Phone;
+use app\models\search\expressions\CompanySearchExpressions;
 use app\models\views\CompanySearchView;
 use Exception;
 use yii\base\ErrorException;
@@ -197,7 +196,11 @@ class CompanySearch extends Form
 		}
 
 		if ($this->hasFilter($this->current_user_id)) {
-			$query->addSelect(['tasks_count' => 'COUNT(DISTINCT task.id)', 'has_pending_survey' => '(sd.id is not null)', 'pending_survey_status' => 'sd.status']);
+			$query->addSelect([
+				'tasks_count'           => 'COUNT(DISTINCT task.id)',
+				'has_pending_survey'    => '(sd.id is not null)',
+				'pending_survey_status' => 'sd.status'
+			]);
 
 			$query->joinWith(['tasks' => function (TaskQuery $subquery) {
 				$subquery->andOnCondition([
@@ -368,49 +371,38 @@ class CompanySearch extends Form
 				                             ->beforeBuild(fn($expression) => "$expression DESC")
 				                             ->build()
 			],
+			'activity'                => [
+				'asc' => [
+					new Expression('CASE
+			            WHEN MIN(task.start) < DATE_ADD(CURDATE(), INTERVAL 5 DAY) THEN 1
+			            ELSE 2
+			        END ASC'),
+					'MIN(task.start)'            => SORT_ASC,
+					CompanySearchExpressions::surveyDelayedOrder(),
+					CompanySearchExpressions::surveyCompletedOrder(),
+					CompanySearchExpressions::recentlyCreatedOrder(),
+					CompanySearchExpressions::byRequestStatusOrder(),
+					CompanySearchExpressions::requestRelatedOrder(),
+					Request::field('created_at') => SORT_ASC,
+					Request::field('updated_at') => SORT_ASC,
+					Company::field('created_at') => SORT_ASC
+				]
+			],
 			'default'                 => [
 				'asc'     => [
-					IfExpressionBuilder::create()
-					                   ->condition('NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR)')
-					                   ->left(Company::field('created_at'))
-					                   ->right('NULL')
-					                   ->beforeBuild(fn($expression) => "$expression ASC")
-					                   ->build(),
-					FieldExpressionBuilder::create()
-					                      ->field(Request::field('status'))
-					                      ->values(0, 2, 1)
-					                      ->beforeBuild(fn($expression) => "$expression ASC")
-					                      ->build(),
+					CompanySearchExpressions::recentlyCreatedOrder(),
+					CompanySearchExpressions::byRequestStatusOrder(),
 					"COALESCE(last_call_rel.created_at, company.updated_at, company.created_at)" => SORT_ASC,
-					IfExpressionBuilder::create()
-					                   ->condition(Request::field('related_updated_at'))
-					                   ->left(Request::field('related_updated_at'))
-					                   ->right(Request::field('created_at'))
-					                   ->beforeBuild(fn($expression) => "$expression ASC")
-					                   ->build(),
+					CompanySearchExpressions::requestRelatedOrder(),
 					Request::field('created_at')                                                 => SORT_ASC,
 					Request::field('updated_at')                                                 => SORT_ASC,
 					Company::field('created_at')                                                 => SORT_ASC
 				],
 				'desc'    => [
-					IfExpressionBuilder::create()
-					                   ->condition('NOW() BETWEEN company.created_at AND DATE_ADD(company.created_at, INTERVAL 12 HOUR)')
-					                   ->left(Company::field('created_at'))
-					                   ->right('NULL')
-					                   ->beforeBuild(fn($expression) => "$expression DESC")
-					                   ->build(),
-					FieldExpressionBuilder::create()
-					                      ->field(Request::field('status'))
-					                      ->values(0, 2, 1)
-					                      ->beforeBuild(fn($expression) => "$expression DESC")
-					                      ->build(),
+					CompanySearchExpressions::recentlyCreatedOrder('DESC'),
+					CompanySearchExpressions::byRequestStatusOrder('DESC'),
 					"COALESCE(last_call_rel.created_at, company.updated_at, company.created_at)" => SORT_DESC,
-					IfExpressionBuilder::create()
-					                   ->condition(Request::field('related_updated_at'))
-					                   ->left(Request::field('related_updated_at'))
-					                   ->right(Request::field('created_at'))
-					                   ->beforeBuild(fn($expression) => "$expression DESC")
-					                   ->build(),
+					CompanySearchExpressions::requestRelatedOrder('DESC'),
 					Request::field('created_at')                                                 => SORT_DESC,
 					Request::field('updated_at')                                                 => SORT_DESC,
 					Company::field('created_at')                                                 => SORT_DESC
@@ -429,6 +421,7 @@ class CompanySearch extends Form
 			'last_request_created_at' => fn(CompanyQuery $query) => $query->leftJoin(['lr' => $this->makeLastRequestQuery()], 'lr.company_id = company.id'),
 			'last_object_created_at'  => fn(CompanyQuery $query) => $query->leftJoin(['lob' => $this->makeLastObjectQuery()], 'lob.company_id = company.id'),
 			'last_offer_updated_at'   => fn(CompanyQuery $query) => $query->leftJoin(['lof' => $this->makeLastOfferQuery()], 'lof.company_id = company.id'),
+			'activity'                => fn(CompanyQuery $query) => $query->leftJoin(['lps' => $this->makeLastProcessedSurveyQuery()], 'lps.chat_member_id = cm.id'),
 		];
 	}
 
@@ -533,7 +526,33 @@ class CompanySearch extends Form
 			             'last_survey_created_at'   => 'MAX(created_at)',
 			             'last_survey_completed_at' => 'MAX(completed_at)',
 		             ])
-		             ->andWhere(['!=', Survey::field('status'), Survey::STATUS_DRAFT])
+		             ->andWhere(['!=', Survey::field('status'), [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED]])
 		             ->groupBy('chat_member_id');
+	}
+
+	private function makeLastProcessedSurveyQuery(int $delayedInterval = 5, int $completedInterval = 90): SurveyQuery
+	{
+		$subQuery = Survey::find()
+		                  ->select(['chat_member_id', 'max_id' => 'MAX(id)'])
+		                  ->where([
+			                  'or',
+			                  ['and',
+			                   ['status' => [Survey::STATUS_COMPLETED, Survey::STATUS_CANCELED]],
+			                   new Expression('NOW() > DATE_ADD(completed_at, INTERVAL :completedInterval DAY)')
+			                  ],
+			                  ['and',
+			                   ['status' => Survey::STATUS_DELAYED],
+			                   new Expression('NOW() > DATE_ADD(updated_at, INTERVAL :delayedInterval DAY)')
+			                  ]
+		                  ], [
+			                  ':completedInterval' => $completedInterval,
+			                  ':delayedInterval'   => $delayedInterval
+		                  ])
+		                  ->groupBy('chat_member_id');
+
+		return Survey::find()
+		             ->from(['s' => Survey::tableName()])
+		             ->innerJoin(['sq' => $subQuery], 'id = sq.max_id')
+		             ->select(['s.id', 's.chat_member_id', 's.status', 's.completed_at', 's.updated_at', 's.created_at']);
 	}
 }
