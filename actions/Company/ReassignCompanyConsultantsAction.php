@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace app\actions\Company;
 
+use app\dto\Request\ChangeRequestConsultantDto;
 use app\helpers\ArrayHelper;
 use app\helpers\StringHelper;
 use app\kernel\common\actions\Action;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\UserQuery;
@@ -17,6 +19,7 @@ use app\models\Company;
 use app\models\Request;
 use app\models\User;
 use app\repositories\UserRepository;
+use app\usecases\Request\RequestService;
 use Throwable;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -47,17 +50,20 @@ class ReassignCompanyConsultantsAction extends Action
 
 	private UserRepository               $userRepository;
 	private TransactionBeginnerInterface $transactionBeginner;
+	private RequestService               $requestService;
 
 	public function __construct(
 		$id,
 		$controller,
 		UserRepository $userRepository,
 		TransactionBeginnerInterface $transactionBeginner,
+		RequestService $requestService,
 		array $config = []
 	)
 	{
 		$this->userRepository      = $userRepository;
 		$this->transactionBeginner = $transactionBeginner;
+		$this->requestService      = $requestService;
 
 		parent::__construct($id, $controller, $config);
 	}
@@ -243,9 +249,9 @@ class ReassignCompanyConsultantsAction extends Action
 				$totalAssignedCompaniesCount += $limit;
 				$limit                       = min($limit, $neededCompaniesCount - $totalAssignedCompaniesCount);
 
-				$companiesIds = ArrayHelper::column($companies, 'id');
-
-				Company::updateAll(['consultant_id' => $consultant->id], ['id' => $companiesIds]);
+				foreach ($companies as $company) {
+					$this->changeCompanyConsultant($company, $consultant);
+				}
 			}
 
 			$tx->commit();
@@ -257,6 +263,30 @@ class ReassignCompanyConsultantsAction extends Action
 				$consultant->username,
 				$totalAssignedCompaniesCount + $currentCompaniesCount
 			);
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function changeCompanyConsultant(Company $company, User $consultant): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$company->updateAttributes(['consultant_id' => $consultant->id]);
+
+			$requests = $company->activeRequests;
+
+			foreach ($requests as $request) {
+				$this->requestService->changeConsultant($request, new ChangeRequestConsultantDto(['consultant' => $consultant]));
+			}
+
+			$tx->commit();
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
