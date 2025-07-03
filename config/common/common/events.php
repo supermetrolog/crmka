@@ -18,6 +18,7 @@ use app\events\Task\PostponeTaskEvent;
 use app\events\Task\RestoreTaskEvent;
 use app\events\Task\UpdateTaskEvent;
 use app\events\Timeline\UpdateTimelineStepEvent;
+use app\listeners\Company\ChangeCompanyRequestsConsultantListener;
 use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
 use app\listeners\Company\DeactivateCompanyContactsListener;
 use app\listeners\Company\DeactivateCompanyRequestsListener;
@@ -51,7 +52,8 @@ return [
 		UpdateSurveySystemChatMessageListener::class,
 	],
 	ChangeConsultantCompanyEvent::class => [
-		ChangeConsultantCompanySystemChatMessageListener::class
+		ChangeConsultantCompanySystemChatMessageListener::class,
+		ChangeCompanyRequestsConsultantListener::class
 	],
 	CreateTaskEvent::class              => [
 		CreateHistoryTaskListener::class,

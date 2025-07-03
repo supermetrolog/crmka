@@ -7,6 +7,7 @@ namespace app\usecases\Company;
 use app\components\EventManager;
 use app\components\Media\SaveMediaErrorException;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
+use app\dto\Company\ChangeCompanyConsultantDto;
 use app\dto\Company\CompanyActivityGroupDto;
 use app\dto\Company\CompanyActivityProfileDto;
 use app\dto\Company\CompanyDto;
@@ -635,6 +636,36 @@ class CompanyService
 			$tx->commit();
 
 			return $pinnedMessage;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function changeConsultant(Company $company, ChangeCompanyConsultantDto $dto): Company
+	{
+		if ($company->consultant_id === $dto->consultant->id) {
+			return $company;
+		}
+
+		$oldConsultant = $company->consultant;
+
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+
+			$company->consultant_id = $dto->consultant->id;
+			$company->saveOrThrow();
+
+			$this->eventManager->trigger(new ChangeConsultantCompanyEvent($company, $oldConsultant, $dto->consultant, $dto));
+
+			$tx->commit();
+
+			return $company;
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;
