@@ -13,12 +13,12 @@ use app\models\User;
  */
 class ChangeConsultantCompanyEvent extends AbstractEvent
 {
-	private Company                     $company;
-	private User                        $oldConsultant;
-	private User                        $newConsultant;
-	private ?ChangeCompanyConsultantDto $dto;
+	private Company                    $company;
+	private User                       $oldConsultant;
+	private User                       $newConsultant;
+	private ChangeCompanyConsultantDto $dto;
 
-	public function __construct(Company $company, User $oldConsultant, User $newConsultant, ?ChangeCompanyConsultantDto $dto)
+	public function __construct(Company $company, User $oldConsultant, User $newConsultant, ChangeCompanyConsultantDto $dto)
 	{
 		parent::__construct();
 
