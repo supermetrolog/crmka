@@ -9,6 +9,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\CompanySearch;
 use app\models\forms\ChatMember\ChatMemberMessageForm;
+use app\models\forms\Company\CompanyChangeConsultantForm;
 use app\models\forms\Company\CompanyContactsForm;
 use app\models\forms\Company\CompanyDisableForm;
 use app\models\forms\Company\CompanyForm;
@@ -28,6 +29,7 @@ use app\usecases\Company\CompanyService;
 use app\usecases\Company\CompanyWithGeneralContactService;
 use Throwable;
 use yii\base\ErrorException;
+use yii\base\InvalidArgumentException;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\UploadedFile;
@@ -323,5 +325,29 @@ class CompanyController extends AppController
 		$message = $this->companyService->createPinnedMessage($company, $form->getDto());
 
 		return new EntityPinnedMessageResource($message);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionChangeConsultant($id)
+	{
+		$company = $this->companyRepository->findModelById($id);
+
+		$form = new CompanyChangeConsultantForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		try {
+			$model = $this->companyService->changeConsultant($company, $form->getDto());
+
+			return new CreatedCompanyResource($model);
+		} catch (InvalidArgumentException $e) {
+			return $this->error('Консультант уже назначен на эту компанию');
+		}
 	}
 }
