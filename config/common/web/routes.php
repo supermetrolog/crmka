@@ -60,6 +60,7 @@ return static function (RouterInterface $router) {
 
 			$route->post('pin-message');
 			$route->post('create-pinned-message');
+			$route->post('change-consultant');
 
 			$route->post('logo', 'update-logo');
 			$route->delete('logo', 'delete-logo');
