@@ -270,7 +270,7 @@ class CompanyService
 					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
 				]));
 
-				$this->eventManager->trigger(new ChangeConsultantCompanyEvent($model, $oldConsultant, $newConsultant));
+				$this->eventManager->trigger(new ChangeConsultantCompanyEvent($model, $oldConsultant, $newConsultant, new ChangeCompanyConsultantDto(['consultant' => $newConsultant])));
 			}
 
 			$tx->commit();
