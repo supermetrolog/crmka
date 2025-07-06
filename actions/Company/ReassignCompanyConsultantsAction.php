@@ -47,6 +47,7 @@ class ReassignCompanyConsultantsAction extends Action
 	private const CURRENT_REASSIGN_STRATEGY = self::REASSIGN_STRATEGY_SYSTEM_CONSULTANT;
 
 	private const MAX_COMPANIES_TO_ASSIGN = 300;
+	private const CREATED_AFTER_DATE      = '2021-01-01';
 
 	private UserRepository               $userRepository;
 	private TransactionBeginnerInterface $transactionBeginner;
@@ -308,6 +309,7 @@ class ReassignCompanyConsultantsAction extends Action
 		              ->innerJoinWith(['categories' => function (ActiveQuery $query) {
 			              return $query->andOnCondition([Category::field('category') => self::COMPANY_CATEGORIES]);
 		              }], false)
+		              ->createdAfter(self::CREATED_AFTER_DATE)
 		              ->groupBy(Company::field('id'));
 	}
 
