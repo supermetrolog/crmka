@@ -81,6 +81,6 @@ class CompanyQuery extends AQ
 	 */
 	public function createdAfter(string $date): self
 	{
-		return $this->andWhere([Company::field('created_at') => $date]);
+		return $this->andWhere(['>', Company::field('created_at'), $date]);
 	}
 }
