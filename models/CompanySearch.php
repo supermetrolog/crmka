@@ -383,8 +383,9 @@ class CompanySearch extends Form
 			'activity'                => [
 				'asc' => [
 					new Expression('CASE
-			            WHEN MIN(task.start) < DATE_ADD(CURDATE(), INTERVAL 5 DAY) THEN 1
-			            ELSE 2
+			            WHEN DATE(MIN(task.start)) = CURDATE() THEN 1 
+			            WHEN DATE(MIN(task.start)) < DATE_ADD(CURDATE(), INTERVAL 5 DAY) THEN 2
+			            ELSE 3
 			        END ASC'),
 					'MIN(task.start)'            => SORT_ASC,
 					CompanySearchExpressions::surveyDelayedOrder(),
