@@ -75,4 +75,12 @@ class CompanyQuery extends AQ
 	{
 		return $this->byStatus(Company::STATUS_ACTIVE);
 	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function createdAfter(string $date): self
+	{
+		return $this->andWhere([Company::field('created_at') => $date]);
+	}
 }
