@@ -47,7 +47,7 @@ class ReassignCompanyConsultantsAction extends Action
 	private const CURRENT_REASSIGN_STRATEGY = self::REASSIGN_STRATEGY_SYSTEM_CONSULTANT;
 
 	private const MAX_COMPANIES_TO_ASSIGN = 300;
-	private const CREATED_AFTER_DATE      = '2021-01-01';
+	private const CREATED_AFTER_DATE      = '2019-01-01';
 
 	private UserRepository               $userRepository;
 	private TransactionBeginnerInterface $transactionBeginner;
