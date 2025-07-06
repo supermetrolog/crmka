@@ -217,7 +217,7 @@ class CompanySearch extends Form
 					[Task::field('user_id') => $this->current_user_id],
 					['!=', Task::field('status'), Task::STATUS_DONE]
 				]);
-			}], false, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN')
+			}], true, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN')
 			      ->leftJoin(
 				      ['sd' => Survey::getTable()],
 				      ['and', ['sd.status' => [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED], 'sd.deleted_at' => null], 'sd.chat_member_id = cm.id', 'sd.user_id = :user_id'],
