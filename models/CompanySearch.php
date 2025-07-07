@@ -57,6 +57,7 @@ class CompanySearch extends Form
 	public $without_surveys         = false;
 	public $with_passive_consultant = false;
 	public $with_current_user_tasks = false;
+	public $with_active_contacts    = false;
 	public $show_product_ranges;
 	public $requests_filter;
 	public $requests_area_min;
@@ -73,7 +74,7 @@ class CompanySearch extends Form
 			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'active', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['id', 'all', 'nameEng', 'nameRu', 'categories', 'dateStart', 'dateEnd', 'product_ranges'], 'safe'],
 			[['activity_group_ids', 'activity_profile_ids', 'folder_ids'], 'each', 'rule' => ['integer']],
-			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges', 'with_current_user_tasks', 'without_surveys'], 'boolean'],
+			[['without_product_ranges', 'with_passive_consultant', 'show_product_ranges', 'with_current_user_tasks', 'without_surveys', 'with_active_contacts'], 'boolean'],
 			['requests_filter', 'string'],
 			['requests_filter', 'in', 'range' => ['none', 'active', 'not-active', 'passive']],
 			[['requests_area_min', 'requests_area_max', 'current_user_id'], 'integer'],
@@ -173,6 +174,10 @@ class CompanySearch extends Form
 				['surveys' => Survey::find()->notDeleted()->byStatuses([Survey::STATUS_CANCELED, Survey::STATUS_COMPLETED])->groupBy(['chat_member_id'])],
 				'surveys.chat_member_id = cm.id'
 			)->andWhere(['surveys.id' => null]);
+		}
+
+		if ($this->isFilterTrue($this->with_active_contacts)) {
+			$query->andHaving(['>', 'active_contacts_count', 0]);
 		}
 
 		if (!is_null($this->requests_filter)) {
@@ -324,12 +329,12 @@ class CompanySearch extends Form
 			],
 			'last_task_created_at'    => [
 				'asc'  => [
-					new Expression('lt.last_task_created_at IS NOT NULL DESC'),
-					'lt.last_task_created_at'                          => SORT_ASC,
+					new Expression('lt.min_task_start IS NOT NULL DESC'),
+					'lt.min_task_start'                                => SORT_ASC,
 					'COALESCE(company.updated_at, company.created_at)' => SORT_ASC
 				],
 				'desc' => [
-					'lt.last_task_created_at'                          => SORT_DESC,
+					'lt.max_task_start'                                => SORT_DESC,
 					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
 				]
 			],
@@ -468,14 +473,17 @@ class CompanySearch extends Form
 		           ->from(Task::getTable())
 		           ->select([
 			           'tre.entity_id AS company_id',
-			           'last_task_created_at' => 'MAX(task.created_at)',
+			           'max_task_start' => 'MAX(task.start)',
+			           'min_task_start' => 'MIN(task.start)',
 		           ])
 		           ->innerJoin(['tre' => TaskRelationEntity::getTable()], 'tre.task_id = task.id')
 		           ->where([
 			           'tre.entity_type' => Company::getMorphClass(),
 			           'task.deleted_at' => null,
+			           'task.user_id'    => $this->current_user_id,
 			           'tre.deleted_at'  => null,
 		           ])
+		           ->andWhere(['!=', 'task.status', Task::STATUS_DONE])
 		           ->groupBy('tre.entity_id');
 	}
 
