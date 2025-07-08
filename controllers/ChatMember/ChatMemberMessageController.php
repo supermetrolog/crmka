@@ -65,6 +65,16 @@ class ChatMemberMessageController extends AppController
 	}
 
 	/**
+	 * @throws NotFoundHttpException
+	 */
+	public function actionView(int $id): ChatMemberMessageResource
+	{
+		$message = $this->findModel($id, false);
+
+		return new ChatMemberMessageResource($message);
+	}
+
+	/**
 	 * @return ChatMemberMessageResource
 	 * @throws SaveModelException
 	 * @throws Throwable
