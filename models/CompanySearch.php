@@ -4,6 +4,8 @@ namespace app\models;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\helpers\ArrayHelper;
+use app\helpers\DateIntervalHelper;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
@@ -211,7 +213,6 @@ class CompanySearch extends Form
 
 		if ($this->hasFilter($this->current_user_id)) {
 			$query->addSelect([
-				'tasks_count'           => 'COUNT(DISTINCT task.id)',
 				'has_pending_survey'    => '(sd.id is not null)',
 				'pending_survey_status' => 'sd.status'
 			]);
@@ -283,6 +284,7 @@ class CompanySearch extends Form
 		]);
 
 		$this->applySortJoins($query, $sort);
+		$this->prepareSort($query, $sort);
 
 		return $sort;
 	}
@@ -327,15 +329,18 @@ class CompanySearch extends Form
 					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
 				]
 			],
-			'last_task_created_at'    => [
+			'relevant_tasks'          => [
 				'asc'  => [
-					new Expression('lt.min_task_start IS NOT NULL DESC'),
-					'lt.min_task_start'                                => SORT_ASC,
-					'COALESCE(company.updated_at, company.created_at)' => SORT_ASC
+					'relevant_group'              => SORT_ASC,
+					'relevant_task_priority'      => SORT_ASC,
+					'relevant_task_overdue_count' => SORT_DESC,
+					'relevant_task_min_start'     => SORT_ASC,
 				],
 				'desc' => [
-					'lt.max_task_start'                                => SORT_DESC,
-					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
+					'relevant_group'              => SORT_DESC,
+					'relevant_task_priority'      => SORT_ASC,
+					'relevant_task_overdue_count' => SORT_DESC,
+					'relevant_task_min_start'     => SORT_ASC,
 				]
 			],
 			'last_request_created_at' => [
@@ -387,20 +392,10 @@ class CompanySearch extends Form
 			],
 			'activity'                => [
 				'asc' => [
-					new Expression('CASE
-			            WHEN DATE(MIN(task.start)) = CURDATE() THEN 1 
-			            WHEN DATE(MIN(task.start)) < DATE_ADD(CURDATE(), INTERVAL 5 DAY) THEN 2
-			            ELSE 3
-			        END ASC'),
-					'MIN(task.start)'            => SORT_ASC,
-					CompanySearchExpressions::surveyDelayedOrder(),
-					CompanySearchExpressions::surveyCompletedOrder(),
-					CompanySearchExpressions::recentlyCreatedOrder(),
-					CompanySearchExpressions::byRequestStatusOrder(),
-					CompanySearchExpressions::requestRelatedOrder(),
-					Request::field('created_at') => SORT_ASC,
-					Request::field('updated_at') => SORT_ASC,
-					Company::field('created_at') => SORT_ASC
+					"relevant_group"              => SORT_ASC,
+					"relevant_task_priority"      => SORT_ASC,
+					"relevant_task_overdue_count" => SORT_DESC,
+					"relevant_task_min_start"     => SORT_ASC,
 				]
 			],
 			'default'                 => [
@@ -432,7 +427,6 @@ class CompanySearch extends Form
 		return [
 			'last_survey_created_at'  => fn(CompanyQuery $query) => $query->leftJoin(['ls' => $this->makeLastSurveyQuery()], 'ls.chat_member_id = cm.id'),
 			'last_message_created_at' => fn(CompanyQuery $query) => $query->leftJoin(['lcmm' => $this->makeLastChatMemberMessageQuery()], 'lcmm.to_chat_member_id = cm.id'),
-			'last_task_created_at'    => fn(CompanyQuery $query) => $query->leftJoin(['lt' => $this->makeLastTaskQuery()], 'lt.company_id = company.id'),
 			'last_request_created_at' => fn(CompanyQuery $query) => $query->leftJoin(['lr' => $this->makeLastRequestQuery()], 'lr.company_id = company.id'),
 			'last_object_created_at'  => fn(CompanyQuery $query) => $query->leftJoin(['lob' => $this->makeLastObjectQuery()], 'lob.company_id = company.id'),
 			'last_offer_updated_at'   => fn(CompanyQuery $query) => $query->leftJoin(['lof' => $this->makeLastOfferQuery()], 'lof.company_id = company.id'),
@@ -462,29 +456,6 @@ class CompanySearch extends Form
 		                        ->select(['id', 'to_chat_member_id', 'last_message_created_at' => 'MAX(created_at)', 'deleted_at'])
 		                        ->groupBy(['to_chat_member_id'])
 		                        ->notDeleted();
-	}
-
-	/**
-	 * @throws ErrorException
-	 */
-	private function makeLastTaskQuery(): TaskQuery
-	{
-		return Task::find()
-		           ->from(Task::getTable())
-		           ->select([
-			           'tre.entity_id AS company_id',
-			           'max_task_start' => 'MAX(task.start)',
-			           'min_task_start' => 'MIN(task.start)',
-		           ])
-		           ->innerJoin(['tre' => TaskRelationEntity::getTable()], 'tre.task_id = task.id')
-		           ->where([
-			           'tre.entity_type' => Company::getMorphClass(),
-			           'task.deleted_at' => null,
-			           'task.user_id'    => $this->current_user_id,
-			           'tre.deleted_at'  => null,
-		           ])
-		           ->andWhere(['!=', 'task.status', Task::STATUS_DONE])
-		           ->groupBy('tre.entity_id');
 	}
 
 	/**
@@ -544,7 +515,7 @@ class CompanySearch extends Form
 			             'last_survey_created_at'   => 'MAX(created_at)',
 			             'last_survey_completed_at' => 'MAX(completed_at)',
 		             ])
-		             ->andWhere(['!=', Survey::field('status'), [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED]])
+		             ->andWhere(['not in', Survey::field('status'), [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED]])
 		             ->groupBy('chat_member_id');
 	}
 
@@ -572,5 +543,82 @@ class CompanySearch extends Form
 		             ->from(['s' => Survey::tableName()])
 		             ->innerJoin(['sq' => $subQuery], 'id = sq.max_id')
 		             ->select(['s.id', 's.chat_member_id', 's.status', 's.completed_at', 's.updated_at', 's.created_at']);
+	}
+
+	private function getPrepareMap(): array
+	{
+		return [
+			'relevant_tasks' => fn(CompanyQuery $query) => $this->prepareRelevantTasksSort($query),
+			'activity'       => fn(CompanyQuery $query) => $this->prepareActivitySort($query),
+		];
+	}
+
+	private function prepareSort(CompanyQuery $query, Sort $sort): void
+	{
+		$fieldsToSort = ArrayHelper::keys($sort->getAttributeOrders());
+		$prepareMap   = $this->getPrepareMap();
+
+		foreach ($fieldsToSort as $field) {
+			if (isset($prepareMap[$field])) {
+				$prepareMap[$field]($query);
+			}
+		}
+	}
+
+	private function prepareRelevantTasksSort(CompanyQuery $query): void
+	{
+		$today          = DateTimeHelper::nowf('Y-m-d');
+		$tomorrow       = DateTimeHelper::format(DateTimeHelper::now()->add(DateIntervalHelper::days(1)), 'Y-m-d');
+		$threeDaysLater = DateTimeHelper::format(DateTimeHelper::now()->add(DateIntervalHelper::days(3)), 'Y-m-d');
+
+
+		$query->addSelect([
+			'relevant_group'              => new Expression("
+				MIN(CASE
+	                WHEN DATE(task.start) = :today THEN 0
+	                WHEN DATE(task.start) BETWEEN :tomorrow AND :threeDaysLater THEN 1
+	                WHEN DATE(task.start) < :today THEN 2
+	                ELSE 3
+                END)
+			"),
+			'relevant_task_priority'      => new Expression("
+				MIN(CASE
+	                WHEN task.type = :callType THEN 0
+	                WHEN task.type = :visitType THEN 1
+	                ELSE 2
+                END)
+			"),
+			'relevant_task_overdue_count' => new Expression("COUNT(CASE WHEN task.start < :today THEN 1 END)"),
+			'relevant_task_min_start'     => new Expression("MIN(task.start)"),
+		]);
+
+		$query->addParams([
+			':today'          => $today,
+			':tomorrow'       => $tomorrow,
+			':threeDaysLater' => $threeDaysLater,
+			':visitType'      => Task::TYPE_SCHEDULED_VISIT,
+			':callType'       => Task::TYPE_SCHEDULED_CALL
+		]);
+	}
+
+	private function prepareActivitySort(CompanyQuery $query): void
+	{
+		$this->prepareRelevantTasksSort($query);
+
+		$query->addSelect([
+			'relevant_group' => new Expression("
+				MIN(CASE
+	                WHEN DATE(task.start) = :today THEN 0
+	                WHEN DATE(task.start) BETWEEN :tomorrow AND :threeDaysLater THEN 1
+	                WHEN DATE(task.start) < :today THEN 2
+	                WHEN lps.status = :delayedStatus THEN 3
+	                ELSE 4
+                END)
+			")
+		]);
+
+		$query->addParams([
+			':delayedStatus' => Survey::STATUS_DELAYED
+		]);
 	}
 }
