@@ -331,16 +331,16 @@ class CompanySearch extends Form
 			],
 			'relevant_tasks'          => [
 				'asc'  => [
-					'relevant_task_group'                              => SORT_ASC,
-					'relevant_task_overdue_count'                      => SORT_DESC,
-					'relevant_task_min_start'                          => SORT_ASC,
-					'COALESCE(company.updated_at, company.created_at)' => SORT_ASC
+					'relevant_group'              => SORT_ASC,
+					'relevant_task_priority'      => SORT_ASC,
+					'relevant_task_overdue_count' => SORT_DESC,
+					'relevant_task_min_start'     => SORT_ASC,
 				],
 				'desc' => [
-					'relevant_task_group'                              => SORT_DESC,
-					'relevant_task_overdue_count'                      => SORT_DESC,
-					'relevant_task_min_start'                          => SORT_ASC,
-					'COALESCE(company.updated_at, company.created_at)' => SORT_DESC
+					'relevant_group'              => SORT_DESC,
+					'relevant_task_priority'      => SORT_ASC,
+					'relevant_task_overdue_count' => SORT_DESC,
+					'relevant_task_min_start'     => SORT_ASC,
 				]
 			],
 			'last_request_created_at' => [
@@ -392,20 +392,10 @@ class CompanySearch extends Form
 			],
 			'activity'                => [
 				'asc' => [
-					new Expression('CASE
-			            WHEN DATE(MIN(task.start)) = CURDATE() THEN 1 
-			            WHEN DATE(MIN(task.start)) < DATE_ADD(CURDATE(), INTERVAL 5 DAY) THEN 2
-			            ELSE 3
-			        END ASC'),
-					'MIN(task.start)'            => SORT_ASC,
-					CompanySearchExpressions::surveyDelayedOrder(),
-					CompanySearchExpressions::surveyCompletedOrder(),
-					CompanySearchExpressions::recentlyCreatedOrder(),
-					CompanySearchExpressions::byRequestStatusOrder(),
-					CompanySearchExpressions::requestRelatedOrder(),
-					Request::field('created_at') => SORT_ASC,
-					Request::field('updated_at') => SORT_ASC,
-					Company::field('created_at') => SORT_ASC
+					"relevant_group"              => SORT_ASC,
+					"relevant_task_priority"      => SORT_ASC,
+					"relevant_task_overdue_count" => SORT_DESC,
+					"relevant_task_min_start"     => SORT_ASC,
 				]
 			],
 			'default'                 => [
@@ -525,7 +515,7 @@ class CompanySearch extends Form
 			             'last_survey_created_at'   => 'MAX(created_at)',
 			             'last_survey_completed_at' => 'MAX(completed_at)',
 		             ])
-		             ->andWhere(['!=', Survey::field('status'), [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED]])
+		             ->andWhere(['not in', Survey::field('status'), [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED]])
 		             ->groupBy('chat_member_id');
 	}
 
@@ -558,7 +548,8 @@ class CompanySearch extends Form
 	private function getPrepareMap(): array
 	{
 		return [
-			'relevant_tasks' => fn(CompanyQuery $query) => $this->prepareRelevantTasksSort($query)
+			'relevant_tasks' => fn(CompanyQuery $query) => $this->prepareRelevantTasksSort($query),
+			'activity'       => fn(CompanyQuery $query) => $this->prepareActivitySort($query),
 		];
 	}
 
@@ -582,7 +573,7 @@ class CompanySearch extends Form
 
 
 		$query->addSelect([
-			'relevant_task_group'         => new Expression("
+			'relevant_group'              => new Expression("
 				MIN(CASE
 	                WHEN DATE(task.start) = :today THEN 0
 	                WHEN DATE(task.start) BETWEEN :tomorrow AND :threeDaysLater THEN 1
@@ -590,10 +581,44 @@ class CompanySearch extends Form
 	                ELSE 3
                 END)
 			"),
+			'relevant_task_priority'      => new Expression("
+				MIN(CASE
+	                WHEN task.type = :callType THEN 0
+	                WHEN task.type = :visitType THEN 1
+	                ELSE 2
+                END)
+			"),
 			'relevant_task_overdue_count' => new Expression("COUNT(CASE WHEN task.start < :today THEN 1 END)"),
 			'relevant_task_min_start'     => new Expression("MIN(task.start)"),
 		]);
 
-		$query->addParams([':today' => $today, ':tomorrow' => $tomorrow, ':threeDaysLater' => $threeDaysLater]);
+		$query->addParams([
+			':today'          => $today,
+			':tomorrow'       => $tomorrow,
+			':threeDaysLater' => $threeDaysLater,
+			':visitType'      => Task::TYPE_SCHEDULED_VISIT,
+			':callType'       => Task::TYPE_SCHEDULED_CALL
+		]);
+	}
+
+	private function prepareActivitySort(CompanyQuery $query): void
+	{
+		$this->prepareRelevantTasksSort($query);
+
+		$query->addSelect([
+			'relevant_group' => new Expression("
+				MIN(CASE
+	                WHEN DATE(task.start) = :today THEN 0
+	                WHEN DATE(task.start) BETWEEN :tomorrow AND :threeDaysLater THEN 1
+	                WHEN DATE(task.start) < :today THEN 2
+	                WHEN lps.status = :delayedStatus THEN 3
+	                ELSE 4
+                END)
+			")
+		]);
+
+		$query->addParams([
+			':delayedStatus' => Survey::STATUS_DELAYED
+		]);
 	}
 }
