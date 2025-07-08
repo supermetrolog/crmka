@@ -30,7 +30,7 @@ class CreateEffectSystemMessageService
 			'message'    => $message,
 			'to'         => $chatMember,
 			'surveyIds'  => [$survey->id],
-			'contactIds' => [$survey->contact_id],
+			'contactIds' => $survey->contact_id ? [$survey->contact_id] : [],
 		]);
 
 		return $this->chatMemberMessageService->createSystemMessage($dto);
