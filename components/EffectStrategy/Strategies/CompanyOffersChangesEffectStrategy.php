@@ -114,6 +114,10 @@ class CompanyOffersChangesEffectStrategy extends AbstractEffectStrategy
 		$answer = ArrayHelper::getValue($payload, 'answer');
 
 		if (is_null($answer)) {
+			if ($survey->isCompleted()) {
+				$this->markObjectAsCalled($object, $survey);
+			}
+
 			return;
 		}
 

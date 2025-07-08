@@ -18,11 +18,12 @@ use yii\db\Expression;
 class TaskSearch extends Form
 {
 	public $id;
-	public $ids = [];
+	public $ids   = [];
 	public $user_id;
 	public $message;
 	public $status;
 	public $type;
+	public $types = [];
 	public $start_after;
 	public $start_before;
 	public $created_by_id;
@@ -53,6 +54,7 @@ class TaskSearch extends Form
 				'targetAttribute' => ['tag_ids' => 'id'],
 			]],
 			[['relation_entity_type', 'type'], 'string'],
+			['types', 'each', 'rule' => ['in', 'range' => Task::getTypes()]],
 			['relation_entity_type', 'in', 'range' => TaskRelationEntity::getAvailableEntityTypes()],
 		];
 	}
@@ -182,9 +184,8 @@ class TaskSearch extends Form
 		])->andFilterWhere(['>=', Task::field('start'), $this->start_after])
 		      ->andFilterWhere(['<=', Task::field('start'), $this->start_before]);
 
-		if ($this->hasFilter($this->ids)) {
-			$query->andFilterWhere(['in', Task::field('id'), $this->ids]);
-		}
+		$query->andFilterWhere(['in', Task::field('type'), $this->types])
+		      ->andFilterWhere(['in', Task::field('id'), $this->ids]);
 
 		if ($this->hasFilter($this->relation_entity_id) && $this->hasFilter($this->relation_entity_type)) {
 			$query->innerJoinWith([

@@ -172,8 +172,6 @@ class CompanyRequestsChangesEffectStrategy extends AbstractEffectStrategy
 			$tx->rollback();
 			throw $th;
 		}
-
-		$tx->commit();
 	}
 
 	private function createEditingTask(Request $request, array $payload, Survey $survey): void
