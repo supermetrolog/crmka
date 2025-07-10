@@ -39,6 +39,14 @@ class UserRepository
 	/**
 	 * @throws ModelNotFoundException
 	 */
+	public function findOneOrThrow(int $id): User
+	{
+		return User::find()->byId($id)->oneOrThrow();
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
 	public function getByUsernameOrThrow(string $username): User
 	{
 		return User::find()->byUsername($username)->notDeleted()->oneOrThrow();
