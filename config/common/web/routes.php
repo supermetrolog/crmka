@@ -157,6 +157,8 @@ return static function (RouterInterface $router) {
 
 	$router->controller('pdf/presentation')->group(static function (RouteInterface $route) {
 		$route->addRule([Method::GET], 'html');
+		
+		$route->post('download');
 	});
 
 	$router->controller('complex')->disablePluralize()->group(static function (RouteInterface $route) {

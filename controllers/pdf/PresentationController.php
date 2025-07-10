@@ -3,6 +3,7 @@
 namespace app\controllers\pdf;
 
 use app\behaviors\BaseControllerBehaviors;
+use app\helpers\ArrayHelper;
 use app\helpers\TranslateHelper;
 use app\models\pdf\OffersPdf;
 use app\models\pdf\PdfManager;
@@ -10,13 +11,21 @@ use app\services\pythonpdfcompress\PythonPdfCompress;
 use Dompdf\Options;
 use Exception;
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
 use yii\web\Controller;
 use yii\web\RangeNotSatisfiableHttpException;
 use yii\web\Response;
 
 class PresentationController extends Controller
 {
-	public function behaviors()
+	private const STRATEGY_PDF_MANAGER  = 'pdf-manager';
+	private const STRATEGY_MICROSERVICE = 'microservice';
+
+	private string $CURRENT_STRATEGY = self::STRATEGY_PDF_MANAGER;
+	private bool   $useCompression   = false;
+
+	public function behaviors(): array
 	{
 		$behaviors = parent::behaviors();
 
@@ -28,12 +37,26 @@ class PresentationController extends Controller
 		return TranslateHelper::simpleTranslate($text);
 	}
 
-
-	private function compressPdf()
+	/**
+	 * @throws Exception
+	 */
+	private function compressPdf(string $inPath): void
 	{
-		$pdfCompressor = new PdfManager();
-	}
+		$outPath = Yii::$app->params['pdf']['tmp_dir'] . '/' . Yii::$app->security->generateRandomString() . '.pdf';
 
+		$pythonCompressor = new PythonPdfCompress(
+			Yii::$app->params['pythonPath'],
+			Yii::$app->params['compressorPath'],
+			$inPath,
+			$outPath
+		);
+
+		$pythonCompressor->Compress();
+
+		// Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
+
+		$pythonCompressor->deleteOriginalFileAndChangeFileName();
+	}
 
 	/**
 	 * @throws RangeNotSatisfiableHttpException
@@ -41,45 +64,16 @@ class PresentationController extends Controller
 	 */
 	public function actionIndex(): Response
 	{
-		$pdfTmpDir = Yii::$app->params['pdf']['tmp_dir'];
+		$pdf = $this->generatePdfFromPayload($this->request->get());
 
-		$model = new OffersPdf($this->request->get(), 'https://api.pennylane.pro/');
+		$path = ArrayHelper::getValue($pdf, 'path');
+		$name = ArrayHelper::getValue($pdf, 'name');
 
-		$options = new Options();
-		$options->set('isRemoteEnabled', true);
-		$options->set('isJavascriptEnabled', true);
+		if ($this->useCompression) {
+			$this->compressPdf($path);
+		}
 
-		$pdfManager = new PdfManager($options, $this->translate($model->getPresentationName()), $pdfTmpDir);
-
-		$title = $model->getPresentationTitle();
-
-		$html = $this->renderPartial('index', ['model' => $model, 'title' => $title]);
-
-		$pdfManager->loadHtml($html);
-		$pdfManager->setPaper('A4');
-		$pdfManager->render();
-		$pdfManager->save();
-
-		$pyScriptPath     = Yii::$app->params['compressorPath'];
-		$pythonPath       = Yii::$app->params['pythonPath'];
-		$inPath           = $pdfManager->getPdfPath();
-		$outPath          = $pdfTmpDir . "/" . Yii::$app->security->generateRandomString() . ".pdf";
-		$pythonCompressor = new PythonPdfCompress($pythonPath, $pyScriptPath, $inPath, $outPath);
-		$pythonCompressor->Compress();
-		// Т.к не получается сохранить пдф с тем же именем, приходится удалять оригинал и заменять его на уменьшенную версию
-		$pythonCompressor->deleteOriginalFileAndChangeFileName();
-		$pdfContent = file_get_contents($pdfManager->getPdfPath());
-
-		$pdfManager->removeFile();
-
-		return Yii::$app->response->sendContentAsFile(
-			$pdfContent,
-			$this->translate($model->getPresentationName()),
-			[
-				'mimeType' => 'application/pdf',
-				'inline'   => true,
-			]
-		);
+		return $this->sendPdf($path, $name);
 	}
 
 	/**
@@ -90,5 +84,131 @@ class PresentationController extends Controller
 		$model = new OffersPdf($this->request->get(), $this->request->getHostInfo());
 
 		return $this->renderPartial('index', ['model' => $model]);
+	}
+
+
+	public function actionDownload(): Response
+	{
+		// TODO: Временное тестовое решение
+
+		$consultantId = $this->request->post('consultant', 33);
+		$isNew        = $this->request->post('is_new', 1);
+
+		$objects = $this->request->post('objects', []);
+
+		$payload = ArrayHelper::map(
+			$objects,
+			static fn($object) => [
+				'object_id'   => ArrayHelper::getValue($object, 'object_id'),
+				'original_id' => ArrayHelper::getValue($object, 'original_id'),
+				'type_id'     => ArrayHelper::getValue($object, 'type_id'),
+				'consultant'  => $consultantId,
+				'is_new'      => $isNew
+			]
+		);
+
+		$json = ArrayHelper::map($payload, [$this, 'generatePdfFromPayload']);
+
+		return $this->asJson($json);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function generatePdfFromPayload(array $payload): array
+	{
+		// TODO: Заменить на обращение к микросервису
+
+		$model = new OffersPdf($payload, 'https://api.pennylane.pro/');
+
+		$html = $this->renderPdfHtml($model);
+
+		$name = $model->getPresentationName();
+
+		return ArrayHelper::merge(
+			['name' => $name],
+			$this->generatePdf($html, $model->getPresentationName())
+		);
+	}
+
+	private function renderPdfHtml(OffersPdf $offer): string
+	{
+		return $this->renderPartial('index', ['model' => $offer, 'title' => $offer->getPresentationTitle()]);
+	}
+
+	/**
+	 * @throws InvalidConfigException
+	 * @throws NotSupportedException
+	 * @throws Exception
+	 */
+	private function generatePdf(string $html, string $filename): array
+	{
+		if ($this->CURRENT_STRATEGY === self::STRATEGY_PDF_MANAGER) {
+			return $this->generatePdfUsingPdfManager($html, $filename);
+		}
+
+		if ($this->CURRENT_STRATEGY === self::STRATEGY_MICROSERVICE) {
+			return $this->generatePdfUsingMicroservice($html, $filename);
+		}
+
+		throw new InvalidConfigException('Unknown pdf generation strategy');
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function generatePdfUsingPdfManager(string $html, string $filename): array
+	{
+		$pdfManager = new PdfManager(
+			$this->createPdfManagerOptions(),
+			$this->translate($filename),
+			Yii::$app->params['pdf']['tmp_dir']
+		);
+
+		$pdfManager->loadHtml($html);
+
+		$pdfManager->render();
+		$pdfManager->save();
+
+		$path = $pdfManager->getPdfPath();
+
+		return [
+			'path' => $path,
+			'url'  => $this->request->getHostInfo() . '/runtime/pdf_tmp/' . basename($path)
+		];
+	}
+
+	private function createPdfManagerOptions(): Options
+	{
+		return new Options([
+			'isRemoteEnabled'     => true,
+			'isJavascriptEnabled' => true,
+			'defaultPaperSize'    => 'A4'
+		]);
+	}
+
+	/**
+	 * @throws NotSupportedException
+	 */
+	private function generatePdfUsingMicroservice(string $html, string $filename): array
+	{
+		// TODO: Описать логику работы с микросервисом
+
+		throw new NotSupportedException('Not implemented');
+	}
+
+	/**
+	 * @throws RangeNotSatisfiableHttpException
+	 */
+	private function sendPdf(string $path, string $name): Response
+	{
+		$content = file_get_contents($path);
+
+		unlink($path);
+
+		return $this->response->sendContentAsFile($content, $name, [
+			'mimeType' => 'application/pdf',
+			'inline'   => true,
+		]);
 	}
 }
