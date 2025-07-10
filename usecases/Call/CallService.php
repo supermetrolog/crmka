@@ -20,6 +20,7 @@ class CallService
 	{
 		$model->load([
 			'contact_id'  => $dto->contact->id,
+			'phone_id'    => $dto->phone->id ?? null,
 			'type'        => $dto->type,
 			'status'      => $dto->status,
 			'description' => $dto->description

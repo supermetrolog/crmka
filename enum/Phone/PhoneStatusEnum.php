@@ -1,6 +1,8 @@
 <?php
 
-namespace app\enum;
+namespace app\enum\Phone;
+
+use app\enum\AbstractEnum;
 
 class PhoneStatusEnum extends AbstractEnum
 {

@@ -5,9 +5,11 @@ namespace app\models;
 use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ContactQuery;
+use app\models\ActiveQuery\PhoneQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\miniModels\Phone;
 use yii\base\ErrorException;
 
 /**
@@ -16,6 +18,7 @@ use yii\base\ErrorException;
  * @property int               $id
  * @property int               $user_id
  * @property int|null          $contact_id
+ * @property int|null          $phone_id
  * @property int               $type
  * @property int               $status
  * @property ?string           $description
@@ -27,6 +30,7 @@ use yii\base\ErrorException;
  * @property-read Contact      $contact
  * @property-read ChatMember[] $chatMembers
  * @property-read Survey[]     $surveys
+ * @property-read ?Phone       $phone
  */
 class Call extends \app\kernel\common\models\AR\AR
 {
@@ -77,25 +81,12 @@ class Call extends \app\kernel\common\models\AR\AR
 	{
 		return [
 			[['user_id', 'contact_id', 'type', 'status'], 'required'],
-			[['user_id', 'contact_id', 'type', 'status'], 'integer'],
+			[['user_id', 'contact_id', 'type', 'status', 'phone_id'], 'integer'],
 			['description', 'string', 'max' => 512],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
-			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
-			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::className(), 'targetAttribute' => ['contact_id' => 'id']],
-		];
-	}
-
-
-	public function attributeLabels(): array
-	{
-		return [
-			'id'         => 'ID',
-			'user_id'    => 'User ID',
-			'contact_id' => 'Contact ID',
-			'type'       => 'Type',
-			'status'     => 'Status',
-			'created_at' => 'Created At',
-			'updated_at' => 'Updated At',
+			[['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			[['contact_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
+			[['phone_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['phone_id' => 'id']],
 		];
 	}
 
@@ -111,6 +102,12 @@ class Call extends \app\kernel\common\models\AR\AR
 		return $this->hasOne(Contact::class, ['id' => 'contact_id']);
 	}
 
+	public function getPhone(): PhoneQuery
+	{
+		/** @var PhoneQuery */
+		return $this->hasOne(Phone::class, ['id' => 'phone_id']);
+	}
+
 	public function isOutgoing(): bool
 	{
 		return $this->type === self::TYPE_OUTGOING;
@@ -123,7 +120,7 @@ class Call extends \app\kernel\common\models\AR\AR
 
 	public static function find(): CallQuery
 	{
-		return new CallQuery(get_called_class());
+		return new CallQuery(static::class);
 	}
 
 	/**

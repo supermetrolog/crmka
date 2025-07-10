@@ -8,9 +8,9 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Contact;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Contact\Email\ContactEmailResource;
-use app\resources\Contact\Phone\ContactPhoneResource;
 use app\resources\Contact\WayOfInforming\ContactWayOfInformingResource;
 use app\resources\Contact\Website\ContactWebsiteResource;
+use app\resources\Phone\PhoneResource;
 
 class ContactResource extends JsonResource
 {
@@ -46,7 +46,7 @@ class ContactResource extends JsonResource
 			'isMain'              => $this->resource->isMain,
 			'consultant'          => UserShortResource::tryMakeArray($this->resource->consultant),
 			'emails'              => ContactEmailResource::collection($this->resource->emails),
-			'phones'              => ContactPhoneResource::collection($this->resource->phones),
+			'phones'              => PhoneResource::collection($this->resource->phones),
 			'wayOfInformings'     => ContactWayOfInformingResource::collection($this->resource->wayOfInformings),
 			'websites'            => ContactWebsiteResource::collection($this->resource->websites)
 		];

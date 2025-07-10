@@ -99,6 +99,8 @@ return static function (RouterInterface $router) {
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
+			$route->get('phones', 'view-phones');
+
 			$route->put()->action('update');
 
 			$route->post('disable');

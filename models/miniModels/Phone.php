@@ -2,14 +2,17 @@
 
 namespace app\models\miniModels;
 
-use app\enum\PhoneStatusEnum;
+use app\enum\Phone\PhoneStatusEnum;
+use app\helpers\PhoneHelper;
 use app\helpers\StringHelper;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ContactQuery;
+use app\models\ActiveQuery\PhoneQuery;
+use app\models\Call;
 use app\models\Contact;
 use app\traits\EnumAttributeLabelTrait;
-use floor12\phone\PhoneFormatter;
 
 /**
  * This is the model class for table "phone".
@@ -28,6 +31,7 @@ use floor12\phone\PhoneFormatter;
  * @property ?string      $deleted_at
  *
  * @property-read Contact $contact
+ * @property-read Call[]  $calls
  */
 class Phone extends AR
 {
@@ -59,6 +63,14 @@ class Phone extends AR
 		];
 	}
 
+	public static function find(): PhoneQuery
+	{
+		return (new PhoneQuery(self::class))->notDeleted();
+	}
+
+	/**
+	 * @deprecated Use PhoneHelper::isValidNumber
+	 */
 	public static function isValidPhoneNumber(string $number): bool
 	{
 		if (StringHelper::length($number) !== 11) {
@@ -86,13 +98,9 @@ class Phone extends AR
 		return true;
 	}
 
-	public function toFormattedPhone(): string
+	public function isMainPhone(): bool
 	{
-		if (self::isValidPhoneNumber($this->phone)) {
-			return PhoneFormatter::format($this->phone);
-		}
-
-		return $this->phone;
+		return $this->isMain === 1;
 	}
 
 	public function isActive(): bool
@@ -114,5 +122,11 @@ class Phone extends AR
 	{
 		/** @var ContactQuery */
 		return $this->hasOne(Contact::class, ['id' => 'contact_id']);
+	}
+
+	public function getCalls(): CallQuery
+	{
+		/** @var CallQuery */
+		return $this->hasMany(Call::class, ['phone_id' => 'id']);
 	}
 }

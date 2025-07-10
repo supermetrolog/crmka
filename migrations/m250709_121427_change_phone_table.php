@@ -15,7 +15,7 @@ class m250709_121427_change_phone_table extends Migration
 		$tableName = '{{%phone}}';
 
 		$this->addColumns($tableName, [
-			'country_code' => $this->string(3)->notNull()->defaultValue('ru'),
+			'country_code' => $this->string(3)->notNull()->defaultValue('RU'),
 			'type'         => $this->string(16)->notNull()->defaultValue('mobile'),
 			'comment'      => $this->string(128)->null(),
 			'status'       => $this->string(16)->notNull()->defaultValue('active'),

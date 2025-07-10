@@ -18,6 +18,7 @@ use app\resources\Contact\Comment\ContactCommentResource;
 use app\resources\Contact\ContactResource;
 use app\resources\Contact\ContactSearchResource;
 use app\resources\Contact\ContactWithCommentsResource;
+use app\resources\Phone\PhoneResource;
 use app\usecases\Contact\ContactCommentService;
 use app\usecases\Contact\ContactService;
 use ErrorException;
@@ -196,6 +197,18 @@ class ContactController extends AppController
 		$this->contactService->markAsActive($contact);
 
 		return $this->success('Контакт успешно восстановлен из архива');
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function actionViewPhones(int $id): array
+	{
+		$contact = $this->repository->findOneOrThrow($id);
+
+		$phones = $contact->phones;
+
+		return PhoneResource::collection($phones);
 	}
 
 	/**
