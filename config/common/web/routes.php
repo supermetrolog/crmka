@@ -319,6 +319,7 @@ return static function (RouterInterface $router) {
 	$router->controller('utilities')->disablePluralize()->group(static function (RouteInterface $route) {
 		$route->post('fix-land-object-purposes');
 		$route->post('reassign-consultants-to-companies');
+		$route->post('transfer-companies-to-consultant/<id>', 'transfer-companies-to-consultant');
 	});
 
 	$router->controller('folder')->group(static function (RouteInterface $route) {

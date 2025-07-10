@@ -38,6 +38,7 @@ class CompanySearch extends Form
 	public $companyGroup_id;
 	public $status;
 	public $consultant_id;
+	public $exclude_consultant_ids = [];
 	public $activityGroup;
 	public $activityProfile;
 	public $rating;
@@ -80,6 +81,7 @@ class CompanySearch extends Form
 			['requests_filter', 'string'],
 			['requests_filter', 'in', 'range' => ['none', 'active', 'not-active', 'passive']],
 			[['requests_area_min', 'requests_area_max', 'current_user_id'], 'integer'],
+			['exclude_consultant_ids', 'each', 'rule' => ['integer']],
 		];
 	}
 
@@ -252,7 +254,8 @@ class CompanySearch extends Form
 		      ->andFilterWhere(['like', Company::field('nameRu'), $this->nameRu])
 		      ->andFilterWhere(['like', Company::field('formOfOrganization'), $this->formOfOrganization])
 		      ->andFilterWhere(['>=', Company::field('created_at'), $this->dateStart])
-		      ->andFilterWhere(['<=', Company::field('created_at'), $this->dateEnd]);
+		      ->andFilterWhere(['<=', Company::field('created_at'), $this->dateEnd])
+		      ->andFilterWhere(['not in', Company::field('consultant_id'), $this->exclude_consultant_ids]);
 
 		$query->andFilterWhere([
 			'and',
@@ -264,7 +267,8 @@ class CompanySearch extends Form
 		return new ActiveDataProvider([
 			'query'      => $query,
 			'pagination' => [
-				'pageSize' => 50
+				'defaultPageSize' => 50,
+				'pageSizeLimit'   => [0, 50],
 			],
 			'sort'       => $this->createSort($query)
 		]);
