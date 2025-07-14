@@ -18,6 +18,7 @@ class CreateCallService
 		$model = new Call([
 			'user_id'     => $dto->user->id,
 			'contact_id'  => $dto->contact->id,
+			'phone_id'    => $dto->phone->id ?? null,
 			'type'        => $dto->type,
 			'status'      => $dto->status,
 			'description' => $dto->description

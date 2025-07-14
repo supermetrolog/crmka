@@ -7,37 +7,39 @@ namespace app\usecases\Contact;
 use app\dto\Contact\CreateContactDto;
 use app\dto\Contact\DisableContactDto;
 use app\dto\Contact\UpdateContactDto;
-use app\helpers\ArrayHelper;
+use app\dto\Phone\PhoneDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\Contact;
 use app\models\miniModels\Email;
-use app\models\miniModels\Phone;
 use app\models\miniModels\WayOfInforming;
 use app\models\miniModels\Website;
+use app\usecases\Phone\PhoneService;
 use Throwable;
 use yii\db\StaleObjectException;
 
 class ContactService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
+	private PhoneService                 $phoneService;
 
 	public function __construct(
-		TransactionBeginnerInterface $transactionBeginner
+		TransactionBeginnerInterface $transactionBeginner,
+		PhoneService $phoneService
 	)
 	{
 		$this->transactionBeginner = $transactionBeginner;
+		$this->phoneService        = $phoneService;
 	}
 
 	/**
-	 * @param CreateContactDto $dto
+	 * @param PhoneDto[] $phoneDtos
 	 *
-	 * @return Contact
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function create(CreateContactDto $dto): Contact
+	public function create(CreateContactDto $dto, array $phoneDtos): Contact
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -64,10 +66,11 @@ class ContactService
 
 			$model->createManyMiniModels([
 				Email::class          => $dto->emails,
-				Phone::class          => ArrayHelper::merge($dto->phones, $dto->invalidPhones),
 				Website::class        => $dto->websites,
 				WayOfInforming::class => $dto->wayOfInformings
 			]);
+
+			$this->createPhones($model, $phoneDtos);
 
 			if ($dto->isMain) {
 				$this->setMainContact($model);
@@ -76,6 +79,29 @@ class ContactService
 			$tx->commit();
 
 			return $model;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @param PhoneDto[] $dtos
+	 *
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function createPhones(Contact $model, array $dtos): void
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+
+			foreach ($dtos as $phoneDto) {
+				$this->phoneService->createForContact($model, $phoneDto);
+			}
+
+			$tx->commit();
 		} catch (Throwable $th) {
 			$tx->rollBack();
 			throw $th;
@@ -154,7 +180,6 @@ class ContactService
 
 			$model->updateManyMiniModels([
 				Email::class          => $dto->emails,
-				Phone::class          => ArrayHelper::merge($dto->phones, $dto->invalidPhones),
 				Website::class        => $dto->websites,
 				WayOfInforming::class => $dto->wayOfInformings
 			]);

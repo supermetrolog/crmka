@@ -7,7 +7,7 @@ namespace app\resources\Company\Contact;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Contact;
 use app\resources\Contact\Email\ContactEmailResource;
-use app\resources\Contact\Phone\ContactPhoneResource;
+use app\resources\Phone\PhoneResource;
 
 class CompanyContactResource extends JsonResource
 {
@@ -40,7 +40,7 @@ class CompanyContactResource extends JsonResource
 			'isMain'              => $this->resource->isMain,
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
-			'phones'              => ContactPhoneResource::collection($this->resource->phones),
+			'phones'              => PhoneResource::collection($this->resource->phones),
 			'emails'              => ContactEmailResource::collection($this->resource->emails)
 		];
 	}

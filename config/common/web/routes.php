@@ -99,10 +99,29 @@ return static function (RouterInterface $router) {
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
+			$route->get('phones', 'view-phones');
+
 			$route->put()->action('update');
 
 			$route->post('disable');
 			$route->post('enable');
+
+			$route->post('phones', 'create-phone');
+		});
+	});
+
+	$router->controller('phone')->group(static function (RouteInterface $route) {
+		$route->get()->action('index');
+
+		$route->prefix('<id>', static function (RouteInterface $route) {
+
+			$route->put()->action('update');
+
+			$route->post('disable');
+			$route->post('enable');
+			$route->post('mark-as-main');
+
+			$route->delete()->action('delete');
 		});
 	});
 
