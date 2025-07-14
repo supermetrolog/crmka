@@ -35,7 +35,6 @@ class ContactForm extends Form
 
 	public $emails;
 	public $phones;
-	public $invalidPhones;
 	public $websites;
 	public $wayOfInformings;
 
@@ -88,7 +87,6 @@ class ContactForm extends Form
 			'status',
 			'emails',
 			'phones',
-			'invalidPhones',
 			'websites',
 			'wayOfInformings'
 		];
@@ -118,8 +116,6 @@ class ContactForm extends Form
 			'isMain'              => $this->isMain,
 			'status'              => $this->status,
 			'emails'              => $this->emails,
-			'phones'              => $this->phones,
-			'invalidPhones'       => $this->invalidPhones,
 			'websites'            => $this->websites,
 			'wayOfInformings'     => $this->wayOfInformings
 		];

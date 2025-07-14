@@ -30,7 +30,7 @@ class PhoneService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function createForContact(PhoneDto $dto, Contact $contact): Phone
+	public function createForContact(Contact $contact, PhoneDto $dto): Phone
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -39,7 +39,7 @@ class PhoneService
 				'contact_id'   => $contact->id,
 				'status'       => PhoneStatusEnum::ACTIVE,
 				'type'         => $dto->type,
-				'country_code' => $dto->country_code,
+				'country_code' => $dto->countryCode,
 				'phone'        => $dto->phone,
 				'exten'        => $dto->exten,
 				'comment'      => $dto->comment

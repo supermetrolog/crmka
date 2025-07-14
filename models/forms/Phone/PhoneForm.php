@@ -6,11 +6,9 @@ namespace app\models\forms\Phone;
 
 use app\dto\Phone\PhoneDto;
 use app\enum\Phone\PhoneCountryCodeEnum;
-use app\enum\Phone\PhoneStatusEnum;
 use app\enum\Phone\PhoneTypeEnum;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
 use Exception;
 use floor12\phone\PhoneValidator;
 
@@ -26,16 +24,26 @@ class PhoneForm extends Form
 	public function rules(): array
 	{
 		return [
-			[['phone'], 'required'],
+			['phone', 'required'],
 			['phone', PhoneValidator::class],
 			['isMain', 'integer'],
-			[['phone', 'exten'], 'max' => 255],
-			[['country_code', 'type', 'status'], 'string'],
-			['status', EnumValidator::class, 'class' => PhoneStatusEnum::class],
-			['type', EnumValidator::class, 'class' => PhoneTypeEnum::class],
-			['country_code', EnumValidator::class, 'class' => PhoneCountryCodeEnum::class],
-			[['comment'], 'string', 'max' => 128],
-			['user_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+			['phone', 'string', 'max' => 255],
+			[['country_code', 'type', 'exten'], 'string'],
+			['type', EnumValidator::class, 'enumClass' => PhoneTypeEnum::class],
+			['country_code', EnumValidator::class, 'enumClass' => PhoneCountryCodeEnum::class],
+			['comment', 'string', 'max' => 128]
+		];
+	}
+
+	public function attributeLabels(): array
+	{
+		return [
+			'phone'       => 'Телефон',
+			'countryCode' => 'Код страны',
+			'exten'       => 'Добавочный номер',
+			'isMain'      => 'Флаг основного телефона',
+			'type'        => 'Тип',
+			'comment'     => 'Комментарии',
 		];
 	}
 

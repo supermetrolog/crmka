@@ -107,4 +107,18 @@ class PhoneController extends AppController
 
 		return new SuccessResponse('Телефон успешно удален');
 	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function actionMarkAsMain(int $id): SuccessResponse
+	{
+		$phone = $this->repository->findOneOrThrow($id);
+
+		$this->service->markAsMain($phone);
+
+		return $this->success('Телефон отмечен как основной');
+	}
 }

@@ -13,6 +13,7 @@ use app\models\ContactSearch;
 use app\models\forms\Contact\ContactCommentForm;
 use app\models\forms\Contact\ContactDisableForm;
 use app\models\forms\Contact\ContactForm;
+use app\models\forms\Phone\PhoneForm;
 use app\repositories\ContactRepository;
 use app\resources\Contact\Comment\ContactCommentResource;
 use app\resources\Contact\ContactResource;
@@ -21,6 +22,7 @@ use app\resources\Contact\ContactWithCommentsResource;
 use app\resources\Phone\PhoneResource;
 use app\usecases\Contact\ContactCommentService;
 use app\usecases\Contact\ContactService;
+use app\usecases\Phone\PhoneService;
 use ErrorException;
 use Throwable;
 use yii\data\ActiveDataProvider;
@@ -33,6 +35,7 @@ class ContactController extends AppController
 	private ContactService        $contactService;
 	private ContactCommentService $contactCommentService;
 	private ContactRepository     $repository;
+	private PhoneService          $phoneService;
 
 	public function __construct(
 		$id,
@@ -40,12 +43,14 @@ class ContactController extends AppController
 		ContactService $contactService,
 		ContactCommentService $contactCommentService,
 		ContactRepository $repository,
+		PhoneService $phoneService,
 		array $config = []
 	)
 	{
 		$this->contactService        = $contactService;
 		$this->contactCommentService = $contactCommentService;
 		$this->repository            = $repository;
+		$this->phoneService          = $phoneService;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -95,7 +100,14 @@ class ContactController extends AppController
 
 		$form->validateOrThrow();
 
-		$model = $this->contactService->create($form->getDto());
+		$phoneDtos = [];
+
+		foreach ($this->request->post('phones', []) as $phoneData) {
+			$phoneForm   = $this->makePhoneForm($phoneData);
+			$phoneDtos[] = $phoneForm->getDto();
+		}
+
+		$model = $this->contactService->create($form->getDto(), $phoneDtos);
 
 		return new ContactResource($model);
 	}
@@ -212,6 +224,27 @@ class ContactController extends AppController
 	}
 
 	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionCreatePhone(int $id): PhoneResource
+	{
+		$contact = $this->repository->findOneOrThrow($id);
+
+		$form = new PhoneForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$phone = $this->phoneService->createForContact($contact, $form->getDto());
+
+		return new PhoneResource($phone);
+	}
+
+	/**
 	 * @param $id
 	 *
 	 * @return Contact
@@ -224,5 +257,19 @@ class ContactController extends AppController
 		}
 
 		throw new NotFoundHttpException('The requested page does not exist.');
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	protected function makePhoneForm(array $payload): PhoneForm
+	{
+		$form = new PhoneForm();
+
+		$form->load($payload);
+
+		$form->validateOrThrow();
+
+		return $form;
 	}
 }

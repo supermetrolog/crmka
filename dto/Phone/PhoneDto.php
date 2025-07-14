@@ -15,7 +15,7 @@ class PhoneDto extends BaseObject
 	public ?string $exten;
 	public ?int    $isMain;
 	public string  $type;
-	public string  $country_code;
+	public string  $countryCode;
 	public ?string $comment;
 
 }

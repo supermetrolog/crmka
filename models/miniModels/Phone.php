@@ -20,7 +20,7 @@ use app\traits\EnumAttributeLabelTrait;
  * @property int          $id
  * @property int          $contact_id
  * @property string       $phone
- * @property string       $exten
+ * @property ?string      $exten
  * @property string       $type
  * @property ?string      $comment
  * @property string       $country_code
@@ -57,7 +57,7 @@ class Phone extends AR
 			['comment', 'string', 'max' => 128],
 			['country_code', 'string', 'max' => 3],
 			[['type', 'status'], 'string', 'max' => 16],
-			['status', EnumValidator::class, 'class' => PhoneStatusEnum::class],
+			['status', EnumValidator::class, 'enumClass' => PhoneStatusEnum::class],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 			[['contact_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
 		];

@@ -15,7 +15,7 @@ class EnumValidator extends Validator
 	/**
 	 * @var class-string
 	 */
-	public string $class;
+	public string $enumClass;
 
 	/**
 	 * @throws InvalidConfigException
@@ -24,14 +24,14 @@ class EnumValidator extends Validator
 	{
 		parent::init();
 
-		if (!is_subclass_of($this->class, AbstractEnum::class)) {
+		if (!is_subclass_of($this->enumClass, AbstractEnum::class)) {
 			throw new InvalidConfigException('EnumValidator::$class must be a subclass of AbstractEnum');
 		}
 	}
 
 	public function validateValue($value): ?array
 	{
-		$isValid = call_user_func([$this->class, 'isValid'], $value);
+		$isValid = call_user_func([$this->enumClass, 'isValid'], $value);
 
 		if (!$isValid) {
 			return [$this->message, []];
