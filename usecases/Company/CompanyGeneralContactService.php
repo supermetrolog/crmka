@@ -56,7 +56,7 @@ class CompanyGeneralContactService
 			'status'              => Contact::STATUS_ACTIVE
 		]);
 
-		$model = $this->contactService->create($dto, $contactsDto->phones);
+		$model = $this->contactService->create($dto);
 
 		$model->saveOrThrow();
 
