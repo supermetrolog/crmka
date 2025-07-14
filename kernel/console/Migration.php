@@ -153,9 +153,11 @@ class Migration extends \yii\db\Migration
 		$this->dropForeignKey($this->getForeignKeyName($table, $columns), $table);
 	}
 
-	public function addColumns(string $table, array $columns): void
+	public function addColumns(string $table, array ...$columns): void
 	{
-		foreach ($columns as $column => $definition) {
+		$preparedColumns = array_merge(...$columns);
+
+		foreach ($preparedColumns as $column => $definition) {
 			$this->addColumn($table, $column, $definition);
 		}
 	}

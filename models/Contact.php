@@ -9,6 +9,7 @@ use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ContactQuery;
+use app\models\ActiveQuery\PhoneQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\ContactComment;
 use app\models\miniModels\Email;
@@ -16,7 +17,7 @@ use app\models\miniModels\Phone;
 use app\models\miniModels\WayOfInforming;
 use app\models\miniModels\Website;
 use app\resources\Contact\Email\ContactEmailResource;
-use app\resources\Contact\Phone\ContactPhoneResource;
+use app\resources\Phone\PhoneResource;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 
@@ -228,7 +229,7 @@ class Contact extends AR
 				return Phone::isValidPhoneNumber($phone['phone']);
 			});
 
-			return ContactPhoneResource::collection($resource);
+			return PhoneResource::collection($resource);
 		};
 
 		$extraFields['invalidPhones'] = static function ($ef) {
@@ -238,7 +239,7 @@ class Contact extends AR
 				return !Phone::isValidPhoneNumber($phone['phone']);
 			});
 
-			return ContactPhoneResource::collection($resource);
+			return PhoneResource::collection($resource);
 		};
 
 		$extraFields['emails'] = static function ($ef) {
@@ -292,13 +293,9 @@ class Contact extends AR
 		return $this->hasMany(Email::class, ['contact_id' => 'id']);
 	}
 
-	/**
-	 * Gets query for [[Phones]].
-	 *
-	 * @return ActiveQuery
-	 */
-	public function getPhones(): ActiveQuery
+	public function getPhones(): PhoneQuery
 	{
+		/** @var PhoneQuery */
 		return $this->hasMany(Phone::class, ['contact_id' => 'id']);
 	}
 

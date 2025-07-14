@@ -9,6 +9,7 @@ use app\dto\Call\UpdateCallDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Call;
 use app\models\Contact;
+use app\models\miniModels\Phone;
 use app\models\User;
 use Exception;
 
@@ -19,6 +20,7 @@ class CallForm extends Form
 
 	public $user_id;
 	public $contact_id;
+	public $phone_id;
 	public $status;
 	public $type;
 	public $description;
@@ -27,12 +29,13 @@ class CallForm extends Form
 	{
 		return [
 			[['user_id', 'contact_id', 'status', 'type'], 'required'],
-			[['user_id', 'contact_id', 'status', 'type'], 'integer'],
+			[['user_id', 'contact_id', 'status', 'type', 'phone_id'], 'integer'],
 			['description', 'string', 'max' => 512],
 			['status', 'in', 'range' => Call::getStatuses()],
 			['type', 'in', 'range' => Call::getTypes()],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
+			[['phone_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['phone_id' => 'id']],
 		];
 	}
 
@@ -42,7 +45,8 @@ class CallForm extends Form
 			'contact_id',
 			'status',
 			'type',
-			'description'
+			'description',
+			'phone_id'
 		];
 
 		return [
@@ -56,10 +60,20 @@ class CallForm extends Form
 		return [
 			'user_id'     => 'ID сотрудника',
 			'contact_id'  => 'ID контакта',
+			'phone_id'    => 'ID телефона',
 			'type'        => 'Тип звонка',
 			'status'      => 'Статус звонка',
 			'description' => 'Описание',
 		];
+	}
+
+	private function getPhone(): ?Phone
+	{
+		if (!empty($this->phone_id)) {
+			return Phone::find()->byId((int)$this->phone_id)->one();
+		}
+
+		return null;
 	}
 
 	/**
@@ -73,6 +87,7 @@ class CallForm extends Form
 				return new CreateCallDto([
 					'user'        => User::find()->byId((int)$this->user_id)->one(),
 					'contact'     => Contact::find()->byId((int)$this->contact_id)->one(),
+					'phone'       => $this->getPhone(),
 					'type'        => $this->type,
 					'status'      => $this->status,
 					'description' => $this->description
@@ -81,6 +96,7 @@ class CallForm extends Form
 			default:
 				return new UpdateCallDto([
 					'contact'     => Contact::find()->byId((int)$this->contact_id)->one(),
+					'phone'       => $this->getPhone(),
 					'type'        => $this->type,
 					'status'      => $this->status,
 					'description' => $this->description

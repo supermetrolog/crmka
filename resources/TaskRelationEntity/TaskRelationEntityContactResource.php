@@ -8,8 +8,8 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Contact;
 use app\resources\Company\CompanyShortResource;
 use app\resources\Contact\Email\ContactEmailResource;
-use app\resources\Contact\Phone\ContactPhoneResource;
 use app\resources\Contact\WayOfInforming\ContactWayOfInformingResource;
+use app\resources\Phone\PhoneResource;
 
 class TaskRelationEntityContactResource extends JsonResource
 {
@@ -43,7 +43,7 @@ class TaskRelationEntityContactResource extends JsonResource
 			'isMain'              => $this->resource->isMain,
 
 			'emails'          => ContactEmailResource::collection($this->resource->emails),
-			'phones'          => ContactPhoneResource::collection($this->resource->phones),
+			'phones'          => PhoneResource::collection($this->resource->phones),
 			'wayOfInformings' => ContactWayOfInformingResource::collection($this->resource->wayOfInformings),
 			'company'         => CompanyShortResource::tryMakeArray($this->resource->company)
 

@@ -40,7 +40,6 @@ class CompanyGeneralContactService
 			'type'                => Contact::GENERAL_CONTACT_TYPE,
 			'first_name'          => Contact::GENERAL_CONTACT_FIRST_NAME,
 			'emails'              => $contactsDto->emails,
-			'phones'              => $contactsDto->phones,
 			'websites'            => $contactsDto->websites,
 			'consultant_id'       => null,
 			'middle_name'         => null,
@@ -57,7 +56,7 @@ class CompanyGeneralContactService
 			'status'              => Contact::STATUS_ACTIVE
 		]);
 
-		$model = $this->contactService->create($dto);
+		$model = $this->contactService->create($dto, $contactsDto->phones);
 
 		$model->saveOrThrow();
 
@@ -92,7 +91,6 @@ class CompanyGeneralContactService
 				'isMain'              => $model->isMain,
 				'consultant_id'       => $model->consultant_id,
 				'emails'              => $contactsDto->emails,
-				'phones'              => $contactsDto->phones,
 				'websites'            => $contactsDto->websites
 			]
 		);

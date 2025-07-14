@@ -24,8 +24,6 @@ class CreateContactDto extends BaseObject
 	public ?int    $status;
 
 	public ?array $emails          = [];
-	public ?array $phones          = [];
-	public ?array $invalidPhones   = [];
 	public ?array $websites        = [];
 	public ?array $wayOfInformings = [];
 
