@@ -25,7 +25,8 @@ class CompanyRequestFullResource extends JsonResource
 			RequestFullResource::make($this->resource)->toArray(),
 			[
 				'consultant' => UserShortResource::tryMakeArray($this->resource->consultant),
-				'timeline'   => CompanyRequestTimelineResource::tryMakeArray($this->resource->mainTimeline)
+				'timeline'   => CompanyRequestTimelineResource::tryMakeArray($this->resource->mainTimeline),
+				'deal'       => CompanyRequestDealResource::tryMakeArray($this->resource->deal)
 			]
 		);
 	}
