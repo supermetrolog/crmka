@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\kernel\web\http\resources;
 
 use app\helpers\ArrayHelper;
-use app\models\ChatMember;
 use yii\data\ActiveDataProvider;
 
 abstract class JsonResource
@@ -48,6 +47,11 @@ abstract class JsonResource
 		}
 
 		return (new static(...$argv))->toArray();
+	}
+	
+	public static function makeArray(...$argv): array
+	{
+		return self::make(...$argv)->toArray();
 	}
 
 	/**
