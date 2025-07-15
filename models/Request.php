@@ -81,6 +81,7 @@ use yii\db\ActiveQuery;
  * @property-read Timeline[]            $activeTimelines
  * @property-read Timeline              $mainTimeline
  * @property-read ?Contact              $contact
+ * @property-read ?Deal                 $deal
  */
 class Request extends AR
 {
