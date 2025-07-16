@@ -23,7 +23,10 @@ class ShortMixedOfferInObjectResource extends JsonResource
 			'visual_id'  => $this->resource->visual_id,
 			'deal_type'  => $this->resource->deal_type,
 			'status'     => $this->resource->status,
-			'is_deleted' => $this->resource->isDeleted()
+			'is_deleted' => $this->resource->isDeleted(),
+			'company_id' => $this->resource->company_id,
+			'is_fake'    => $this->resource->is_fake,
+			'deal_id'    => $this->resource->deal_id,
 		];
 	}
 }

@@ -7,7 +7,7 @@ namespace app\resources\Company\Survey;
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Survey;
-use app\resources\Call\CallShortResource;
+use app\resources\Call\CallResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\ChatMemberMessage\ChatMemberMessageInlineResource;
 use app\resources\Contact\ContactResource;
@@ -30,7 +30,7 @@ class CompanySurveyResource extends JsonResource
 			[
 				'user'    => UserShortResource::make($this->resource->user)->toArray(),
 				'contact' => ContactResource::tryMakeArray($this->resource->contact),
-				'calls'   => CallShortResource::collection($this->resource->calls),
+				'calls'   => CallResource::collection($this->resource->calls),
 				'message' => ChatMemberMessageInlineResource::tryMakeArray($this->resource->chatMemberMessage),
 				'tasks'   => TaskResource::collection($this->resource->tasks)
 			]

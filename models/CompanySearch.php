@@ -120,7 +120,7 @@ class CompanySearch extends Form
 			                          'objects.objectFloors',
 			                          'lastCall',
 			                          'chatMember',
-			                          'lastSurvey.user.userProfile', 'lastSurvey.calls',
+			                          'lastSurvey.user.userProfile', 'lastSurvey.calls.user.userProfile', 'lastSurvey.calls.contact.consultant.userProfile',
 			                          'lastSurvey.contact.emails', 'lastSurvey.contact.websites', 'lastSurvey.contact.phones',
 			                          'lastSurvey.contact.consultant.userProfile', 'lastSurvey.contact.wayOfInformings',
 			                          'lastSurvey.tasks.tags', 'lastSurvey.tasks.createdByUser.userProfile', 'lastSurvey.tasks.user.userProfile',
