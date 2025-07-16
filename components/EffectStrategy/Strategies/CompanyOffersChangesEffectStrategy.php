@@ -34,11 +34,15 @@ class CompanyOffersChangesEffectStrategy extends AbstractEffectStrategy
 
 	private const OFFER_MUST_BE_EDITED_TITLE_TASK   = 'Комп. "%s", объект #%d. Редактировать предложение #%d';
 	private const OFFER_MUST_BE_DISABLED_TITLE_TASK = 'Комп. "%s", объект #%d. Архивировать предложение #%d';
+	private const OBJECT_SOLD_TITLE_TASK            = 'Комп. "%s", объект #%d продан, отвязать от компании';
+	private const OBJECT_DESTROYED_TITLE_TASK       = 'Комп. "%s", объект #%d снесен, убрать из компании';
 
 	private const ANSWER_OBJECT_WITHOUT_CHANGES         = 1;
 	private const ANSWER_OBJECT_OFFERS_MUST_BE_DISABLED = 2;
 	private const ANSWER_OBJECT_SKIPPED                 = 3;
 	private const ANSWER_OBJECT_COMPLETED               = 4;
+	private const ANSWER_OBJECT_SOLD                    = 5;
+	private const ANSWER_OBJECT_DESTROYED               = 6;
 
 	private const ANSWER_OFFER_WITHOUT_CHANGES  = 1;
 	private const ANSWER_OFFER_MUST_BE_DISABLED = 2;
@@ -54,7 +58,6 @@ class CompanyOffersChangesEffectStrategy extends AbstractEffectStrategy
 		TransactionBeginnerInterface $transactionBeginner,
 		ChatMemberService $chatMemberService,
 		CreateTaskService $createTaskService
-
 	)
 	{
 		$this->taskBuilderFactory  = $taskBuilderFactory;
@@ -141,6 +144,16 @@ class CompanyOffersChangesEffectStrategy extends AbstractEffectStrategy
 				case self::ANSWER_OBJECT_COMPLETED:
 				{
 					$this->handleObjectOffers($object, $payload, $survey);
+					break;
+				}
+				case self::ANSWER_OBJECT_SOLD:
+				{
+					$this->markObjectAsSold($object, $survey);
+					break;
+				}
+				case self::ANSWER_OBJECT_DESTROYED:
+				{
+					$this->markObjectAsDestroyed($object, $survey);
 					break;
 				}
 			}
@@ -264,7 +277,7 @@ class CompanyOffersChangesEffectStrategy extends AbstractEffectStrategy
 	 * @throws Throwable
 	 * @throws ModelNotFoundException
 	 */
-	private function createHandlingOfferTask(Objects $object, Survey $survey, string $title, ?string $message, ?Block $block = null): void
+	private function createHandlingOfferTask(Objects $object, Survey $survey, string $title, ?string $message = null, ?Block $block = null): void
 	{
 		$dto = $this->taskBuilderFactory->createEffectBuilder()
 		                                ->setType(Task::TYPE_OBJECT_HANDLING)
@@ -330,5 +343,29 @@ class CompanyOffersChangesEffectStrategy extends AbstractEffectStrategy
 			'entityType'   => $entity::getMorphClass(),
 			'relationType' => TaskRelationEntity::RELATION_TYPE_SYSTEM
 		]);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function markObjectAsSold(Objects $object, Survey $survey): void
+	{
+		$title = sprintf(self::OBJECT_SOLD_TITLE_TASK, $object->id, $survey->chatMember->company->getShortName());
+
+		$this->createHandlingOfferTask($object, $survey, $title);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function markObjectAsDestroyed(Objects $object, Survey $survey): void
+	{
+		$title = sprintf(self::OBJECT_DESTROYED_TITLE_TASK, $object->id, $survey->chatMember->company->getShortName());
+
+		$this->createHandlingOfferTask($object, $survey, $title);
 	}
 }
