@@ -599,9 +599,9 @@ class Objects extends AR
 			return $fuck;
 		};
 
-		$fields['offers'] = function ($fields) {
+		$fields['offers'] = static function ($fields) {
 			if (!$fields['offers']) {
-				return null;
+				return [];
 			}
 
 			return ShortMixedOfferInObjectResource::collection($fields['offers']);
