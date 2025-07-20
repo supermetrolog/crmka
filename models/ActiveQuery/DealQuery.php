@@ -2,28 +2,32 @@
 
 namespace app\models\ActiveQuery;
 
+use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Deal;
-use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 
-class DealQuery extends ActiveQuery
+class DealQuery extends AQ
 {
+	/**
+	 * @return Deal[]
+	 */
+	public function all($db = null): array
+	{
+		return parent::all($db);
+	}
 
-    /**
-     * @param $db
-     * @return array|Deal[]
-     */
-    public function all($db = null): array
-    {
-        return parent::all($db);
-    }
+	public function one($db = null): ?Deal
+	{
+		/** @var Deal */
+		return parent::one($db);
+	}
 
-    /**
-     * @param $db
-     * @return array|ActiveRecord|null|Deal
-     */
-    public function one($db = null): ?Deal
-    {
-        return parent::one($db);
-    }
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function oneOrThrow($db = null): Deal
+	{
+		/** @var Deal */
+		return parent::oneOrThrow($db);
+	}
 }

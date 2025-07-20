@@ -3,6 +3,7 @@
 namespace app\listeners\Company;
 
 use app\dto\Request\PassiveRequestDto;
+use app\enum\Request\RequestPassiveWhyEnum;
 use app\events\Company\DisableCompanyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -67,7 +68,7 @@ class DeactivateCompanyRequestsListener implements EventListenerInterface
 	private function disableRequest(Request $request): void
 	{
 		$this->requestService->markAsPassive($request, new PassiveRequestDto([
-			'passive_why'         => Request::PASSIVE_WHY_OTHER,
+			'passive_why'         => RequestPassiveWhyEnum::OTHER,
 			'passive_why_comment' => null
 		]));
 	}

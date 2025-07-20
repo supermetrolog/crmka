@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace app\repositories;
 
 use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\repository\AbstractRepository;
 use app\models\Request;
 use yii\base\ErrorException;
 
-class RequestRepository
+class RequestRepository extends AbstractRepository
 {
 	public function findOne(int $id): ?Request
 	{
@@ -21,6 +22,14 @@ class RequestRepository
 	public function findOneOrThrow(int $id): Request
 	{
 		return Request::find()->byId($id)->oneOrThrow();
+	}
+
+	/**
+	 * @return Request[]
+	 */
+	public function findAll(): array
+	{
+		return Request::find()->all();
 	}
 
 	/**
