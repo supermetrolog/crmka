@@ -2,6 +2,7 @@
 
 use app\events\Company\ChangeConsultantCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
+use app\events\Deal\CreateRequestDealEvent;
 use app\events\Request\RequestActivatedEvent;
 use app\events\Request\RequestDeactivatedEvent;
 use app\events\Survey\CancelSurveyEvent;
@@ -23,6 +24,7 @@ use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
 use app\listeners\Company\DeactivateCompanyContactsListener;
 use app\listeners\Company\DeactivateCompanyRequestsListener;
 use app\listeners\Company\DisableCompanySystemChatMemberMessageListener;
+use app\listeners\Deal\CompleteDealRequestListener;
 use app\listeners\Survey\CreateCancelledSurveySystemChatMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
 use app\listeners\Survey\UpdateSurveySystemChatMessageListener;
@@ -108,5 +110,8 @@ return [
 		DeactivateCompanyRequestsListener::class,
 		DeactivateCompanyContactsListener::class,
 		DisableCompanySystemChatMemberMessageListener::class
+	],
+	CreateRequestDealEvent::class       => [
+		CompleteDealRequestListener::class
 	]
 ];

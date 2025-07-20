@@ -148,7 +148,7 @@ class Complex extends oldDb\Complex
 		$fields['building_property_documents'] = function () {
 			return $this->getBuildingPropertyDocuments();
 		};
-		$fields['photos_360'] = function () {
+		$fields['photos_360']                  = function () {
 			return $this->getPhotos360();
 		};
 
@@ -175,7 +175,7 @@ class Complex extends oldDb\Complex
 	 */
 	public static function find(): ComplexQuery
 	{
-		return new ComplexQuery(get_called_class());
+		return new ComplexQuery(static::class);
 	}
 
 	/**

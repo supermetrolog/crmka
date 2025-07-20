@@ -4,6 +4,7 @@ namespace app\components\EffectStrategy\Strategies;
 
 use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\dto\Request\PassiveRequestDto;
+use app\enum\Request\RequestPassiveWhyEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\TypeConverterHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -84,7 +85,7 @@ class HasActualRequestsEffectStrategy extends AbstractEffectStrategy
 		$this->requestService->markAsPassive(
 			$request,
 			new PassiveRequestDto([
-				'passive_why' => Request::PASSIVE_WHY_SURVEY
+				'passive_why' => RequestPassiveWhyEnum::SURVEY
 			])
 		);
 	}

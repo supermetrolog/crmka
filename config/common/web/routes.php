@@ -7,7 +7,6 @@ use app\components\router\Method;
 return static function (RouterInterface $router) {
 	$router->controller('companygroup');
 	$router->controller('calendar');
-	$router->controller('deal');
 	$router->controller('favorite-offer');
 	$router->controller('company-events-log')->disablePluralize();
 
@@ -365,5 +364,20 @@ return static function (RouterInterface $router) {
 		$route->post('viewed');
 
 		$route->post('<id>/reset', 'reset');
+	});
+
+
+	$router->controller('deal')->group(static function (RouteInterface $route) {
+		$route->get()->action('index');
+
+		$route->post('for-request/<id>', 'create-for-request');
+
+		$route->prefix('<id>', static function (RouteInterface $route) {
+			$route->get()->action('view');
+
+			$route->put()->action('update');
+
+			$route->delete()->action('delete');
+		});
 	});
 };

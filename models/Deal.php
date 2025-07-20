@@ -2,16 +2,16 @@
 
 namespace app\models;
 
-use app\exceptions\ValidationErrorHttpException;
+use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\BlockQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\DealQuery;
 use app\models\ActiveQuery\oldDb\OfferMixQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\oldDb\Complex;
 use app\models\oldDb\OfferMix;
 use Yii;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "deal".
@@ -31,7 +31,6 @@ use yii\db\ActiveRecord;
  * @property int|null      $object_id             ID объекта из старой базы
  * @property int|null      $original_id           ID Block
  * @property int|null      $complex_id            ID комплекса из старой базы
- * @property string|null   $competitor_name       Название компании конкурента
  * @property int|null      $is_our                принадлежит ли сделка нашей компании
  * @property int|null      $is_competitor         принадлежит ли сделка  конкурентам
  * @property int           $type_id
@@ -48,7 +47,7 @@ use yii\db\ActiveRecord;
  * @property-read OfferMix $offer
  * @property-read Block    $block
  */
-class Deal extends ActiveRecord
+class Deal extends AR
 {
 	public const STATUS_DELETED = -1;
 
@@ -64,26 +63,28 @@ class Deal extends ActiveRecord
 			[['status', 'company_id', 'request_id', 'consultant_id', 'area', 'floorPrice', 'object_id', 'original_id', 'complex_id', 'competitor_company_id', 'is_our', 'is_competitor', 'contractTerm', 'formOfOrganization'], 'integer'],
 			[['dealDate', 'created_at', 'updated_at'], 'safe'],
 			[['clientLegalEntity', 'description', 'name', 'visual_id'], 'string', 'max' => 255],
-			[['company_id'], 'exist', 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
-			[['consultant_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
-			[['request_id'], 'exist', 'targetClass' => Request::class, 'targetAttribute' => ['request_id' => 'id']],
-			[['competitor_company_id'], 'exist', 'targetClass' => Company::class, 'targetAttribute' => ['competitor_company_id' => 'id']],
+			['company_id', 'exist', 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
+			['request_id', 'exist', 'targetClass' => Request::class, 'targetAttribute' => ['request_id' => 'id']],
+			['consultant_id', 'exist', 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
+			['object_id', 'exist', 'targetClass' => Objects::class, 'targetAttribute' => ['object_id' => 'id']],
+			['complex_id', 'exist', 'targetClass' => Complex::class, 'targetAttribute' => ['complex_id' => 'id']],
+			['competitor_company_id', 'exist', 'targetClass' => Company::class, 'targetAttribute' => ['competitor_company_id' => 'id']],
 		];
 	}
 
-	public function fields()
+	public function fields(): array
 	{
 		$fields = parent::fields();
 
-		$fields['dealDate_format'] = function ($fields) {
+		$fields['dealDate_format'] = static function ($fields) {
 			return $fields['dealDate'] ? Yii::$app->formatter->format($fields['dealDate'], 'date') : null;
 		};
 
-		$fields['dealDate'] = function ($fields) {
+		$fields['dealDate'] = static function ($fields) {
 			return $fields['dealDate'] ? date('Y-m-d', strtotime($fields['dealDate'])) : null;
 		};
 
-		$fields['clientLegalEntity_full_name'] = function ($fields) {
+		$fields['clientLegalEntity_full_name'] = static function ($fields) {
 			if ($fields['formOfOrganization'] !== null) {
 				return Company::FORM_OF_ORGANIZATION_LIST[$fields['formOfOrganization']] . ' ' . $fields['clientLegalEntity'];
 			}
@@ -91,7 +92,7 @@ class Deal extends ActiveRecord
 			return $fields['clientLegalEntity'];
 		};
 
-		$fields['restOfTheTerm'] = function ($fields) {
+		$fields['restOfTheTerm'] = static function ($fields) {
 			if ($fields['contractTerm'] === null) {
 				return null;
 			}
@@ -109,47 +110,6 @@ class Deal extends ActiveRecord
 		};
 
 		return $fields;
-	}
-
-	// TODO: Вынести в сервис
-	public static function createDeal($post_data)
-	{
-		if ($post_data['request_id'] && $model = self::find()->where(['company_id' => $post_data['company_id'], 'request_id' => $post_data['request_id']])->one()) {
-			$model->addError("request_id", 'Сделка для этого запроса уже существует!');
-			throw new ValidationErrorHttpException($model->getErrorSummary(false));
-		}
-
-		$db          = Yii::$app->db;
-		$model       = new self();
-		$transaction = $db->beginTransaction();
-
-		try {
-			if (!$model->load($post_data, '') || !$model->save()) {
-				throw new ValidationErrorHttpException($model->getErrorSummary(false));
-			}
-			if ($model->request_id) {
-				$request         = Request::find()->where(['id' => $model->request_id])->limit(1)->one();
-				$request->status = Request::STATUS_DONE;
-				if (!$request->save(false)) {
-					throw new ValidationErrorHttpException($request->getErrorSummary(false));
-				}
-			}
-			$transaction->commit();
-
-			return ['message' => "Сделка создана", 'data' => $model->id];
-		} catch (\Throwable $th) {
-			$transaction->rollBack();
-			throw $th;
-		}
-	}
-
-	public static function updateDeal($model, $post_data)
-	{
-		$post_data['updated_at'] = date('Y-m-d H:i:s');
-		if ($model->load($post_data, '') && $model->save()) {
-			return ['message' => "Сделка изменена", 'data' => $model->id];
-		}
-		throw new ValidationErrorHttpException($model->getErrorSummary(false));
 	}
 
 	public function getCompany(): CompanyQuery

@@ -2,6 +2,7 @@
 
 namespace app\models\oldDb;
 
+use app\enum\Request\RequestDealTypeEnum;
 use app\helpers\ArrayHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
@@ -14,7 +15,6 @@ use app\models\Contact;
 use app\models\miniModels\TimelineStepObjectComment;
 use app\models\oldDb\User as OldDbUser;
 use app\models\Relation;
-use app\models\Request;
 use app\models\User;
 use Yii;
 use yii\base\ErrorException;
@@ -927,10 +927,10 @@ class OfferMix extends AR
 	{
 //			Request::DEAL_TYPE_RENT             => [OfferMix::DEAL_TYPE_RENT, OfferMix::DEAL_TYPE_SUBLEASE, OfferMix::DEAL_TYPE_RESPONSE_STORAGE],
 		$dealTypes = [
-			Request::DEAL_TYPE_RENT             => OfferMix::DEAL_TYPE_RENT,
-			Request::DEAL_TYPE_SALE             => OfferMix::DEAL_TYPE_SALE,
-			Request::DEAL_TYPE_RESPONSE_STORAGE => OfferMix::DEAL_TYPE_RESPONSE_STORAGE,
-			Request::DEAL_TYPE_SUBLEASE         => OfferMix::DEAL_TYPE_SUBLEASE,
+			RequestDealTypeEnum::RENT             => OfferMix::DEAL_TYPE_RENT,
+			RequestDealTypeEnum::SALE             => OfferMix::DEAL_TYPE_SALE,
+			RequestDealTypeEnum::RESPONSE_STORAGE => OfferMix::DEAL_TYPE_RESPONSE_STORAGE,
+			RequestDealTypeEnum::SUBLEASE         => OfferMix::DEAL_TYPE_SUBLEASE,
 		];
 
 		return $dealTypes[$dealType] ?? null;

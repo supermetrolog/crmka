@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\enum\Request\RequestDealTypeEnum;
+use app\enum\Request\RequestStatusEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\NumberHelper;
 use app\helpers\StringHelper;
@@ -23,6 +25,7 @@ use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestObjectTypeGeneral;
 use app\models\miniModels\RequestRegion;
+use app\traits\EnumAttributeLabelTrait;
 use Yii;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -85,22 +88,7 @@ use yii\db\ActiveQuery;
  */
 class Request extends AR
 {
-	public const STATUS_ACTIVE              = 1;
-	public const STATUS_PASSIVE             = 0;
-	public const STATUS_DONE                = 2;
-	public const DEAL_TYPE_LIST             = ['Аренда', 'Продажа', 'Ответ-хранение', 'Субаренда'];
-	public const DEAL_TYPE_RENT             = 0;
-	public const DEAL_TYPE_SALE             = 1;
-	public const DEAL_TYPE_RESPONSE_STORAGE = 2;
-	public const DEAL_TYPE_SUBLEASE         = 3;
-
-	public const PASSIVE_WHY_BLOCK        = 0;
-	public const PASSIVE_WHY_ALREADY_RENT = 1;
-	public const PASSIVE_WHY_ALREADY_BUY  = 2;
-	public const PASSIVE_WHY_OUTDATED     = 3;
-	public const PASSIVE_WHY_SUSPEND      = 4;
-	public const PASSIVE_WHY_OTHER        = 5;
-	public const PASSIVE_WHY_SURVEY       = 6;
+	use EnumAttributeLabelTrait;
 
 	public const UNKNOWN_MOVING_DATE_REASON_CONSTANTLY  = 0;
 	public const UNKNOWN_MOVING_DATE_REASON_NO_DEADLINE = 1;
@@ -111,37 +99,6 @@ class Request extends AR
 	protected bool $useSoftCreate = true;
 	protected bool $useSoftUpdate = true;
 
-	public static function getStatuses(): array
-	{
-		return [
-			self::STATUS_PASSIVE,
-			self::STATUS_ACTIVE,
-			self::STATUS_DONE,
-		];
-	}
-
-	public static function getPassiveWhyReasons(): array
-	{
-		return [
-			self::PASSIVE_WHY_BLOCK,
-			self::PASSIVE_WHY_ALREADY_RENT,
-			self::PASSIVE_WHY_ALREADY_BUY,
-			self::PASSIVE_WHY_OUTDATED,
-			self::PASSIVE_WHY_SUSPEND,
-			self::PASSIVE_WHY_OTHER,
-			self::PASSIVE_WHY_SURVEY,
-		];
-	}
-
-	public static function getDealTypes(): array
-	{
-		return [
-			self::DEAL_TYPE_RENT,
-			self::DEAL_TYPE_SALE,
-			self::DEAL_TYPE_RESPONSE_STORAGE,
-			self::DEAL_TYPE_SUBLEASE,
-		];
-	}
 
 	public static function getUnknownMovingDateReasons(): array
 	{
@@ -191,9 +148,14 @@ class Request extends AR
 		];
 	}
 
+	public function getDealTypeLabel(): string
+	{
+		return $this->getEnumLabel('dealType', RequestDealTypeEnum::class);
+	}
+
 	public function getFormatName(): string
 	{
-		$name = StringHelper::join(' - ', $this->name ?? "", self::DEAL_TYPE_LIST[$this->dealType]);
+		$name = StringHelper::join(' - ', $this->name ?? "", $this->getDealTypeLabel());
 		$area = StringHelper::join(' - ', $this->minArea, $this->maxArea);
 
 		return StringHelper::join(' ', $name, $area, 'м');
@@ -371,16 +333,21 @@ class Request extends AR
 
 	public function isActive(): bool
 	{
-		return $this->status === self::STATUS_ACTIVE;
+		return $this->status === RequestStatusEnum::ACTIVE;
 	}
 
 	public function isPassive(): bool
 	{
-		return $this->status === self::STATUS_PASSIVE;
+		return $this->status === RequestStatusEnum::PASSIVE;
 	}
 
 	public function isCompleted(): bool
 	{
-		return $this->status === self::STATUS_DONE;
+		return $this->status === RequestStatusEnum::DONE || $this->status === RequestStatusEnum::DEPRECATED_DONE;
+	}
+
+	public function hasDeal(): bool
+	{
+		return $this->getDeal()->exists();
 	}
 }
