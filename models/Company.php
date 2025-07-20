@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\enum\Request\RequestStatusEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\StringHelper;
 use app\kernel\common\models\AQ\AQ;
@@ -466,7 +467,7 @@ class Company extends AR
 	 */
 	public function getActiveRequests(): RequestQuery
 	{
-		return $this->getRequests()->andOnCondition([Request::field('status') => Request::STATUS_ACTIVE]);
+		return $this->getRequests()->andOnCondition([Request::field('status') => RequestStatusEnum::ACTIVE]);
 	}
 
 	/**

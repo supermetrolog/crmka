@@ -12,6 +12,7 @@ use app\dto\Request\PassiveRequestDto;
 use app\dto\Request\RequestRelationsDto;
 use app\dto\Request\UpdateRequestDto;
 use app\dto\Timeline\CreateTimelineDto;
+use app\enum\Request\RequestStatusEnum;
 use app\events\NotificationEvent;
 use app\events\Request\CreateRequestEvent;
 use app\events\Request\RequestActivatedEvent;
@@ -88,7 +89,7 @@ class RequestService
 
 		try {
 			$request = new Request([
-				'status'                        => Request::STATUS_ACTIVE,
+				'status'                        => RequestStatusEnum::ACTIVE,
 				'company_id'                    => $dto->company_id,
 				'name'                          => $dto->name,
 				'description'                   => $dto->description,
@@ -314,7 +315,7 @@ class RequestService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$request->status              = Request::STATUS_ACTIVE;
+			$request->status              = RequestStatusEnum::ACTIVE;
 			$request->passive_why         = null;
 			$request->passive_why_comment = null;
 
@@ -342,7 +343,7 @@ class RequestService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$request->status              = Request::STATUS_PASSIVE;
+			$request->status              = RequestStatusEnum::PASSIVE;
 			$request->passive_why         = $dto->passive_why;
 			$request->passive_why_comment = $dto->passive_why_comment;
 
@@ -371,7 +372,7 @@ class RequestService
 			$request->passive_why_comment = null;
 		}
 
-		$request->status = Request::STATUS_DONE;
+		$request->status = RequestStatusEnum::DONE;
 		$request->saveOrThrow();
 	}
 

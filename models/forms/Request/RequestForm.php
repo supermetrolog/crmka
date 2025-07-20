@@ -6,8 +6,12 @@ namespace app\models\forms\Request;
 
 use app\dto\Request\CreateRequestDto;
 use app\dto\Request\UpdateRequestDto;
+use app\enum\Request\RequestDealTypeEnum;
+use app\enum\Request\RequestPassiveWhyEnum;
+use app\enum\Request\RequestStatusEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\DateTimeHelper;
+use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\Form\Form;
 use app\models\Company;
 use app\models\Contact;
@@ -87,9 +91,9 @@ class RequestForm extends Form
 					'maxArea', 'maxCeilingHeight'
 				], 'integer'
 			],
-			['dealType', 'in', 'range' => Request::getDealTypes()],
-			['status', 'in', 'range' => Request::getStatuses()],
-			['passive_why', 'in', 'range' => Request::getPassiveWhyReasons()],
+			['dealType', EnumValidator::class, 'enumClass' => RequestDealTypeEnum::class],
+			['status', EnumValidator::class, 'enumClass' => RequestStatusEnum::class],
+			['passive_why', EnumValidator::class, 'enumClass' => RequestPassiveWhyEnum::class],
 			['unknownMovingDate', 'in', 'range' => Request::getUnknownMovingDateReasons()],
 			[['movingDate'], 'safe'],
 			[['direction_ids', 'district_ids', 'gate_types', 'object_classes', 'object_type_ids', 'object_type_general_ids', 'region_ids'], 'each', 'rule' => ['integer']],
