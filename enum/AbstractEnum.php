@@ -22,7 +22,10 @@ abstract class AbstractEnum
 		return ArrayHelper::keys(static::toArray());
 	}
 
-	public static function isValid(string $value): bool
+	/**
+	 * @param mixed $value
+	 */
+	public static function isValid($value): bool
 	{
 		return ArrayHelper::includes(static::values(), $value);
 	}
@@ -32,7 +35,7 @@ abstract class AbstractEnum
 		return static::toArray();
 	}
 
-	public static function label(string $value): ?string
+	public static function label($value): ?string
 	{
 		return static::labels()[$value] ?? null;
 	}

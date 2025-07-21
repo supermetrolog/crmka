@@ -86,13 +86,12 @@ class CompanyController extends AppController
 	 */
 	public function actionView($id): CompanyViewResource
 	{
-		$model = $this->companyRepository->findModelByIdWithRelations($id);
+		$model = $this->companyRepository->findOneOrThrowWithRelations($id);
 
 		return new CompanyViewResource($model);
 	}
 
 	/**
-	 * @return CompanyViewResource
 	 * @throws Throwable
 	 * @throws SaveModelException
 	 * @throws ValidateException
@@ -147,7 +146,7 @@ class CompanyController extends AppController
 	 */
 	public function actionUpdate($id): CreatedCompanyResource
 	{
-		$company = $this->companyRepository->findModelById($id);
+		$company = $this->companyRepository->findOneOrThrow($id);
 
 		$form = new CompanyForm();
 
@@ -216,7 +215,7 @@ class CompanyController extends AppController
 	 */
 	public function actionDeleteLogo($id): SuccessResponse
 	{
-		$company = $this->companyRepository->findModelById($id);
+		$company = $this->companyRepository->findOneOrThrow($id);
 		$this->companyService->deleteLogo($company);
 
 		return new SuccessResponse('Логотип компании удален');
@@ -231,7 +230,7 @@ class CompanyController extends AppController
 	 */
 	public function actionUpdateLogo($id): MediaShortResource
 	{
-		$company = $this->companyRepository->findModelById($id);
+		$company = $this->companyRepository->findOneOrThrow($id);
 
 		$form = new CompanyLogoForm();
 
@@ -254,7 +253,7 @@ class CompanyController extends AppController
 	 */
 	public function actionDisable(int $id): SuccessResponse
 	{
-		$company = $this->companyRepository->findModelById($id);
+		$company = $this->companyRepository->findOneOrThrow($id);
 
 		$form = new CompanyDisableForm();
 
@@ -274,7 +273,7 @@ class CompanyController extends AppController
 	 */
 	public function actionEnable(int $id): SuccessResponse
 	{
-		$company = $this->companyRepository->findModelById($id);
+		$company = $this->companyRepository->findOneOrThrow($id);
 
 		$this->companyService->markAsActive($company, $this->user->identity);
 
@@ -288,7 +287,7 @@ class CompanyController extends AppController
 	 */
 	public function actionPinMessage(int $id): EntityPinnedMessageResource
 	{
-		$company = $this->companyRepository->findModelById($id);
+		$company = $this->companyRepository->findOneOrThrow($id);
 
 		$form = new CompanyPinMessageForm();
 
@@ -310,7 +309,7 @@ class CompanyController extends AppController
 	 */
 	public function actionCreatePinnedMessage(int $id): EntityPinnedMessageResource
 	{
-		$company = $this->companyRepository->findModelById($id);
+		$company = $this->companyRepository->findOneOrThrow($id);
 
 		$form = new ChatMemberMessageForm();
 		$form->setScenario(ChatMemberMessageForm::SCENARIO_CREATE);
@@ -334,7 +333,7 @@ class CompanyController extends AppController
 	 */
 	public function actionChangeConsultant($id)
 	{
-		$company = $this->companyRepository->findModelById($id);
+		$company = $this->companyRepository->findOneOrThrow($id);
 
 		$form = new CompanyChangeConsultantForm();
 

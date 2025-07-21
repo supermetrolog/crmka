@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\actions\Company;
 
 use app\dto\Request\ChangeRequestConsultantDto;
+use app\enum\Request\RequestStatusEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\StringHelper;
 use app\kernel\common\actions\Action;
@@ -304,7 +305,7 @@ class ReassignCompanyConsultantsAction extends Action
 		return Company::find()
 		              ->active()
 		              ->innerJoinWith(['requests' => function (RequestQuery $query) {
-			              return $query->andOnCondition([Request::field('status') => Request::STATUS_ACTIVE]);
+			              return $query->andOnCondition([Request::field('status') => RequestStatusEnum::ACTIVE]);
 		              }], false)
 		              ->innerJoinWith(['categories' => function (ActiveQuery $query) {
 			              return $query->andOnCondition([Category::field('category') => self::COMPANY_CATEGORIES]);

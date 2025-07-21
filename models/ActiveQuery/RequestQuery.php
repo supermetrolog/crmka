@@ -2,6 +2,7 @@
 
 namespace app\models\ActiveQuery;
 
+use app\enum\Request\RequestStatusEnum;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Request;
 use yii\base\ErrorException;
@@ -32,7 +33,7 @@ class RequestQuery extends AQ
 	 */
 	public function active(): self
 	{
-		return $this->andWhere([Request::field('status') => Request::STATUS_ACTIVE]);
+		return $this->andWhere([Request::field('status') => RequestStatusEnum::ACTIVE]);
 	}
 
 	/**

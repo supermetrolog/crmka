@@ -2,36 +2,39 @@
 
 namespace app\models\ActiveQuery;
 
+use app\kernel\common\models\AQ\AQ;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Complex;
-use yii\db\ActiveQuery;
 
-class ComplexQuery extends ActiveQuery
+class ComplexQuery extends AQ
 {
-    /**
-     * @param $db
-     * @return array|Complex[]
-     */
-    public function all($db = null): array
-    {
-        return parent::all($db);
-    }
+	/**
+	 * @return Complex[]
+	 */
+	public function all($db = null): array
+	{
+		return parent::all($db);
+	}
 
-    /**
-     * @param $db
-     * @return array|Complex|null
-     */
-    public function one($db = null)
-    {
-        $this->limit(1);
-        return parent::one($db);
-    }
+	/**
+	 * @throws ModelNotFoundException
+	 */
+	public function oneOrThrow($db = null): Complex
+	{
+		/** @var Complex */
+		return parent::oneOrThrow($db);
+	}
 
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function byId(int $id): self
-    {
-        return $this->andWhere([Complex::tableName() .  '.id' => $id]);
-    }
+	public function one($db = null): ?Complex
+	{
+		$this->limit(1);
+
+		/** @var Complex */
+		return parent::one($db);
+	}
+
+	public function byId(int $id): self
+	{
+		return $this->andWhere([Complex::tableName() . '.id' => $id]);
+	}
 }

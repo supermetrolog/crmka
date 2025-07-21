@@ -93,7 +93,7 @@ class AQ extends ActiveQuery
 
 
 	/**
-	 * @return ActiveRecord|array
+	 * @return ActiveRecord|array|AR
 	 * @throws ModelNotFoundException
 	 */
 	public function oneOrThrow($db = null): ActiveRecord

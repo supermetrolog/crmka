@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace app\repositories;
 
 use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\kernel\common\repository\AbstractRepository;
 use app\models\User;
 
-class UserRepository
+class UserRepository extends AbstractRepository
 {
 	public function getOnlineCount(): int
 	{
@@ -42,6 +43,11 @@ class UserRepository
 	public function findOneOrThrow(int $id): User
 	{
 		return User::find()->byId($id)->oneOrThrow();
+	}
+
+	public function findAll(): array
+	{
+		return User::find()->all();
 	}
 
 	/**
