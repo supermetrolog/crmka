@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\commands;
 
+use app\actions\Company\FixCompanyCategoriesAction;
 use app\actions\Company\FixCompanyProductRangesAction;
 use app\actions\Company\TransferCompanyActivityAction;
 use app\actions\Company\TransferCompanyPinnedMessagesAction;
@@ -19,7 +20,8 @@ class DataFixController extends Controller
 			'company-activity'        => TransferCompanyActivityAction::class,
 			'company-product-ranges'  => FixCompanyProductRangesAction::class,
 			'task-message-to-title'   => TaskMessageToTitleAction::class,
-			'company-pinned-messages' => TransferCompanyPinnedMessagesAction::class
+			'company-pinned-messages' => TransferCompanyPinnedMessagesAction::class,
+			'company-categories'      => FixCompanyCategoriesAction::class
 		];
 	}
 }
