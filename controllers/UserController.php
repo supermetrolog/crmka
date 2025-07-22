@@ -13,8 +13,10 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\LoginForm;
+use app\models\forms\User\UserChangePasswordForm;
 use app\models\forms\User\UserForm;
 use app\models\forms\User\UserProfileForm;
 use app\models\search\UserSearch;
@@ -368,6 +370,29 @@ class UserController extends AppController
 		$resource->online_count = $this->userRepository->getOnlineCount();
 
 		return new UserOnlineResource($resource);
+	}
+
+	/**
+	 * @return SuccessResponse|ErrorResponse
+	 * @throws SaveModelException
+	 * @throws ValidateException
+	 * @throws Exception
+	 */
+	public function actionChangePassword()
+	{
+		$form = new UserChangePasswordForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		try {
+			$this->userService->changePassword($this->user->identity, $form->getDto());
+		} catch (InvalidPasswordException $e) {
+			return $this->error('Неверный текущий пароль');
+		}
+
+		return $this->success('Пароль успешно изменен');
 	}
 
 	/**
