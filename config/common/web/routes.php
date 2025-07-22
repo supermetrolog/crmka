@@ -25,6 +25,7 @@ return static function (RouterInterface $router) {
 		$route->post('login');
 		$route->post('logout');
 		$route->post('activity');
+		$route->post('change-password');
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');

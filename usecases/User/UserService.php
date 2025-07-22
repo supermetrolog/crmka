@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace app\usecases\User;
 
+use app\dto\User\ChangeUserPasswordDto;
 use app\dto\User\CreateUserDto;
 use app\dto\User\CreateUserProfileDto;
 use app\dto\User\UpdateUserDto;
 use app\dto\User\UserActivityDto;
+use app\exceptions\InvalidPasswordException;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -17,6 +19,7 @@ use app\models\UploadFile;
 use app\models\User;
 use app\repositories\UserRepository;
 use Throwable;
+use yii\base\Exception;
 use yii\base\Security;
 use yii\db\ActiveRecord;
 use yii\db\StaleObjectException;
@@ -210,5 +213,22 @@ class UserService
 			$tx->rollBack();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Exception
+	 */
+	public function changePassword(User $user, ChangeUserPasswordDto $dto): void
+	{
+		// TODO: Разлогин со всех аккаунтов
+
+		if (!$this->security->validatePassword($dto->currentPassword, $user->password_hash)) {
+			throw new InvalidPasswordException('Invalid current password.');
+		}
+
+		$user->password_hash = $this->security->generatePasswordHash($dto->newPassword);
+
+		$user->saveOrThrow();
 	}
 }
