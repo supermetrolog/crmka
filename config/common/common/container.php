@@ -6,9 +6,12 @@ use app\components\EventManager;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ActiveQuery\NotificationChannelQuery;
 use app\models\Notification\NotificationChannel;
+use app\usecases\Auth\AuthService;
 
 $db     = require __DIR__ . "/db.php";
 $old_db = require __DIR__ . "/db_old.php";
+
+$secrets = require YII_PROJECT_ROOT . "/config/secrets.php";
 
 return [
 	'singletons'  => [
@@ -24,6 +27,10 @@ return [
 		NotificationChannelQuery::class => [
 			'class'      => NotificationChannelQuery::class,
 			'modelClass' => NotificationChannel::class
+		],
+		AuthService::class              => [
+			'class'            => AuthService::class,
+			'allowedOfficeIps' => $secrets['allowed_office_ips']
 		]
 	]
 ];

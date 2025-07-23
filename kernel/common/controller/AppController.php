@@ -2,6 +2,7 @@
 
 namespace app\kernel\common\controller;
 
+use app\behaviors\IpRestrictionFilter;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
@@ -65,6 +66,10 @@ class AppController extends Controller
 			'authenticator'     => [
 				'class'  => HttpBearerAuth::class,
 				'except' => $this->exceptAuthActions,
+			],
+			'ipRestriction'     => [
+				'class'            => IpRestrictionFilter::class,
+				'allowedOfficeIps' => Yii::$app->params['allowed_office_ips']
 			]
 		];
 	}

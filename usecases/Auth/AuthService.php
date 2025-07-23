@@ -8,7 +8,9 @@ use app\dto\Auth\AuthUserAgentDto;
 use app\dto\User\UserAccessTokenDto;
 use app\dto\User\UserActivityDto;
 use app\exceptions\InvalidPasswordException;
+use app\exceptions\services\RestrictedUserIpAccessException;
 use app\exceptions\services\UserHasInactiveStatusException;
+use app\helpers\ArrayHelper;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
 use app\helpers\StringHelper;
@@ -26,6 +28,7 @@ use yii\db\StaleObjectException;
 
 class AuthService
 {
+	public array $allowedOfficeIps = [];
 
 	private Security                     $security;
 	private UserService                  $userService;
@@ -65,6 +68,10 @@ class AuthService
 
 		if (!$this->validatePassword($user, $dto->password)) {
 			throw new InvalidPasswordException();
+		}
+
+		if ($user->isIpAccessRestricted() && !$this->isOfficeIpAllowed($userAgentDto->ip)) {
+			throw new RestrictedUserIpAccessException();
 		}
 
 		$tx = $this->transactionBeginner->begin();
@@ -155,5 +162,14 @@ class AuthService
 	public function validatePassword(User $user, string $password): bool
 	{
 		return $this->security->validatePassword($password, $user->password_hash);
+	}
+
+	public function isOfficeIpAllowed(string $ip): bool
+	{
+		if (empty($this->allowedOfficeIps)) {
+			return true;
+		}
+
+		return ArrayHelper::includes($this->allowedOfficeIps, $ip);
 	}
 }

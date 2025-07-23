@@ -4,7 +4,7 @@ namespace app\components\EffectStrategy\Strategies;
 
 use app\components\EffectStrategy\AbstractEffectStrategy;
 use app\components\EffectStrategy\Service\CreateEffectTaskService;
-use app\enum\EffectKind;
+use app\enum\Effect\EffectKind;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
 use app\models\QuestionAnswer;

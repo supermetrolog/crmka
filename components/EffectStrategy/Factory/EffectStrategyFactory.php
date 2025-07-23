@@ -10,7 +10,7 @@ use app\components\EffectStrategy\Strategies\CompanyRequestsChangesEffectStrateg
 use app\components\EffectStrategy\Strategies\CompanyRequestsCreatedEffectStrategy;
 use app\components\EffectStrategy\Strategies\HasEquipmentsOffersEffectStrategy;
 use app\components\EffectStrategy\Strategies\HasEquipmentsRequestsEffectStrategy;
-use app\enum\EffectKind;
+use app\enum\Effect\EffectKind;
 use app\helpers\ArrayHelper;
 use Yii;
 use yii\base\InvalidConfigException;
