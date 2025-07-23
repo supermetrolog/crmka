@@ -8,6 +8,7 @@ use app\actions\Company\FixCompanyCategoriesAction;
 use app\actions\Company\FixCompanyProductRangesAction;
 use app\actions\Company\TransferCompanyActivityAction;
 use app\actions\Company\TransferCompanyPinnedMessagesAction;
+use app\actions\Task\FixTaskScheduledCallsActions;
 use app\actions\Task\TaskMessageToTitleAction;
 use yii\console\Controller;
 
@@ -21,7 +22,8 @@ class DataFixController extends Controller
 			'company-product-ranges'  => FixCompanyProductRangesAction::class,
 			'task-message-to-title'   => TaskMessageToTitleAction::class,
 			'company-pinned-messages' => TransferCompanyPinnedMessagesAction::class,
-			'company-categories'      => FixCompanyCategoriesAction::class
+			'company-categories'      => FixCompanyCategoriesAction::class,
+			'task-scheduled-calls'    => FixTaskScheduledCallsActions::class
 		];
 	}
 }
