@@ -100,4 +100,9 @@ class TaskQuery extends AQ
 	{
 		return $this->andWhere([Task::field('user_id') => $userId]);
 	}
+
+	public function byType(string $type): self
+	{
+		return $this->andWhere([$this->field('type') => $type]);
+	}
 }
