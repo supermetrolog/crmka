@@ -21,6 +21,7 @@ class UserForm extends Form
 	public $email_password;
 	public $role;
 	public $password;
+	public $restrict_ip_login;
 
 	public function rules(): array
 	{
@@ -31,6 +32,7 @@ class UserForm extends Form
 			['username', 'string', 'min' => 4, 'max' => 32],
 			[['email', 'email_password', 'email_username'], 'string', 'max' => 255],
 			['username', 'validateUsername'],
+			['restrict_ip_login', 'boolean'],
 			['role', 'integer'],
 			['role', 'in', 'range' => User::getRoles()]
 		];
@@ -42,7 +44,7 @@ class UserForm extends Form
 	 *
 	 * @param string $attribute the attribute currently being validated
 	 */
-	public function validateUsername(string $attribute)
+	public function validateUsername(string $attribute): void
 	{
 		if (!$this->hasErrors()) {
 			$userExist = User::find()->andWhere(['username' => $this->$attribute])->exists();
@@ -56,12 +58,13 @@ class UserForm extends Form
 	public function attributeLabels(): array
 	{
 		return [
-			'username'       => 'Логин',
-			'password'       => 'Пароль',
-			'role'           => 'Роль',
-			'email'          => 'Email',
-			'email_username' => 'Логин от почты',
-			'email_password' => 'Пароль от почты'
+			'username'          => 'Логин',
+			'password'          => 'Пароль',
+			'role'              => 'Роль',
+			'email'             => 'Email',
+			'email_username'    => 'Логин от почты',
+			'email_password'    => 'Пароль от почты',
+			'restrict_ip_login' => 'Запрет на дистанционный вход',
 		];
 	}
 
@@ -72,7 +75,8 @@ class UserForm extends Form
 			'email_username',
 			'role',
 			'password',
-			'email_password'
+			'email_password',
+			'restrict_ip_login'
 		];
 
 		return [
@@ -89,21 +93,23 @@ class UserForm extends Form
 	{
 		if ($this->getScenario() === self::SCENARIO_CREATE) {
 			return new CreateUserDto([
-				'username'       => $this->username,
-				'email'          => $this->email,
-				'email_username' => $this->email_username,
-				'email_password' => $this->email_password,
-				'role'           => $this->role,
-				'password'       => $this->password
+				'username'          => $this->username,
+				'email'             => $this->email,
+				'email_username'    => $this->email_username,
+				'email_password'    => $this->email_password,
+				'role'              => $this->role,
+				'password'          => $this->password,
+				'restrict_ip_login' => $this->restrict_ip_login
 			]);
 		}
 
 		return new UpdateUserDto([
-			'email'          => $this->email,
-			'email_username' => $this->email_username,
-			'email_password' => $this->email_password,
-			'role'           => $this->role,
-			'password'       => $this->password
+			'email'             => $this->email,
+			'email_username'    => $this->email_username,
+			'email_password'    => $this->email_password,
+			'role'              => $this->role,
+			'password'          => $this->password,
+			'restrict_ip_login' => $this->restrict_ip_login
 		]);
 	}
 }

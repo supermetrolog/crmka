@@ -32,6 +32,7 @@ use yii\web\IdentityInterface;
  * @property int                    $role
  * @property int                    $user_id_old
  * @property ?string                $last_seen
+ * @property bool                   $restrict_ip_login
  *
  * @property UserProfile            $userProfile
  * @property ChatMember             $chatMember
@@ -111,6 +112,7 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 			[['email'], 'unique'],
 			[['password_reset_token'], 'unique'],
 			['role', 'in', 'range' => self::getRoles()],
+			['restrict_ip_login', 'boolean'],
 		];
 	}
 
@@ -317,5 +319,10 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	public function isDeleted(): bool
 	{
 		return $this->status === self::STATUS_DELETED;
+	}
+
+	public function isIpAccessRestricted(): bool
+	{
+		return $this->restrict_ip_login;
 	}
 }

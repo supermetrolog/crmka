@@ -74,12 +74,13 @@ class UserService
 
 		try {
 			$model = new User([
-				'username'       => $createUserDto->username,
-				'email'          => $createUserDto->email,
-				'email_username' => $createUserDto->email_username,
-				'email_password' => $createUserDto->email_password,
-				'role'           => $createUserDto->role,
-				'password_hash'  => $this->security->generatePasswordHash($createUserDto->password)
+				'username'          => $createUserDto->username,
+				'email'             => $createUserDto->email,
+				'email_username'    => $createUserDto->email_username,
+				'email_password'    => $createUserDto->email_password,
+				'role'              => $createUserDto->role,
+				'password_hash'     => $this->security->generatePasswordHash($createUserDto->password),
+				'restrict_ip_login' => $createUserDto->restrict_ip_login
 			]);
 
 			$model->saveOrThrow();
@@ -113,9 +114,10 @@ class UserService
 
 		try {
 			$model->load([
-				'email'          => $dto->email,
-				'email_username' => $dto->email_username,
-				'role'           => $dto->role
+				'email'             => $dto->email,
+				'email_username'    => $dto->email_username,
+				'role'              => $dto->role,
+				'restrict_ip_login' => $dto->restrict_ip_login
 			]);
 
 			if ($dto->email_password !== null) {

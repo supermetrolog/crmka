@@ -1,6 +1,6 @@
 <?php
 
-namespace app\enum;
+namespace app\enum\Effect;
 
 class EffectKind
 {
