@@ -4,8 +4,10 @@ namespace app\controllers;
 
 use app\dto\Auth\AuthUserAgentDto;
 use app\dto\User\UserActivityDto;
+use app\exceptions\http\RestrictedIpHttpException;
 use app\exceptions\InvalidBearerTokenException;
 use app\exceptions\InvalidPasswordException;
+use app\exceptions\services\RestrictedUserIpAccessException;
 use app\exceptions\services\UserHasInactiveStatusException;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\TokenHelper;
@@ -199,16 +201,15 @@ class UserController extends AppController
 
 
 	/**
-	 * @return array
-	 * @throws ErrorException
 	 * @throws NotFoundHttpException
 	 * @throws SaveModelException
+	 * @throws Throwable
 	 * @throws ValidateException
 	 * @throws Exception
 	 */
 	public function actionLogin(): array
 	{
-		$form = new LoginForm($this->authService);
+		$form = new LoginForm();
 
 		$form->load($this->request->post());
 
@@ -228,6 +229,8 @@ class UserController extends AppController
 			throw new NotFoundHttpException('Неправильный логин или пароль.');
 		} catch (UserHasInactiveStatusException $e) {
 			throw new NotFoundHttpException('Пользователь занесен в архив.');
+		} catch (RestrictedUserIpAccessException $e) {
+			throw new RestrictedIpHttpException();
 		}
 	}
 

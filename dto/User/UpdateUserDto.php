@@ -13,4 +13,5 @@ class UpdateUserDto extends BaseObject
 	public ?string $email_password;
 	public string  $role;
 	public ?string $password;
+	public bool    $restrict_ip_login;
 }
