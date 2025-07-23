@@ -445,4 +445,14 @@ class TaskService
 		}
 
 	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function changeType(Task $task, string $type): void
+	{
+		$task->type = $type;
+
+		$task->saveOrThrow();
+	}
 }
