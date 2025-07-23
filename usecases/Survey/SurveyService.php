@@ -13,6 +13,7 @@ use app\dto\Survey\UpdateSurveyDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
 use app\dto\SurveyQuestionAnswer\UpdateSurveyQuestionAnswerDto;
 use app\events\Survey\CancelSurveyEvent;
+use app\events\Survey\ChangeSurveyCommentEvent;
 use app\events\Survey\CompleteSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\exceptions\services\SurveyAlreadyCancelledException;
@@ -374,5 +375,26 @@ class SurveyService
 				'second_id'   => $relationId
 			])
 		);
+	}
+
+	/**
+	 * @throws Throwable
+	 */
+	public function changeComment(Survey $survey, string $comment): Survey
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$survey->updateAttributes(['comment' => $comment]);
+
+			$this->eventManager->trigger(new ChangeSurveyCommentEvent($survey));
+
+			$tx->commit();
+
+			return $survey;
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
 	}
 }

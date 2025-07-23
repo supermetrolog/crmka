@@ -12,7 +12,6 @@ use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\ChatMemberMessage\ChatMemberMessageInlineResource;
 use app\resources\Contact\ContactResource;
 use app\resources\Survey\SurveyBaseResource;
-use app\resources\Task\TaskResource;
 
 class CompanySurveyResource extends JsonResource
 {
@@ -31,8 +30,7 @@ class CompanySurveyResource extends JsonResource
 				'user'    => UserShortResource::make($this->resource->user)->toArray(),
 				'contact' => ContactResource::tryMakeArray($this->resource->contact),
 				'calls'   => CallResource::collection($this->resource->calls),
-				'message' => ChatMemberMessageInlineResource::tryMakeArray($this->resource->chatMemberMessage),
-				'tasks'   => TaskResource::collection($this->resource->tasks)
+				'message' => ChatMemberMessageInlineResource::tryMakeArray($this->resource->chatMemberMessage)
 			]
 		);
 	}

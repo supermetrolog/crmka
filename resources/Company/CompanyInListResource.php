@@ -18,6 +18,7 @@ use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Company\Request\CompanyRequestResource;
 use app\resources\Company\Survey\CompanySurveyResource;
 use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
+use app\resources\Task\TaskResource;
 
 class CompanyInListResource extends JsonResource
 {
@@ -77,7 +78,7 @@ class CompanyInListResource extends JsonResource
 			'last_survey'           => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
 			'has_pending_survey'    => $this->resource->has_pending_survey,
 			'pending_survey_status' => $this->resource->pending_survey_status,
-			'tasks'                 => $this->resource->tasks,
+			'tasks'                 => TaskResource::collection($this->resource->tasks),
 
 			'chat_member_id' => $this->resource->chatMember->id ?? null,
 

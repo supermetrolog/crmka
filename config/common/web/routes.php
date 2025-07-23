@@ -248,6 +248,8 @@ return static function (RouterInterface $router) {
 			$route->post('delay');
 			$route->post('continue');
 
+			$route->post('change-comment');
+
 			$route->put()->action('update');
 			$route->put('with-survey-question-answer', 'update-with-survey-question-answer');
 			$route->delete()->action('delete');

@@ -17,6 +17,7 @@ use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Call\CallForm;
 use app\models\forms\Media\MediaForm;
+use app\models\forms\Survey\SurveyChangeCommentForm;
 use app\models\forms\Survey\SurveyForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
 use app\models\Media;
@@ -290,6 +291,26 @@ class SurveyController extends AppController
 		$this->service->delete($model);
 
 		return new SuccessResponse();
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws ValidateException
+	 * @throws Throwable
+	 */
+	public function actionChangeComment(int $id): SurveyShortResource
+	{
+		$survey = $this->repository->findOneOrThrow($id);
+
+		$form = new SurveyChangeCommentForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->service->changeComment($survey, $form->comment);
+
+		return new SurveyShortResource($survey);
 	}
 
 	/**
