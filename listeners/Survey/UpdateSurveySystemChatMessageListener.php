@@ -11,7 +11,7 @@ use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
 use app\models\ChatMemberMessage;
 use app\models\QuestionAnswer;
 use app\models\Survey;
-use app\usecases\ChatMember\ChatMemberMessageService;
+use app\repositories\ChatMemberMessageRepository;
 use app\usecases\Task\TaskService;
 use Throwable;
 use yii\base\ErrorException;
@@ -22,22 +22,22 @@ use yii\di\NotInstantiableException;
 
 class UpdateSurveySystemChatMessageListener implements EventListenerInterface
 {
-	private ChatMemberMessageService     $chatMemberMessageService;
+	private ChatMemberMessageRepository  $chatMemberMessageRepository;
 	private EffectStrategyFactory        $effectStrategyFactory;
 	private TransactionBeginnerInterface $transactionBeginner;
 	private TaskService                  $taskService;
 
 	public function __construct(
-		ChatMemberMessageService $chatMemberMessageService,
 		EffectStrategyFactory $effectStrategyFactory,
 		TransactionBeginnerInterface $transactionBeginner,
-		TaskService $taskService
+		TaskService $taskService,
+		ChatMemberMessageRepository $chatMemberMessageRepository
 	)
 	{
-		$this->chatMemberMessageService = $chatMemberMessageService;
-		$this->effectStrategyFactory    = $effectStrategyFactory;
-		$this->transactionBeginner      = $transactionBeginner;
-		$this->taskService              = $taskService;
+		$this->effectStrategyFactory       = $effectStrategyFactory;
+		$this->transactionBeginner         = $transactionBeginner;
+		$this->taskService                 = $taskService;
+		$this->chatMemberMessageRepository = $chatMemberMessageRepository;
 	}
 
 	/**
@@ -54,11 +54,7 @@ class UpdateSurveySystemChatMessageListener implements EventListenerInterface
 			return;
 		}
 
-		$message = $this->chatMemberMessageService->getSystemMessageBySurveyIdAndTemplateAndChatMemberId(
-			$survey->id,
-			ChatMemberMessage::SURVEY_TEMPLATE,
-			$survey->chat_member_id
-		);
+		$message = $this->chatMemberMessageRepository->findOneBySurveyIdAndTemplateAndChatMemberId($survey->id, ChatMemberMessage::SURVEY_TEMPLATE, $survey->chat_member_id);
 
 		if ($message) {
 			$this->handleEffects($survey, $message);

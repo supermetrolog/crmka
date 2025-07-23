@@ -120,11 +120,11 @@ class CompanySearch extends Form
 			                          'objects.objectFloors',
 			                          'lastCall',
 			                          'chatMember',
+			                          'tasks.tags', 'tasks.createdByUser.userProfile', 'tasks.user.userProfile',
+			                          'tasks.observers.user.userProfile', 'tasks.targetUserObserver',
 			                          'lastSurvey.user.userProfile', 'lastSurvey.calls.user.userProfile', 'lastSurvey.calls.contact.consultant.userProfile',
 			                          'lastSurvey.contact.emails', 'lastSurvey.contact.websites', 'lastSurvey.contact.phones',
 			                          'lastSurvey.contact.consultant.userProfile', 'lastSurvey.contact.wayOfInformings',
-			                          'lastSurvey.tasks.tags', 'lastSurvey.tasks.createdByUser.userProfile', 'lastSurvey.tasks.user.userProfile',
-			                          'lastSurvey.tasks.observers.user.userProfile', 'lastSurvey.tasks.targetUserObserver',
 			                          'lastSurvey.chatMemberMessage.fromChatMember.user.userProfile',
 			                          'lastSurvey.chatMemberMessage.files',
 			                          'pinnedMessages.chatMemberMessage.fromChatMember.user.userProfile', 'pinnedMessages.chatMemberMessage.files',
@@ -220,17 +220,17 @@ class CompanySearch extends Form
 			]);
 
 			$query->joinWith(['tasks' => function (TaskQuery $subquery) {
-				$subquery->andOnCondition([
-					'and',
-					[Task::field('user_id') => $this->current_user_id],
-					['!=', Task::field('status'), Task::STATUS_DONE]
-				]);
-			}], true, $this->isFilterTrue($this->with_current_user_tasks) ? 'INNER JOIN' : 'LEFT JOIN')
+				$subquery->andOnCondition(['!=', Task::field('status'), Task::STATUS_DONE]);
+			}])
 			      ->leftJoin(
 				      ['sd' => Survey::getTable()],
 				      ['and', ['sd.status' => [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED], 'sd.deleted_at' => null], 'sd.chat_member_id = cm.id', 'sd.user_id = :user_id'],
 				      ['user_id' => $this->current_user_id]
 			      );
+		}
+
+		if ($this->isFilterTrue($this->with_current_user_tasks)) {
+			$query->andWhere(['is not', Task::field('id'), null]);
 		}
 
 		$query->andFilterWhere([

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\repositories;
 
+use app\models\ActiveQuery\SurveyQuery;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use yii\db\BatchQueryResult;
@@ -29,5 +30,17 @@ class ChatMemberMessageRepository
 		                        ->andWhere(['views.chat_member_id' => null])
 		                        ->notDeleted()
 		                        ->each();
+	}
+
+	public function findOneBySurveyIdAndTemplateAndChatMemberId(int $surveyId, string $template, int $chatMemberId): ?ChatMemberMessage
+	{
+		return ChatMemberMessage::find()
+		                        ->notDeleted()
+		                        ->byToChatMemberId($chatMemberId)
+		                        ->byTemplate($template)
+		                        ->innerJoinWith(['surveys' => function (SurveyQuery $query) use ($surveyId) {
+			                        $query->byId($surveyId);
+		                        }])
+		                        ->one();
 	}
 }

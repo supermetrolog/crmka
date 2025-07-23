@@ -237,9 +237,7 @@ class ChatMemberMessageService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$message->message = $dto->message;
-
-			$message->saveOrThrow();
+			$this->changeMessage($message, $dto->message);
 
 			$this->updateRelations($message, Contact::getMorphClass(), $dto->contactIds);
 			$this->updateRelations($message, ChatMemberMessageTag::getMorphClass(), $dto->tagIds);
@@ -265,6 +263,18 @@ class ChatMemberMessageService
 			$tx->rollback();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function changeMessage(ChatMemberMessage $model, string $message): ChatMemberMessage
+	{
+		$model->message = $message;
+
+		$model->saveOrThrow();
+
+		return $model;
 	}
 
 	/**

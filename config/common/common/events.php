@@ -6,6 +6,7 @@ use app\events\Deal\CreateRequestDealEvent;
 use app\events\Request\RequestActivatedEvent;
 use app\events\Request\RequestDeactivatedEvent;
 use app\events\Survey\CancelSurveyEvent;
+use app\events\Survey\ChangeSurveyCommentEvent;
 use app\events\Survey\CompleteSurveyEvent;
 use app\events\Survey\UpdateSurveyEvent;
 use app\events\Task\AssignTaskEvent;
@@ -27,6 +28,7 @@ use app\listeners\Company\DisableCompanySystemChatMemberMessageListener;
 use app\listeners\Deal\CompleteDealRequestListener;
 use app\listeners\Survey\CreateCancelledSurveySystemChatMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
+use app\listeners\Survey\UpdateSurveyPinnedCommentListener;
 use app\listeners\Survey\UpdateSurveySystemChatMessageListener;
 use app\listeners\Task\AssignTaskListener;
 use app\listeners\Task\ChangeStatusTaskListener;
@@ -52,6 +54,7 @@ return [
 	],
 	UpdateSurveyEvent::class            => [
 		UpdateSurveySystemChatMessageListener::class,
+		UpdateSurveyPinnedCommentListener::class
 	],
 	ChangeConsultantCompanyEvent::class => [
 		ChangeConsultantCompanySystemChatMessageListener::class,
@@ -113,5 +116,8 @@ return [
 	],
 	CreateRequestDealEvent::class       => [
 		CompleteDealRequestListener::class
+	],
+	ChangeSurveyCommentEvent::class     => [
+		UpdateSurveyPinnedCommentListener::class
 	]
 ];
