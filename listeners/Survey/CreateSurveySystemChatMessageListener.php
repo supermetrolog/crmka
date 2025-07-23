@@ -3,7 +3,7 @@
 namespace app\listeners\Survey;
 
 use app\components\EffectStrategy\Factory\EffectStrategyFactory;
-use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
+use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\EntityPinnedMessage\EntityPinnedMessageDto;
 use app\events\Survey\CompleteSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -56,7 +56,7 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$message = $this->createSystemMessage($survey, $survey->chatMember);
+			$message = $this->createMessage($survey, $survey->chatMember);
 
 			if (!empty($survey->comment)) {
 				$this->pinMessageToCompany($survey->chatMember->company, $message);
@@ -75,17 +75,19 @@ class CreateSurveySystemChatMessageListener implements EventListenerInterface
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function createSystemMessage(Survey $survey, ChatMember $chatMember): ChatMemberMessage
+	private function createMessage(Survey $survey, ChatMember $chatMember): ChatMemberMessage
 	{
-		$dto = new CreateChatMemberSystemMessageDto([
-			'message'    => $survey->comment ?? self::SURVEY_DEFAULT_MESSAGE,
+		$dto = new CreateChatMemberMessageDto([
+			'from'       => $survey->user->chatMember,
 			'to'         => $chatMember,
+			'message'    => $survey->comment ?? self::SURVEY_DEFAULT_MESSAGE,
+			'contactIds' => $survey->contact_id ? [$survey->contact_id] : [],
 			'surveyIds'  => [$survey->id],
-			'contactIds' => [$survey->contact_id],
-			'template'   => ChatMemberMessage::SURVEY_TEMPLATE
+			'template'   => ChatMemberMessage::SURVEY_TEMPLATE,
+			'tagIds'     => []
 		]);
 
-		return $this->chatMemberMessageService->createSystemMessage($dto);
+		return $this->chatMemberMessageService->create($dto);
 	}
 
 	/**

@@ -35,4 +35,19 @@ class EntityPinnedMessageQuery extends AQ
 		/** @var EntityPinnedMessage */
 		return parent::oneOrThrow($db);
 	}
+
+	public function byEntityId(int $entityId): EntityPinnedMessageQuery
+	{
+		return $this->andWhere(['entity_id' => $entityId]);
+	}
+
+	public function byEntityType(string $entityType): EntityPinnedMessageQuery
+	{
+		return $this->andWhere(['entity_type' => $entityType]);
+	}
+	
+	public function byEntity(int $entityId, string $entityType): EntityPinnedMessageQuery
+	{
+		return $this->byEntityId($entityId)->byEntityType($entityType);
+	}
 }
