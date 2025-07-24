@@ -301,6 +301,8 @@ return static function (RouterInterface $router) {
 			$route->post('assign');
 			$route->post('postpone');
 			$route->post('restore');
+			$route->post('change-dates');
+			$route->post('change-type');
 
 			$route->prefix('relations', static function (RouteInterface $route) {
 				$route->get()->action('relations');

@@ -130,4 +130,9 @@ class DateTimeHelper
 	{
 		return (clone $dateTime)->setTime(0, 0, 0);
 	}
+
+	public static function compare(DateTimeInterface $first, DateTimeInterface $second): int
+	{
+		return $first->getTimestamp() <=> $second->getTimestamp();
+	}
 }
