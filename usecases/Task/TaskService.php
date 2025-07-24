@@ -8,6 +8,7 @@ use app\components\EventManager;
 use app\dto\Media\CreateMediaDto;
 use app\dto\Media\DeleteMediaDto;
 use app\dto\Relation\CreateRelationDto;
+use app\dto\Task\ChangeTaskDatesDto;
 use app\dto\Task\ChangeTaskStatusDto;
 use app\dto\Task\CreateTaskRelationEntityDto;
 use app\dto\Task\LinkTaskRelationEntityDto;
@@ -452,6 +453,17 @@ class TaskService
 	public function changeType(Task $task, string $type): void
 	{
 		$task->type = $type;
+
+		$task->saveOrThrow();
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function changeDates(Task $task, ChangeTaskDatesDto $dto): void
+	{
+		$task->start = DateTimeHelper::format($dto->start);
+		$task->end   = DateTimeHelper::tryFormat($dto->end);
 
 		$task->saveOrThrow();
 	}

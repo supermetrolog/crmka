@@ -12,7 +12,9 @@ use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Media\DeleteMediaForm;
 use app\models\forms\Media\MediaForm;
 use app\models\forms\Task\TaskAssignForm;
+use app\models\forms\Task\TaskChangeDatesForm;
 use app\models\forms\Task\TaskChangeStatusForm;
+use app\models\forms\Task\TaskChangeTypeForm;
 use app\models\forms\Task\TaskCommentForm;
 use app\models\forms\Task\TaskForm;
 use app\models\forms\Task\TaskPostponeForm;
@@ -515,6 +517,48 @@ class TaskController extends AppController
 		$entities = $this->taskService->linkEntities($task, $dtos);
 
 		return TaskRelationEntityResource::collection($entities);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionChangeDates(int $id): TaskResource
+	{
+		$task = $this->repository->findModelById($id);
+
+		$form = new TaskChangeDatesForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->updateTaskService->changeDates($task, $form->getDto(), $this->user->identity);
+
+		return new TaskResource($task);
+	}
+
+
+	/**
+	 * @throws ValidateException
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 */
+	public function actionChangeType(int $id): TaskResource
+	{
+		$task = $this->repository->findModelById($id);
+
+		$form = new TaskChangeTypeForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->taskService->changeType($task, $form->type);
+
+		return new TaskResource($task);
 	}
 
 	/**
