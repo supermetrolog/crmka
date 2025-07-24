@@ -6,14 +6,17 @@ namespace app\usecases\Task;
 
 use app\components\EventManager;
 use app\dto\Media\CreateMediaDto;
+use app\dto\Task\ChangeTaskDatesDto;
 use app\dto\Task\UpdateTaskDto;
 use app\events\Task\UpdateTaskEvent;
 use app\helpers\ArrayHelper;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
 use app\models\TaskEvent;
 use app\models\User;
+use DateTimeInterface;
 use Throwable;
 use yii\base\ErrorException;
 
@@ -70,6 +73,32 @@ class UpdateTaskService
 	}
 
 	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function changeDates(Task $task, ChangeTaskDatesDto $dto, User $initiator): Task
+	{
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$changedAttributes = $this->trackPrimitiveChanges($task, $dto);
+
+			$this->taskService->changeDates($task, $dto);
+
+			if (ArrayHelper::notEmpty($changedAttributes)) {
+				$this->eventManager->trigger(new UpdateTaskEvent($task, $initiator, $changedAttributes));
+			}
+
+			$tx->commit();
+
+			return $task;
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
 	 * @param CreateMediaDto[] $mediaDtos
 	 *
 	 * @throws ErrorException
@@ -93,7 +122,10 @@ class UpdateTaskService
 		return $changedAttributes;
 	}
 
-	private function trackPrimitiveChanges(Task $newTask, UpdateTaskDto $dto): array
+	/**
+	 * @param UpdateTaskDto|ChangeTaskDatesDto $dto
+	 */
+	private function trackPrimitiveChanges(Task $newTask, $dto): array
 	{
 		$changedAttributes = [];
 
@@ -102,12 +134,21 @@ class UpdateTaskService
 				continue;
 			}
 
-			if ($newTask->getAttribute($attribute) !== $dto->$attribute) {
+			if ($newTask->getAttribute($attribute) !== $this->parseDtoAttribute($dto->$attribute)) {
 				$changedAttributes[] = $event;
 			}
 		}
 
 		return $changedAttributes;
+	}
+
+	private function parseDtoAttribute($value)
+	{
+		if ($value instanceof DateTimeInterface) {
+			return DateTimeHelper::format($value);
+		}
+
+		return $value;
 	}
 
 	/**
