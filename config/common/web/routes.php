@@ -209,6 +209,8 @@ return static function (RouterInterface $router) {
 	$router->controller('ChatMember/chat-member-message')->alias('chat-member-messages')->group(static function (RouteInterface $route) {
 		$route->get()->action('index');
 
+		$route->get('search');
+
 		$route->post()->action('create');
 		$route->post('with-task', 'create-with-task');
 		$route->post('with-tasks', 'create-with-tasks');
