@@ -18,9 +18,11 @@ use app\models\forms\Reminder\ReminderForm;
 use app\models\forms\Task\TaskForm;
 use app\models\forms\Task\TaskRelationEntityLinkForm;
 use app\models\Media;
+use app\models\search\ChatMemberMessageCommonSearch;
 use app\models\search\ChatMemberMessageSearch;
 use app\resources\AlertResource;
 use app\resources\ChatMemberMessage\ChatMemberMessageResource;
+use app\resources\ChatMemberMessage\ChatMemberMessageSearchResource;
 use app\resources\ReminderResource;
 use app\resources\Task\TaskResource;
 use app\resources\UserNotificationResource;
@@ -328,6 +330,19 @@ class ChatMemberMessageController extends AppController
 		$this->service->viewMessages($form->getChatMemberMessage(), $form->from_chat_member_id);
 
 		return new SuccessResponse();
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws ErrorException
+	 */
+	public function actionSearch(): ActiveDataProvider
+	{
+		$searchModel = new ChatMemberMessageCommonSearch();
+
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return ChatMemberMessageSearchResource::fromDataProvider($dataProvider);
 	}
 
 
