@@ -17,7 +17,7 @@ use app\resources\Company\Object\CompanyObjectResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Company\Request\CompanyRequestResource;
 use app\resources\Company\Survey\CompanySurveyResource;
-use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
+use app\resources\EntityMessageLink\EntityMessageLinkResource;
 use app\resources\Task\TaskResource;
 
 class CompanyInListResource extends JsonResource
@@ -74,7 +74,13 @@ class CompanyInListResource extends JsonResource
 
 			'last_call' => CallShortResource::tryMakeArray($this->resource->lastCall),
 
-			'pinned_messages'       => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
+			'note'           => EntityMessageLinkResource::tryMakeArray($this->resource->latestNote),
+			'pinned_message' => EntityMessageLinkResource::tryMakeArray($this->resource->latestPinnedMessage),
+			'comment'        => EntityMessageLinkResource::tryMakeArray($this->resource->latestComment),
+
+			'notes_count'    => $this->resource->notes_count,
+			'comments_count' => $this->resource->comments_count,
+
 			'last_survey'           => CompanySurveyResource::tryMakeArray($this->resource->lastSurvey),
 			'has_pending_survey'    => $this->resource->has_pending_survey,
 			'pending_survey_status' => $this->resource->pending_survey_status,

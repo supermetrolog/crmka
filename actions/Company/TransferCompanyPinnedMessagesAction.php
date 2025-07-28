@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace app\actions\Company;
 
-use app\dto\EntityPinnedMessage\EntityPinnedMessageDto;
+use app\dto\EntityMessageLink\EntityMessageLinkDto;
+use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\kernel\common\actions\Action;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ChatMemberMessage;
 use app\models\Company;
-use app\models\EntityPinnedMessage;
-use app\usecases\EntityPinnedMessage\EntityPinnedMessageService;
+use app\models\EntityMessageLink;
+use app\usecases\EntityMessageLink\EntityMessageLinkService;
 use yii\base\ErrorException;
 
 class TransferCompanyPinnedMessagesAction extends Action
 {
-	private EntityPinnedMessageService $service;
+	private EntityMessageLinkService $service;
 
 	public function __construct(
 		$id,
 		$controller,
-		EntityPinnedMessageService $service,
+		EntityMessageLinkService $service,
 		array $config = []
 	)
 	{
@@ -45,7 +46,7 @@ class TransferCompanyPinnedMessagesAction extends Action
 			                          $query->andWhere('tcm.model_type = :type', [':type' => Company::getMorphClass()])
 			                                ->andWhere('tcm.pinned_chat_member_message_id = cmm.id');
 		                          }], false)
-		                          ->leftJoin(['cpm' => EntityPinnedMessage::getTable()], 'cpm.chat_member_message_id = cmm.id')
+		                          ->leftJoin(['cpm' => EntityMessageLink::getTable()], 'cpm.chat_member_message_id = cmm.id')
 		                          ->with(['toChatMember', 'fromChatMember.user'])
 		                          ->andWhere('cmm.deleted_at is null')
 		                          ->andWhere('cpm.id is null');
@@ -62,11 +63,12 @@ class TransferCompanyPinnedMessagesAction extends Action
 
 		/** @var ChatMemberMessage $message */
 		foreach ($query->each() as $message) {
-			$pinned = $this->service->create(new EntityPinnedMessageDto([
+			$pinned = $this->service->create(new EntityMessageLinkDto([
 					'entity_id'   => $message->toChatMember->model_id,
 					'entity_type' => $message->toChatMember->model_type,
 					'message'     => $message,
-					'user'        => $message->fromChatMember->user
+					'user'        => $message->fromChatMember->user,
+					'kind'        => EntityMessageLinkKindEnum::COMMENT
 				])
 			);
 
