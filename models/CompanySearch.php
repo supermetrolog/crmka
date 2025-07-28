@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
+use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
@@ -12,6 +13,7 @@ use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\CommercialOfferQuery;
 use app\models\ActiveQuery\CompanyQuery;
+use app\models\ActiveQuery\EntityMessageLinkQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
@@ -103,10 +105,14 @@ class CompanySearch extends Form
 			                          'requests_count'        => 'COUNT(DISTINCT request.id)',
 			                          'active_requests_count' => 'COUNT(DISTINCT CASE WHEN request.status = 1 THEN request.id ELSE NULL END)',
 			                          'contacts_count'        => 'COUNT(DISTINCT contact.id)',
-			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)'
+			                          'active_contacts_count' => 'COUNT(DISTINCT CASE WHEN contact.status = 1 THEN contact.id ELSE NULL END)',
+			                          'comments_count'        => 'COALESCE(comments.count, 0)',
+			                          'notes_count'           => 'COALESCE(notes.count, 0)',
 		                          ])
 		                          ->joinWith(['requests', 'categories', 'contacts.phones', 'objects', 'productRanges', 'companyActivityGroups', 'companyActivityProfiles'])
 		                          ->joinWith(['chatMember cm'])
+		                          ->leftJoin(['comments' => $this->getEntityMessageLinkQueryByKind(EntityMessageLinkKindEnum::COMMENT)], 'comments.entity_id = ' . Company::field('id'))
+		                          ->leftJoin(['notes' => $this->getEntityMessageLinkQueryByKind(EntityMessageLinkKindEnum::NOTE)], 'notes.entity_id = ' . Company::field('id'))
 		                          ->leftJoinLastCallRelation()
 		                          ->with([
 			                          'requests',
@@ -127,7 +133,9 @@ class CompanySearch extends Form
 			                          'lastSurvey.contact.consultant.userProfile', 'lastSurvey.contact.wayOfInformings',
 			                          'lastSurvey.chatMemberMessage.fromChatMember.user.userProfile',
 			                          'lastSurvey.chatMemberMessage.files',
-			                          'pinnedMessages.chatMemberMessage.fromChatMember.user.userProfile', 'pinnedMessages.chatMemberMessage.files',
+			                          'latestPinnedMessage.chatMemberMessage.fromChatMember.user.userProfile', 'latestPinnedMessage.chatMemberMessage.files',
+			                          'latestNote.chatMemberMessage.fromChatMember.user.userProfile',
+			                          'latestComment.chatMemberMessage.fromChatMember.user.userProfile',
 		                          ])->groupBy(Company::field('id'));
 
 		$this->load($params);
@@ -624,5 +632,14 @@ class CompanySearch extends Form
 		$query->addParams([
 			':delayedStatus' => Survey::STATUS_DELAYED
 		]);
+	}
+
+	private function getEntityMessageLinkQueryByKind(string $kind): EntityMessageLinkQuery
+	{
+		return EntityMessageLink::find()
+		                        ->select(['entity_id', 'count' => new Expression('COUNT(*)')])
+		                        ->byKind($kind)
+		                        ->byEntityType(Company::getMorphClass())
+		                        ->groupBy('entity_id');
 	}
 }

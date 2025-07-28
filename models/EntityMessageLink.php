@@ -2,10 +2,12 @@
 
 namespace app\models;
 
+use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
+use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\CompanyQuery;
-use app\models\ActiveQuery\EntityPinnedMessageQuery;
+use app\models\ActiveQuery\EntityMessageLinkQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\UserQuery;
 use InvalidArgumentException;
@@ -17,6 +19,7 @@ use yii\db\ActiveQuery;
  * @property string                 $entity_type
  * @property int                    $created_by_id
  * @property int                    $chat_member_message_id
+ * @property string                 $kind
  * @property int                    $created_at
  * @property int                    $updated_at
  * @property int                    $deleted_at
@@ -27,7 +30,7 @@ use yii\db\ActiveQuery;
  * @property-read Objects           $object
  * @property-read User              $createdBy
  */
-class EntityPinnedMessage extends AR
+class EntityMessageLink extends AR
 {
 	protected bool $useSoftCreate = true;
 	protected bool $useSoftUpdate = true;
@@ -35,15 +38,16 @@ class EntityPinnedMessage extends AR
 
 	public static function tableName(): string
 	{
-		return 'entity_pinned_message';
+		return 'entity_message_link';
 	}
 
 	public function rules(): array
 	{
 		return [
-			[['chat_member_message_id', 'entity_id', 'entity_type', 'created_by_id'], 'required'],
+			[['chat_member_message_id', 'entity_id', 'entity_type', 'created_by_id', 'kind'], 'required'],
 			[['chat_member_message_id', 'entity_id', 'created_by_id'], 'integer'],
-			['entity_type', 'string'],
+			[['entity_type', 'kind'], 'string'],
+			['kind', EnumValidator::class, 'enumClass' => EntityMessageLinkKindEnum::class],
 			[['chat_member_message_id'], 'exist', 'targetClass' => ChatMemberMessage::class, 'targetAttribute' => ['chat_member_message_id' => 'id']],
 			[['created_by_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['created_by_id' => 'id']],
 		];
@@ -83,7 +87,7 @@ class EntityPinnedMessage extends AR
 			case Objects::getMorphClass():
 				return $this->object;
 			default:
-				throw new InvalidArgumentException("Unexpected EntityPinnedMessage type: " . $this->entity_type);
+				throw new InvalidArgumentException("Unexpected EntityMessageLink entity_type: " . $this->entity_type);
 		}
 	}
 
@@ -99,8 +103,8 @@ class EntityPinnedMessage extends AR
 		return $this->hasOne(User::class, ['id' => 'created_by_id']);
 	}
 
-	public static function find(): EntityPinnedMessageQuery
+	public static function find(): EntityMessageLinkQuery
 	{
-		return (new EntityPinnedMessageQuery(self::class))->notDeleted();
+		return (new EntityMessageLinkQuery(self::class))->notDeleted();
 	}
 }

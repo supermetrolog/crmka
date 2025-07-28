@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\enum\Request\RequestStatusEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\StringHelper;
@@ -13,7 +14,7 @@ use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\ContactQuery;
-use app\models\ActiveQuery\EntityPinnedMessageQuery;
+use app\models\ActiveQuery\EntityMessageLinkQuery;
 use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\OfferMixQuery;
@@ -98,7 +99,14 @@ use yii\db\Expression;
  * @property-read Task[]                   $tasks
  * @property-read ?Survey                  $lastSurvey
  * @property-read Contact[]                $activeContacts
- * @property-read EntityPinnedMessage[]    $pinnedMessages
+ * @property-read EntityMessageLink[]      $linkedMessages
+ * @property-read EntityMessageLink        $linkedMessage
+ * @property-read EntityMessageLink[]      $notes
+ * @property-read EntityMessageLink        $latestNote
+ * @property-read EntityMessageLink[]      $comments
+ * @property-read EntityMessageLink        $latestComment
+ * @property-read EntityMessageLink[]      $pinnedMessages
+ * @property-read EntityMessageLink        $latestPinnedMessage
  */
 class Company extends AR
 {
@@ -632,10 +640,67 @@ class Company extends AR
 	/**
 	 * @throws ErrorException
 	 */
-	public function getPinnedMessages(): EntityPinnedMessageQuery
+	public function getLinkedMessages(): EntityMessageLinkQuery
 	{
-		/** @var EntityPinnedMessageQuery */
-		return $this->morphHasMany(EntityPinnedMessage::class, 'id', 'entity')->orderBy(['id' => SORT_DESC]);
+		/** @var EntityMessageLinkQuery */
+		return $this->morphHasMany(EntityMessageLink::class, 'id', 'entity')->orderBy(['id' => SORT_DESC]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getLinkedMessage(): EntityMessageLinkQuery
+	{
+		/** @var EntityMessageLinkQuery */
+		return $this->morphHasOne(EntityMessageLink::class, 'id', 'entity')->orderBy(['id' => SORT_DESC]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getNotes(): EntityMessageLinkQuery
+	{
+		return $this->getLinkedMessages()->byKind(EntityMessageLinkKindEnum::NOTE);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getLatestNote(): EntityMessageLinkQuery
+	{
+		return $this->getLinkedMessage()->byKind(EntityMessageLinkKindEnum::NOTE);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getComments(): EntityMessageLinkQuery
+	{
+		return $this->getLinkedMessages()->byKind(EntityMessageLinkKindEnum::COMMENT);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getLatestComment(): EntityMessageLinkQuery
+	{
+		return $this->getLinkedMessage()->byKind(EntityMessageLinkKindEnum::COMMENT);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getPinnedMessages(): EntityMessageLinkQuery
+	{
+		return $this->getLinkedMessages()->byKind(EntityMessageLinkKindEnum::PIN);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getLatestPinnedMessage(): EntityMessageLinkQuery
+	{
+		return $this->getLinkedMessage()->byKind(EntityMessageLinkKindEnum::PIN);
 	}
 
 	public function getChatMemberPinnedMessage(): ?ChatMemberMessage

@@ -8,7 +8,7 @@ use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ActiveQuery\ChatMemberMessageTagQuery;
 use app\models\ActiveQuery\ChatMemberMessageViewQuery;
 use app\models\ActiveQuery\ChatMemberQuery;
-use app\models\ActiveQuery\EntityPinnedMessageQuery;
+use app\models\ActiveQuery\EntityMessageLinkQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\ReminderQuery;
@@ -22,29 +22,29 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "chat_member_message".
  *
- * @property int                        $id
- * @property int                        $to_chat_member_id
- * @property int|null                   $from_chat_member_id
- * @property int|null                   $reply_to_id
- * @property string|null                $message
- * @property ?string                    $template
- * @property string                     $created_at
- * @property string                     $updated_at
- * @property string                     $deleted_at
+ * @property int                      $id
+ * @property int                      $to_chat_member_id
+ * @property int|null                 $from_chat_member_id
+ * @property int|null                 $reply_to_id
+ * @property string|null              $message
+ * @property ?string                  $template
+ * @property string                   $created_at
+ * @property string                   $updated_at
+ * @property string                   $deleted_at
  *
- * @property ChatMember                 $fromChatMember
- * @property ChatMember                 $toChatMember
- * @property Task[]                     $tasks
- * @property Alert[]                    $alerts
- * @property Contact[]                  $contacts
- * @property UserNotification[]         $notifications
- * @property Reminder[]                 $reminders
- * @property ChatMemberMessageTag[]     $tags
- * @property Media[]                    $files
- * @property ChatMemberMessageView[]    $views
- * @property ChatMemberMessage          $replyTo
- * @property Survey[]                   $surveys
- * @property-read EntityPinnedMessage[] $entityPinnedMessages
+ * @property ChatMember               $fromChatMember
+ * @property ChatMember               $toChatMember
+ * @property Task[]                   $tasks
+ * @property Alert[]                  $alerts
+ * @property Contact[]                $contacts
+ * @property UserNotification[]       $notifications
+ * @property Reminder[]               $reminders
+ * @property ChatMemberMessageTag[]   $tags
+ * @property Media[]                  $files
+ * @property ChatMemberMessageView[]  $views
+ * @property ChatMemberMessage        $replyTo
+ * @property Survey[]                 $surveys
+ * @property-read EntityMessageLink[] $entityPinnedMessages
  */
 class ChatMemberMessage extends AR
 {
@@ -229,10 +229,10 @@ class ChatMemberMessage extends AR
 		return $query;
 	}
 
-	public function getEntityPinnedMessages(): EntityPinnedMessageQuery
+	public function getEntityPinnedMessages(): EntityMessageLinkQuery
 	{
-		/** @var EntityPinnedMessageQuery */
-		return $this->hasMany(EntityPinnedMessage::class, ['chat_member_message_id' => 'id']);
+		/** @var EntityMessageLinkQuery */
+		return $this->hasMany(EntityMessageLink::class, ['chat_member_message_id' => 'id']);
 	}
 
 	public function isSystem(): bool
