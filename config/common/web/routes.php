@@ -58,8 +58,8 @@ return static function (RouterInterface $router) {
 			$route->post('disable');
 			$route->post('enable');
 
-			$route->post('pin-message');
-			$route->post('create-pinned-message');
+			$route->post('link-message');
+			$route->post('create-note');
 			$route->post('change-consultant');
 
 			$route->post('logo', 'update-logo');
@@ -69,7 +69,8 @@ return static function (RouterInterface $router) {
 		});
 	});
 
-	$router->controller('entity-pinned-message')->group(static function (RouteInterface $route) {
+	$router->controller('entity-message-link')->group(static function (RouteInterface $route) {
+		$route->get();
 		$route->delete('<id>', 'delete');
 	});
 

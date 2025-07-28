@@ -90,7 +90,7 @@ class ChatMemberMessageCommonSearch extends Form
 		}
 
 		if ($this->isFilterTrue($this->is_pinned)) {
-			$query->innerJoin(['chatMember' => $this->makeChatMemberQuery()], ChatMemberMessage::field('to_chat_member_id') . ' = ' . 'chatMember.id');
+			$query->innerJoin(['chatMember' => $this->makeChatMemberQuery()], ChatMemberMessage::field('id') . ' = ' . 'chatMember.pinned_chat_member_message_id');
 		}
 
 		if ($this->hasFilter($this->from_user_id)) {

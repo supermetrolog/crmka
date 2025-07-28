@@ -13,16 +13,16 @@ use app\models\forms\Company\CompanyChangeConsultantForm;
 use app\models\forms\Company\CompanyContactsForm;
 use app\models\forms\Company\CompanyDisableForm;
 use app\models\forms\Company\CompanyForm;
+use app\models\forms\Company\CompanyLinkMessageForm;
 use app\models\forms\Company\CompanyLogoForm;
 use app\models\forms\Company\CompanyMediaForm;
 use app\models\forms\Company\CompanyMiniModelsForm;
-use app\models\forms\Company\CompanyPinMessageForm;
 use app\repositories\CompanyRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
 use app\resources\Company\CompanyViewResource;
 use app\resources\Company\CreatedCompanyResource;
-use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
+use app\resources\EntityMessageLink\EntityMessageLinkResource;
 use app\resources\Media\MediaShortResource;
 use app\resources\ProductRange\ProductRangeResource;
 use app\usecases\Company\CompanyService;
@@ -285,11 +285,11 @@ class CompanyController extends AppController
 	 * @throws ModelNotFoundException
 	 * @throws Throwable
 	 */
-	public function actionPinMessage(int $id): EntityPinnedMessageResource
+	public function actionLinkMessage(int $id): EntityMessageLinkResource
 	{
 		$company = $this->companyRepository->findOneOrThrow($id);
 
-		$form = new CompanyPinMessageForm();
+		$form = new CompanyLinkMessageForm();
 
 		$form->load($this->request->post());
 
@@ -297,9 +297,9 @@ class CompanyController extends AppController
 
 		$form->validateOrThrow();
 
-		$message = $this->companyService->pinMessage($company, $form->getDto());
+		$message = $this->companyService->linkMessage($company, $form->getDto());
 
-		return new EntityPinnedMessageResource($message);
+		return new EntityMessageLinkResource($message);
 	}
 
 	/**
@@ -307,7 +307,7 @@ class CompanyController extends AppController
 	 * @throws ModelNotFoundException
 	 * @throws Throwable
 	 */
-	public function actionCreatePinnedMessage(int $id): EntityPinnedMessageResource
+	public function actionCreateNote(int $id): EntityMessageLinkResource
 	{
 		$company = $this->companyRepository->findOneOrThrow($id);
 
@@ -321,9 +321,9 @@ class CompanyController extends AppController
 
 		$form->validateOrThrow();
 
-		$message = $this->companyService->createPinnedMessage($company, $form->getDto());
+		$message = $this->companyService->createNote($company, $form->getDto());
 
-		return new EntityPinnedMessageResource($message);
+		return new EntityMessageLinkResource($message);
 	}
 
 	/**

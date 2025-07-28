@@ -2,7 +2,8 @@
 
 namespace app\listeners\Survey;
 
-use app\dto\EntityPinnedMessage\EntityPinnedMessageDto;
+use app\dto\EntityMessageLink\EntityMessageLinkDto;
+use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\events\Survey\CompleteSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -12,7 +13,7 @@ use app\models\Company;
 use app\models\Survey;
 use app\repositories\ChatMemberMessageRepository;
 use app\usecases\ChatMember\ChatMemberMessageService;
-use app\usecases\EntityPinnedMessage\EntityPinnedMessageService;
+use app\usecases\EntityMessageLink\EntityMessageLinkService;
 use Throwable;
 use yii\base\Event;
 
@@ -22,19 +23,19 @@ class UpdateSurveyPinnedCommentListener implements EventListenerInterface
 	private ChatMemberMessageService     $chatMemberMessageService;
 	private ChatMemberMessageRepository  $chatMemberMessageRepository;
 	private TransactionBeginnerInterface $transactionBeginner;
-	private EntityPinnedMessageService   $entityPinnedMessageService;
+	private EntityMessageLinkService     $entityMessageLinkService;
 
 	public function __construct(
 		ChatMemberMessageService $chatMemberMessageService,
 		TransactionBeginnerInterface $transactionBeginner,
 		ChatMemberMessageRepository $chatMemberMessageRepository,
-		EntityPinnedMessageService $entityPinnedMessageService
+		EntityMessageLinkService $entityMessageLinkService
 	)
 	{
 		$this->chatMemberMessageService    = $chatMemberMessageService;
 		$this->transactionBeginner         = $transactionBeginner;
 		$this->chatMemberMessageRepository = $chatMemberMessageRepository;
-		$this->entityPinnedMessageService  = $entityPinnedMessageService;
+		$this->entityMessageLinkService    = $entityMessageLinkService;
 	}
 
 	/**
@@ -91,12 +92,13 @@ class UpdateSurveyPinnedCommentListener implements EventListenerInterface
 	 */
 	private function pinMessageToCompany(Company $company, ChatMemberMessage $message): void
 	{
-		$this->entityPinnedMessageService->create(
-			new EntityPinnedMessageDto([
+		$this->entityMessageLinkService->createIfNotExists(
+			new EntityMessageLinkDto([
 				'entity_id'   => $company->id,
 				'entity_type' => $company::getMorphClass(),
 				'message'     => $message,
-				'user'        => $message->fromChatMember->user
+				'user'        => $message->fromChatMember->user,
+				'kind'        => EntityMessageLinkKindEnum::COMMENT
 			])
 		);
 	}

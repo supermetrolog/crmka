@@ -4,7 +4,8 @@ namespace app\listeners\Survey;
 
 use app\components\EffectStrategy\Factory\EffectStrategyFactory;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
-use app\dto\EntityPinnedMessage\EntityPinnedMessageDto;
+use app\dto\EntityMessageLink\EntityMessageLinkDto;
+use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\events\Survey\CompleteSurveyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -15,7 +16,7 @@ use app\models\ChatMemberMessage;
 use app\models\Company;
 use app\models\Survey;
 use app\usecases\ChatMember\ChatMemberMessageService;
-use app\usecases\EntityPinnedMessage\EntityPinnedMessageService;
+use app\usecases\EntityMessageLink\EntityMessageLinkService;
 use Throwable;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
@@ -27,16 +28,16 @@ class CreateCancelledSurveySystemChatMessageListener implements EventListenerInt
 	private const SURVEY_DEFAULT_MESSAGE = 'Без важных комментариев..';
 
 	private ChatMemberMessageService     $chatMemberMessageService;
-	private EntityPinnedMessageService   $entityPinnedMessageService;
+	private EntityMessageLinkService     $entityMessageLinkService;
 	private EffectStrategyFactory        $effectStrategyFactory;
 	private TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(ChatMemberMessageService $chatMemberMessageService, EntityPinnedMessageService $entityPinnedMessageService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
+	public function __construct(ChatMemberMessageService $chatMemberMessageService, EntityMessageLinkService $entityMessageLinkService, EffectStrategyFactory $effectStrategyFactory, TransactionBeginnerInterface $transactionBeginner)
 	{
-		$this->chatMemberMessageService   = $chatMemberMessageService;
-		$this->entityPinnedMessageService = $entityPinnedMessageService;
-		$this->effectStrategyFactory      = $effectStrategyFactory;
-		$this->transactionBeginner        = $transactionBeginner;
+		$this->chatMemberMessageService = $chatMemberMessageService;
+		$this->entityMessageLinkService = $entityMessageLinkService;
+		$this->effectStrategyFactory    = $effectStrategyFactory;
+		$this->transactionBeginner      = $transactionBeginner;
 	}
 
 	/**
@@ -92,12 +93,13 @@ class CreateCancelledSurveySystemChatMessageListener implements EventListenerInt
 	 */
 	private function pinMessageToCompany(Company $company, ChatMemberMessage $message): void
 	{
-		$this->entityPinnedMessageService->create(
-			new EntityPinnedMessageDto([
+		$this->entityMessageLinkService->createIfNotExists(
+			new EntityMessageLinkDto([
 				'entity_id'   => $company->id,
 				'entity_type' => $company::getMorphClass(),
 				'message'     => $message,
-				'user'        => $message->fromChatMember->user
+				'user'        => $message->fromChatMember->user,
+				'kind'        => EntityMessageLinkKindEnum::COMMENT
 			])
 		);
 	}

@@ -17,8 +17,8 @@ use app\resources\Company\File\CompanyFileResource;
 use app\resources\Company\Group\CompanyGroupResource;
 use app\resources\Company\ProductRange\CompanyProductRangeResource;
 use app\resources\Contact\ContactResource;
-use app\resources\EntityPinnedMessage\EntityPinnedMessageResource;
 use app\resources\Media\MediaShortResource;
+use yii\base\ErrorException;
 
 class CompanyViewResource extends JsonResource
 {
@@ -29,6 +29,9 @@ class CompanyViewResource extends JsonResource
 		$this->resource = $resource;
 	}
 
+	/**
+	 * @throws ErrorException
+	 */
 	public function toArray(): array
 	{
 		return ArrayHelper::merge(
@@ -45,7 +48,8 @@ class CompanyViewResource extends JsonResource
 				'last_call'         => CallResource::tryMakeArray($this->resource->lastCall),
 				'activity_groups'   => CompanyActivityGroupResource::collection($this->resource->companyActivityGroups),
 				'activity_profiles' => CompanyActivityProfileResource::collection($this->resource->companyActivityProfiles),
-				'pinned_messages'   => EntityPinnedMessageResource::collection($this->resource->pinnedMessages),
+
+				'comments_count' => $this->resource->getComments()->count(),
 
 				'dealsRequestEmpty'     => $this->resource->dealsRequestEmpty,
 				'objects_count'         => $this->resource->objects_count,

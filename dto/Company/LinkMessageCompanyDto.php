@@ -8,8 +8,10 @@ use app\models\ChatMemberMessage;
 use app\models\User;
 use yii\base\BaseObject;
 
-class PinMessageCompanyDto extends BaseObject
+class LinkMessageCompanyDto extends BaseObject
 {
 	public User              $user;
 	public ChatMemberMessage $message;
+
+	public string $kind;
 } 
