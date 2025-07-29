@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\commands;
 
+use app\actions\ChatMemberMessage\FixSurveyChatMemberMessagesAction;
 use app\actions\Company\FixCompanyCategoriesAction;
 use app\actions\Company\FixCompanyProductRangesAction;
 use app\actions\Company\TransferCompanyActivityAction;
@@ -18,12 +19,13 @@ class DataFixController extends Controller
 	public function actions(): array
 	{
 		return [
-			'company-activity'        => TransferCompanyActivityAction::class,
-			'company-product-ranges'  => FixCompanyProductRangesAction::class,
-			'task-message-to-title'   => TaskMessageToTitleAction::class,
-			'company-pinned-messages' => TransferCompanyPinnedMessagesAction::class,
-			'company-categories'      => FixCompanyCategoriesAction::class,
-			'task-scheduled-calls'    => FixTaskScheduledCallsActions::class
+			'company-activity'            => TransferCompanyActivityAction::class,
+			'company-product-ranges'      => FixCompanyProductRangesAction::class,
+			'task-message-to-title'       => TaskMessageToTitleAction::class,
+			'company-pinned-messages'     => TransferCompanyPinnedMessagesAction::class,
+			'company-categories'          => FixCompanyCategoriesAction::class,
+			'task-scheduled-calls'        => FixTaskScheduledCallsActions::class,
+			'survey-chat-member-messages' => FixSurveyChatMemberMessagesAction::class,
 		];
 	}
 }
