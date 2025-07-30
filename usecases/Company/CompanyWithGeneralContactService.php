@@ -9,6 +9,7 @@ use app\dto\Company\CompanyContactsDto;
 use app\dto\Company\CompanyDto;
 use app\dto\Company\CompanyMediaDto;
 use app\dto\Company\CompanyMiniModelsDto;
+use app\dto\Phone\PhoneDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -36,21 +37,18 @@ class CompanyWithGeneralContactService
 	}
 
 	/**
-	 * @param CompanyDto           $companyDto
-	 * @param CompanyMiniModelsDto $miniModelsDto
-	 * @param CompanyContactsDto   $contactsDto
-	 * @param CompanyMediaDto      $mediaDto
+	 * @param PhoneDto[] $phoneDtos
 	 *
-	 * @return Company
+	 * @throws SaveMediaErrorException
 	 * @throws SaveModelException
 	 * @throws Throwable
-	 * @throws SaveMediaErrorException
 	 */
 	public function create(
 		CompanyDto $companyDto,
 		CompanyMiniModelsDto $miniModelsDto,
 		CompanyContactsDto $contactsDto,
-		CompanyMediaDto $mediaDto
+		CompanyMediaDto $mediaDto,
+		array $phoneDtos = []
 	): Company
 	{
 		$tx = $this->transactionBeginner->begin();
@@ -58,7 +56,7 @@ class CompanyWithGeneralContactService
 		try {
 			$company = $this->companyService->create($companyDto, $miniModelsDto, $mediaDto);
 
-			$this->companyGeneralContactService->create($company, $contactsDto);
+			$this->companyGeneralContactService->create($company, $contactsDto, $phoneDtos);
 
 			$tx->commit();
 
@@ -72,13 +70,8 @@ class CompanyWithGeneralContactService
 	}
 
 	/**
-	 * @param Company              $company
-	 * @param CompanyDto           $companyDto
-	 * @param CompanyMiniModelsDto $miniModelsDto
-	 * @param CompanyContactsDto   $contactsDto
-	 * @param CompanyMediaDto      $companyMediaDto
+	 * @param PhoneDto[] $phoneDtos
 	 *
-	 * @return Company
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
@@ -87,7 +80,8 @@ class CompanyWithGeneralContactService
 		CompanyDto $companyDto,
 		CompanyMiniModelsDto $miniModelsDto,
 		CompanyContactsDto $contactsDto,
-		CompanyMediaDto $companyMediaDto
+		CompanyMediaDto $companyMediaDto,
+		array $phoneDtos = []
 	): Company
 	{
 		$tx = $this->transactionBeginner->begin();
@@ -105,7 +99,7 @@ class CompanyWithGeneralContactService
 			if ($contact) {
 				$this->companyGeneralContactService->update($contact, $contactsDto);
 			} else {
-				$this->companyGeneralContactService->create($updatedCompany, $contactsDto);
+				$this->companyGeneralContactService->create($updatedCompany, $contactsDto, $phoneDtos);
 			}
 
 			$tx->commit();
