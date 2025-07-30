@@ -13,6 +13,7 @@ use app\models\ContactSearch;
 use app\models\forms\Contact\ContactCommentForm;
 use app\models\forms\Contact\ContactDisableForm;
 use app\models\forms\Contact\ContactForm;
+use app\models\forms\Contact\ContactTransferToCompanyForm;
 use app\models\forms\Phone\PhoneForm;
 use app\repositories\ContactRepository;
 use app\resources\Contact\Comment\ContactCommentResource;
@@ -242,6 +243,27 @@ class ContactController extends AppController
 		$phone = $this->phoneService->createForContact($contact, $form->getDto());
 
 		return new PhoneResource($phone);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionTransferToCompany(int $id): SuccessResponse
+	{
+		$contact = $this->repository->findOneOrThrow($id);
+
+		$form = new ContactTransferToCompanyForm();
+
+		$form->load($this->request->post());
+
+		$form->validateOrThrow();
+
+		$this->contactService->transferToCompany($contact, $form->getDto());
+
+		return $this->success('Контакт успешно переведен в компанию');
 	}
 
 	/**
