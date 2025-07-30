@@ -107,6 +107,8 @@ return static function (RouterInterface $router) {
 			$route->post('disable');
 			$route->post('enable');
 
+			$route->post('transfer-to-company');
+
 			$route->post('phones', 'create-phone');
 		});
 	});
