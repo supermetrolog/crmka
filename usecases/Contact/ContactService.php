@@ -6,10 +6,14 @@ namespace app\usecases\Contact;
 
 use app\dto\Contact\CreateContactDto;
 use app\dto\Contact\DisableContactDto;
+use app\dto\Contact\TransferContactToCompanyDto;
 use app\dto\Contact\UpdateContactDto;
 use app\dto\Phone\PhoneDto;
+use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
+use app\mappers\Contact\CreateContactDtoMapper;
+use app\mappers\Phone\PhoneDtoMapper;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\Contact;
 use app\models\miniModels\Email;
@@ -23,14 +27,20 @@ class ContactService
 {
 	private TransactionBeginnerInterface $transactionBeginner;
 	private PhoneService                 $phoneService;
+	private PhoneDtoMapper               $phoneDtoMapper;
+	private CreateContactDtoMapper       $createContactDtoMapper;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
-		PhoneService $phoneService
+		PhoneService $phoneService,
+		PhoneDtoMapper $phoneDtoMapper,
+		CreateContactDtoMapper $createContactDtoMapper
 	)
 	{
-		$this->transactionBeginner = $transactionBeginner;
-		$this->phoneService        = $phoneService;
+		$this->transactionBeginner    = $transactionBeginner;
+		$this->phoneService           = $phoneService;
+		$this->phoneDtoMapper         = $phoneDtoMapper;
+		$this->createContactDtoMapper = $createContactDtoMapper;
 	}
 
 	/**
@@ -255,6 +265,43 @@ class ContactService
 			$contact->passive_why_comment = null;
 
 			$contact->saveOrThrow();
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function transferToCompany(Contact $contact, TransferContactToCompanyDto $dto): void
+	{
+		if ($contact->company_id === $dto->company->id) {
+			return;
+		}
+
+		$clonedContactDto = $this->createContactDtoMapper->fromRecord($contact);
+
+		$clonedContactDto->isMain        = $dto->is_main;
+		$clonedContactDto->company_id    = $dto->company->id;
+		$clonedContactDto->consultant_id = $dto->consultant->id;
+		$clonedContactDto->status        = Contact::STATUS_ACTIVE;
+
+		$createPhonesDtos = ArrayHelper::map($contact->phones, [$this->phoneDtoMapper, 'fromRecord']);
+
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$this->create($clonedContactDto, $createPhonesDtos);
+
+			if ($dto->disable_contact) {
+				$this->markAsPassive($contact, new DisableContactDto([
+					'passive_why' => Contact::PASSIVE_WHY_NOT_WORKING_IN_COMPANY
+				]));
+			}
 
 			$tx->commit();
 		} catch (Throwable $th) {
