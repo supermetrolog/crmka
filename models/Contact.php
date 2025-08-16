@@ -319,9 +319,10 @@ class Contact extends AR
 		return $this->hasMany(Website::class, ['contact_id' => 'id']);
 	}
 
-	public function getRelatedContacts(): ActiveQuery
+	public function getRelatedContacts(): ContactQuery
 	{
-		return $this->hasMany(Contact::class, ['company_id' => 'company_id'])->andWhere(['!=', 'id', $this->id]);
+		/** @var ContactQuery */
+		return $this->hasMany(__CLASS__, ['company_id' => 'company_id'])->andWhere(['!=', 'id', $this->id]);
 	}
 
 	/**
