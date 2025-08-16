@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\commands;
 
+use app\actions\Call\SetContactCallMainPhone;
 use app\actions\ChatMemberMessage\FixSurveyChatMemberMessagesAction;
 use app\actions\Company\FixCompanyCategoriesAction;
 use app\actions\Company\FixCompanyProductRangesAction;
@@ -26,6 +27,7 @@ class DataFixController extends Controller
 			'company-categories'          => FixCompanyCategoriesAction::class,
 			'task-scheduled-calls'        => FixTaskScheduledCallsActions::class,
 			'survey-chat-member-messages' => FixSurveyChatMemberMessagesAction::class,
+			'contact-call-main-phone'     => SetContactCallMainPhone::class,
 		];
 	}
 }

@@ -54,6 +54,7 @@ use yii\db\ActiveQuery;
  * @property-read ActiveQuery      $relatedContacts
  * @property-read Website[]        $websites
  * @property-read Call[]           $calls
+ * @property-read ?Phone           $mainPhone
  */
 class Contact extends AR
 {
@@ -291,6 +292,12 @@ class Contact extends AR
 	public function getEmails(): ActiveQuery
 	{
 		return $this->hasMany(Email::class, ['contact_id' => 'id']);
+	}
+
+	public function getMainPhone(): PhoneQuery
+	{
+		/** @var PhoneQuery */
+		return $this->hasOne(Phone::class, ['contact_id' => 'id'])->andWhere(['isMain' => 1]);
 	}
 
 	public function getPhones(): PhoneQuery

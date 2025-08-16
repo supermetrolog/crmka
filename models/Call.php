@@ -86,7 +86,7 @@ class Call extends \app\kernel\common\models\AR\AR
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 			[['user_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			[['contact_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
-			[['phone_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['phone_id' => 'id']],
+			[['phone_id'], 'exist', 'targetClass' => Phone::class, 'targetAttribute' => ['phone_id' => 'id']],
 		];
 	}
 
