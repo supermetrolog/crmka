@@ -67,6 +67,10 @@ class ChangeCompanyRequestsConsultantListener implements EventListenerInterface
 	 */
 	private function changeRequestsConsultant(Request $request, User $consultant): void
 	{
+		if ($request->consultant_id === $consultant->id) {
+			return;
+		}
+
 		$this->requestService->changeConsultant($request, new ChangeRequestConsultantDto(['consultant' => $consultant]));
 	}
 }

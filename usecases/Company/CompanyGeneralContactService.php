@@ -7,6 +7,7 @@ namespace app\usecases\Company;
 use app\dto\Company\CompanyContactsDto;
 use app\dto\Contact\CreateContactDto;
 use app\dto\Contact\UpdateContactDto;
+use app\dto\Phone\PhoneDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Company;
 use app\models\Contact;
@@ -26,14 +27,12 @@ class CompanyGeneralContactService
 	}
 
 	/**
-	 * @param Company            $company
-	 * @param CompanyContactsDto $contactsDto
+	 * @param PhoneDto[] $phoneDtos
 	 *
-	 * @return Contact
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function create(Company $company, CompanyContactsDto $contactsDto): Contact
+	public function create(Company $company, CompanyContactsDto $contactsDto, array $phoneDtos = []): Contact
 	{
 		$dto = new CreateContactDto([
 			'company_id'          => $company->id,
@@ -56,7 +55,7 @@ class CompanyGeneralContactService
 			'status'              => Contact::STATUS_ACTIVE
 		]);
 
-		$model = $this->contactService->create($dto, $contactsDto->phones);
+		$model = $this->contactService->create($dto, $phoneDtos);
 
 		$model->saveOrThrow();
 

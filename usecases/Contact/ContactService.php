@@ -48,7 +48,7 @@ class ContactService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function create(CreateContactDto $dto, array $phoneDtos): Contact
+	public function create(CreateContactDto $dto, array $phoneDtos = []): Contact
 	{
 		$tx = $this->transactionBeginner->begin();
 
