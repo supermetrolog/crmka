@@ -29,7 +29,8 @@ class SurveyRepository
 			             'tasks.tags',
 			             'tasks.createdByUser.userProfile',
 			             'tasks.observers.user.userProfile',
-			             'tasks.targetUserObserver'
+			             'tasks.targetUserObserver',
+			             'actions.createdBy.userProfile'
 		             ])
 		             ->with([
 			             'dependentSurveys.chatMember.objectChatMember.object.company',

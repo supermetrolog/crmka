@@ -11,6 +11,8 @@ use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\PhoneQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\letter\Letter;
+use app\models\letter\LetterContact;
 use app\models\miniModels\ContactComment;
 use app\models\miniModels\Email;
 use app\models\miniModels\Phone;
@@ -55,6 +57,8 @@ use yii\db\ActiveQuery;
  * @property-read Website[]        $websites
  * @property-read Call[]           $calls
  * @property-read ?Phone           $mainPhone
+ * @property-read Letter[]         $letters
+ * @property-read LetterContact[]  $lettersContacts
  */
 class Contact extends AR
 {
@@ -339,6 +343,16 @@ class Contact extends AR
 	{
 		/** @var CallQuery */
 		return $this->hasMany(Call::class, ['contact_id' => 'id'])->andOnCondition([Call::field('deleted_at') => null]);
+	}
+
+	public function getLettersContacts(): ActiveQuery
+	{
+		return $this->hasMany(LetterContact::class, ['contact_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+	}
+
+	public function getLetters(): ActiveQuery
+	{
+		return $this->hasMany(Letter::class, ['id' => 'letter_id'])->via('lettersContacts');
 	}
 
 	public static function find(): ContactQuery

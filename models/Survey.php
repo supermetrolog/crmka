@@ -45,6 +45,7 @@ use yii\db\ActiveQuery;
  * @property-read Call[]                 $calls
  * @property-read ChatMemberMessage      $chatMemberMessage
  * @property-read ?Call                  $mainCall
+ * @property-read SurveyAction[]         $actions
  */
 class Survey extends AR
 {
@@ -228,6 +229,12 @@ class Survey extends AR
 	{
 		/** @var ChatMemberMessageQuery */
 		return $this->morphHasOneVia(ChatMemberMessage::class, 'id', 'first')->via('relationSecond');
+	}
+
+	public function getActions(): AQ
+	{
+		/** @var AQ */
+		return $this->hasMany(SurveyAction::class, ['survey_id' => 'id']);
 	}
 
 	public static function find(): SurveyQuery
