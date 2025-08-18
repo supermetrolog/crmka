@@ -234,7 +234,13 @@ class OfferMix extends oldDb\OfferMix implements OfferInterface
 	 */
 	public function getFullConsultantName(): string
 	{
-		return $this->consultant->userProfile->getFullName();
+		$consultant = $this->consultant;
+
+		if ($consultant) {
+			return $consultant->userProfile->getFullName();
+		}
+
+		return '';
 	}
 
 	/**
