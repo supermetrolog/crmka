@@ -11,6 +11,8 @@ use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\PhoneQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\letter\Letter;
+use app\models\letter\LetterContact;
 use app\models\miniModels\ContactComment;
 use app\models\miniModels\Email;
 use app\models\miniModels\Phone;
@@ -54,6 +56,9 @@ use yii\db\ActiveQuery;
  * @property-read ActiveQuery      $relatedContacts
  * @property-read Website[]        $websites
  * @property-read Call[]           $calls
+ * @property-read ?Phone           $mainPhone
+ * @property-read Letter[]         $letters
+ * @property-read LetterContact[]  $lettersContacts
  */
 class Contact extends AR
 {
@@ -293,6 +298,12 @@ class Contact extends AR
 		return $this->hasMany(Email::class, ['contact_id' => 'id']);
 	}
 
+	public function getMainPhone(): PhoneQuery
+	{
+		/** @var PhoneQuery */
+		return $this->hasOne(Phone::class, ['contact_id' => 'id'])->andWhere(['isMain' => 1]);
+	}
+
 	public function getPhones(): PhoneQuery
 	{
 		/** @var PhoneQuery */
@@ -319,9 +330,10 @@ class Contact extends AR
 		return $this->hasMany(Website::class, ['contact_id' => 'id']);
 	}
 
-	public function getRelatedContacts(): ActiveQuery
+	public function getRelatedContacts(): ContactQuery
 	{
-		return $this->hasMany(Contact::class, ['company_id' => 'company_id'])->andWhere(['!=', 'id', $this->id]);
+		/** @var ContactQuery */
+		return $this->hasMany(__CLASS__, ['company_id' => 'company_id'])->andWhere(['!=', 'id', $this->id]);
 	}
 
 	/**
@@ -331,6 +343,16 @@ class Contact extends AR
 	{
 		/** @var CallQuery */
 		return $this->hasMany(Call::class, ['contact_id' => 'id'])->andOnCondition([Call::field('deleted_at') => null]);
+	}
+
+	public function getLettersContacts(): ActiveQuery
+	{
+		return $this->hasMany(LetterContact::class, ['contact_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+	}
+
+	public function getLetters(): ActiveQuery
+	{
+		return $this->hasMany(Letter::class, ['id' => 'letter_id'])->via('lettersContacts');
 	}
 
 	public static function find(): ContactQuery

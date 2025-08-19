@@ -58,6 +58,7 @@ class SurveyWithQuestionsResource extends JsonResource
 			'chatMember'       => ChatMemberShortResource::tryMakeArray($this->resource->chatMember),
 
 			'questions' => $this->getQuestions(),
+			'actions'   => SurveyActionResource::collection($this->resource->actions)
 		];
 	}
 

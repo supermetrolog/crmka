@@ -186,7 +186,12 @@ return static function (RouterInterface $router) {
 	});
 
 	$router->controller('letter')->group(static function (RouteInterface $route) {
+		$route->post('send-custom-letter');
 		$route->post('send');
+	});
+
+	$router->controller('letter-contact-answer')->group(static function (RouteInterface $route) {
+		$route->post()->action('create');
 	});
 
 	$router->controller('archiver')->disablePluralize()->group(static function (RouteInterface $route) {
@@ -254,10 +259,17 @@ return static function (RouterInterface $router) {
 			$route->post('continue');
 
 			$route->post('change-comment');
+			$route->post('actions', 'create-action');
 
 			$route->put()->action('update');
 			$route->put('with-survey-question-answer', 'update-with-survey-question-answer');
 			$route->delete()->action('delete');
+		});
+	});
+
+	$router->controller('survey-action')->group(static function (RouteInterface $route) {
+		$route->prefix('<id>', static function (RouteInterface $route) {
+			$route->put()->action('update');
 		});
 	});
 

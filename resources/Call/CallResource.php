@@ -8,6 +8,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Call;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Contact\ContactShortResource;
+use app\resources\Phone\PhoneResource;
 
 class CallResource extends JsonResource
 {
@@ -34,6 +35,7 @@ class CallResource extends JsonResource
 
 			'user'    => UserShortResource::make($this->resource->user)->toArray(),
 			'contact' => ContactShortResource::make($this->resource->contact)->toArray(),
+			'phone'   => PhoneResource::tryMakeArray($this->resource->phone)
 		];
 	}
 }

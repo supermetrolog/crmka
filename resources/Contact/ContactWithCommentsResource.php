@@ -9,6 +9,7 @@ use app\kernel\web\http\resources\JsonResource;
 use app\models\Contact;
 use app\resources\Call\CallShortResource;
 use app\resources\Contact\Comment\ContactCommentResource;
+use app\resources\Letter\LetterContactResource;
 
 class ContactWithCommentsResource extends JsonResource
 {
@@ -25,7 +26,8 @@ class ContactWithCommentsResource extends JsonResource
 			ContactResource::make($this->resource)->toArray(),
 			[
 				'comments' => ContactCommentResource::collection($this->resource->contactComments),
-				'calls'    => CallShortResource::collection($this->resource->calls)
+				'calls'    => CallShortResource::collection($this->resource->calls),
+				'letters'  => LetterContactResource::collection($this->resource->lettersContacts)
 			]
 		);
 	}

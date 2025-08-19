@@ -10,6 +10,7 @@ use app\dto\Media\CreateMediaDto;
 use app\dto\Relation\CreateRelationDto;
 use app\dto\Survey\CreateSurveyDto;
 use app\dto\Survey\UpdateSurveyDto;
+use app\dto\SurveyAction\CreateSurveyActionDto;
 use app\dto\SurveyQuestionAnswer\CreateSurveyQuestionAnswerDto;
 use app\dto\SurveyQuestionAnswer\UpdateSurveyQuestionAnswerDto;
 use app\events\Survey\CancelSurveyEvent;
@@ -28,11 +29,13 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Call;
 use app\models\Relation;
 use app\models\Survey;
+use app\models\SurveyAction;
 use app\models\SurveyQuestionAnswer;
 use app\repositories\SurveyRepository;
 use app\usecases\Call\CreateCallService;
 use app\usecases\ChatMember\ChatMemberService;
 use app\usecases\Relation\RelationService;
+use app\usecases\SurveyAction\SurveyActionService;
 use app\usecases\SurveyQuestionAnswer\SurveyQuestionAnswerService;
 use Throwable;
 use yii\base\ErrorException;
@@ -47,6 +50,7 @@ class SurveyService
 	private RelationService               $relationService;
 	private ChatMemberService             $chatMemberService;
 	private SurveyRepository              $repository;
+	private SurveyActionService           $surveyActionService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -55,7 +59,8 @@ class SurveyService
 		CreateCallService $createCallService,
 		RelationService $relationService,
 		ChatMemberService $chatMemberService,
-		SurveyRepository $repository
+		SurveyRepository $repository,
+		SurveyActionService $surveyActionService
 	)
 	{
 		$this->transactionBeginner         = $transactionBeginner;
@@ -65,6 +70,7 @@ class SurveyService
 		$this->relationService             = $relationService;
 		$this->chatMemberService           = $chatMemberService;
 		$this->repository                  = $repository;
+		$this->surveyActionService         = $surveyActionService;
 	}
 
 	/**
@@ -396,5 +402,16 @@ class SurveyService
 			$tx->rollBack();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function createAction(Survey $survey, CreateSurveyActionDto $dto): SurveyAction
+	{
+		$dto->survey = $survey;
+
+		return $this->surveyActionService->create($dto);
 	}
 }

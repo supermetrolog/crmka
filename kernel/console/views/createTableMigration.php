@@ -13,49 +13,37 @@
 
 echo "<?php\n";
 if (!empty($namespace)) {
-    echo "\nnamespace {$namespace};\n";
+	echo "\nnamespace {$namespace};\n";
 }
 ?>
 
 use app\kernel\console\Migration;
 
-/**
- * Handles the creation of table `<?= $table ?>`.
-<?= $this->render('@yii/views/_foreignTables', [
-    'foreignKeys' => $foreignKeys,
-]) ?>
- */
 class <?= $className ?> extends Migration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function safeUp()
-    {
+public function safeUp()
+{
 <?= $this->render('_createTable', [
-    'table' => $table,
-    'fields' => $fields,
-    'foreignKeys' => $foreignKeys,
+	'table'       => $table,
+	'fields'      => $fields,
+	'foreignKeys' => $foreignKeys,
 ])
 ?>
 <?php if (!empty($tableComment)) {
-    echo $this->render('@yii/views/_addComments', [
-        'table' => $table,
-        'tableComment' => $tableComment,
-    ]);
+	echo $this->render('@yii/views/_addComments', [
+		'table'        => $table,
+		'tableComment' => $tableComment,
+	]);
 }
 ?>
-    }
+}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function safeDown()
-    {
+public function safeDown()
+{
 <?= $this->render('_dropTable', [
-    'table' => $table,
-    'foreignKeys' => $foreignKeys,
+	'table'       => $table,
+	'foreignKeys' => $foreignKeys,
 ])
 ?>
-    }
+}
 }

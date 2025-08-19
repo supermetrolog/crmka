@@ -129,6 +129,7 @@ class CompanySearch extends Form
 			                          'tasks.tags', 'tasks.createdByUser.userProfile', 'tasks.user.userProfile',
 			                          'tasks.observers.user.userProfile', 'tasks.targetUserObserver',
 			                          'lastSurvey.user.userProfile', 'lastSurvey.calls.user.userProfile', 'lastSurvey.calls.contact.consultant.userProfile',
+			                          'lastSurvey.calls.phone',
 			                          'lastSurvey.contact.emails', 'lastSurvey.contact.websites', 'lastSurvey.contact.phones',
 			                          'lastSurvey.contact.consultant.userProfile', 'lastSurvey.contact.wayOfInformings',
 			                          'lastSurvey.chatMemberMessage.fromChatMember.user.userProfile',
