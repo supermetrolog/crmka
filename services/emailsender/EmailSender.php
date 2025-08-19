@@ -80,7 +80,7 @@ class EmailSender extends Model
 
 		Yii::$app->on(Application::EVENT_AFTER_REQUEST, function () use ($logger) {
 			if ($log = $logger->dump()) {
-				Yii::warning("SMTP LOG: " . $log);
+				Yii::error("SMTP LOG: " . $log);
 			}
 		});
 
