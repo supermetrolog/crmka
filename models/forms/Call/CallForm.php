@@ -35,7 +35,7 @@ class CallForm extends Form
 			['type', 'in', 'range' => Call::getTypes()],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 			[['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
-			[['phone_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['phone_id' => 'id']],
+			[['phone_id'], 'exist', 'targetClass' => Phone::class, 'targetAttribute' => ['phone_id' => 'id']],
 		];
 	}
 

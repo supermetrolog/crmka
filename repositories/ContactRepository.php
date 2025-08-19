@@ -17,7 +17,8 @@ class ContactRepository
 			              'emails', 'phones', 'websites', 'wayOfInformings', 'consultant.userProfile', 'contactComments.author.userProfile',
 			              'calls' => function (CallQuery $query) {
 				              $query->addOrderBy(['created_at' => SORT_DESC]);
-			              }
+			              },
+			              'lettersContacts.answers.markedBy.userProfile', 'lettersContacts.letter.user.userProfile'
 		              ])
 		              ->byCompanyId($companyId)
 		              ->all();

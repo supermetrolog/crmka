@@ -27,6 +27,7 @@ class CallSearchResource extends JsonResource
 			'status'      => $this->resource->status,
 			'description' => $this->resource->description,
 			'contact_id'  => $this->resource->contact_id,
+			'phone_id'    => $this->resource->phone_id,
 			'created_at'  => $this->resource->created_at,
 			'updated_at'  => $this->resource->updated_at,
 			'deleted_at'  => $this->resource->deleted_at,

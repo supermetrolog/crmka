@@ -6,8 +6,6 @@ use yii\base\BaseObject;
 
 class CompanyContactsDto extends BaseObject
 {
-	public array $emails = [];
-
-	public array $phones   = [];
+	public array $emails   = [];
 	public array $websites = [];
 }

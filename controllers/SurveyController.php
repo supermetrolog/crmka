@@ -19,11 +19,13 @@ use app\models\forms\Call\CallForm;
 use app\models\forms\Media\MediaForm;
 use app\models\forms\Survey\SurveyChangeCommentForm;
 use app\models\forms\Survey\SurveyForm;
+use app\models\forms\SurveyAction\SurveyActionForm;
 use app\models\forms\SurveyQuestionAnswer\SurveyQuestionAnswerForm;
 use app\models\Media;
 use app\models\search\SurveySearch;
 use app\repositories\QuestionRepository;
 use app\repositories\SurveyRepository;
+use app\resources\Survey\SurveyActionResource;
 use app\resources\Survey\SurveyResource;
 use app\resources\Survey\SurveyShortResource;
 use app\resources\Survey\SurveyWithQuestionsResource;
@@ -311,6 +313,31 @@ class SurveyController extends AppController
 		$this->service->changeComment($survey, $form->comment);
 
 		return new SurveyShortResource($survey);
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionCreateAction(int $id): SurveyActionResource
+	{
+		$survey = $this->repository->findOneOrThrow($id);
+
+		$form = new SurveyActionForm();
+
+		$form->setScenario(SurveyActionForm::SCENARIO_CREATE_WITH_SURVEY);
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$dto = $form->getDto();
+
+		$dto->createdBy = $this->user->identity;
+
+		$action = $this->service->createAction($survey, $dto);
+
+		return new SurveyActionResource($action);
 	}
 
 	/**

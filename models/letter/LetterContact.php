@@ -2,106 +2,64 @@
 
 namespace app\models\letter;
 
+use app\kernel\common\models\AQ\AQ;
+use app\models\ActiveQuery\ContactQuery;
 use app\models\Contact;
-use app\models\miniModels\Email;
-use app\models\miniModels\Phone;
-use Yii;
+use app\models\LetterContactAnswer;
+use yii\db\ActiveQuery;
 use yii\validators\RequiredValidator;
 
 /**
- * This is the model class for table "letter_contact".
+ * @property int                        $id
+ * @property int                        $letter_id  [СВЯЗЬ] с отправленными письмами
+ * @property ?string                    $email
+ * @property ?string                    $phone
+ * @property int                        $contact_id [СВЯЗЬ] с таблицей контактов
  *
- * @property int $id
- * @property int $letter_id [СВЯЗЬ] с отправленными письмами
- * @property string|null $email email контакта
- * @property string|null $phone номер контакта
- * @property int $contact_id [СВЯЗЬ] с таблицей контактов
- *
- * @property Letter $letter
+ * @property-read Letter                $letter
+ * @property-read LetterContactAnswer[] $answers
  */
 class LetterContact extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return 'letter_contact';
-    }
+	public static function tableName(): string
+	{
+		return 'letter_contact';
+	}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['letter_id'], 'required'],
-            [['letter_id', "contact_id"], 'integer'],
-            [['email', 'phone'], 'string'],
-            ['email', 'validateContacts'],
-            [['letter_id'], 'exist', 'skipOnError' => true, 'targetClass' => Letter::className(), 'targetAttribute' => ['letter_id' => 'id']],
-        ];
-    }
+	public function rules(): array
+	{
+		return [
+			[['letter_id'], 'required'],
+			[['letter_id', "contact_id"], 'integer'],
+			[['email', 'phone'], 'string'],
+			['email', 'validateContacts'],
+			[['letter_id'], 'exist', 'targetClass' => Letter::class, 'targetAttribute' => ['letter_id' => 'id']],
+		];
+	}
 
-    public function validateContacts()
-    {
-        $required = new RequiredValidator();
-        if ($required->validate($this->email) && $required->validate($this->phone)) {
-            $this->addError('contacts', 'phone or email connot be empty');
-        }
-    }
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'letter_id' => 'Letter ID',
-            'email' => 'Email',
-            'phone' => 'Phone',
-            'contact_id' => 'Contact ID',
-        ];
-    }
-    /**
-     * Gets query for [[Contact]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getContact()
-    {
-        return $this->hasOne(Contact::className(), ['id' => 'contact_id']);
-    }
+	public function validateContacts(): void
+	{
+		$required = new RequiredValidator();
 
+		if ($required->validate($this->email) && $required->validate($this->phone)) {
+			$this->addError('contacts', 'Phone or email cannot be empty');
+		}
+	}
 
-    /**
-     * Gets query for [[Letter]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getLetter()
-    {
-        return $this->hasOne(Letter::className(), ['id' => 'letter_id']);
-    }
+	public function getContact(): ContactQuery
+	{
+		/** @var ContactQuery */
+		return $this->hasOne(Contact::class, ['id' => 'contact_id']);
+	}
 
+	public function getLetter(): ActiveQuery
+	{
+		return $this->hasOne(Letter::class, ['id' => 'letter_id']);
+	}
 
-    /**
-     * Gets query for [[Email]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEmail()
-    {
-        return $this->hasOne(Email::className(), ['id' => 'email']);
-    }
-
-    /**
-     * Gets query for [[Phone]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPhone()
-    {
-        return $this->hasOne(Phone::className(), ['id' => 'phone']);
-    }
+	public function getAnswers(): AQ
+	{
+		/** @var AQ */
+		return $this->hasMany(LetterContactAnswer::class, ['letter_contact_id' => 'id']);
+	}
 }

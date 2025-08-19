@@ -17,6 +17,7 @@ use app\models\forms\Company\CompanyLinkMessageForm;
 use app\models\forms\Company\CompanyLogoForm;
 use app\models\forms\Company\CompanyMediaForm;
 use app\models\forms\Company\CompanyMiniModelsForm;
+use app\models\forms\Phone\PhoneForm;
 use app\repositories\CompanyRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
@@ -121,16 +122,23 @@ class CompanyController extends AppController
 		$companyContactsForm = new CompanyContactsForm();
 		$companyContactsForm->load([
 			'emails'   => $contactsData['emails'] ?? [],
-			'phones'   => $contactsData['phones'] ?? [],
 			'websites' => $contactsData['websites'] ?? []
 		]);
 		$companyContactsForm->validateOrThrow();
+
+		$phoneDtos = [];
+
+		foreach (($contactsData['phones'] ?? []) as $phoneData) {
+			$phoneForm   = $this->makePhoneForm($phoneData);
+			$phoneDtos[] = $phoneForm->getDto();
+		}
 
 		$company = $this->companyWithGeneralContactService->create(
 			$form->getDto(),
 			$companyMiniModelsForm->getDto(),
 			$companyContactsForm->getDto(),
-			$companyMediaForm->getDto()
+			$companyMediaForm->getDto(),
+			$phoneDtos
 		);
 
 
@@ -171,17 +179,24 @@ class CompanyController extends AppController
 		$companyContactsForm = new CompanyContactsForm();
 		$companyContactsForm->load([
 			'emails'   => $contactsData['emails'] ?? [],
-			'phones'   => $contactsData['phones'] ?? [],
 			'websites' => $contactsData['websites'] ?? []
 		]);
 		$companyContactsForm->validateOrThrow();
+
+		$phoneDtos = [];
+
+		foreach (($contactsData['phones'] ?? []) as $phoneData) {
+			$phoneForm   = $this->makePhoneForm($phoneData);
+			$phoneDtos[] = $phoneForm->getDto();
+		}
 
 		$company = $this->companyWithGeneralContactService->update(
 			$company,
 			$form->getDto(),
 			$companyMiniModelsForm->getDto(),
 			$companyContactsForm->getDto(),
-			$companyMediaForm->getDto()
+			$companyMediaForm->getDto(),
+			$phoneDtos
 		);
 
 		return new CreatedCompanyResource($company);
@@ -348,5 +363,19 @@ class CompanyController extends AppController
 		} catch (InvalidArgumentException $e) {
 			return $this->error('Консультант уже назначен на эту компанию');
 		}
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	protected function makePhoneForm(array $payload): PhoneForm
+	{
+		$form = new PhoneForm();
+
+		$form->load($payload);
+
+		$form->validateOrThrow();
+
+		return $form;
 	}
 }

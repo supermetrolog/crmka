@@ -20,15 +20,15 @@ interface RouteInterface
 
 	public function addRule(array $methods, string $pattern, ?string $action = null);
 
-	public function get(string $pattern, ?string $action = null): RouteRuleInterface;
+	public function get(string $pattern = '/', ?string $action = null): RouteRuleInterface;
 
-	public function post(string $pattern, ?string $action = null): RouteRuleInterface;
+	public function post(string $pattern = '/', ?string $action = null): RouteRuleInterface;
 
-	public function put(string $pattern, ?string $action = null): RouteRuleInterface;
+	public function put(string $pattern = '/', ?string $action = null): RouteRuleInterface;
 
-	public function patch(string $pattern, ?string $action = null): RouteRuleInterface;
+	public function patch(string $pattern = '/', ?string $action = null): RouteRuleInterface;
 
-	public function delete(string $pattern, ?string $action = null): RouteRuleInterface;
+	public function delete(string $pattern = '/', ?string $action = null): RouteRuleInterface;
 
 	public function build(): array;
 }

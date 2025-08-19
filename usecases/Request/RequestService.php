@@ -37,7 +37,6 @@ use app\usecases\Timeline\TimelineService;
 use Throwable;
 use Yii;
 use yii\base\ErrorException;
-use yii\base\InvalidArgumentException;
 use yii\db\ActiveRecord;
 
 class RequestService
@@ -500,7 +499,7 @@ class RequestService
 
 		try {
 			if ($request->consultant_id === $dto->consultant->id) {
-				throw new InvalidArgumentException('Request is already assigned to consultant');
+				return $request;
 			}
 
 			$request->consultant_id = $dto->consultant->id;

@@ -14,7 +14,6 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\mappers\Contact\CreateContactDtoMapper;
 use app\mappers\Phone\PhoneDtoMapper;
-use app\models\ActiveQuery\ContactQuery;
 use app\models\Contact;
 use app\models\miniModels\Email;
 use app\models\miniModels\WayOfInforming;
@@ -49,7 +48,7 @@ class ContactService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function create(CreateContactDto $dto, array $phoneDtos): Contact
+	public function create(CreateContactDto $dto, array $phoneDtos = []): Contact
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -131,15 +130,11 @@ class ContactService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			/** @var ContactQuery $contactQuery */
-			$contactQuery = $model->getRelatedContacts();
+			$currentMainContacts = $model->getRelatedContacts()->main()->all();
 
-			/** @var Contact $preventMainContact */
-			$preventMainContact = $contactQuery->main()->one();
-
-			if ($preventMainContact !== null) {
-				$preventMainContact->isMain = null;
-				$preventMainContact->saveOrThrow();
+			foreach ($currentMainContacts as $contact) {
+				$contact->isMain = null;
+				$contact->saveOrThrow();
 			}
 
 			$model->isMain = Contact::IS_MAIN_CONTACT;

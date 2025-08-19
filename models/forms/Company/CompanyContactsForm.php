@@ -11,7 +11,6 @@ use app\kernel\common\models\Form\Form;
 class CompanyContactsForm extends Form
 {
 	public $websites;
-	public $phones;
 	public $emails;
 
 	public function rules(): array
@@ -22,14 +21,6 @@ class CompanyContactsForm extends Form
 				'validateParameters',
 				'params'      => [
 					'parameter' => 'website'
-				],
-				'skipOnEmpty' => true
-			],
-			[
-				'phones',
-				'validateParameters',
-				'params'      => [
-					'parameter' => 'phone'
 				],
 				'skipOnEmpty' => true
 			],
@@ -57,7 +48,6 @@ class CompanyContactsForm extends Form
 	{
 		return new CompanyContactsDto([
 			'websites' => $this->websites,
-			'phones'   => $this->phones,
 			'emails'   => $this->emails
 		]);
 	}

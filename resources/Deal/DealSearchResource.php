@@ -28,7 +28,7 @@ class DealSearchResource extends JsonResource
 				'company'    => CompanyShortResource::tryMakeArray($this->resource->company),
 				'competitor' => CompanyShortResource::tryMakeArray($this->resource->competitor),
 				'consultant' => UserShortResource::tryMakeArray($this->resource->consultant),
-				'request'    => RequestShortResource::makeArray($this->resource->request),
+				'request'    => RequestShortResource::tryMakeArray($this->resource->request),
 				'offerMix'   => $this->resource->offer
 			]
 		);
