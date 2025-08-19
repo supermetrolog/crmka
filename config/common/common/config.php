@@ -2,7 +2,7 @@
 
 return [
 	'basePath'   => YII_PROJECT_ROOT,
-	'bootstrap'  => ['log', 'sentry'],
+	'bootstrap'  => ['log'],
 	'timeZone'   => 'Europe/Moscow',
 	'language'   => 'ru-RU',
 	'aliases'    => [
