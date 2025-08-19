@@ -63,7 +63,7 @@ class EmailSender extends Model
 				'useFileTransport'         => false,
 				'transport'                => [
 					'class'      => 'Swift_SmtpTransport',
-					'host'       => 'smtp.yandex.ru',
+					'host'       => 'smtp.yandex.com',
 					'port'       => 465,
 					'encryption' => 'ssl',
 					'username'   => $this->username,
