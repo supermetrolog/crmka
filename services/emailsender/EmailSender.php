@@ -6,10 +6,6 @@ use app\helpers\validators\EmailsArrayValidator;
 use app\helpers\validators\IsArrayValidator;
 use Exception;
 use RuntimeException;
-use Swift_Plugins_LoggerPlugin;
-use Swift_Plugins_Loggers_ArrayLogger;
-use Yii;
-use yii\base\Application;
 use yii\base\Model;
 use yii\mail\MailerInterface;
 use yii\swiftmailer\Mailer;
@@ -60,31 +56,21 @@ class EmailSender extends Model
 
 	private function getMailer(): MailerInterface
 	{
-		$mailer = new Mailer(
+		return new Mailer(
 			[
-				'htmlLayout'       => 'layouts/html',
-				'useFileTransport' => false,
-				'transport'        => [
+				'enableSwiftMailerLogging' => true,
+				'htmlLayout'               => 'layouts/html',
+				'useFileTransport'         => false,
+				'transport'                => [
 					'class'      => 'Swift_SmtpTransport',
 					'host'       => 'smtp.yandex.ru',
 					'port'       => 465,
 					'encryption' => 'ssl',
 					'username'   => $this->username,
 					'password'   => $this->password,
-				]
+				],
 			]
 		);
-
-		$logger = new Swift_Plugins_Loggers_ArrayLogger();
-		$mailer->swiftMailer->registerPlugin(new Swift_Plugins_LoggerPlugin($logger));
-
-		Yii::$app->on(Application::EVENT_AFTER_REQUEST, function () use ($logger) {
-			if ($log = $logger->dump()) {
-				Yii::error("SMTP LOG: " . $log);
-			}
-		});
-
-		return $mailer;
 	}
 
 	/**
