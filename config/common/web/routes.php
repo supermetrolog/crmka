@@ -129,6 +129,7 @@ return static function (RouterInterface $router) {
 	});
 
 	$router->controller('contact-comment')->crud(['update', 'delete']);
+	$router->controller('contact-position')->crud(['index', 'create', 'update', 'delete']);
 
 	$router->controller('timeline')->disablePluralize()->group(static function (RouteInterface $route) {
 		$route->get()->action('index');

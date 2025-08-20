@@ -124,7 +124,7 @@ class Migration extends \yii\db\Migration
 	public function color(): array
 	{
 		return [
-			'color' => $this->string(6)->notNull()
+			'color' => $this->string(6)->null()
 		];
 	}
 

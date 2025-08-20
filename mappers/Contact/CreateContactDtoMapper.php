@@ -25,7 +25,7 @@ class CreateContactDtoMapper extends AbstractDtoMapper
 			'first_name'          => $contact->first_name,
 			'middle_name'         => $contact->middle_name,
 			'last_name'           => $contact->last_name,
-			'position'            => $contact->position,
+			'position_id'         => $contact->position_id,
 			'position_unknown'    => $contact->position_unknown,
 			'faceToFaceMeeting'   => $contact->faceToFaceMeeting,
 			'warning'             => $contact->warning,

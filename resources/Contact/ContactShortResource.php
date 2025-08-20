@@ -30,7 +30,7 @@ class ContactShortResource extends JsonResource
 			'created_at'          => $this->resource->created_at,
 			'updated_at'          => $this->resource->updated_at,
 			'consultant_id'       => $this->resource->consultant_id,
-			'position'            => $this->resource->position,
+			'position_id'         => $this->resource->position_id,
 			'faceToFaceMeeting'   => $this->resource->faceToFaceMeeting,
 			'warning'             => $this->resource->warning,
 			'good'                => $this->resource->good,

@@ -28,7 +28,7 @@ class CompanyContactResource extends JsonResource
 			'last_name'           => $this->resource->last_name,
 			'full_name'           => $this->resource->getFullName(),
 			'type'                => $this->resource->type,
-			'position'            => $this->resource->position,
+			'position_id'         => $this->resource->position_id,
 			'faceToFaceMeeting'   => $this->resource->faceToFaceMeeting,
 			'warning'             => $this->resource->warning,
 			'good'                => $this->resource->good,
