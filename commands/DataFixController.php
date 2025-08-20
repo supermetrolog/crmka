@@ -10,6 +10,7 @@ use app\actions\Company\FixCompanyCategoriesAction;
 use app\actions\Company\FixCompanyProductRangesAction;
 use app\actions\Company\TransferCompanyActivityAction;
 use app\actions\Company\TransferCompanyPinnedMessagesAction;
+use app\actions\Contact\FixContactPositionsAction;
 use app\actions\Task\FixTaskScheduledCallsActions;
 use app\actions\Task\TaskMessageToTitleAction;
 use yii\console\Controller;
@@ -28,6 +29,7 @@ class DataFixController extends Controller
 			'task-scheduled-calls'        => FixTaskScheduledCallsActions::class,
 			'survey-chat-member-messages' => FixSurveyChatMemberMessagesAction::class,
 			'contact-call-main-phone'     => SetContactCallMainPhone::class,
+			'contact-positions'           => FixContactPositionsAction::class
 		];
 	}
 }
