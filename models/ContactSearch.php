@@ -25,7 +25,7 @@ class ContactSearch extends Form
 	public $created_at;
 	public $updated_at;
 	public $consultant_id;
-	public $position;
+	public $position_id;
 	public $faceToFaceMeeting;
 	public $warning;
 	public $good;
@@ -44,7 +44,7 @@ class ContactSearch extends Form
 	public function rules(): array
 	{
 		return [
-			[['company_id', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'status', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
+			[['company_id', 'type', 'consultant_id', 'position_id', 'faceToFaceMeeting', 'warning', 'good', 'status', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
 			[['id', 'middle_name', 'last_name', 'created_at', 'updated_at', 'first_name', 'passive_why_comment', 'warning_why_comment', 'search'], 'safe'],
 		];
 	}
@@ -79,7 +79,7 @@ class ContactSearch extends Form
 			Contact::field('created_at')        => $this->created_at,
 			Contact::field('updated_at')        => $this->updated_at,
 			Contact::field('consultant_id')     => $this->consultant_id,
-			Contact::field('position')          => $this->position,
+			Contact::field('position_id')       => $this->position_id,
 			Contact::field('faceToFaceMeeting') => $this->faceToFaceMeeting,
 			Contact::field('warning')           => $this->warning,
 			Contact::field('good')              => $this->good,

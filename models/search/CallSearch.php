@@ -76,8 +76,8 @@ class CallSearch extends Form
 						'desc' => [Contact::field('first_name') => SORT_DESC]
 					],
 					'contact_position' => [
-						'asc'  => [Contact::field('position') => SORT_ASC],
-						'desc' => [Contact::field('position') => SORT_DESC]
+						'asc'  => [Contact::field('position_id') => SORT_ASC],
+						'desc' => [Contact::field('position_id') => SORT_DESC]
 					]
 				]
 			]
