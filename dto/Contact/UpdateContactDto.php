@@ -10,7 +10,7 @@ class UpdateContactDto extends BaseObject
 	public string  $first_name;
 	public ?string $middle_name;
 	public ?string $last_name;
-	public ?int    $position;
+	public ?int    $position_id;
 	public ?int    $position_unknown;
 	public ?int    $faceToFaceMeeting;
 	public ?int    $warning;

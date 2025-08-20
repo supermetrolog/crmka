@@ -6,6 +6,7 @@ use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\helpers\ArrayHelper as AppArrayHelper;
 use app\helpers\PersonNameHelper;
 use app\helpers\StringHelper;
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ContactQuery;
@@ -35,16 +36,16 @@ use yii\db\ActiveQuery;
  * @property int|null              $type
  * @property string|null           $created_at
  * @property string|null           $updated_at
- * @property int|null              $consultant_id     [связь] с пользователями
- * @property int|null              $position          Должность
- * @property int|null              $position_unknown  Должность неизвестна
- * @property int|null              $faceToFaceMeeting [флаг] Очная встреча
- * @property int|null              $warning           [флаг] Внимание
- * @property int|null              $good              [флаг] Хор. взаимоотношения
+ * @property int|null              $consultant_id        [связь] с пользователями
+ * @property int|null              $position_id          Должность
+ * @property int|null              $position_unknown     Должность неизвестна
+ * @property int|null              $faceToFaceMeeting    [флаг] Очная встреча
+ * @property int|null              $warning              [флаг] Внимание
+ * @property int|null              $good                 [флаг] Хор. взаимоотношения
  * @property int|null              $passive_why
  * @property string|null           $passive_why_comment
  * @property string|null           $warning_why_comment
- * @property int|null              $isMain            основной контакт
+ * @property int|null              $isMain               основной контакт
  * @property-read Company          $company
  * @property-read User             $consultant
  * @property-read ContactComment[] $contactComments
@@ -117,54 +118,21 @@ class Contact extends AR
 		];
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public static function tableName(): string
 	{
 		return 'contact';
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function rules(): array
 	{
 		return [
 			[['company_id'], 'required'],
-			[['company_id', 'status', 'type', 'consultant_id', 'position', 'faceToFaceMeeting', 'warning', 'good', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
+			[['company_id', 'status', 'type', 'consultant_id', 'position_id', 'faceToFaceMeeting', 'warning', 'good', 'passive_why', 'position_unknown', 'isMain'], 'integer'],
 			[['created_at', 'updated_at'], 'safe'],
 			[['first_name', 'middle_name', 'last_name', 'passive_why_comment', 'warning_why_comment'], 'string', 'max' => 255],
 			[['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
 			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
-		];
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels(): array
-	{
-		return [
-			'id'                  => 'ID',
-			'company_id'          => 'Company ID',
-			'first_name'          => 'First Name',
-			'middle_name'         => 'Middle Name',
-			'last_name'           => 'Last Name',
-			'status'              => 'Status',
-			'type'                => 'Type',
-			'created_at'          => 'Created At',
-			'updated_at'          => 'Updated At',
-			'consultant_id'       => 'Consultant ID',
-			'position'            => 'Position',
-			'faceToFaceMeeting'   => 'Face To Face Meeting',
-			'warning'             => 'Warning',
-			'good'                => 'Good',
-			'passive_why'         => 'PassiveWhy',
-			'passive_why_comment' => 'PassiveWhyComment',
-			'warning_why_comment' => 'WarningWhyComment',
-			'position_unknown'    => 'PositionUnknown',
-			'isMain'              => 'IsMain'
+			[['position_id'], 'exist', 'targetClass' => ContactPosition::class, 'targetAttribute' => 'id'],
 		];
 	}
 
@@ -355,9 +323,15 @@ class Contact extends AR
 		return $this->hasMany(Letter::class, ['id' => 'letter_id'])->via('lettersContacts');
 	}
 
+	public function getContactPosition(): AQ
+	{
+		/** @var AQ */
+		return $this->hasOne(ContactPosition::class, ['id' => 'position_id']);
+	}
+
 	public static function find(): ContactQuery
 	{
-		return new ContactQuery(get_called_class());
+		return new ContactQuery(static::class);
 	}
 
 	public function isPassive(): bool

@@ -31,7 +31,7 @@ class TaskRelationEntityContactResource extends JsonResource
 			'full_name'           => $this->resource->getFullName(),
 			'type'                => $this->resource->type,
 			'consultant_id'       => $this->resource->consultant_id,
-			'position'            => $this->resource->position,
+			'position_id'         => $this->resource->position_id,
 			'faceToFaceMeeting'   => $this->resource->faceToFaceMeeting,
 			'warning'             => $this->resource->warning,
 			'good'                => $this->resource->good,
