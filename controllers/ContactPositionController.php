@@ -94,6 +94,6 @@ class ContactPositionController extends AppController
 	{
 		$this->service->delete($this->repository->findOneOrThrow($id));
 
-		return $this->success('Контакт успешно удален');
+		return $this->success('Должность успешно удалена');
 	}
 }
