@@ -4,11 +4,14 @@ namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\enum\Phone\PhoneCountryCodeEnum;
+use app\enum\UserProfile\UserProfileGenderEnum;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\ArrayHelper;
 use app\helpers\PhoneHelper;
 use app\helpers\StringHelper;
+use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\UserProfileEmail;
 use app\models\miniModels\UserProfilePhone;
 use libphonenumber\PhoneNumberFormat;
@@ -24,6 +27,7 @@ use yii\db\ActiveQuery;
  * @property string|null             $last_name
  * @property string|null             $caller_id Номер в системе Asterisk
  * @property string|null             $avatar
+ * @property string                  $gender
  *
  * @property string                  $fullName
  * @property string                  $shortName
@@ -37,24 +41,19 @@ use yii\db\ActiveQuery;
  */
 class UserProfile extends AR
 {
-	/**
-	 * {@inheritdoc}
-	 */
 	public static function tableName(): string
 	{
 		return 'user_profile';
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function rules(): array
 	{
 		return [
-			[['user_id'], 'required'],
+			[['user_id', 'gender'], 'required'],
 			[['user_id'], 'integer'],
 			[['first_name', 'middle_name', 'last_name', 'caller_id', 'avatar'], 'string', 'max' => 255],
 			[['caller_id'], 'unique'],
+			[['gender'], EnumValidator::class, 'enumClass' => UserProfileGenderEnum::class],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
@@ -63,22 +62,6 @@ class UserProfile extends AR
 	{
 		return [
 			CreateManyMiniModelsBehaviors::class
-		];
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels(): array
-	{
-		return [
-			'id'          => 'ID',
-			'user_id'     => 'User ID',
-			'first_name'  => 'First Name',
-			'middle_name' => 'Middle Name',
-			'last_name'   => 'Last Name',
-			'caller_id'   => 'Caller ID',
-			'avatar'      => "Avatar",
 		];
 	}
 
@@ -159,43 +142,25 @@ class UserProfile extends AR
 		return '-';
 	}
 
-	/**
-	 * Gets query for [[CallLists]].
-	 *
-	 * @return ActiveQuery
-	 */
 	public function getCallLists(): ActiveQuery
 	{
 		return $this->hasMany(CallList::class, ['caller_id' => 'caller_id']);
 	}
 
-	/**
-	 * Gets query for [[Phones]].
-	 *
-	 * @return ActiveQuery
-	 */
 	public function getEmails(): ActiveQuery
 	{
 		return $this->hasMany(UserProfileEmail::class, ['user_profile_id' => 'id']);
 	}
 
-	/**
-	 * Gets query for [[Phones]].
-	 *
-	 * @return ActiveQuery
-	 */
+
 	public function getPhones(): ActiveQuery
 	{
 		return $this->hasMany(UserProfilePhone::class, ['user_profile_id' => 'id']);
 	}
 
-	/**
-	 * Gets query for [[User]].
-	 *
-	 * @return ActiveQuery
-	 */
-	public function getUser(): ActiveQuery
+	public function getUser(): UserQuery
 	{
+		/** @var UserQuery */
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 }
