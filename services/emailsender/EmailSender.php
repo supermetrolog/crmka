@@ -58,16 +58,17 @@ class EmailSender extends Model
 	{
 		return new Mailer(
 			[
-				'htmlLayout'       => 'layouts/html',
-				'useFileTransport' => false,
-				'transport'        => [
+				'enableSwiftMailerLogging' => true,
+				'htmlLayout'               => 'layouts/html',
+				'useFileTransport'         => false,
+				'transport'                => [
 					'class'      => 'Swift_SmtpTransport',
 					'host'       => 'smtp.yandex.com',
 					'port'       => 465,
 					'encryption' => 'ssl',
 					'username'   => $this->username,
 					'password'   => $this->password,
-				]
+				],
 			]
 		);
 	}
