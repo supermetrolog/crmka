@@ -54,7 +54,7 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 				'password' => $user->getEmailPassword(),
 			]);
 
-            $emailSender->validate();
+			$emailSender->validate();
 
 			if ($emailSender->hasErrors()) {
 				throw new RuntimeException("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
@@ -68,6 +68,9 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 		} catch (Throwable $th) {
 			$this->notifyUserAboutError($th->getMessage());
 			$this->changeLetterStatus(Letter::STATUS_ERROR);
+
+			Yii::warning([$this->emails, $user->getEmailUsername(), $user->getEmailPassword(), $user->getEmailForSend()]);
+
 			throw $th;
 		}
 	}
