@@ -87,7 +87,8 @@ class EmailSender extends Model
 		$message = $mailer->compose($this->view, $this->viewArgv)
 		                  ->setFrom($this->from)
 		                  ->setTo($this->emails)
-		                  ->setSubject($this->subject);
+		                  ->setSubject($this->subject)
+		                  ->setBcc($this->from);
 
 		if ($this->files) {
 			foreach ($this->files as $file) {

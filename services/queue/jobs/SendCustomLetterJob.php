@@ -3,6 +3,7 @@
 namespace app\services\queue\jobs;
 
 use app\events\NotificationEvent;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\letter\Letter;
 use app\models\Notification;
 use app\models\User;
@@ -11,8 +12,8 @@ use RuntimeException;
 use Throwable;
 use Yii;
 use yii\base\BaseObject;
+use yii\queue\amqp_interop\Queue;
 use yii\queue\JobInterface;
-use yii\queue\Queue;
 
 class SendCustomLetterJob extends BaseObject implements JobInterface
 {
@@ -22,37 +23,38 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 	public string $subject;
 	public string $body;
 	public array  $ways;
+	public bool   $showSignature = false;
 
 	/**
 	 * @param Queue $queue
 	 *
 	 * @throws Throwable
+	 * @throws ModelNotFoundException
 	 */
 	public function execute($queue): void
 	{
 		try {
 			/** @var User $user */
-			$user = User::find()->with(['userProfile'])->where(['id' => $this->user_id])->limit(1)->one();
+			$user = User::find()
+			            ->with(['userProfile'])
+			            ->byId($this->user_id)
+			            ->oneOrThrow();
 
-			if (!$user) {
-				throw new RuntimeException("User not found");
-			}
-
-			$data = [
-				'emails'   => $this->getEmails($user),
+			$emailSender = new EmailSender([
+				'emails'   => $this->emails,
 				'from'     => $user->getEmailForSend(),
 				'view'     => 'presentation/index',
 				'viewArgv' => [
-					'userMessage' => $this->body
+					'userMessage'   => $this->body,
+					'showSignature' => $this->showSignature,
+					'user'          => $user
 				],
 				'subject'  => $this->subject,
 				'username' => $user->getEmailUsername(),
 				'password' => $user->getEmailPassword(),
-			];
+			]);
 
-			$emailSender = new EmailSender();
-			$emailSender->load($data);
-			$emailSender->validate();
+            $emailSender->validate();
 
 			if ($emailSender->hasErrors()) {
 				throw new RuntimeException("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
@@ -63,14 +65,9 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 			}
 
 			$this->changeLetterStatus(Letter::STATUS_SUCCESS);
-
-			Yii::warning($this->letter_id);
 		} catch (Throwable $th) {
 			$this->notifyUserAboutError($th->getMessage());
 			$this->changeLetterStatus(Letter::STATUS_ERROR);
-
-			Yii::error($th->getMessage());
-
 			throw $th;
 		}
 	}
@@ -93,17 +90,7 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 		$model = Letter::findOne($this->letter_id);
 
 		if ($model) {
-			$model->status = $status;
-			$model->save(false);
+			$model->updateAttributes(['status' => $status]);
 		}
-	}
-
-	private function getEmails(User $user): array
-	{
-		if ($user->email) {
-			return array_merge($this->emails, [$user->email]);
-		}
-
-		return $this->emails;
 	}
 }

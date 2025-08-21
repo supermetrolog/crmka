@@ -3,11 +3,15 @@
 namespace app\models;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\enum\Phone\PhoneCountryCodeEnum;
 use app\exceptions\ValidationErrorHttpException;
+use app\helpers\ArrayHelper;
+use app\helpers\PhoneHelper;
 use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;
 use app\models\miniModels\UserProfileEmail;
 use app\models\miniModels\UserProfilePhone;
+use libphonenumber\PhoneNumberFormat;
 use yii\db\ActiveQuery;
 
 /**
@@ -135,6 +139,24 @@ class UserProfile extends AR
 		};
 
 		return $fields;
+	}
+
+	public function getFormattedPhone(): string
+	{
+		if (ArrayHelper::notEmpty($this->phones)) {
+			return PhoneHelper::tryFormat($this->phones[0]->phone, PhoneNumberFormat::NATIONAL, PhoneCountryCodeEnum::RU);
+		}
+
+		return '-';
+	}
+
+	public function getFormattedTel(): string
+	{
+		if (ArrayHelper::notEmpty($this->phones)) {
+			return PhoneHelper::tryFormat($this->phones[0]->phone, PhoneNumberFormat::RFC3966, PhoneCountryCodeEnum::RU);
+		}
+
+		return '-';
 	}
 
 	/**
