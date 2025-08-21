@@ -69,8 +69,6 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 			$this->notifyUserAboutError($th->getMessage());
 			$this->changeLetterStatus(Letter::STATUS_ERROR);
 
-			Yii::warning([$this->emails, $user->getEmailUsername(), $user->getEmailPassword(), $user->getEmailForSend()]);
-
 			throw $th;
 		}
 	}
