@@ -45,7 +45,8 @@ class UserProfileService
 				'first_name'  => $userProfileDto->first_name,
 				'middle_name' => $userProfileDto->middle_name,
 				'last_name'   => $userProfileDto->last_name,
-				'caller_id'   => $userProfileDto->caller_id
+				'caller_id'   => $userProfileDto->caller_id,
+				'gender'      => $userProfileDto->gender
 			]);
 
 			$model = $model->uploadFiles($uploadMedia, $model);
@@ -84,7 +85,8 @@ class UserProfileService
 				'first_name'  => $userProfileDto->first_name,
 				'middle_name' => $userProfileDto->middle_name,
 				'last_name'   => $userProfileDto->last_name,
-				'caller_id'   => $userProfileDto->caller_id
+				'caller_id'   => $userProfileDto->caller_id,
+				'gender'      => $userProfileDto->gender
 			]);
 
 			$model = $model->uploadFiles($uploadMedia, $model);

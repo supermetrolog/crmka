@@ -14,4 +14,5 @@ class CreateUserProfileDto extends BaseObject
 	public ?string $caller_id;
 	public array   $emails = [];
 	public array   $phones = [];
+	public string  $gender;
 }
