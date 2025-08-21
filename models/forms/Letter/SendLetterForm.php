@@ -10,16 +10,18 @@ class SendLetterForm extends Form
 	public int    $company_id;
 	public string $subject;
 	public string $body;
-	public array  $emails = [];
-	public array  $phones = [];
-	public array  $ways   = [];
+	public array  $emails         = [];
+	public array  $phones         = [];
+	public array  $ways           = [];
 	public int    $shipping_method;
+	public        $show_signature = false;
 
 	public function rules(): array
 	{
 		return [
 			[['company_id', 'subject', 'body', 'emails', 'ways', 'shipping_method'], 'required'],
 			[['company_id', 'shipping_method'], 'integer'],
+			[['show_signature'], 'boolean'],
 			[['subject'], 'string', 'max' => 255],
 			[['body'], 'string'],
 			[['phones'], 'each', 'rule' => ['string']],
@@ -39,6 +41,7 @@ class SendLetterForm extends Form
 			'phones'          => $this->phones,
 			'ways'            => $this->ways,
 			'shipping_method' => $this->shipping_method,
+			'show_signature'  => $this->show_signature
 		]);
 	}
 }
