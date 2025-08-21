@@ -56,16 +56,17 @@ class LetterService
 				return $createLetterModel->letterModel;
 			}
 
-//			$this->queue->push(
-			(new SendCustomLetterJob([
-				'letter_id' => $createLetterModel->letterModel->id,
-				'user_id'   => $dto->user_id,
-				'emails'    => ArrayHelper::map($dto->emails, static fn($email) => ArrayHelper::getValue($email, 'value')),
-				'subject'   => $dto->subject,
-				'body'      => $dto->body,
-				'ways'      => $dto->ways
-			]))->execute(new Queue());
-//			);
+			$this->queue->push(
+				new SendCustomLetterJob([
+					'letter_id'     => $createLetterModel->letterModel->id,
+					'user_id'       => $dto->user_id,
+					'emails'        => ArrayHelper::map($dto->emails, static fn($email) => ArrayHelper::getValue($email, 'value')),
+					'subject'       => $dto->subject,
+					'body'          => $dto->body,
+					'ways'          => $dto->ways,
+					'showSignature' => $dto->show_signature
+				])
+			);
 
 			$tx->commit();
 
