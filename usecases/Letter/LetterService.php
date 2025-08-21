@@ -9,16 +9,14 @@ use app\models\letter\CreateLetter;
 use app\models\letter\Letter;
 use app\services\queue\jobs\SendCustomLetterJob;
 use Throwable;
-use yii\queue\amqp_interop\Queue;
+use Yii;
 
 class LetterService
 {
-	private Queue                        $queue;
 	private TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(Queue $queue, TransactionBeginnerInterface $transactionBeginner)
+	public function __construct(TransactionBeginnerInterface $transactionBeginner)
 	{
-		$this->queue               = $queue;
 		$this->transactionBeginner = $transactionBeginner;
 	}
 
@@ -56,14 +54,15 @@ class LetterService
 				return $createLetterModel->letterModel;
 			}
 
-			$this->queue->push(
+			Yii::$app->queue->push(
 				new SendCustomLetterJob([
-					'letter_id' => $createLetterModel->letterModel->id,
-					'user_id'   => $dto->user_id,
-					'emails'    => ArrayHelper::map($dto->emails, static fn($email) => ArrayHelper::getValue($email, 'value')),
-					'subject'   => $dto->subject,
-					'body'      => $dto->body,
-					'ways'      => $dto->ways
+					'letter_id'     => $createLetterModel->letterModel->id,
+					'user_id'       => $dto->user_id,
+					'emails'        => ArrayHelper::map($dto->emails, static fn($email) => ArrayHelper::getValue($email, 'value')),
+					'subject'       => $dto->subject,
+					'body'          => $dto->body,
+					'ways'          => $dto->ways,
+					'showSignature' => $dto->show_signature
 				])
 			);
 
