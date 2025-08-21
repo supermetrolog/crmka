@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\exceptions\ValidationErrorHttpException;
+use app\helpers\ArrayHelper;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\models\forms\Letter\SendLetterForm;
@@ -77,12 +78,11 @@ class LetterController extends AppController
 		try {
 			$user = $this->user->identity;
 
-			$dto = [
-				...$post,
+			$dto = ArrayHelper::merge($post, [
 				'user_id'      => $user->id,
 				'sender_email' => $user->email ?? Yii::$app->params['senderEmail'],
 				'type'         => Letter::TYPE_DEFAULT
-			];
+			]);
 
 			$createLetterModel = new CreateLetter();
 			$createLetterModel->create($dto);

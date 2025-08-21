@@ -54,15 +54,13 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 				'password' => $user->getEmailPassword(),
 			]);
 
-			$emailSender->validate();
+            $emailSender->validate();
 
 			if ($emailSender->hasErrors()) {
 				throw new RuntimeException("EmailSender validation error: " . implode(', ', $emailSender->getErrorSummary(false)));
 			}
 
-			$sends = $emailSender->send();
-
-			if (!$sends) {
+			if (!$emailSender->send()) {
 				throw new RuntimeException("Email send error");
 			}
 
