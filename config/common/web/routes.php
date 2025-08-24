@@ -403,4 +403,8 @@ return static function (RouterInterface $router) {
 			$route->delete()->action('delete');
 		});
 	});
+
+	$router->controller('message-template')->group(static function (RouteInterface $route) {
+		$route->get('render/<template>', 'render');
+	});
 };

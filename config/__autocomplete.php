@@ -1,5 +1,6 @@
 <?php
 
+use app\components\Formatter;
 use yii\BaseYii;
 use yii\db\Connection;
 use yii\web\Application;
@@ -18,19 +19,20 @@ use yii\web\User;
  */
 class Yii extends BaseYii
 {
-    /**
-     * @var Application|\yii\console\Application|__Application
-     */
-    public static $app;
+	/**
+	 * @var Application|\yii\console\Application|__Application
+	 */
+	public static $app;
 }
 
 /**
- * @property yii\rbac\DbManager $authManager
- * @property User|__WebUser $user
+ * @property yii\rbac\DbManager           $authManager
+ * @property User|__WebUser               $user
  * @property yii\base\Security|__Security $security
- * @property array $params
- * @property Connection $db
- * @property Connection $db_old
+ * @property array                        $params
+ * @property Connection                   $db
+ * @property Connection                   $db_old
+ * @property Formatter                    $formatter
  *
  */
 class __Application extends Application
