@@ -1,6 +1,6 @@
 <?php
 
-use yii\di\Container;
+use app\components\Formatter;
 
 $common_params = require __DIR__ . "/params.php";
 $common_db     = require __DIR__ . "/db.php";
@@ -29,7 +29,7 @@ return [
 		'driver'       => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
 	],
 	'formatter'   => [
-		'class'                  => \yii\i18n\Formatter::className(),
+		'class'                  => Formatter::class,
 		'dateFormat'             => 'long',
 		'currencyCode'           => 'RUB',
 		'decimalSeparator'       => '.',
