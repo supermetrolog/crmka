@@ -60,7 +60,9 @@ class ArchiverController extends AppController
 			$fileInfo = new SplFileInfo($file);
 			$ext      = $fileInfo->getExtension();
 
-			$archiverFile = new File($key . '.' . $ext, file_get_contents($file));
+			$normalizedUrl = $this->normalizeUrl($file);
+
+			$archiverFile = new File($key . '.' . $ext, file_get_contents($normalizedUrl));
 
 			$archiver->add($archiverFile);
 		}
@@ -72,5 +74,20 @@ class ArchiverController extends AppController
 		$this->response->sendContentAsFile($archiveContent, $zipFilename);
 
 		unlink($filename);
+	}
+
+	private function normalizeUrl(string $url): string
+	{
+		$parsed = parse_url($url);
+
+		$path = array_map(static fn($segment) => rawurlencode($segment), explode('/', $parsed['path']));
+
+		$normalized = $parsed['scheme'] . '://' . $parsed['host'] . implode('/', $path);
+
+		if (!empty($parsed['query'])) {
+			$normalized .= '?' . $parsed['query'];
+		}
+
+		return $normalized;
 	}
 }
