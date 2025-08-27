@@ -39,6 +39,10 @@
 			</p>
 		</div>
 	<?php endif; ?>
+	<?php if (!empty($openTrackingUrl)) : ?>
+		<img alt="" width="1" height="1" style="display:none"
+		     src="<?php echo $openTrackingUrl ?>"/>
+	<?php endif; ?>
 </div>
 </body>
 </html>

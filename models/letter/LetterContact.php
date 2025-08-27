@@ -18,6 +18,7 @@ use yii\validators\RequiredValidator;
  *
  * @property-read Letter                $letter
  * @property-read LetterContactAnswer[] $answers
+ * @property-read LetterContactEvent[]  $events
  */
 class LetterContact extends \yii\db\ActiveRecord
 {
@@ -61,5 +62,11 @@ class LetterContact extends \yii\db\ActiveRecord
 	{
 		/** @var AQ */
 		return $this->hasMany(LetterContactAnswer::class, ['letter_contact_id' => 'id']);
+	}
+
+	public function getEvents(): AQ
+	{
+		/** @var AQ */
+		return $this->hasMany(LetterContactEvent::class, ['letter_contact_id' => 'id']);
 	}
 }

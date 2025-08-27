@@ -5,6 +5,7 @@ namespace app\services\queue\jobs;
 use app\events\NotificationEvent;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\letter\Letter;
+use app\models\letter\LetterContact;
 use app\models\Notification;
 use app\models\User;
 use app\services\emailsender\EmailSender;
@@ -45,9 +46,10 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 				'from'     => $user->getEmailForSend(),
 				'view'     => 'presentation/index',
 				'viewArgv' => [
-					'userMessage'   => $this->body,
-					'showSignature' => $this->showSignature,
-					'user'          => $user
+					'userMessage'     => $this->body,
+					'showSignature'   => $this->showSignature,
+					'user'            => $user,
+					'openTrackingUrl' => $this->makeOpenTrackingUrl()
 				],
 				'subject'  => $this->subject,
 				'username' => $user->getEmailUsername(),
@@ -71,6 +73,20 @@ class SendCustomLetterJob extends BaseObject implements JobInterface
 
 			throw $th;
 		}
+	}
+
+	private function makeOpenTrackingUrl(): ?string
+	{
+		/** @var ?LetterContact $letterContact */
+		$letterContact = LetterContact::find()->andWhere(['letter_id' => $this->letter_id])->one();
+
+		if (!$letterContact) {
+			return null;
+		}
+
+		$host = Yii::$app->params['url']['this_host'];
+
+		return "{$host}letter-tracking/open/{$letterContact->id}";
 	}
 
 	private function notifyUserAboutError(string $error): void

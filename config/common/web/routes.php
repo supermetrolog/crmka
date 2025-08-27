@@ -407,4 +407,8 @@ return static function (RouterInterface $router) {
 	$router->controller('message-template')->group(static function (RouteInterface $route) {
 		$route->get('render/<template>', 'render');
 	});
+
+	$router->controller('letter-tracking')->disablePluralize()->group(static function (RouteInterface $route) {
+		$route->get('open/<letter_contact_id>', 'open');
+	});
 };

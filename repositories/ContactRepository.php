@@ -18,7 +18,7 @@ class ContactRepository
 			              'calls' => function (CallQuery $query) {
 				              $query->addOrderBy(['created_at' => SORT_DESC]);
 			              },
-			              'lettersContacts.answers.markedBy.userProfile', 'lettersContacts.letter.user.userProfile'
+			              'lettersContacts.answers.markedBy.userProfile', 'lettersContacts.letter.user.userProfile', 'lettersContacts.events'
 		              ])
 		              ->byCompanyId($companyId)
 		              ->all();
