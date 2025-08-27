@@ -10,6 +10,7 @@ use app\kernel\common\controller\AppController;
 use SplFileInfo;
 use Yii;
 use yii\base\ErrorException;
+use yii\validators\UrlValidator;
 use yii\web\BadRequestHttpException;
 use yii\web\RangeNotSatisfiableHttpException;
 
@@ -40,9 +41,11 @@ class ArchiverController extends AppController
 
 		$name = $this->request->get('name', hash('md5', implode('_', $files)));
 
+		$urlValidator = new UrlValidator();
+
 		// Важная штука. Если не валидировать ссылку можно передать просто путь к файлам исходиников
-		array_walk($files, function ($file) {
-			if (!filter_var($file, FILTER_VALIDATE_URL)) {
+		array_walk($files, static function ($file) use ($urlValidator) {
+			if (!$urlValidator->validate($file)) {
 				throw new BadRequestHttpException('File must be url');
 			}
 		});
@@ -55,9 +58,11 @@ class ArchiverController extends AppController
 
 		foreach ($files as $key => $file) {
 			$fileInfo = new SplFileInfo($file);
-			$ext = $fileInfo->getExtension();
+			$ext      = $fileInfo->getExtension();
 
-			$archiverFile = new File($key . '.' . $ext, file_get_contents($file));
+			$normalizedUrl = $this->normalizeUrl($file);
+
+			$archiverFile = new File($key . '.' . $ext, file_get_contents($normalizedUrl));
 
 			$archiver->add($archiverFile);
 		}
@@ -69,5 +74,20 @@ class ArchiverController extends AppController
 		$this->response->sendContentAsFile($archiveContent, $zipFilename);
 
 		unlink($filename);
+	}
+
+	private function normalizeUrl(string $url): string
+	{
+		$parsed = parse_url($url);
+
+		$path = array_map(static fn($segment) => rawurlencode($segment), explode('/', $parsed['path']));
+
+		$normalized = $parsed['scheme'] . '://' . $parsed['host'] . implode('/', $path);
+
+		if (!empty($parsed['query'])) {
+			$normalized .= '?' . $parsed['query'];
+		}
+
+		return $normalized;
 	}
 }

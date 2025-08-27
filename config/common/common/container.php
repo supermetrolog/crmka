@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 use app\components\EventManager;
+use app\components\MessageTemplate\Adapters\EmailTwigEnvironmentAdapter;
+use app\components\MessageTemplate\Interfaces\EmailTwigEnvironmentInterface;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ActiveQuery\NotificationChannelQuery;
 use app\models\Notification\NotificationChannel;
 use app\usecases\Auth\AuthService;
+use Twig\Loader\FilesystemLoader;
 
 $db     = require __DIR__ . "/db.php";
 $old_db = require __DIR__ . "/db_old.php";
@@ -15,13 +18,21 @@ $secrets = require YII_PROJECT_ROOT . "/config/secrets.php";
 
 return [
 	'singletons'  => [
-		'db'                                => $db,
-		'old_db'                            => $old_db,
-		TransactionBeginnerInterface::class => 'db',
-		EventManager::class                 => [
+		'db'                                 => $db,
+		'old_db'                             => $old_db,
+		TransactionBeginnerInterface::class  => 'db',
+		EventManager::class                  => [
 			'class'  => EventManager::class,
 			'config' => require YII_PROJECT_ROOT . '/config/common/common/events.php'
-		]
+		],
+		EmailTwigEnvironmentInterface::class => static function () {
+			$loader = new FilesystemLoader(Yii::getAlias('@app/components/MessageTemplate/Twig'));
+
+			return new EmailTwigEnvironmentAdapter($loader, [
+				'cache' => Yii::getAlias('@runtime/Twig/email-cache'),
+				'debug' => YII_DEBUG,
+			]);
+		},
 	],
 	'definitions' => [
 		NotificationChannelQuery::class => [

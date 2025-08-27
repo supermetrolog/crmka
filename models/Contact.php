@@ -343,4 +343,17 @@ class Contact extends AR
 	{
 		return $this->status === self::STATUS_ACTIVE;
 	}
+
+	public function getMediumName(): string
+	{
+		if ($this->middle_name) {
+			return StringHelper::join(
+				StringHelper::SYMBOL_SPACE,
+				$this->first_name,
+				$this->middle_name
+			);
+		}
+
+		return $this->first_name;
+	}
 }
