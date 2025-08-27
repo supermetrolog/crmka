@@ -19,6 +19,18 @@ class RequestDirection extends AR
 {
 	public const MAIN_COLUMN = 'direction';
 
+	// @TODO переделать эту фигню
+	private const DIRECTIONS = [
+		0 => 'Север',
+		1 => 'Восток',
+		2 => 'Юг',
+		3 => 'Запад',
+		4 => 'Северо-Восток',
+		5 => 'Юго-Восток',
+		6 => 'Северо-Запад',
+		7 => 'Юго-Запад',
+	];
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -59,5 +71,10 @@ class RequestDirection extends AR
 	public function getRequest(): ActiveQuery
 	{
 		return $this->hasOne(Request::class, ['id' => 'request_id']);
+	}
+
+	public function getName(): string
+	{
+		return self::DIRECTIONS[$this->direction];
 	}
 }

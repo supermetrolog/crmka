@@ -350,4 +350,37 @@ class Request extends AR
 	{
 		return $this->getDeal()->exists();
 	}
+
+	public function getSummary(): string
+	{
+		$formattedArea = Yii::$app->formatter->asRange($this->minArea, $this->maxArea) . ' м2';
+
+		$formattedAddress = '';
+
+		if (ArrayHelper::notEmpty($this->directions)) {
+			$directionsText = StringHelper::join(', ', ...ArrayHelper::map($this->directions, static function (RequestDirection $direction) {
+				return $direction->getName();
+			}));
+
+			$formattedAddress = "МО: {$directionsText}";
+		}
+
+		if (ArrayHelper::notEmpty($this->districts)) {
+			$districtsText = StringHelper::join(', ', ...ArrayHelper::map($this->districts, static function (RequestDistrict $district) {
+				return $district->getName();
+			}));
+
+			$formattedAddress .= empty($formattedAddress) ? "Москва: {$districtsText}" : "; Москва: {$districtsText}";
+		}
+
+		if (empty($formattedAddress)) {
+			$regions = $this->getRegions()->with(['info'])->all();
+
+			$formattedAddress = StringHelper::join(', ', ...ArrayHelper::map($regions, static function (RequestRegion $region) {
+				return StringHelper::ucFirst($region->info->title);
+			}));
+		}
+
+		return sprintf("%s, в локации: %s", $formattedArea, $formattedAddress);
+	}
 }

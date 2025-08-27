@@ -1,6 +1,9 @@
 <?php
 
-use yii\di\Container;
+use app\components\Formatter;
+use yii\helpers\Html;
+use yii\twig\ViewRenderer;
+use yii\web\View;
 
 $common_params = require __DIR__ . "/params.php";
 $common_db     = require __DIR__ . "/db.php";
@@ -29,7 +32,7 @@ return [
 		'driver'       => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
 	],
 	'formatter'   => [
-		'class'                  => \yii\i18n\Formatter::className(),
+		'class'                  => Formatter::class,
 		'dateFormat'             => 'long',
 		'currencyCode'           => 'RUB',
 		'decimalSeparator'       => '.',
@@ -56,4 +59,20 @@ return [
 	],
 	'db'          => fn() => Yii::$container->get('db'),
 	'db_old'      => fn() => Yii::$container->get('old_db'),
+	'view'        => [
+		'class'     => View::class,
+		'renderers' => [
+			'twig' => [
+				'class'     => ViewRenderer::class,
+				'cachePath' => '@runtime/Twig/cache',
+				'options'   => [
+					'auto_reload' => true,
+				],
+				'globals'   => [
+					'html' => ['class' => Html::class],
+				],
+				'uses'      => ['yii\bootstrap'],
+			]
+		],
+	]
 ];

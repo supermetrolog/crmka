@@ -31,7 +31,8 @@
     "ext-zip": "*",
     "ext-json": "*",
     "notamedia/yii2-sentry": "^1.7",
-    "giggsey/libphonenumber-for-php": "^8.13"
+    "giggsey/libphonenumber-for-php": "^8.13",
+    "yiisoft/yii2-twig": "^2.5"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",

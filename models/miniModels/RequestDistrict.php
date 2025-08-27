@@ -19,6 +19,20 @@ class RequestDistrict extends AR
 {
 	public const MAIN_COLUMN = 'district';
 
+	private const DISTRICTS = [
+		0  => 'ЦАО',
+		1  => 'ЗАО',
+		2  => 'СЗАО',
+		3  => 'ЮЗАО',
+		4  => 'ЮАО',
+		5  => 'САО',
+		6  => 'СВАО',
+		7  => 'ЮВАО',
+		8  => 'ВАО',
+		9  => 'Нов. Москва',
+		10 => 'Зеленоград',
+	];
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -59,5 +73,10 @@ class RequestDistrict extends AR
 	public function getRequest(): ActiveQuery
 	{
 		return $this->hasOne(Request::class, ['id' => 'request_id']);
+	}
+
+	public function getName(): string
+	{
+		return self::DISTRICTS[$this->district];
 	}
 }
