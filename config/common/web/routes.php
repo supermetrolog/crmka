@@ -403,4 +403,8 @@ return static function (RouterInterface $router) {
 			$route->delete()->action('delete');
 		});
 	});
+
+	$router->controller('letter-tracking')->disablePluralize()->group(static function (RouteInterface $route) {
+		$route->get('open/<letter_contact_id>', 'open');
+	});
 };

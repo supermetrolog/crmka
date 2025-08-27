@@ -27,6 +27,7 @@ class LetterContactResource extends JsonResource
 
 			'letter'  => LetterResource::makeArray($this->resource->letter),
 			'answers' => LetterAnswerResource::collection($this->resource->answers),
+			'events'  => LetterContactEventResource::collection($this->resource->events),
 		];
 	}
 }
