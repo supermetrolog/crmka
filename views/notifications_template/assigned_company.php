@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Company;
+use app\models\Company\Company;
 
 /** @var Company $model */
 ?>

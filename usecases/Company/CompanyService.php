@@ -8,18 +8,24 @@ use app\components\EventManager;
 use app\components\Media\SaveMediaErrorException;
 use app\dto\ChatMember\CreateChatMemberMessageDto;
 use app\dto\Company\ChangeCompanyConsultantDto;
+use app\dto\Company\ChangeCompanyStatusDto;
 use app\dto\Company\CompanyActivityGroupDto;
 use app\dto\Company\CompanyActivityProfileDto;
 use app\dto\Company\CompanyDto;
 use app\dto\Company\CompanyMediaDto;
 use app\dto\Company\CompanyMiniModelsDto;
+use app\dto\Company\CompanyStatusHistoryDto;
 use app\dto\Company\CreateCompanyFileDto;
+use app\dto\Company\DeleteCompanyDto;
 use app\dto\Company\DisableCompanyDto;
 use app\dto\Company\LinkMessageCompanyDto;
 use app\dto\EntityMessageLink\EntityMessageLinkDto;
 use app\dto\Media\CreateMediaDto;
+use app\enum\Company\CompanyStatusEnum;
+use app\enum\Company\CompanyStatusSourceEnum;
 use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\events\Company\ChangeConsultantCompanyEvent;
+use app\events\Company\DeleteCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
 use app\events\Company\EnableCompanyEvent;
 use app\events\NotificationEvent;
@@ -27,9 +33,9 @@ use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Category;
-use app\models\Company;
-use app\models\CompanyActivityGroup;
-use app\models\CompanyActivityProfile;
+use app\models\Company\Company;
+use app\models\Company\CompanyActivityGroup;
+use app\models\Company\CompanyActivityProfile;
 use app\models\EntityMessageLink;
 use app\models\Media;
 use app\models\miniModels\CompanyFile;
@@ -61,8 +67,9 @@ class CompanyService
 
 	private MediaService $mediaService;
 
-	private EntityMessageLinkService $entityMessageLinkService;
-	private ChatMemberMessageService $chatMemberMessageService;
+	private EntityMessageLinkService    $entityMessageLinkService;
+	private ChatMemberMessageService    $chatMemberMessageService;
+	private CompanyStatusHistoryService $statusHistoryService;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -73,7 +80,8 @@ class CompanyService
 		CompanyActivityGroupService $companyActivityGroupService,
 		CompanyActivityProfileService $companyActivityProfileService,
 		EntityMessageLinkService $entityMessageLinkService,
-		ChatMemberMessageService $chatMemberMessageService
+		ChatMemberMessageService $chatMemberMessageService,
+		CompanyStatusHistoryService $statusHistoryService
 	)
 	{
 		$this->transactionBeginner           = $transactionBeginner;
@@ -85,6 +93,7 @@ class CompanyService
 		$this->companyActivityProfileService = $companyActivityProfileService;
 		$this->entityMessageLinkService      = $entityMessageLinkService;
 		$this->chatMemberMessageService      = $chatMemberMessageService;
+		$this->statusHistoryService          = $statusHistoryService;
 	}
 
 	/**
@@ -342,10 +351,7 @@ class CompanyService
 	}
 
 	/**
-	 * @param Company $model
-	 *
-	 * @return void
-	 * @throws StaleObjectException
+	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
 	public function delete(Company $model): void
@@ -551,7 +557,7 @@ class CompanyService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function markAsPassive(Company $company, DisableCompanyDto $dto, ?User $initiator = null): void
+	public function markAsPassive(Company $company, DisableCompanyDto $dto): void
 	{
 		if ($company->isPassive()) {
 			return;
@@ -560,20 +566,29 @@ class CompanyService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$company->status = Company::STATUS_PASSIVE;
+			$this->changeStatus($company, new ChangeCompanyStatusDto([
+				'status' => CompanyStatusEnum::PASSIVE,
+				'source' => CompanyStatusSourceEnum::SYSTEM,
+				'reason' => Company::passiveWhyToReasonMap[$dto->passive_why]
+			]));
 
-			$company->passive_why         = $dto->passive_why;
-			$company->passive_why_comment = $dto->passive_why_comment;
+			$company->passive_why = $dto->passive_why;
 
 			$company->saveOrThrow();
 
-			$this->eventManager->trigger(new DisableCompanyEvent($company, $dto, $initiator));
+			$this->eventManager->trigger(new DisableCompanyEvent($company, $dto));
 
 			$tx->commit();
 		} catch (Throwable $th) {
 			$tx->rollback();
 			throw $th;
 		}
+	}
+
+	private function clearPassiveWhy(Company $company): void
+	{
+		$company->passive_why         = null;
+		$company->passive_why_comment = null;
 	}
 
 	/**
@@ -589,10 +604,13 @@ class CompanyService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$company->status = Company::STATUS_ACTIVE;
+			$this->changeStatus($company, new ChangeCompanyStatusDto([
+				'status'    => CompanyStatusEnum::ACTIVE,
+				'initiator' => $initiator,
+				'source'    => $initiator ? CompanyStatusSourceEnum::USER : CompanyStatusSourceEnum::SYSTEM
+			]));
 
-			$company->passive_why         = null;
-			$company->passive_why_comment = null;
+			$this->clearPassiveWhy($company);
 
 			$company->saveOrThrow();
 
@@ -603,6 +621,64 @@ class CompanyService
 			$tx->rollback();
 			throw $th;
 		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	public function markAsDeleted(Company $company, DeleteCompanyDto $dto): void
+	{
+		if ($company->isDeleted()) {
+			return;
+		}
+
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$this->changeStatus($company, new ChangeCompanyStatusDto([
+				'status'    => CompanyStatusEnum::DELETED,
+				'initiator' => $dto->initiator,
+				'source'    => $dto->initiator ? CompanyStatusSourceEnum::USER : CompanyStatusSourceEnum::SYSTEM,
+				'comment'   => $dto->comment,
+				'reason'    => Company::passiveWhyToReasonMap[$dto->passive_why]
+			]));
+
+			$company->passive_why         = $dto->passive_why;
+			$company->passive_why_comment = $dto->comment;
+
+			$company->saveOrThrow();
+
+			$this->eventManager->trigger(new DeleteCompanyEvent($company, $dto));
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollback();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 */
+	private function changeStatus(Company $company, ChangeCompanyStatusDto $dto): void
+	{
+		if ($company->status === $dto->status) {
+			return;
+		}
+
+		$company->status = $dto->status;
+		$company->saveOrThrow();
+
+		$this->statusHistoryService->create(new CompanyStatusHistoryDto([
+			'company'         => $company,
+			'status'          => $dto->status,
+			'reason'          => $dto->reason,
+			'comment'         => $dto->comment,
+			'changedBy'       => $dto->initiator,
+			'changedBySource' => $dto->source
+		]));
 	}
 
 	/**

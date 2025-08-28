@@ -2,7 +2,7 @@
 
 namespace app\models\views;
 
-use app\models\Company;
+use app\models\Company\Company;
 
 class CompanySearchView extends Company
 {

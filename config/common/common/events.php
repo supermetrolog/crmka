@@ -1,7 +1,10 @@
 <?php
 
 use app\events\Company\ChangeConsultantCompanyEvent;
+use app\events\Company\DeleteCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
+use app\events\Contact\ContactCreatedEvent;
+use app\events\Contact\ContactStatusChangedEvent;
 use app\events\Deal\CreateRequestDealEvent;
 use app\events\Request\RequestActivatedEvent;
 use app\events\Request\RequestDeactivatedEvent;
@@ -25,6 +28,8 @@ use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
 use app\listeners\Company\DeactivateCompanyContactsListener;
 use app\listeners\Company\DeactivateCompanyRequestsListener;
 use app\listeners\Company\DisableCompanySystemChatMemberMessageListener;
+use app\listeners\Contact\ContactCreatedListener;
+use app\listeners\Contact\ContactStatusChangedListener;
 use app\listeners\Deal\CompleteDealRequestListener;
 use app\listeners\Survey\CreateCancelledSurveySystemChatMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
@@ -113,6 +118,17 @@ return [
 		DeactivateCompanyRequestsListener::class,
 		DeactivateCompanyContactsListener::class,
 		DisableCompanySystemChatMemberMessageListener::class
+	],
+	DeleteCompanyEvent::class           => [
+		DeactivateCompanyRequestsListener::class,
+		DeactivateCompanyContactsListener::class,
+		DisableCompanySystemChatMemberMessageListener::class
+	],
+	ContactStatusChangedEvent::class    => [
+		ContactStatusChangedListener::class
+	],
+	ContactCreatedEvent::class          => [
+		ContactCreatedListener::class
 	],
 	CreateRequestDealEvent::class       => [
 		CompleteDealRequestListener::class

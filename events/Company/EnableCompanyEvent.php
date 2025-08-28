@@ -4,7 +4,7 @@ namespace app\events\Company;
 
 
 use app\events\AbstractEvent;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\User;
 
 class EnableCompanyEvent extends AbstractEvent

@@ -13,7 +13,7 @@ use app\dto\Phone\PhoneDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\Company;
+use app\models\Company\Company;
 use Throwable;
 use yii\db\StaleObjectException;
 

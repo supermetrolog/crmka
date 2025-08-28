@@ -7,7 +7,7 @@ use app\components\EffectStrategy\Service\CreateEffectTaskService;
 use app\enum\Effect\EffectKind;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\QuestionAnswer;
 use app\models\Survey;
 use app\models\SurveyQuestionAnswer;

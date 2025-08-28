@@ -7,11 +7,11 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
-use app\models\CompanySearch;
+use app\models\Company\CompanySearch;
 use app\models\forms\ChatMember\ChatMemberMessageForm;
 use app\models\forms\Company\CompanyChangeConsultantForm;
 use app\models\forms\Company\CompanyContactsForm;
-use app\models\forms\Company\CompanyDisableForm;
+use app\models\forms\Company\CompanyDeleteForm;
 use app\models\forms\Company\CompanyForm;
 use app\models\forms\Company\CompanyLinkMessageForm;
 use app\models\forms\Company\CompanyLogoForm;
@@ -19,8 +19,10 @@ use app\models\forms\Company\CompanyMediaForm;
 use app\models\forms\Company\CompanyMiniModelsForm;
 use app\models\forms\Phone\PhoneForm;
 use app\repositories\CompanyRepository;
+use app\repositories\CompanyStatusHistoryRepository;
 use app\repositories\ProductRangeRepository;
 use app\resources\Company\CompanyInListResource;
+use app\resources\Company\CompanyStatusHistoryResource;
 use app\resources\Company\CompanyViewResource;
 use app\resources\Company\CreatedCompanyResource;
 use app\resources\EntityMessageLink\EntityMessageLinkResource;
@@ -44,7 +46,8 @@ class CompanyController extends AppController
 
 	private CompanyRepository $companyRepository;
 
-	private CompanyService $companyService;
+	private CompanyService                 $companyService;
+	private CompanyStatusHistoryRepository $companyStatusHistoryRepository;
 
 	public function __construct(
 		$id,
@@ -53,6 +56,7 @@ class CompanyController extends AppController
 		CompanyWithGeneralContactService $companyWithGeneralContactService,
 		ProductRangeRepository $productRangeRepository,
 		CompanyRepository $companyRepository,
+		CompanyStatusHistoryRepository $companyStatusHistoryRepository,
 		array $config = []
 	)
 	{
@@ -60,6 +64,7 @@ class CompanyController extends AppController
 		$this->companyWithGeneralContactService = $companyWithGeneralContactService;
 		$this->productRangeRepository           = $productRangeRepository;
 		$this->companyRepository                = $companyRepository;
+		$this->companyStatusHistoryRepository   = $companyStatusHistoryRepository;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -79,17 +84,28 @@ class CompanyController extends AppController
 	}
 
 	/**
-	 * @param $id
-	 *
-	 * @return CompanyViewResource
 	 * @throws ErrorException
 	 * @throws ModelNotFoundException
 	 */
-	public function actionView($id): CompanyViewResource
+	public function actionView(int $id): CompanyViewResource
 	{
 		$model = $this->companyRepository->findOneOrThrowWithRelations($id);
 
 		return new CompanyViewResource($model);
+	}
+
+	/**
+	 * @return CompanyStatusHistoryResource[]
+	 * @throws ErrorException
+	 * @throws ModelNotFoundException
+	 */
+	public function actionViewStatusHistory(int $id): array
+	{
+		$company = $this->companyRepository->findOneOrThrow($id);
+
+		$history = $this->companyStatusHistoryRepository->findAllByCompanyId($company->id);
+
+		return CompanyStatusHistoryResource::collection($history);
 	}
 
 	/**
@@ -266,19 +282,22 @@ class CompanyController extends AppController
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function actionDisable(int $id): SuccessResponse
+	public function actionDelete(int $id): SuccessResponse
 	{
 		$company = $this->companyRepository->findOneOrThrow($id);
 
-		$form = new CompanyDisableForm();
+		$form = new CompanyDeleteForm();
 
 		$form->load($this->request->post());
-
 		$form->validateOrThrow();
 
-		$this->companyService->markAsPassive($company, $form->getDto(), $this->user->identity);
+		$dto = $form->getDto();
 
-		return $this->success('Компания переведена в пассив');
+		$dto->initiator = $this->user->identity;
+
+		$this->companyService->markAsDeleted($company, $dto);
+
+		return $this->success('Компания отправлена в корзину');
 	}
 
 	/**

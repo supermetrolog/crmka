@@ -4,7 +4,7 @@ namespace app\models\miniModels;
 
 use app\components\Media\Media;
 use app\kernel\common\models\AR\AR;
-use app\models\Company;
+use app\models\Company\Company;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;

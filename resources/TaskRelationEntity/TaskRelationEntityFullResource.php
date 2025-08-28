@@ -6,7 +6,7 @@ namespace app\resources\TaskRelationEntity;
 
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Contact;
 use app\models\Objects;
 use app\models\OfferMix;

@@ -6,7 +6,7 @@ use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
 use app\models\ChatMember;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Objects;
 use app\models\Relation;
 use app\models\views\ChatMemberSearchView;

@@ -6,7 +6,7 @@ namespace app\models\forms\Company;
 
 use app\dto\Company\CompanyDto;
 use app\kernel\common\models\Form\Form;
-use app\models\Companygroup;
+use app\models\Company\Companygroup;
 use app\models\Media;
 use app\models\User;
 

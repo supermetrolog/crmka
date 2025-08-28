@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\resources\Company\Group;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Companygroup;
+use app\models\Company\Companygroup;
 
 class CompanyGroupResource extends JsonResource
 {

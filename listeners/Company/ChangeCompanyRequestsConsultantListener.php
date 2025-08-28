@@ -7,7 +7,7 @@ use app\events\Company\ChangeConsultantCompanyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Request;
 use app\models\User;
 use app\usecases\Request\RequestService;

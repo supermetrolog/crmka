@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\dto\Deal;
 
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Complex;
 use app\models\Objects;
 use app\models\Request;

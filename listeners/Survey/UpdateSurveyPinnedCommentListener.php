@@ -9,7 +9,7 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ChatMemberMessage;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Survey;
 use app\repositories\ChatMemberMessageRepository;
 use app\usecases\ChatMember\ChatMemberMessageService;

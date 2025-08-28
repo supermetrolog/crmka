@@ -2,7 +2,7 @@
 
 namespace app\dto\Contact;
 
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\User;
 use yii\base\BaseObject;
 

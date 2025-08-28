@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\Company;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
 use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
@@ -18,8 +18,20 @@ use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Category;
+use app\models\ChatMemberMessage;
+use app\models\CommercialOffer;
+use app\models\Contact;
+use app\models\EntityMessageLink;
+use app\models\FolderEntity;
 use app\models\miniModels\Phone;
+use app\models\Objects;
+use app\models\Productrange;
+use app\models\Request;
 use app\models\search\expressions\CompanySearchExpressions;
+use app\models\Survey;
+use app\models\Task;
+use app\models\User;
 use app\models\views\CompanySearchView;
 use Exception;
 use yii\base\ErrorException;
@@ -57,6 +69,7 @@ class CompanySearch extends Form
 	public $product_ranges;
 	public $activity_group_ids   = [];
 	public $activity_profile_ids = [];
+	public $statuses             = [];
 
 	public $without_product_ranges  = false;
 	public $without_surveys         = false;
@@ -83,7 +96,7 @@ class CompanySearch extends Form
 			['requests_filter', 'string'],
 			['requests_filter', 'in', 'range' => ['none', 'active', 'not-active', 'passive']],
 			[['requests_area_min', 'requests_area_max', 'current_user_id'], 'integer'],
-			['exclude_consultant_ids', 'each', 'rule' => ['integer']],
+			[['exclude_consultant_ids', 'statuses'], 'each', 'rule' => ['integer']],
 		];
 	}
 
@@ -258,6 +271,8 @@ class CompanySearch extends Form
 			Company::field('is_individual')                      => $this->is_individual,
 			Productrange::field('product')                       => $this->product_ranges
 		]);
+
+		$query->andFilterWhere(['in', Company::field('status'), $this->statuses]);
 
 		$query->andFilterWhere(['like', Company::field('nameEng'), $this->nameEng])
 		      ->andFilterWhere(['like', Company::field('nameRu'), $this->nameRu])

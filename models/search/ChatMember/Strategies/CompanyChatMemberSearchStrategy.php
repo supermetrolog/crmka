@@ -9,7 +9,7 @@ use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\Category;
 use app\models\ChatMember;
-use app\models\Company;
+use app\models\Company\Company;
 use yii\base\ErrorException;
 use yii\db\Expression;
 

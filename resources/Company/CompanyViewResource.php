@@ -6,7 +6,7 @@ namespace app\resources\Company;
 
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Company;
+use app\models\Company\Company;
 use app\resources\Call\CallResource;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Company\ActivityGroup\CompanyActivityGroupResource;
@@ -48,6 +48,8 @@ class CompanyViewResource extends JsonResource
 				'last_call'         => CallResource::tryMakeArray($this->resource->lastCall),
 				'activity_groups'   => CompanyActivityGroupResource::collection($this->resource->companyActivityGroups),
 				'activity_profiles' => CompanyActivityProfileResource::collection($this->resource->companyActivityProfiles),
+
+				'status_history_count' => $this->resource->getStatusHistoryCount(),
 
 				'comments_count' => $this->resource->getComments()->count(),
 

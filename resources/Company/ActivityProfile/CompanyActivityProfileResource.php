@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\resources\Company\ActivityProfile;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\CompanyActivityProfile;
+use app\models\Company\CompanyActivityProfile;
 
 class CompanyActivityProfileResource extends JsonResource
 {
