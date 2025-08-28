@@ -6,7 +6,7 @@ namespace app\repositories;
 
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\repository\AbstractRepository;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Complex;
 
 class ComplexRepository extends AbstractRepository

@@ -6,7 +6,7 @@ use app\helpers\SQLHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\Call;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Contact;
 use app\models\miniModels\Email;
 use app\models\miniModels\Phone;

@@ -16,7 +16,7 @@ use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\Category;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Request;
 use app\models\User;
 use app\repositories\UserRepository;

@@ -10,7 +10,7 @@ use app\models\ActiveQuery\oldDb\OfferMixQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\Call;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Contact;
 use app\models\miniModels\TimelineStepObjectComment;
 use app\models\oldDb\User as OldDbUser;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\models\forms\Deal;
 
 use app\kernel\common\models\Form\Form;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Objects;
 use app\models\oldDb\Complex;
 use app\models\User;

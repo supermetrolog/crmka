@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\components\MessageTemplate\Forms;
 
 use app\components\MessageTemplate\Dto\ResumeCompanyCooperationMessageTemplateDto;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Contact;
 
 class ResumeCompanyCooperationMessageTemplateForm extends MessageTemplateForm

@@ -3,9 +3,7 @@
 namespace app\controllers\oldDb;
 
 use app\behaviors\BaseControllerBehaviors;
-use yii\rest\ActiveController;
-use Yii;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\oldDb\location\Region;
 use app\models\oldDb\ObjectsSearch;
 use yii\db\Expression;

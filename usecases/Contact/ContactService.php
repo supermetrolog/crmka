@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace app\usecases\Contact;
 
+use app\components\EventManager;
 use app\dto\Contact\CreateContactDto;
 use app\dto\Contact\DisableContactDto;
 use app\dto\Contact\TransferContactToCompanyDto;
 use app\dto\Contact\UpdateContactDto;
 use app\dto\Phone\PhoneDto;
+use app\events\Contact\ContactCreatedEvent;
+use app\events\Contact\ContactStatusChangedEvent;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -28,18 +31,21 @@ class ContactService
 	private PhoneService                 $phoneService;
 	private PhoneDtoMapper               $phoneDtoMapper;
 	private CreateContactDtoMapper       $createContactDtoMapper;
+	private EventManager                 $eventManager;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
 		PhoneService $phoneService,
 		PhoneDtoMapper $phoneDtoMapper,
-		CreateContactDtoMapper $createContactDtoMapper
+		CreateContactDtoMapper $createContactDtoMapper,
+		EventManager $eventManager
 	)
 	{
 		$this->transactionBeginner    = $transactionBeginner;
 		$this->phoneService           = $phoneService;
 		$this->phoneDtoMapper         = $phoneDtoMapper;
 		$this->createContactDtoMapper = $createContactDtoMapper;
+		$this->eventManager           = $eventManager;
 	}
 
 	/**
@@ -84,6 +90,8 @@ class ContactService
 			if ($dto->isMain) {
 				$this->setMainContact($model);
 			}
+
+			$this->eventManager->trigger(new ContactCreatedEvent($model));
 
 			$tx->commit();
 
@@ -227,12 +235,16 @@ class ContactService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
+			$oldStatus = $contact->status;
+
 			$contact->status = Contact::STATUS_PASSIVE;
 
 			$contact->passive_why         = $dto->passive_why;
 			$contact->passive_why_comment = $dto->passive_why_comment;
 
 			$contact->saveOrThrow();
+
+			$this->eventManager->trigger(new ContactStatusChangedEvent($contact, $oldStatus, $contact->status));
 
 			$tx->commit();
 		} catch (Throwable $th) {
@@ -254,12 +266,16 @@ class ContactService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
+			$oldStatus = $contact->status;
+
 			$contact->status = Contact::STATUS_ACTIVE;
 
 			$contact->passive_why         = null;
 			$contact->passive_why_comment = null;
 
 			$contact->saveOrThrow();
+
+			$this->eventManager->trigger(new ContactStatusChangedEvent($contact, $oldStatus, $contact->status));
 
 			$tx->commit();
 		} catch (Throwable $th) {

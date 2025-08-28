@@ -12,6 +12,7 @@ use app\models\ActiveQuery\CallQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\PhoneQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Company\Company;
 use app\models\letter\Letter;
 use app\models\letter\LetterContact;
 use app\models\miniModels\ContactComment;

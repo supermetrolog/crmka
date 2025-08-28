@@ -7,7 +7,7 @@ namespace app\models\forms\Equipment;
 use app\dto\Equipment\CreateEquipmentDto;
 use app\dto\Equipment\UpdateEquipmentDto;
 use app\kernel\common\models\Form\Form;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Contact;
 use app\models\Equipment;
 use app\models\User;

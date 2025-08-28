@@ -8,7 +8,7 @@ use app\helpers\SQLHelper;
 use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ChatMember;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\ObjectChatMember;
 use app\models\Objects;
 use yii\base\ErrorException;

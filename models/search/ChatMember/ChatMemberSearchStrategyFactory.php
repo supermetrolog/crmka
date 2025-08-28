@@ -2,7 +2,7 @@
 
 namespace app\models\search\ChatMember;
 
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\search\ChatMember\Strategies\CompanyChatMemberSearchStrategy;

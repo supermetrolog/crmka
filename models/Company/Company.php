@@ -1,12 +1,15 @@
 <?php
 
-namespace app\models;
+namespace app\models\Company;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
+use app\enum\Company\CompanyStatusEnum;
+use app\enum\Company\CompanyStatusReasonEnum;
 use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\enum\Request\RequestStatusEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\StringHelper;
+use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CallQuery;
@@ -24,7 +27,25 @@ use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Call;
+use app\models\Category;
+use app\models\ChatMember;
+use app\models\ChatMemberMessage;
+use app\models\Contact;
+use app\models\Deal;
+use app\models\EntityMessageLink;
+use app\models\FolderEntity;
+use app\models\Media;
 use app\models\miniModels\CompanyFile;
+use app\models\Objects;
+use app\models\OfferMix;
+use app\models\Productrange;
+use app\models\Relation;
+use app\models\Request;
+use app\models\Survey;
+use app\models\Task;
+use app\models\TaskRelationEntity;
+use app\models\User;
 use Yii;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
@@ -107,6 +128,7 @@ use yii\db\Expression;
  * @property-read EntityMessageLink        $latestComment
  * @property-read EntityMessageLink[]      $pinnedMessages
  * @property-read EntityMessageLink        $latestPinnedMessage
+ * @property-read CompanyStatusHistory[]   $statusHistory
  */
 class Company extends AR
 {
@@ -127,11 +149,12 @@ class Company extends AR
 	public const COMPANY_CREATED_EVENT = 'company_created_event';
 	public const COMPANY_UPDATED_EVENT = 'company_updated_event';
 
-	public const PASSIVE_WHY_SUSPENDED = 0;
-	public const PASSIVE_WHY_BLOCKED   = 1;
-	public const PASSIVE_WHY_OTHER     = 2;
-	public const PASSIVE_WHY_DESTROYED = 3;
-	public const PASSIVE_WHY_INCORRECT = 4;
+	public const PASSIVE_WHY_SUSPENDED   = 0;
+	public const PASSIVE_WHY_BLOCKED     = 1;
+	public const PASSIVE_WHY_OTHER       = 2;
+	public const PASSIVE_WHY_DESTROYED   = 3;
+	public const PASSIVE_WHY_INCORRECT   = 4;
+	public const PASSIVE_WHY_NO_CONTACTS = 5;
 
 	public static function getPassiveWhyOptions(): array
 	{
@@ -157,6 +180,15 @@ class Company extends AR
 		return self::passiveWhyMap[$code] ?? 'Причина не указана';
 	}
 
+	public const passiveWhyToReasonMap = [
+		self::PASSIVE_WHY_SUSPENDED   => CompanyStatusReasonEnum::SUSPENDED,
+		self::PASSIVE_WHY_BLOCKED     => CompanyStatusReasonEnum::BLOCKED,
+		self::PASSIVE_WHY_OTHER       => CompanyStatusReasonEnum::OTHER,
+		self::PASSIVE_WHY_DESTROYED   => CompanyStatusReasonEnum::DESTROYED,
+		self::PASSIVE_WHY_INCORRECT   => CompanyStatusReasonEnum::INCORRECT,
+		self::PASSIVE_WHY_NO_CONTACTS => CompanyStatusReasonEnum::NO_CONTACTS,
+	];
+
 	public const STATUS_PASSIVE = 0;
 	public const STATUS_ACTIVE  = 1;
 
@@ -173,77 +205,24 @@ class Company extends AR
 		];
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public static function tableName(): string
 	{
 		return 'company';
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	public function rules(): array
 	{
 		return [
-			[['noName', 'companyGroup_id', 'status', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
+			[['noName', 'companyGroup_id', 'consultant_id', 'broker_id', 'activityGroup', 'activityProfile', 'formOfOrganization', 'processed', 'passive_why', 'rating'], 'integer'],
 			[['consultant_id'], 'required'],
 			[['description'], 'string'],
 			[['is_individual', 'show_product_ranges'], 'boolean'],
+			['status', EnumValidator::class, 'enumClass' => CompanyStatusEnum::class],
 			[['created_at', 'updated_at'], 'safe'],
 			[['nameBrand', 'nameEng', 'nameRu', 'officeAdress', 'legalAddress', 'ogrn', 'inn', 'kpp', 'checkingAccount', 'correspondentAccount', 'inTheBank', 'bik', 'okved', 'okpo', 'signatoryName', 'signatoryMiddleName', 'signatoryLastName', 'basis', 'documentNumber', 'passive_why_comment', 'latitude', 'longitude', 'individual_full_name'], 'string', 'max' => 255],
 			[['broker_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['broker_id' => 'id']],
 			[['companyGroup_id'], 'exist', 'skipOnError' => true, 'targetClass' => Companygroup::class, 'targetAttribute' => ['companyGroup_id' => 'id']],
 			[['consultant_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
-		];
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels(): array
-	{
-		return [
-			'id'                   => 'ID',
-			'nameEng'              => 'Name Eng',
-			'nameRu'               => 'Name Ru',
-			'nameBrand'            => 'Name Brand',
-			'noName'               => 'No Name',
-			'formOfOrganization'   => 'Form Of Organization',
-			'companyGroup_id'      => 'Company Group ID',
-			'officeAdress'         => 'Office Adress',
-			'status'               => 'Status',
-			'consultant_id'        => 'Consultant ID',
-			'broker_id'            => 'Broker ID',
-			'legalAddress'         => 'Legal Address',
-			'ogrn'                 => 'Ogrn',
-			'inn'                  => 'Inn',
-			'kpp'                  => 'Kpp',
-			'checkingAccount'      => 'Checking Account',
-			'correspondentAccount' => 'Correspondent Account',
-			'inTheBank'            => 'In The Bank',
-			'bik'                  => 'Bik',
-			'okved'                => 'Okved',
-			'okpo'                 => 'Okpo',
-			'signatoryName'        => 'Signatory Name',
-			'signatoryMiddleName'  => 'Signatory Middle Name',
-			'signatoryLastName'    => 'Signatory Last Name',
-			'basis'                => 'Basis',
-			'documentNumber'       => 'Document Number',
-			'activityGroup'        => 'Activity Group',
-			'activityProfile'      => 'Activity Profile',
-			'processed'            => 'Processed',
-			'rating'               => 'Rating',
-			'description'          => 'Description',
-			'created_at'           => 'Created At',
-			'updated_at'           => 'Updated At',
-			'passive_why'          => 'PassiveWhy',
-			'passive_why_comment'  => 'PassiveWhyComment',
-			'latitude'             => 'Latitude',
-			'longitude'            => 'Longitude',
-			'is_individual'        => 'Individual Person',
-			'individual_full_name' => 'Individual Full Name',
 		];
 	}
 
@@ -708,13 +687,29 @@ class Company extends AR
 		return $this->chatMember->pinnedChatMemberMessage ?? null;
 	}
 
+	public function getStatusHistory(): AQ
+	{
+		/** @var AQ */
+		return $this->hasMany(CompanyStatusHistory::class, ['company_id' => 'id'])->orderBy(['id' => SORT_DESC]);
+	}
+
+	public function getStatusHistoryCount(): int
+	{
+		return $this->getStatusHistory()->count();
+	}
+
 	public function isPassive(): bool
 	{
-		return $this->status === self::STATUS_PASSIVE;
+		return $this->status === CompanyStatusEnum::PASSIVE;
 	}
 
 	public function isActive(): bool
 	{
-		return $this->status === self::STATUS_ACTIVE;
+		return $this->status === CompanyStatusEnum::ACTIVE;
+	}
+
+	public function isDeleted(): bool
+	{
+		return $this->status === CompanyStatusEnum::DELETED;
 	}
 }

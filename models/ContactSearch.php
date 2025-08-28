@@ -5,6 +5,7 @@ namespace app\models;
 use app\helpers\SQLHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
+use app\models\Company\Company;
 use app\models\miniModels\ContactComment;
 use app\models\miniModels\Email;
 use app\models\miniModels\Phone;

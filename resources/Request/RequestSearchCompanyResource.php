@@ -6,7 +6,7 @@ namespace app\resources\Request;
 
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Company;
+use app\models\Company\Company;
 use app\resources\Company\CompanyBaseResource;
 
 class RequestSearchCompanyResource extends JsonResource

@@ -7,7 +7,7 @@ namespace app\actions\ChatMember;
 use app\dto\ChatMember\CreateChatMemberDto;
 use app\kernel\common\actions\Action;
 use app\models\ChatMember;
-use app\models\Company;
+use app\models\Company\Company;
 use app\usecases\ChatMember\ChatMemberService;
 use yii\base\ErrorException;
 use yii\db\Exception;

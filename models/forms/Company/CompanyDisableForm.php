@@ -6,7 +6,7 @@ namespace app\models\forms\Company;
 
 use app\dto\Company\DisableCompanyDto;
 use app\kernel\common\models\Form\Form;
-use app\models\Company;
+use app\models\Company\Company;
 
 class CompanyDisableForm extends Form
 {

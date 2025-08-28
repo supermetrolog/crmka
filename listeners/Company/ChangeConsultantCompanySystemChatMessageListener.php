@@ -10,7 +10,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Notification\NotificationChannel;
 use app\models\User;
 use app\services\ChatMemberSystemMessage\ChangeConsultantCompanyChatMemberSystemMessage;

@@ -9,6 +9,7 @@ use app\models\ActiveQuery\DealQuery;
 use app\models\ActiveQuery\oldDb\OfferMixQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Company\Company;
 use app\models\oldDb\Complex;
 use app\models\oldDb\OfferMix;
 use Yii;

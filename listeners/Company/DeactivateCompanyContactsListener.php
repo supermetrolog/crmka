@@ -3,11 +3,12 @@
 namespace app\listeners\Company;
 
 use app\dto\Contact\DisableContactDto;
+use app\events\Company\DeleteCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Contact;
 use app\usecases\Contact\ContactService;
 use Throwable;
@@ -26,7 +27,7 @@ class DeactivateCompanyContactsListener implements EventListenerInterface
 	}
 
 	/**
-	 * @param DisableCompanyEvent $event
+	 * @param DisableCompanyEvent|DeleteCompanyEvent $event
 	 *
 	 * @throws Throwable
 	 * @throws SaveModelException

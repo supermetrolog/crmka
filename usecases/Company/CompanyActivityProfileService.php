@@ -4,7 +4,7 @@ namespace app\usecases\Company;
 
 use app\dto\Company\CompanyActivityProfileDto;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\CompanyActivityProfile;
+use app\models\Company\CompanyActivityProfile;
 use Throwable;
 use yii\db\StaleObjectException;
 

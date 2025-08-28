@@ -6,7 +6,7 @@ namespace app\resources\ChatMember;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\ChatMember;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\ObjectChatMember;
 use app\models\Request;
 use app\models\User;

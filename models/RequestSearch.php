@@ -7,6 +7,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Company\Company;
 use app\models\miniModels\RequestDirection;
 use app\models\miniModels\RequestDistrict;
 use app\models\miniModels\RequestGateType;
