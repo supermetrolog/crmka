@@ -7,7 +7,7 @@ namespace app\actions\Company;
 use app\kernel\common\actions\Action;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Category;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Objects;
 use app\models\Request;
 use yii\base\ErrorException;

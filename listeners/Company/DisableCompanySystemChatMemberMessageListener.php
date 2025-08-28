@@ -4,6 +4,7 @@ namespace app\listeners\Company;
 
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\dto\Notification\CreateNotificationDto;
+use app\events\Company\DeleteCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
 use app\helpers\StringHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -11,7 +12,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Notification\NotificationChannel;
 use app\models\User;
 use app\usecases\ChatMember\ChatMemberMessageService;
@@ -32,7 +33,7 @@ class DisableCompanySystemChatMemberMessageListener implements EventListenerInte
 	}
 
 	/**
-	 * @param DisableCompanyEvent $event
+	 * @param DisableCompanyEvent|DeleteCompanyEvent $event
 	 *
 	 * @throws Throwable
 	 * @throws SaveModelException
@@ -68,11 +69,7 @@ class DisableCompanySystemChatMemberMessageListener implements EventListenerInte
 	 */
 	private function createSystemMessage(ChatMember $chatMember, Company $company, ?User $initiator): ChatMemberMessage
 	{
-		$message = sprintf(
-			'Компания архивирована. Причина: %s. Комментарий: %s',
-			Company::resolvePassiveWhyOption($company->passive_why),
-			$company->passive_why_comment ?? 'Отсутствует'
-		);
+		$message = $company->isDeleted() ? 'Компания удалена' : 'Компания приостановлена';
 
 		if ($initiator) {
 			$message = StringHelper::join('. ', $message, sprintf('Ответственный: %s', $initiator->userProfile->getMediumName()));
@@ -110,8 +107,8 @@ class DisableCompanySystemChatMemberMessageListener implements EventListenerInte
 	{
 		$this->chatMemberMessageService->createNotification($chatMemberMessage, new CreateNotificationDto([
 			'channel'         => NotificationChannel::WEB,
-			'subject'         => 'Архивация прикрепленной компании',
-			'message'         => sprintf('Компания %s архивирована и больше не является активной', $company->getShortName()),
+			'subject'         => $company->isDeleted() ? 'Удаление прикрепленной компании' : 'Архивация прикрепленной компании',
+			'message'         => sprintf('Компания %s %s', $company->getShortName(), $company->isDeleted() ? 'удалена' : 'приостановлена'),
 			'notifiable'      => $company->consultant,
 			'created_by_id'   => $chatMemberMessage->fromChatMember->model_id,
 			'created_by_type' => $chatMemberMessage->fromChatMember::getMorphClass()

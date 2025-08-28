@@ -5,7 +5,7 @@ namespace app\models\letter;
 use app\kernel\common\models\AQ\AQ;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\UserQuery;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\LetterContactAnswer;
 use app\models\User;
 use yii\db\ActiveQuery;

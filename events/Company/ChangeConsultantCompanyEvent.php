@@ -5,7 +5,7 @@ namespace app\events\Company;
 
 use app\dto\Company\ChangeCompanyConsultantDto;
 use app\events\AbstractEvent;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\User;
 
 /**

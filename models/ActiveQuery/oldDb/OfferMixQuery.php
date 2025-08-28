@@ -8,7 +8,7 @@ use app\helpers\DbHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
 use app\models\ChatMember;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\oldDb\OfferMix;
 use app\models\Relation;
 use yii\base\ErrorException;

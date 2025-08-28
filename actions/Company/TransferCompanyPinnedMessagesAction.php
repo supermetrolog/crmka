@@ -10,7 +10,7 @@ use app\kernel\common\actions\Action;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ChatMemberMessage;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\EntityMessageLink;
 use app\usecases\EntityMessageLink\EntityMessageLinkService;
 use yii\base\ErrorException;

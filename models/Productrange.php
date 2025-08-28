@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;
+use app\models\Company\Company;
 use yii\db\ActiveQuery;
 
 /**

@@ -12,6 +12,7 @@ use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Company\Company;
 use InvalidArgumentException;
 use yii\db\ActiveQuery;
 

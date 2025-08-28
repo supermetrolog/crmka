@@ -13,7 +13,7 @@ use app\listeners\EventListenerInterface;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
 use app\models\ChatMember;
 use app\models\ChatMemberMessage;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Survey;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use app\usecases\EntityMessageLink\EntityMessageLinkService;

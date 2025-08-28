@@ -7,7 +7,7 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ObjectChatMemberQuery;
 use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ChatMember;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Deal;
 use app\models\ObjectChatMember;
 use app\models\OfferMix;

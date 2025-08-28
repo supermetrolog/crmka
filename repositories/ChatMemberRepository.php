@@ -15,7 +15,7 @@ use app\models\ChatMember;
 use app\models\ChatMemberLastEvent;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Notification\UserNotification;
 use app\models\Objects;
 use app\models\Relation;

@@ -7,6 +7,7 @@ use app\helpers\DateTimeHelper;
 use app\helpers\JsonFieldNormalizer;
 use app\kernel\common\models\AQ\AQ;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Company\Company;
 use app\models\crane\Crane;
 use app\models\location\Location;
 use Yii;

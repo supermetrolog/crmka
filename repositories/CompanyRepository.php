@@ -6,7 +6,7 @@ namespace app\repositories;
 
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\repository\AbstractRepository;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Objects;
 use app\models\views\CompanySearchView;
 use yii\base\ErrorException;

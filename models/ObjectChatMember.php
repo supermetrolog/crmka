@@ -6,6 +6,7 @@ use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ObjectChatMemberQuery;
+use app\models\Company\Company;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 

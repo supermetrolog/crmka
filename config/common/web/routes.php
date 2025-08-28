@@ -52,11 +52,12 @@ return static function (RouterInterface $router) {
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
+			$route->get('status-history', 'view-status-history');
 
 			$route->put()->action('update');
 
-			$route->post('disable');
 			$route->post('enable');
+			$route->post('delete');
 
 			$route->post('link-message');
 			$route->post('create-note');

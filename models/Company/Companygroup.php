@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\Company;
 
 use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;

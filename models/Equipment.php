@@ -9,6 +9,7 @@ use app\models\ActiveQuery\EquipmentQuery;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Company\Company;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 

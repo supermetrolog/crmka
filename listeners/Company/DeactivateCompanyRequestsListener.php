@@ -4,11 +4,12 @@ namespace app\listeners\Company;
 
 use app\dto\Request\PassiveRequestDto;
 use app\enum\Request\RequestPassiveWhyEnum;
+use app\events\Company\DeleteCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Request;
 use app\usecases\Request\RequestService;
 use Throwable;
@@ -27,7 +28,7 @@ class DeactivateCompanyRequestsListener implements EventListenerInterface
 	}
 
 	/**
-	 * @param DisableCompanyEvent $event
+	 * @param DisableCompanyEvent|DeleteCompanyEvent $event
 	 *
 	 * @throws Throwable
 	 * @throws SaveModelException

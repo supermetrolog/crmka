@@ -10,7 +10,7 @@ use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\FolderEntity;
 use app\models\oldDb\location\Region;
 use app\models\Search;

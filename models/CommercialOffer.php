@@ -5,6 +5,7 @@ namespace app\models;
 use app\helpers\JsonFieldNormalizer;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\CommercialOfferQuery;
+use app\models\Company\Company;
 use app\models\oldDb\Offers;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\resources\TaskRelationEntity;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Company;
+use app\models\Company\Company;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\Company\ActivityGroup\CompanyActivityGroupResource;
 use app\resources\Company\ActivityProfile\CompanyActivityProfileResource;

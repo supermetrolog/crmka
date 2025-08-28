@@ -13,7 +13,7 @@ use app\helpers\ArrayHelper;
 use app\helpers\DateTimeHelper;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\Form\Form;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Contact;
 use app\models\Request;
 use app\models\User;

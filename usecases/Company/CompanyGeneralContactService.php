@@ -9,7 +9,7 @@ use app\dto\Contact\CreateContactDto;
 use app\dto\Contact\UpdateContactDto;
 use app\dto\Phone\PhoneDto;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\Company;
+use app\models\Company\Company;
 use app\models\Contact;
 use app\usecases\Contact\ContactService;
 use Throwable;

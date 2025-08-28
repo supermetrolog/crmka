@@ -6,6 +6,7 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\FolderQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\Company\Company;
 
 /**
  * @property int         $id
