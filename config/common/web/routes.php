@@ -58,6 +58,7 @@ return static function (RouterInterface $router) {
 
 			$route->post('enable');
 			$route->post('delete');
+			$route->post('passive');
 
 			$route->post('link-message');
 			$route->post('create-note');
