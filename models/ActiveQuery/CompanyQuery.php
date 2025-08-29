@@ -83,4 +83,14 @@ class CompanyQuery extends AQ
 	{
 		return $this->andWhere(['>', Company::field('created_at'), $date]);
 	}
+
+	/**
+	 * @param int[]|int $passiveWhy
+	 *
+	 * @throws ErrorException
+	 */
+	public function byPassiveWhy($passiveWhy): self
+	{
+		return $this->andWhere([Company::field('passive_why') => $passiveWhy]);
+	}
 }

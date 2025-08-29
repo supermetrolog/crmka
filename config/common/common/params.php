@@ -101,7 +101,8 @@ return [
 	],
 	'media'              => [
 		'baseFolder' => '/uploads',
-		'diskPath'   => YII_PROJECT_ROOT . '/public_html' . '/uploads'
+		'diskPath'   => YII_PROJECT_ROOT . '/public_html' . '/uploads',
+		'baseUrl'    => $common_thisHost,
 	],
 	'router'             => [
 		'cacheFilePath'    => YII_PROJECT_ROOT . '/config/common/web/url_rules.php',
