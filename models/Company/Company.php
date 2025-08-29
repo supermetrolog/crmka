@@ -164,15 +164,17 @@ class Company extends AR
 			self::PASSIVE_WHY_OTHER,
 			self::PASSIVE_WHY_DESTROYED,
 			self::PASSIVE_WHY_INCORRECT,
+			self::PASSIVE_WHY_NO_CONTACTS,
 		];
 	}
 
 	public const passiveWhyMap = [
-		self::PASSIVE_WHY_SUSPENDED => 'Временно приостановлено',
-		self::PASSIVE_WHY_BLOCKED   => 'Заблокировано модератором',
-		self::PASSIVE_WHY_OTHER     => 'Иное',
-		self::PASSIVE_WHY_DESTROYED => 'Компания ликвидирована',
-		self::PASSIVE_WHY_INCORRECT => 'Идентификация невозможна',
+		self::PASSIVE_WHY_SUSPENDED   => 'Временно приостановлено',
+		self::PASSIVE_WHY_BLOCKED     => 'Заблокировано модератором',
+		self::PASSIVE_WHY_OTHER       => 'Иное',
+		self::PASSIVE_WHY_DESTROYED   => 'Компания ликвидирована',
+		self::PASSIVE_WHY_INCORRECT   => 'Идентификация невозможна',
+		self::PASSIVE_WHY_NO_CONTACTS => 'Нет контактов',
 	];
 
 	public static function resolvePassiveWhyOption(?int $code): string

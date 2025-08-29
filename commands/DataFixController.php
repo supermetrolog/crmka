@@ -8,6 +8,7 @@ use app\actions\Call\SetContactCallMainPhone;
 use app\actions\ChatMemberMessage\FixSurveyChatMemberMessagesAction;
 use app\actions\Company\FixCompanyCategoriesAction;
 use app\actions\Company\FixCompanyProductRangesAction;
+use app\actions\Company\FixOldCompanyStatusAction;
 use app\actions\Company\TransferCompanyActivityAction;
 use app\actions\Company\TransferCompanyPinnedMessagesAction;
 use app\actions\Contact\FixContactPositionsAction;
@@ -29,7 +30,8 @@ class DataFixController extends Controller
 			'task-scheduled-calls'        => FixTaskScheduledCallsActions::class,
 			'survey-chat-member-messages' => FixSurveyChatMemberMessagesAction::class,
 			'contact-call-main-phone'     => SetContactCallMainPhone::class,
-			'contact-positions'           => FixContactPositionsAction::class
+			'contact-positions'           => FixContactPositionsAction::class,
+			'company-status'              => FixOldCompanyStatusAction::class
 		];
 	}
 }

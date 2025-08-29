@@ -1,5 +1,8 @@
 <?php
 
+use app\components\Media\Media;
+use app\components\PathBuilder\PathBuilderFactory;
+use yii\di\Container;
 use yii\helpers\ArrayHelper;
 
 return ArrayHelper::merge(
@@ -23,6 +26,17 @@ return ArrayHelper::merge(
 					'create_junction' => '@yii/views/createTableMigration.php',
 				]
 			],
+		],
+		'container'           => [
+			'singletons' => [
+				Media::class => function (Container $container) {
+					return new Media(
+						$container->get(PathBuilderFactory::class),
+						Yii::$app->params['media']['baseUrl'],
+						Yii::$app->params['media']['diskPath']
+					);
+				}
+			]
 		],
 	]
 );
