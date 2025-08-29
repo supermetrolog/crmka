@@ -12,6 +12,7 @@ use app\models\forms\ChatMember\ChatMemberMessageForm;
 use app\models\forms\Company\CompanyChangeConsultantForm;
 use app\models\forms\Company\CompanyContactsForm;
 use app\models\forms\Company\CompanyDeleteForm;
+use app\models\forms\Company\CompanyDisableForm;
 use app\models\forms\Company\CompanyForm;
 use app\models\forms\Company\CompanyLinkMessageForm;
 use app\models\forms\Company\CompanyLogoForm;
@@ -312,6 +313,28 @@ class CompanyController extends AppController
 		$this->companyService->markAsActive($company, $this->user->identity);
 
 		return $this->success('Компания успешно восстановлена из архива');
+	}
+
+	/**
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 */
+	public function actionPassive(int $id): SuccessResponse
+	{
+		$company = $this->companyRepository->findOneOrThrow($id);
+
+		$form = new CompanyDisableForm();
+
+		$form->load($this->request->post());
+		$form->validateOrThrow();
+
+		$dto = $form->getDto();
+
+		$this->companyService->markAsPassive($company, $dto);
+
+		return $this->success('Компания временно приостановлена');
 	}
 
 	/**

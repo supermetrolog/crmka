@@ -557,7 +557,7 @@ class CompanyService
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	public function markAsPassive(Company $company, DisableCompanyDto $dto): void
+	public function markAsPassive(Company $company, DisableCompanyDto $dto, ?User $initiator = null): void
 	{
 		if ($company->isPassive()) {
 			return;
@@ -567,16 +567,18 @@ class CompanyService
 
 		try {
 			$this->changeStatus($company, new ChangeCompanyStatusDto([
-				'status' => CompanyStatusEnum::PASSIVE,
-				'source' => CompanyStatusSourceEnum::SYSTEM,
-				'reason' => Company::passiveWhyToReasonMap[$dto->passive_why]
+				'status'    => CompanyStatusEnum::PASSIVE,
+				'source'    => CompanyStatusSourceEnum::SYSTEM,
+				'reason'    => Company::passiveWhyToReasonMap[$dto->passive_why],
+				'initiator' => $initiator
 			]));
 
-			$company->passive_why = $dto->passive_why;
+			$company->passive_why         = $dto->passive_why;
+			$company->passive_why_comment = null;
 
 			$company->saveOrThrow();
 
-			$this->eventManager->trigger(new DisableCompanyEvent($company, $dto));
+			$this->eventManager->trigger(new DisableCompanyEvent($company, $dto, $initiator));
 
 			$tx->commit();
 		} catch (Throwable $th) {
