@@ -43,6 +43,7 @@ class CompanyOffersChangesEffectStrategy extends AbstractEffectStrategy
 	private const ANSWER_OBJECT_COMPLETED               = 4;
 	private const ANSWER_OBJECT_SOLD                    = 5;
 	private const ANSWER_OBJECT_DESTROYED               = 6;
+	private const ANSWER_OBJECT_HAS_NEW_OFFER           = 7;
 
 	private const ANSWER_OFFER_WITHOUT_CHANGES  = 1;
 	private const ANSWER_OFFER_MUST_BE_DISABLED = 2;
@@ -141,6 +142,7 @@ class CompanyOffersChangesEffectStrategy extends AbstractEffectStrategy
 					$this->createDisableObjectOffersTask($object, $survey);
 					break;
 				}
+				case self::ANSWER_OBJECT_HAS_NEW_OFFER:
 				case self::ANSWER_OBJECT_COMPLETED:
 				{
 					$this->handleObjectOffers($object, $payload, $survey);
