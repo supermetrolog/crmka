@@ -1,7 +1,7 @@
 <?php
 
 $secrets               = require YII_PROJECT_ROOT . "/config/secrets.php";
-$prod_common_this_host = "https://api.pennylane.pro/";
+$prod_common_this_host = "https://api.raysen.ru/";
 
 return [
 	'params'     => [

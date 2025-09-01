@@ -43,7 +43,7 @@ class PresentationController extends Controller
 	{
 		$pdfTmpDir = Yii::$app->params['pdf']['tmp_dir'];
 
-		$model = new OffersPdf($this->request->get(), 'https://api.pennylane.pro/');
+		$model = new OffersPdf($this->request->get(), 'https://api.raysen.ru/');
 
 		$options = new Options();
 		$options->set('isRemoteEnabled', true);
