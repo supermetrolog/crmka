@@ -16,19 +16,12 @@ jobs:
         with:
           php-version: "7.4"
 
-      - name: 📂 Sync files with PROD server (api.pennylane.pro)
+      - name: 📂 Sync files with PROD server (api.raysen.pro)
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: 62.113.107.218
           username: ${{ secrets.ftp_prod_server_username }}
           password: ${{ secrets.ftp_prod_server_password }}
-
-      # - name: 📂 Sync files with DEV server (api.supermetrolog.ru)
-      #   uses: SamKirkland/FTP-Deploy-Action@4.3.0
-      #   with:
-      #     server: 62.113.107.218
-      #     username: ${{ secrets.ftp_dev_server_username }}
-      #     password: ${{ secrets.ftp_dev_server_password }}
 
       - name: multiple command in PROD server
         uses: appleboy/ssh-action@master
