@@ -359,6 +359,7 @@ class OfferMix extends AR
 		'344' => 77,
 		'345' => 79,
 		'346' => 78,
+		'347' => 80,
 	];
 
 	public ?int $last_call_rel_id = null;
