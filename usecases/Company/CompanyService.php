@@ -25,10 +25,10 @@ use app\enum\Company\CompanyStatusEnum;
 use app\enum\Company\CompanyStatusSourceEnum;
 use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\events\Company\ChangeConsultantCompanyEvent;
+use app\events\Company\ConsultantCompanyAssignedEvent;
 use app\events\Company\DeleteCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
 use app\events\Company\EnableCompanyEvent;
-use app\events\NotificationEvent;
 use app\helpers\ArrayHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
@@ -39,7 +39,6 @@ use app\models\Company\CompanyActivityProfile;
 use app\models\EntityMessageLink;
 use app\models\Media;
 use app\models\miniModels\CompanyFile;
-use app\models\Notification;
 use app\models\Productrange;
 use app\models\User;
 use app\usecases\ChatMember\ChatMemberMessageService;
@@ -48,7 +47,6 @@ use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
 use ErrorException;
 use Throwable;
-use Yii;
 use yii\db\StaleObjectException;
 use yii\helpers\ArrayHelper as YiiArrayHelper;
 use yii\web\UploadedFile;
@@ -162,16 +160,7 @@ class CompanyService
 				$this->saveLogo($model, $mediaDto->logo);
 			}
 
-			// TODO: Переделать на EventManager
-			$model->trigger(
-				Company::COMPANY_CREATED_EVENT,
-				new NotificationEvent([
-					'consultant_id' => $model->consultant_id,
-					'type'          => Notification::TYPE_COMPANY_INFO,
-					'title'         => 'компания',
-					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
-				])
-			);
+			$this->eventManager->trigger(new ConsultantCompanyAssignedEvent($model, $model->consultant));
 
 			$tx->commit();
 
@@ -261,26 +250,18 @@ class CompanyService
 				$this->saveLogo($model, $mediaDto->logo);
 			}
 
-			// TODO: Переделать на EventManager
 			if ($oldConsultantId !== $model->consultant_id) {
 				$oldConsultant = User::find()->byId($oldConsultantId)->one();
 				$newConsultant = User::find()->byId($model->consultant_id)->one();
 
-				$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-					'consultant_id' => $oldConsultant->id,
-					'type'          => Notification::TYPE_COMPANY_INFO,
-					'title'         => 'компания',
-					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_company.php', ['model' => $model])
-				]));
-
-				$model->trigger(Company::COMPANY_CREATED_EVENT, new NotificationEvent([
-					'consultant_id' => $model->consultant_id,
-					'type'          => Notification::TYPE_COMPANY_INFO,
-					'title'         => 'компания',
-					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_company.php', ['model' => $model])
-				]));
-
-				$this->eventManager->trigger(new ChangeConsultantCompanyEvent($model, $oldConsultant, $newConsultant, new ChangeCompanyConsultantDto(['consultant' => $newConsultant])));
+				$this->eventManager->trigger(
+					new ChangeConsultantCompanyEvent(
+						$model,
+						$oldConsultant,
+						$newConsultant,
+						new ChangeCompanyConsultantDto(['consultant' => $newConsultant])
+					)
+				);
 			}
 
 			$tx->commit();

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace app\usecases\Notification;
 
 use app\dto\UserNotification\CreateUserNotificationDto;
+use app\helpers\DateTimeHelper;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Notification\UserNotification;
 
 class UserNotificationService
 {
-
 	/**
 	 * @throws SaveModelException
 	 */
@@ -22,6 +22,7 @@ class UserNotificationService
 		$model->user_id     = $dto->user_id;
 		$model->notified_at = $dto->notified_at ? $dto->notified_at->format('Y-m-d H:i:s') : null;
 		$model->viewed_at   = $dto->viewed_at ? $dto->viewed_at->format('Y-m-d H:i:s') : null;
+		$model->template_id = $dto->template->id ?? null;
 
 		$model->saveOrThrow();
 
@@ -33,7 +34,18 @@ class UserNotificationService
 	 */
 	public function viewed(UserNotification $notification): void
 	{
-		$notification->viewed_at = (new \DateTime())->format('Y-m-d H:i:s');
+		$notification->viewed_at = DateTimeHelper::nowf();
+
+		$notification->saveOrThrow();
+	}
+
+	/**
+	 * @throws SaveModelException
+	 */
+	public function acted(UserNotification $notification): void
+	{
+		$notification->acted_at = DateTimeHelper::nowf();
+
 		$notification->saveOrThrow();
 	}
 }

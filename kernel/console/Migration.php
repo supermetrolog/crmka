@@ -4,18 +4,31 @@ declare(strict_types=1);
 
 namespace app\kernel\console;
 
+use app\helpers\ArrayHelper;
+
 class Migration extends \yii\db\Migration
 {
 
 	public const CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
 	public const CASCADE           = 'CASCADE';
 
-	public function timestamps(): array
+	public function softCreate(string $columnName = 'created_at'): array
 	{
 		return [
-			'created_at' => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP),
-			'updated_at' => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP),
+			$columnName => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP),
 		];
+	}
+
+	public function softUpdate(string $columnName = 'updated_at'): array
+	{
+		return [
+			$columnName => $this->timestamp()->notNull()->defaultExpression(self::CURRENT_TIMESTAMP),
+		];
+	}
+
+	public function timestamps(): array
+	{
+		return ArrayHelper::merge($this->softCreate(), $this->softUpdate());
 	}
 
 	public function morphCol(string $defaultValue, string $name = 'morph'): array
@@ -148,9 +161,25 @@ class Migration extends \yii\db\Migration
 		);
 	}
 
+	/**
+	 * @deprecated
+	 */
+	public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
+	{
+		parent::addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update);
+	}
+
 	public function foreignKeyDrop(string $table, $columns): void
 	{
 		$this->dropForeignKey($this->getForeignKeyName($table, $columns), $table);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public function dropForeignKey($name, $table)
+	{
+		parent::dropForeignKey($name, $table);
 	}
 
 	public function addColumns(string $table, array ...$columns): void

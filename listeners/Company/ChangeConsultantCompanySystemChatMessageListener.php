@@ -2,33 +2,41 @@
 
 namespace app\listeners\Company;
 
+use app\components\Notification\Factories\CompanyNotificationFactory;
+use app\components\Notification\Factories\NotifierFactory;
+use app\components\Notification\Interfaces\NotifiableInterface;
+use app\components\Notification\Interfaces\NotificationInterface;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
-use app\dto\Notification\CreateNotificationDto;
+use app\enum\Notification\NotificationChannelSlugEnum;
 use app\events\Company\ChangeConsultantCompanyEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ChatMember;
-use app\models\ChatMemberMessage;
 use app\models\Company\Company;
-use app\models\Notification\NotificationChannel;
 use app\models\User;
 use app\services\ChatMemberSystemMessage\ChangeConsultantCompanyChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
+use ErrorException;
 use Throwable;
 use yii\base\Event;
-use yii\db\Exception;
+use yii\base\InvalidConfigException;
+use yii\di\NotInstantiableException;
 
 
 class ChangeConsultantCompanySystemChatMessageListener implements EventListenerInterface
 {
 	private ChatMemberMessageService     $chatMemberMessageService;
 	private TransactionBeginnerInterface $transactionBeginner;
+	private NotifierFactory              $notifierFactory;
+	private CompanyNotificationFactory   $companyNotificationFactory;
 
-	public function __construct(ChatMemberMessageService $chatMemberMessageService, TransactionBeginnerInterface $transactionBeginner)
+	public function __construct(ChatMemberMessageService $chatMemberMessageService, TransactionBeginnerInterface $transactionBeginner, NotifierFactory $notifierFactory, CompanyNotificationFactory $companyNotificationFactory)
 	{
-		$this->chatMemberMessageService = $chatMemberMessageService;
-		$this->transactionBeginner      = $transactionBeginner;
+		$this->chatMemberMessageService   = $chatMemberMessageService;
+		$this->transactionBeginner        = $transactionBeginner;
+		$this->notifierFactory            = $notifierFactory;
+		$this->companyNotificationFactory = $companyNotificationFactory;
 	}
 
 	/**
@@ -42,15 +50,15 @@ class ChangeConsultantCompanySystemChatMessageListener implements EventListenerI
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$company           = $event->getCompany();
-			$newConsultant     = $event->getNewConsultant();
-			$oldConsultant     = $event->getOldConsultant();
-			$companyChatMember = $company->chatMember;
+			$company       = $event->getCompany();
+			$oldConsultant = $event->getOldConsultant();
+			$newConsultant = $event->getNewConsultant();
 
-			if ($companyChatMember) {
-				$systemMessage = $this->createSystemMessage($companyChatMember, $oldConsultant, $newConsultant);
-				$this->createNotification($systemMessage, $company);
+			if ($company->chatMember) {
+				$this->createSystemMessage($company->chatMember, $oldConsultant, $newConsultant);
 			}
+
+			$this->createNotifications($company, $oldConsultant, $newConsultant);
 
 			$tx->commit();
 		} catch (Throwable $e) {
@@ -63,36 +71,54 @@ class ChangeConsultantCompanySystemChatMessageListener implements EventListenerI
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 */
-	private function createSystemMessage(ChatMember $chatMember, User $oldConsultant, User $newConsultant): ChatMemberMessage
+	private function createSystemMessage(ChatMember $chatMember, User $oldConsultant, User $newConsultant): void
 	{
 		$message = ChangeConsultantCompanyChatMemberSystemMessage::create()
 		                                                         ->setConsultant($newConsultant)
 		                                                         ->setOldConsultant($oldConsultant)
 		                                                         ->toMessage();
 
-		$dto = new CreateChatMemberSystemMessageDto([
-			'message' => $message,
-			'to'      => $chatMember
-		]);
-
-
-		return $this->chatMemberMessageService->createSystemMessage($dto);
+		$this->chatMemberMessageService->createSystemMessage(
+			new CreateChatMemberSystemMessageDto([
+				'message' => $message,
+				'to'      => $chatMember
+			])
+		);
 	}
 
 	/**
 	 * @throws SaveModelException
 	 * @throws Throwable
-	 * @throws Exception
 	 */
-	private function createNotification(ChatMemberMessage $chatMemberMessage, Company $company): void
+	private function createNotifications(Company $company, User $oldConsultant, User $newConsultant): void
 	{
-		$this->chatMemberMessageService->createNotification($chatMemberMessage, new CreateNotificationDto([
-			'channel'         => NotificationChannel::WEB,
-			'subject'         => 'Назначение консультантом компании',
-			'message'         => sprintf('Вы назначены консультантом для компании %s', $company->getFullName()),
-			'notifiable'      => $company->consultant,
-			'created_by_id'   => $chatMemberMessage->fromChatMember->model_id,
-			'created_by_type' => $chatMemberMessage->fromChatMember::getMorphClass()
-		]));
+		$tx = $this->transactionBeginner->begin();
+
+		try {
+			$this->sendNotification($this->companyNotificationFactory->assigned($company), $newConsultant);
+
+			$this->sendNotification($this->companyNotificationFactory->reassigned($company), $oldConsultant);
+
+			$tx->commit();
+		} catch (Throwable $th) {
+			$tx->rollBack();
+			throw $th;
+		}
+	}
+
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ErrorException
+	 * @throws InvalidConfigException
+	 * @throws NotInstantiableException
+	 */
+	private function sendNotification(NotificationInterface $notification, NotifiableInterface $notifiable): void
+	{
+		$this->notifierFactory->create()
+		                      ->setChannel(NotificationChannelSlugEnum::WEB)
+		                      ->setNotifiable($notifiable)
+		                      ->setNotification($notification)
+		                      ->send();
 	}
 }
