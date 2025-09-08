@@ -2,34 +2,41 @@
 
 namespace app\daemons\loops\notification;
 
-use app\daemons\Message;
-use app\daemons\loops\BaseLoop;
-use app\components\ConsoleLogger;
 use app\components\NotificationsQueueService;
+use app\daemons\loops\BaseLoop;
+use app\daemons\Message;
+use Exception;
 
 class NotifyLoop extends BaseLoop
 {
+	private NotificationsQueueService $notifyQueue;
 
-    private NotificationsQueueService $notifyQueue;
+	public function __construct(NotificationsQueueService $notifyQueue)
+	{
+		parent::__construct();
 
-    public function __construct(NotificationsQueueService $notifyQueue)
-    {
-        $this->notifyQueue = $notifyQueue;
-    }
-    public function processed()
-    {
-        ConsoleLogger::info('processed NOTIFY LOOP');
-        $webMessage = new Message();
-        $webMessage->setAction(Message::ACTION_NEW_NOTIFICATION);
-        while ($message = $this->notifyQueue->get()) {
-            $notif = $message->getBody();
-            ConsoleLogger::info("new notification for consultant with ID: " . $notif->consultant_id);
+		$this->notifyQueue = $notifyQueue;
+	}
 
-            $webMessage->setBody(1);
-            if ($this->clients->isExistByUserID($notif->consultant_id)) {
-                $this->clients->sendClientPool($notif->consultant_id, $webMessage);
-            }
-            $message->getNativeMessage()->ack();
-        }
-    }
+	/**
+	 * @throws Exception
+	 */
+	public function processed(): void
+	{
+		while ($message = $this->notifyQueue->get()) {
+			$body = $message->getBody();
+
+			$webMessage = new Message();
+			$webMessage->setAction($body->action ?? Message::ACTION_NEW_NOTIFICATION);
+
+			$webMessage->setBody($body->payload ?? '');
+			$webMessage->setTime($body->ts ?? time());
+
+			if ($this->clients->hasUser($body->consultant_id)) {
+				$this->clients->sendToUser($body->consultant_id, $webMessage);
+			}
+
+			$message->getNativeMessage()->ack();
+		}
+	}
 }

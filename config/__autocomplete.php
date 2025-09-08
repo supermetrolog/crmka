@@ -1,6 +1,7 @@
 <?php
 
 use app\components\Formatter;
+use app\components\NotificationsQueueService;
 use yii\BaseYii;
 use yii\db\Connection;
 use yii\web\Application;
@@ -33,6 +34,7 @@ class Yii extends BaseYii
  * @property Connection                   $db
  * @property Connection                   $db_old
  * @property Formatter                    $formatter
+ * @property NotificationsQueueService    $notifyQueue
  *
  */
 class __Application extends Application

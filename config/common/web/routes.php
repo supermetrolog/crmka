@@ -413,4 +413,17 @@ return static function (RouterInterface $router) {
 	$router->controller('letter-tracking')->disablePluralize()->group(static function (RouteInterface $route) {
 		$route->get('open/<letter_contact_id>', 'open');
 	});
+
+	$router->controller('user-notification')->group(static function (RouteInterface $route) {
+		$route->get()->action('index');
+		$route->get()->action('count');
+
+		$route->prefix('<id>', static function (RouteInterface $route) {
+			$route->get()->action('view');
+
+			$route->post('viewed');
+			$route->post('acted');
+			$route->post('actions/<actionId>/process', 'process-action');
+		});
+	});
 };

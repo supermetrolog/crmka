@@ -10,24 +10,26 @@ use stdClass;
 
 class NotifyQueueMessageDecorator
 {
-    private AMQPMessage $message;
+	private AMQPMessage $message;
 
-    public function __construct(AMQPMessage $message)
-    {
-        $this->message = $message;
-    }
+	public function __construct(AMQPMessage $message)
+	{
+		$this->message = $message;
+	}
 
-    public function getBody(): stdClass
-    {
-        $json = json_decode($this->message->getBody());
-        if ($json === false || $json === null) {
-            throw new Exception("json decode error");
-        }
-        return $json;
-    }
+	public function getBody(): stdClass
+	{
+		$json = json_decode($this->message->getBody());
 
-    public function getNativeMessage(): AMQPMessage
-    {
-        return $this->message;
-    }
+		if ($json === false || $json === null) {
+			throw new Exception("json decode error");
+		}
+
+		return $json;
+	}
+
+	public function getNativeMessage(): AMQPMessage
+	{
+		return $this->message;
+	}
 }

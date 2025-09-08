@@ -226,7 +226,7 @@ class UserController extends AppController
 
 			return AuthLoginResource::make($authDto)->toArray();
 		} catch (ModelNotFoundException|InvalidPasswordException $e) {
-			throw new NotFoundHttpException('Неправильный логин или пароль.');
+			throw new InvalidPasswordException('Неправильный логин или пароль.');
 		} catch (UserHasInactiveStatusException $e) {
 			throw new NotFoundHttpException('Пользователь занесен в архив.');
 		} catch (RestrictedUserIpAccessException $e) {

@@ -3,104 +3,141 @@
 namespace app\daemons;
 
 use app\components\ConsoleLogger;
+use app\helpers\ArrayHelper;
+use Exception;
 use Ratchet\ConnectionInterface;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
 
 class Clients extends Model
 {
-    private $clients_pool = [];
+	private array $pools = [];
 
-    public function setClient(ConnectionInterface $client)
-    {
-        $this->clients_pool[$client->name->user_id][] = $client;
-        ConsoleLogger::info("setted user with ID: " . $client->name->user_id);
-    }
+	/**
+	 * @throws Exception
+	 */
+	public function add(ConnectionInterface $connection): void
+	{
+		[$userId, $windowId] = $this->extractIdentity($connection);
 
-    public function removeClient(ConnectionInterface $client)
-    {
-        if (!$this->clientExist($client)) {
-            ConsoleLogger::info('do not removed client because him not exist!');
-            return false;
-        }
-        $pool = $this->clients_pool[$client->name->user_id];
-        foreach ($pool as $key => $_client) {
-            if ($_client->name->window_id == $client->name->window_id) {
-                unset($pool[$key]);
-            }
-        }
+		if ($userId === null || $windowId === null) {
+			ConsoleLogger::info('skip add: missing identity on connection');
 
-        $this->clients_pool[$client->name->user_id] = $pool;
-        if (!count($this->clients_pool[$client->name->user_id])) {
-            unset($this->clients_pool[$client->name->user_id]);
-        }
-        ConsoleLogger::info('removed user');
-        return true;
-    }
+			return;
+		}
 
-    public function sendClient(ConnectionInterface $client, Message $msg)
-    {
-        return $client->send($msg->getData());
-    }
-    public function sendClientPool(int $user_id, Message $msg, ConnectionInterface $notAsweredclient = null)
-    {
-        if (!ArrayHelper::keyExists($user_id, $this->clients_pool)) {
-            ConsoleLogger::info('not exist pool');
-            return false;
-        }
-        ConsoleLogger::info('send client pool');
-        $pool = $this->clients_pool[$user_id];
-        foreach ($pool as $_client) {
-            if ($notAsweredclient) {
-                if ($_client->name->window_id == $notAsweredclient->name->window_id) {
-                    continue;
-                }
-                $this->sendClient($_client, $msg);
-            } else {
-                $this->sendClient($_client, $msg);
-            }
-        }
-        return true;
-    }
+		$this->pools[$userId]            ??= [];
+		$this->pools[$userId][$windowId] = $connection;
 
-    public function sendAllClients(Message $msg, ConnectionInterface $notAsweredclient = null)
-    {
-        ConsoleLogger::info('send all clients');
-        foreach ($this->clients_pool as $user_id => $pool) {
-            $this->sendClientPool($user_id, $msg);
-        }
-        ConsoleLogger::info('sended all clients');
-    }
-    public function clientExist(ConnectionInterface $client)
-    {
-        if (!$client->name) {
-            return false;
-        }
+		ConsoleLogger::info("ws add user={$userId}, window={$windowId}, total_for_user=" . ArrayHelper::length($this->pools[$userId]));
+	}
 
-        if (!ArrayHelper::keyExists($client->name->user_id, $this->clients_pool)) {
-            return false;
-        }
+	/**
+	 * @throws Exception
+	 */
+	public function remove(ConnectionInterface $connection): bool
+	{
+		[$userId, $windowId] = $this->extractIdentity($connection);
 
-        $pool = $this->clients_pool[$client->name->user_id];
-        foreach ($pool as $_client) {
-            if ($_client->name->window_id == $client->name->window_id) {
-                return true;
-            }
-        }
+		if ($userId === null || $windowId === null) {
+			ConsoleLogger::info('skip remove: missing identity on connection');
 
-        return false;
-    }
-    public function isExistByUserID(int $id): bool
-    {
-        return ArrayHelper::keyExists($id, $this->clients_pool);
-    }
-    public function getClientsIds()
-    {
-        $ids = [];
-        foreach ($this->clients_pool as $key => $value) {
-            $ids[] = $key;
-        }
+			return false;
+		}
 
-        return $ids;
-    }
+		if (!isset($this->pools[$userId][$windowId])) {
+			ConsoleLogger::info("skip remove: not found user={$userId}, window={$windowId}");
+
+			return false;
+		}
+
+		unset($this->pools[$userId][$windowId]);
+
+		if (ArrayHelper::empty($this->pools[$userId])) {
+			unset($this->pools[$userId]);
+		}
+
+		ConsoleLogger::info("ws remove user={$userId}, window={$windowId}");
+
+		return true;
+	}
+
+	public function send(ConnectionInterface $connection, Message $message): ConnectionInterface
+	{
+		return $connection->send($message->getData());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function sendToUser(int $userId, Message $msg, ?ConnectionInterface $excludeConnection = null): bool
+	{
+		if (!isset($this->pools[$userId])) {
+			ConsoleLogger::info("sendToUser: no sessions for user={$userId}");
+
+			return false;
+		}
+
+		$excludeWindow = $excludeConnection ? ($this->extractIdentity($excludeConnection)[1] ?? null) : null;
+
+		foreach ($this->pools[$userId] as $windowId => $conn) {
+			if ($excludeWindow !== null && $windowId === $excludeWindow) {
+				continue;
+			}
+
+			$this->send($conn, $msg);
+		}
+
+		return true;
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function broadcast(Message $msg, ?ConnectionInterface $excludeConnection = null): void
+	{
+		ConsoleLogger::info('broadcast to all users');
+
+		[$excludeUser, $excludeWindow] = $excludeConnection ? $this->extractIdentity($excludeConnection) : [null, null];
+
+		foreach ($this->pools as $userId => $connections) {
+			foreach ($connections as $windowId => $conn) {
+				if ($excludeUser !== null && $excludeWindow !== null
+				    && $userId === $excludeUser && $windowId === $excludeWindow) {
+					continue;
+				}
+
+				$this->send($conn, $msg);
+			}
+		}
+
+		ConsoleLogger::info('broadcast done');
+	}
+
+	public function hasUser(int $userId): bool
+	{
+		return isset($this->pools[$userId]) && ArrayHelper::notEmpty($this->pools[$userId]);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function hasConnection(ConnectionInterface $connection): bool
+	{
+		[$userId, $windowId] = $this->extractIdentity($connection);
+
+		return $userId !== null && $windowId !== null && isset($this->pools[$userId][$windowId]);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function extractIdentity(ConnectionInterface $conn): array
+	{
+		$payload = $conn->name ?? [];
+
+		return [
+			ArrayHelper::getValue($payload, 'user_id'),
+			ArrayHelper::getValue($payload, 'window_id')
+		];
+	}
 }
