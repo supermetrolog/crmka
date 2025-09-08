@@ -2,38 +2,58 @@
 
 namespace app\models\ActiveQuery;
 
+use app\helpers\DateTimeHelper;
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
+use app\models\Notification\UserNotification;
+use yii\base\ErrorException;
 
-/**
- * This is the ActiveQuery class for [[\app\models\Notification\UserNotification]].
- *
- * @see \app\models\Notification\UserNotification
- */
-class UserNotificationQuery extends \app\kernel\common\models\AQ\AQ
+class UserNotificationQuery extends AQ
 {
-
-    /**
-     * @return \app\models\Notification\UserNotification[]|\yii\db\ActiveRecord[]
-     */
-    public function all($db = null): array
-    {
-        return parent::all($db);
-    }
-
 	/**
-	 * @return \app\models\Notification\UserNotification|\yii\db\ActiveRecord|null
+	 * @return UserNotification[]
 	 */
-    public function one($db = null): ?\app\models\Notification\UserNotification
-    {
-        return parent::one($db);
-    }
+	public function all($db = null): array
+	{
+		return parent::all($db);
+	}
+
+	public function one($db = null): ?UserNotification
+	{
+		/** @var ?UserNotification */
+		return parent::one($db);
+	}
 
 	/**
-	 * @return \app\models\Notification\UserNotification|\yii\db\ActiveRecord
 	 * @throws ModelNotFoundException
 	 */
-	public function oneOrThrow($db = null): \app\models\Notification\UserNotification
+	public function oneOrThrow($db = null): UserNotification
 	{
+		/** @var ?UserNotification */
 		return parent::oneOrThrow($db);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function byUserId(int $userId): self
+	{
+		return $this->andWhere([UserNotification::field('user_id') => $userId]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function notExpired(): self
+	{
+		return $this->andWhere(['or', [UserNotification::field('expires_at') => null], ['>', UserNotification::field('expires_at'), DateTimeHelper::now()]]);
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function notActed(): self
+	{
+		return $this->andWhere([UserNotification::field('acted_at') => null]);
 	}
 }

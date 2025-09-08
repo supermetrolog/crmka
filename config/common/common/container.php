@@ -5,6 +5,8 @@ declare(strict_types=1);
 use app\components\EventManager;
 use app\components\MessageTemplate\Adapters\EmailTwigEnvironmentAdapter;
 use app\components\MessageTemplate\Interfaces\EmailTwigEnvironmentInterface;
+use app\components\Notification\Interfaces\WebsocketPublisherInterface;
+use app\components\Notification\RabbitMqWebsocketPublisher;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ActiveQuery\NotificationChannelQuery;
 use app\models\Notification\NotificationChannel;
@@ -33,6 +35,7 @@ return [
 				'debug' => YII_DEBUG,
 			]);
 		},
+		WebsocketPublisherInterface::class   => static fn() => new RabbitMqWebsocketPublisher(Yii::$app->notifyQueue)
 	],
 	'definitions' => [
 		NotificationChannelQuery::class => [

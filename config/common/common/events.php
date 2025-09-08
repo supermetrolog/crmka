@@ -1,6 +1,7 @@
 <?php
 
 use app\events\Company\ChangeConsultantCompanyEvent;
+use app\events\Company\ConsultantCompanyAssignedEvent;
 use app\events\Company\DeleteCompanyEvent;
 use app\events\Company\DisableCompanyEvent;
 use app\events\Contact\ContactCreatedEvent;
@@ -25,6 +26,7 @@ use app\events\Task\UpdateTaskEvent;
 use app\events\Timeline\UpdateTimelineStepEvent;
 use app\listeners\Company\ChangeCompanyRequestsConsultantListener;
 use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
+use app\listeners\Company\ConsultantCompanyAssignedListener;
 use app\listeners\Company\DeactivateCompanyContactsListener;
 use app\listeners\Company\DeactivateCompanyRequestsListener;
 use app\listeners\Company\DisableCompanySystemChatMemberMessageListener;
@@ -51,89 +53,92 @@ use app\listeners\Timeline\SyncTimelineOnRequestDeactivationListener;
 use app\listeners\Timeline\UpdateRequestRelationTimestampListener;
 
 return [
-	CompleteSurveyEvent::class          => [
+	CompleteSurveyEvent::class            => [
 		CreateSurveySystemChatMessageListener::class
 	],
-	CancelSurveyEvent::class            => [
+	CancelSurveyEvent::class              => [
 		CreateCancelledSurveySystemChatMessageListener::class
 	],
-	UpdateSurveyEvent::class            => [
+	UpdateSurveyEvent::class              => [
 		UpdateSurveySystemChatMessageListener::class,
 		UpdateSurveyPinnedCommentListener::class
 	],
-	ChangeConsultantCompanyEvent::class => [
+	ChangeConsultantCompanyEvent::class   => [
 		ChangeConsultantCompanySystemChatMessageListener::class,
 		ChangeCompanyRequestsConsultantListener::class
 	],
-	CreateTaskEvent::class              => [
+	CreateTaskEvent::class                => [
 		CreateHistoryTaskListener::class,
 		CreateTaskListener::class
 	],
-	AssignTaskEvent::class              => [
+	AssignTaskEvent::class                => [
 		CreateHistoryTaskListener::class,
 		AssignTaskListener::class
 	],
-	DeleteTaskEvent::class              => [
+	DeleteTaskEvent::class                => [
 		CreateHistoryTaskListener::class,
 		DeleteTaskListener::class
 	],
-	RestoreTaskEvent::class             => [
+	RestoreTaskEvent::class               => [
 		CreateHistoryTaskListener::class,
 		RestoreTaskListener::class
 	],
-	ChangeStatusTaskEvent::class        => [
+	ChangeStatusTaskEvent::class          => [
 		CreateHistoryTaskListener::class,
 		ChangeStatusTaskListener::class
 	],
-	UpdateTaskEvent::class              => [
+	UpdateTaskEvent::class                => [
 		CreateHistoryTaskListener::class,
 		UpdateTaskListener::class
 	],
-	ObserveTaskEvent::class             => [
+	ObserveTaskEvent::class               => [
 		CreateHistoryTaskListener::class,
 		ObserveTaskListener::class
 	],
-	CreateFileTaskEvent::class          => [
+	CreateFileTaskEvent::class            => [
 		CreateHistoryTaskListener::class,
 		CreateFileTaskListener::class
 	],
-	DeleteFileTaskEvent::class          => [
+	DeleteFileTaskEvent::class            => [
 		CreateHistoryTaskListener::class,
 		DeleteFileTaskListener::class
 	],
-	PostponeTaskEvent::class            => [
+	PostponeTaskEvent::class              => [
 		CreateHistoryTaskListener::class,
 		PostponeTaskListener::class
 	],
-	UpdateTimelineStepEvent::class      => [
+	UpdateTimelineStepEvent::class        => [
 		UpdateRequestRelationTimestampListener::class
 	],
-	RequestActivatedEvent::class        => [
+	RequestActivatedEvent::class          => [
 		SyncTimelineOnRequestActivationListener::class
 	],
-	RequestDeactivatedEvent::class      => [
+	RequestDeactivatedEvent::class        => [
 		SyncTimelineOnRequestDeactivationListener::class
 	],
-	DisableCompanyEvent::class          => [
+	DisableCompanyEvent::class            => [
 		DeactivateCompanyRequestsListener::class,
 		DeactivateCompanyContactsListener::class,
 		DisableCompanySystemChatMemberMessageListener::class
 	],
-	DeleteCompanyEvent::class           => [
+	DeleteCompanyEvent::class             => [
 		DeactivateCompanyRequestsListener::class,
 		DeactivateCompanyContactsListener::class,
 		DisableCompanySystemChatMemberMessageListener::class
 	],
-	ContactStatusChangedEvent::class    => [
+	ContactStatusChangedEvent::class      => [
 		ContactStatusChangedListener::class
 	],
-	ContactCreatedEvent::class          => [
+	ContactCreatedEvent::class            => [
 		ContactCreatedListener::class
 	],
-	CreateRequestDealEvent::class       => [
+	CreateRequestDealEvent::class         => [
 		CompleteDealRequestListener::class
 	],
-	ChangeSurveyCommentEvent::class     => [
+	ChangeSurveyCommentEvent::class       => [
 		UpdateSurveyPinnedCommentListener::class
+	],
+	ConsultantCompanyAssignedEvent::class => [
+		ConsultantCompanyAssignedListener::class
 	]
 ];
