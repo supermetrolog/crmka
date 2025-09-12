@@ -19,13 +19,15 @@ class UserNotificationTemplateViewResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'id'         => $this->resource->id,
-			'kind'       => $this->resource->kind,
-			'priority'   => $this->resource->priority,
-			'category'   => $this->resource->category,
-			'is_active'  => $this->resource->is_active,
-			'created_at' => $this->resource->created_at,
-			'updated_at' => $this->resource->updated_at
+			'id'             => $this->resource->id,
+			'kind'           => $this->resource->kind,
+			'priority'       => $this->resource->priority,
+			'priority_label' => $this->resource->getPriorityLabel(),
+			'category'       => $this->resource->category,
+			'category_label' => $this->resource->getCategoryLabel(),
+			'is_active'      => $this->resource->is_active,
+			'created_at'     => $this->resource->created_at,
+			'updated_at'     => $this->resource->updated_at
 		];
 	}
 }

@@ -25,7 +25,8 @@ class WebNotificationChannelDriver implements NotificationChannelDriverInterface
 			[
 				'subject'         => $notification->getSubject(),
 				'message'         => $notification->getMessage(),
-				'notification_id' => $notification->getId()
+				'notification_id' => $notification->getId(),
+				'priority'        => $notification->getPriority()
 			]
 		);
 	}

@@ -17,4 +17,6 @@ interface NotificationInterface
 	public function getRelations(): array;
 
 	public function getTemplate(): ?NotificationTemplateInterface;
+
+	public function getPriority(): ?string;
 }
