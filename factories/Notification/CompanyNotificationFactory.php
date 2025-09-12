@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\components\Notification\Factories;
+namespace app\factories\Notification;
 
 use app\components\Notification\Builders\NotificationActionBuilder;
 use app\components\Notification\Notification;

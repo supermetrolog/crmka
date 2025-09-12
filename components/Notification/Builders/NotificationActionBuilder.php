@@ -19,7 +19,7 @@ class NotificationActionBuilder
 	private ?string            $icon         = null;
 	private ?string            $style        = null;
 	private bool               $confirmation = false;
-	private int                $order        = 10;
+	private int                $order        = 0;
 	private ?DateTimeInterface $expiresAt    = null;
 	private ?array             $payload      = null;
 
