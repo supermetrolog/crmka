@@ -1,13 +1,13 @@
 <?php
 
-namespace app\listeners\Company;
+namespace app\listeners\Request;
 
 use app\components\Notification\Factories\NotifierFactory;
 use app\components\Notification\Interfaces\NotifiableInterface;
 use app\components\Notification\Interfaces\NotificationInterface;
 use app\enum\Notification\NotificationChannelSlugEnum;
-use app\events\Company\ConsultantCompanyAssignedEvent;
-use app\factories\Notification\CompanyNotificationFactory;
+use app\events\Request\RequestConsultantChangedEvent;
+use app\factories\Notification\RequestNotificationFactory;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use ErrorException;
@@ -17,36 +17,37 @@ use yii\base\InvalidConfigException;
 use yii\di\NotInstantiableException;
 
 
-class ConsultantCompanyAssignedListener implements EventListenerInterface
+class NotifyAssignedConsultantOnRequestConsultantChangedListener implements EventListenerInterface
 {
 	private NotifierFactory            $notifierFactory;
-	private CompanyNotificationFactory $companyNotificationFactory;
+	private RequestNotificationFactory $requestNotificationFactory;
 
-	public function __construct(NotifierFactory $notifierFactory, CompanyNotificationFactory $companyNotificationFactory)
+	public function __construct(NotifierFactory $notifierFactory, RequestNotificationFactory $requestNotificationFactory)
 	{
 		$this->notifierFactory            = $notifierFactory;
-		$this->companyNotificationFactory = $companyNotificationFactory;
+		$this->requestNotificationFactory = $requestNotificationFactory;
 	}
 
 	/**
-	 * @param ConsultantCompanyAssignedEvent $event
+	 * @param RequestConsultantChangedEvent $event
 	 *
 	 * @throws Throwable
 	 */
 	public function handle(Event $event): void
 	{
-		$company    = $event->getCompany();
-		$consultant = $event->getConsultant();
+		$request = $event->getRequest();
 
-		$this->sendNotification($this->companyNotificationFactory->assigned($company), $consultant);
+		$consultant = $event->getNewConsultant();
+
+		$this->sendNotification($this->requestNotificationFactory->assigned($request), $consultant);
 	}
 
 	/**
+	 * @throws InvalidConfigException
+	 * @throws NotInstantiableException
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 * @throws ErrorException
-	 * @throws InvalidConfigException
-	 * @throws NotInstantiableException
 	 */
 	private function sendNotification(NotificationInterface $notification, NotifiableInterface $notifiable): void
 	{

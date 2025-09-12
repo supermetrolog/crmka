@@ -8,6 +8,8 @@ use app\events\Contact\ContactCreatedEvent;
 use app\events\Contact\ContactStatusChangedEvent;
 use app\events\Deal\CreateRequestDealEvent;
 use app\events\Request\RequestActivatedEvent;
+use app\events\Request\RequestConsultantChangedEvent;
+use app\events\Request\RequestCreatedEvent;
 use app\events\Request\RequestDeactivatedEvent;
 use app\events\Survey\CancelSurveyEvent;
 use app\events\Survey\ChangeSurveyCommentEvent;
@@ -33,6 +35,9 @@ use app\listeners\Company\DisableCompanySystemChatMemberMessageListener;
 use app\listeners\Contact\ContactCreatedListener;
 use app\listeners\Contact\ContactStatusChangedListener;
 use app\listeners\Deal\CompleteDealRequestListener;
+use app\listeners\Request\NotifyAssignedConsultantOnRequestConsultantChangedListener;
+use app\listeners\Request\NotifyConsultantOnRequestCreatedListener;
+use app\listeners\Request\NotifyPreviousConsultantOnRequestConsultantChangedListener;
 use app\listeners\Survey\CreateCancelledSurveySystemChatMessageListener;
 use app\listeners\Survey\CreateSurveySystemChatMessageListener;
 use app\listeners\Survey\UpdateSurveyPinnedCommentListener;
@@ -140,5 +145,12 @@ return [
 	],
 	ConsultantCompanyAssignedEvent::class => [
 		ConsultantCompanyAssignedListener::class
+	],
+	RequestCreatedEvent::class            => [
+		NotifyConsultantOnRequestCreatedListener::class
+	],
+	RequestConsultantChangedEvent::class  => [
+		NotifyPreviousConsultantOnRequestConsultantChangedListener::class,
+		NotifyAssignedConsultantOnRequestConsultantChangedListener::class
 	]
 ];
