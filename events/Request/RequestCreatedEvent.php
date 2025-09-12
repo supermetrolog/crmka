@@ -5,7 +5,7 @@ namespace app\events\Request;
 use app\events\AbstractEvent;
 use app\models\Request;
 
-class CreateRequestEvent extends AbstractEvent
+class RequestCreatedEvent extends AbstractEvent
 {
 	public Request $request;
 

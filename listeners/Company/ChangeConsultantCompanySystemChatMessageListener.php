@@ -2,13 +2,13 @@
 
 namespace app\listeners\Company;
 
-use app\components\Notification\Factories\CompanyNotificationFactory;
 use app\components\Notification\Factories\NotifierFactory;
 use app\components\Notification\Interfaces\NotifiableInterface;
 use app\components\Notification\Interfaces\NotificationInterface;
 use app\dto\ChatMember\CreateChatMemberSystemMessageDto;
 use app\enum\Notification\NotificationChannelSlugEnum;
 use app\events\Company\ChangeConsultantCompanyEvent;
+use app\factories\Notification\CompanyNotificationFactory;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;

@@ -14,8 +14,9 @@ use app\dto\Request\UpdateRequestDto;
 use app\dto\Timeline\CreateTimelineDto;
 use app\enum\Request\RequestStatusEnum;
 use app\events\NotificationEvent;
-use app\events\Request\CreateRequestEvent;
 use app\events\Request\RequestActivatedEvent;
+use app\events\Request\RequestConsultantChangedEvent;
+use app\events\Request\RequestCreatedEvent;
 use app\events\Request\RequestDeactivatedEvent;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\ArrayHelper;
@@ -26,6 +27,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Notification;
 use app\models\Request;
 use app\models\Timeline;
+use app\models\User;
 use app\usecases\Request\Relations\RequestDirectionRelationService;
 use app\usecases\Request\Relations\RequestDistrictRelationService;
 use app\usecases\Request\Relations\RequestGateTypeRelationService;
@@ -135,7 +137,7 @@ class RequestService
 
 			$this->createMainTimeline($request);
 
-			$this->eventManager->trigger(new CreateRequestEvent($request));
+			$this->eventManager->trigger(new RequestCreatedEvent($request));
 
 			// TODO: Вынести в Listener + render service
 
@@ -214,7 +216,7 @@ class RequestService
 		$tx = $this->transactionBeginner->begin();
 
 		try {
-			$oldConsultantId = $request->consultant_id;
+			$oldConsultant = clone $request->consultant;
 
 			$request->load([
 				'status'                        => $dto->status,
@@ -263,23 +265,12 @@ class RequestService
 				'region_ids'              => $dto->region_ids
 			]));
 
-			if ($oldConsultantId !== $dto->consultant_id) {
+			if ($oldConsultant->id !== $dto->consultant_id) {
+				// TODO: Вынести в Listener
+
 				$this->actualizeMainTimeline($request);
-
-				// TODO: Вынести в Listener + render service
-
-				$request->trigger(Request::REQUEST_CREATED_EVENT, new NotificationEvent([
-					'consultant_id' => $request->consultant_id,
-					'type'          => Notification::TYPE_REQUEST_INFO,
-					'title'         => 'запрос',
-					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/assigned_request.php', ['model' => $request])
-				]));
-				$request->trigger(Request::REQUEST_CREATED_EVENT, new NotificationEvent([
-					'consultant_id' => $oldConsultantId,
-					'type'          => Notification::TYPE_REQUEST_INFO,
-					'title'         => 'запрос',
-					'body'          => Yii::$app->controller->renderFile('@app/views/notifications_template/unAssigned_request.php', ['model' => $request])
-				]));
+				
+				$this->eventManager->trigger(new RequestConsultantChangedEvent($request, $oldConsultant, User::findOne($dto->consultant_id)));
 			}
 
 			$tx->commit();
@@ -502,11 +493,14 @@ class RequestService
 				return $request;
 			}
 
+			$oldConsultant = clone $request->consultant;
+
 			$request->consultant_id = $dto->consultant->id;
 			$request->saveOrThrow();
 
-			// TODO: Возможно вынести в event manager
+			$this->eventManager->trigger(new RequestConsultantChangedEvent($request, $oldConsultant, $dto->consultant));
 
+			// TODO: Возможно вынести в event manager
 			$this->actualizeMainTimeline($request);
 
 			$tx->commit();
