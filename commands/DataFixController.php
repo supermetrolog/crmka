@@ -14,6 +14,7 @@ use app\actions\Company\TransferCompanyPinnedMessagesAction;
 use app\actions\Contact\FixContactPositionsAction;
 use app\actions\Task\FixTaskScheduledCallsActions;
 use app\actions\Task\TaskMessageToTitleAction;
+use app\actions\UserNotification\ActOldUserNotificationsAction;
 use yii\console\Controller;
 
 class DataFixController extends Controller
@@ -31,7 +32,8 @@ class DataFixController extends Controller
 			'survey-chat-member-messages' => FixSurveyChatMemberMessagesAction::class,
 			'contact-call-main-phone'     => SetContactCallMainPhone::class,
 			'contact-positions'           => FixContactPositionsAction::class,
-			'company-status'              => FixOldCompanyStatusAction::class
+			'company-status'              => FixOldCompanyStatusAction::class,
+			'old-user-notifications'      => ActOldUserNotificationsAction::class
 		];
 	}
 }
