@@ -416,7 +416,7 @@ return static function (RouterInterface $router) {
 
 	$router->controller('user-notification')->group(static function (RouteInterface $route) {
 		$route->get()->action('index');
-		$route->get()->action('count');
+		$route->get('count');
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
@@ -424,6 +424,27 @@ return static function (RouterInterface $router) {
 			$route->post('viewed');
 			$route->post('acted');
 			$route->post('actions/<actionId>/process', 'process-action');
+		});
+	});
+
+	$router->controller('user-notification-action-log')->group(static function (RouteInterface $route) {
+		$route->get()->action('index');
+	});
+
+	$router->controller('user-notification-template')->group(static function (RouteInterface $route) {
+		$route->get()->action('index');
+
+		$route->post()->action('create');
+
+		$route->prefix('<id>', static function (RouteInterface $route) {
+			$route->get()->action('view');
+
+			$route->post('disable');
+			$route->post('enable');
+
+			$route->put()->action('update');
+
+			$route->delete()->action('delete');
 		});
 	});
 };

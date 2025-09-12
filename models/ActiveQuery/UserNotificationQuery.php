@@ -46,7 +46,7 @@ class UserNotificationQuery extends AQ
 	 */
 	public function notExpired(): self
 	{
-		return $this->andWhere(['or', [UserNotification::field('expires_at') => null], ['>', UserNotification::field('expires_at'), DateTimeHelper::now()]]);
+		return $this->andWhere(['or', [UserNotification::field('expires_at') => null], ['>', UserNotification::field('expires_at'), DateTimeHelper::nowf()]]);
 	}
 
 	/**

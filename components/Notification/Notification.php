@@ -30,6 +30,8 @@ class Notification implements NotificationInterface
 	{
 		$this->subject = $subject;
 		$this->message = $message;
+		
+		$this->template = $template;
 
 		$this->actions   = $actions;
 		$this->relations = $relations;
@@ -58,5 +60,12 @@ class Notification implements NotificationInterface
 	public function getTemplate(): ?NotificationTemplateInterface
 	{
 		return $this->template;
+	}
+
+	public function getPriority(): ?string
+	{
+		$template = $this->getTemplate();
+
+		return $template ? $template->getPriority() : null;
 	}
 }

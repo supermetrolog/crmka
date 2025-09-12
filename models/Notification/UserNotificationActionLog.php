@@ -5,6 +5,7 @@ namespace app\models\Notification;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\UserNotificationQuery;
+use app\models\ActiveQuery\UserQuery;
 use app\models\User;
 
 /**
@@ -48,15 +49,15 @@ class UserNotificationActionLog extends AR
 		return $this->hasOne(UserNotification::class, ['id' => 'user_notification_id']);
 	}
 
-	public function getUser(): User
+	public function getUser(): UserQuery
 	{
-		/** @var User */
+		/** @var UserQuery */
 		return $this->hasOne(User::class, ['id' => 'user_id']);
 	}
 
-	public function getUserNotificationAction(): UserNotificationAction
+	public function getUserNotificationAction(): AQ
 	{
-		/** @var UserNotificationAction */
+		/** @var AQ */
 		return $this->hasOne(UserNotificationAction::class, ['id' => 'action_id']);
 	}
 }

@@ -18,10 +18,13 @@ class UserNotificationSearch extends Form
 	public $since;
 	public $acted;
 	public $expired;
+	public $processed;
 
 	public ?int $id_less_then = null;
 
 	public int $limit = 20;
+
+	public bool $paginated = false;
 
 	public function rules(): array
 	{
@@ -29,7 +32,7 @@ class UserNotificationSearch extends Form
 			[['id', 'user_id', 'limit', 'id_less_then'], 'integer'],
 			[['channel'], 'string'],
 			[['since'], 'safe'],
-			[['acted', 'expired'], 'boolean']
+			[['acted', 'expired', 'processed', 'paginated'], 'boolean']
 		];
 	}
 
@@ -42,15 +45,13 @@ class UserNotificationSearch extends Form
 		$query = UserNotification::find()
 		                         ->distinct()
 		                         ->innerJoinWith(['mailing'])
-		                         ->with(['mailing.createdByUser.userProfile'])
-		                         ->limit($this->limit);
+		                         ->with(['mailing.createdByUser.userProfile']);
 
 		$dataProvider = new ActiveDataProvider([
-			'query'      => $query,
-			'pagination' => false,
-			'sort'       => [
+			'query' => $query,
+			'sort'  => [
 				'defaultOrder' => [
-					'created_at' => SORT_ASC,
+					'created_at' => SORT_DESC,
 				],
 				'attributes'   => [
 					'created_at'
@@ -62,11 +63,16 @@ class UserNotificationSearch extends Form
 
 		$this->validateOrThrow();
 
+		if (!$this->paginated) {
+			$query->limit($this->limit)->andFilterWhere(['<', UserNotification::field('id'), $this->id_less_then]);
+			$dataProvider->setPagination(false);
+		}
+
 		$query->andFilterWhere([
 			UserNotification::field('id')      => $this->id,
 			UserNotification::field('user_id') => $this->user_id,
-		])
-		      ->andFilterWhere(['<', UserNotification::field('id'), $this->id_less_then]);
+		]);
+
 
 		$query->andFilterWhere(['>', UserNotification::field('created_at'), $this->since])
 		      ->andFilterWhere(['<', UserNotification::field('created_at'), $this->since]);
@@ -87,14 +93,26 @@ class UserNotificationSearch extends Form
 
 		if ($this->isFilterTrue($this->expired)) {
 			$query->andWhereNotNull(UserNotification::field('expired_at'))
-			      ->andWhere(['<', UserNotification::field('expired_at'), DateTimeHelper::now()]);
+			      ->andWhere(['<', UserNotification::field('expired_at'), DateTimeHelper::nowf()]);
 		}
 
 		if ($this->isFilterFalse($this->expired)) {
 			$query->andWhere([
 				'or',
 				[UserNotification::field('expires_at') => null],
-				['>', UserNotification::field('expires_at'), DateTimeHelper::now()]
+				['>', UserNotification::field('expires_at'), DateTimeHelper::nowf()]
+			]);
+		}
+
+		if ($this->isFilterTrue($this->processed)) {
+			$query->andWhere([
+				'or',
+				['is not', UserNotification::field('acted_at'), null],
+				[
+					'and',
+					['is not', UserNotification::field('expires_at'), null],
+					['<', UserNotification::field('expires_at'), DateTimeHelper::nowf()],
+				]
 			]);
 		}
 
