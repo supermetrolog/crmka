@@ -18,6 +18,7 @@ use app\usecases\Notification\UserNotificationActionService;
 use app\usecases\Notification\UserNotificationService;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
+use yii\web\ForbiddenHttpException;
 
 class UserNotificationController extends AppController
 {
@@ -57,7 +58,6 @@ class UserNotificationController extends AppController
 		return UserNotificationSearchResource::fromDataProvider($dataProvider);
 	}
 
-
 	/* @throws ModelNotFoundException */
 	public function actionView(int $id): UserNotificationViewResource
 	{
@@ -71,16 +71,21 @@ class UserNotificationController extends AppController
 	 */
 	public function actionCount(): int
 	{
-		return $this->repository->countByUserId($this->user->id);
+		return $this->repository->countByUserId((int)$this->user->id);
 	}
 
 	/**
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
+	 * @throws ForbiddenHttpException
 	 */
 	public function actionViewed(int $id): UserNotificationViewResource
 	{
 		$notification = $this->repository->findOneOrThrowWithRelations($id);
+
+		if ($this->user->id !== $notification->user_id) {
+			throw new ForbiddenHttpException('Нет доступа');
+		}
 
 		$this->service->viewed($notification);
 
@@ -90,10 +95,15 @@ class UserNotificationController extends AppController
 	/**
 	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
+	 * @throws ForbiddenHttpException
 	 */
 	public function actionActed(int $id): UserNotificationViewResource
 	{
 		$notification = $this->repository->findOneOrThrowWithRelations($id);
+
+		if ($this->user->id !== $notification->user_id) {
+			throw new ForbiddenHttpException('Нет доступа');
+		}
 
 		$this->service->acted($notification);
 

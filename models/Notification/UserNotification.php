@@ -120,4 +120,11 @@ class UserNotification extends AR implements StoredNotificationInterface
 	{
 		return $this->mailing->createdByUser;
 	}
+
+	public function getPriority(): ?string
+	{
+		$template = $this->getTemplate();
+
+		return $template ? $template->getPriority() : null;
+	}
 }

@@ -9,6 +9,7 @@ use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\UserNotificationQuery;
+use app\traits\EnumAttributeLabelTrait;
 
 /**
  * @property int                     $id
@@ -23,6 +24,11 @@ use app\models\ActiveQuery\UserNotificationQuery;
  */
 class UserNotificationTemplate extends AR implements NotificationTemplateInterface
 {
+	use EnumAttributeLabelTrait;
+
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
+
 	public static function tableName(): string
 	{
 		return 'user_notification_template';
@@ -33,6 +39,8 @@ class UserNotificationTemplate extends AR implements NotificationTemplateInterfa
 		return [
 			[['kind', 'priority', 'category', 'is_active'], 'required'],
 			[['kind'], 'string', 'max' => 32],
+			[['category'], 'string', 'max' => 32],
+			[['priority'], 'string', 'max' => 16],
 			[['category'], EnumValidator::class, 'enumClass' => UserNotificationTemplateCategoryEnum::class],
 			[['priority'], EnumValidator::class, 'enumClass' => UserNotificationTemplatePriorityEnum::class],
 			['is_active', 'boolean'],
@@ -55,9 +63,19 @@ class UserNotificationTemplate extends AR implements NotificationTemplateInterfa
 		return $this->category;
 	}
 
+	public function getCategoryLabel(): string
+	{
+		return $this->getEnumLabel('category', UserNotificationTemplateCategoryEnum::class);
+	}
+
 	public function getPriority(): string
 	{
 		return $this->priority;
+	}
+
+	public function getPriorityLabel(): string
+	{
+		return $this->getEnumLabel('priority', UserNotificationTemplatePriorityEnum::class);
 	}
 
 	public function isActive(): bool
