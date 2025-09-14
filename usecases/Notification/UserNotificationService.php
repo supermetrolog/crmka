@@ -34,6 +34,10 @@ class UserNotificationService
 	 */
 	public function viewed(UserNotification $notification): void
 	{
+		if (!is_null($notification->viewed_at)) {
+			return;
+		}
+
 		$notification->viewed_at = DateTimeHelper::nowf();
 
 		$notification->saveOrThrow();
@@ -44,6 +48,10 @@ class UserNotificationService
 	 */
 	public function acted(UserNotification $notification): void
 	{
+		if (!is_null($notification->acted_at)) {
+			return;
+		}
+
 		$notification->acted_at = DateTimeHelper::nowf();
 
 		$notification->saveOrThrow();

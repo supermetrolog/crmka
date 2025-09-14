@@ -17,7 +17,7 @@ class NotificationActionBuilder
 	private string             $code         = 'base';
 	private string             $label        = 'Действие';
 	private ?string            $icon         = null;
-	private ?string            $style        = null;
+	private ?string            $style        = UserNotificationActionStyleEnum::LIGHT;
 	private bool               $confirmation = false;
 	private int                $order        = 0;
 	private ?DateTimeInterface $expiresAt    = null;
@@ -39,7 +39,6 @@ class NotificationActionBuilder
 		$b->code('navigate');
 
 		$b->icon(UiIconEnum::LINK);
-		$b->style(UserNotificationActionStyleEnum::LIGHT);
 
 		return $b;
 	}
