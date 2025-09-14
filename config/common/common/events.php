@@ -24,6 +24,7 @@ use app\events\Task\DeleteTaskEvent;
 use app\events\Task\ObserveTaskEvent;
 use app\events\Task\PostponeTaskEvent;
 use app\events\Task\RestoreTaskEvent;
+use app\events\Task\TaskCommentCreatedEvent;
 use app\events\Task\UpdateTaskEvent;
 use app\events\Timeline\UpdateTimelineStepEvent;
 use app\listeners\Company\ChangeCompanyRequestsConsultantListener;
@@ -49,6 +50,7 @@ use app\listeners\Task\CreateHistoryTaskListener;
 use app\listeners\Task\CreateTaskListener;
 use app\listeners\Task\DeleteFileTaskListener;
 use app\listeners\Task\DeleteTaskListener;
+use app\listeners\Task\NotifyUsersOnTaskCommentCreatedListener;
 use app\listeners\Task\ObserveTaskListener;
 use app\listeners\Task\PostponeTaskListener;
 use app\listeners\Task\RestoreTaskListener;
@@ -152,5 +154,8 @@ return [
 	RequestConsultantChangedEvent::class  => [
 		NotifyPreviousConsultantOnRequestConsultantChangedListener::class,
 		NotifyAssignedConsultantOnRequestConsultantChangedListener::class
+	],
+	TaskCommentCreatedEvent::class        => [
+		NotifyUsersOnTaskCommentCreatedListener::class
 	]
 ];
