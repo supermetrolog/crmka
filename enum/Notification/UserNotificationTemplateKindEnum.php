@@ -8,4 +8,5 @@ class UserNotificationTemplateKindEnum extends AbstractEnum
 {
 	public const CHANGE_COMPANY_CONSULTANT = 'change-company-consultant';
 	public const CHANGE_REQUEST_CONSULTANT = 'change-request-consultant';
+	public const CREATE_TASK_COMMENT       = 'create-task-comment';
 }

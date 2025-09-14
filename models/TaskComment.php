@@ -12,16 +12,17 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "task".
  *
- * @property int     $id
- * @property string  $message
- * @property int     $created_by_id
- * @property int     $task_id
- * @property string  $created_at
- * @property ?string $updated_at
- * @property ?string $deleted_at
+ * @property int          $id
+ * @property string       $message
+ * @property int          $created_by_id
+ * @property int          $task_id
+ * @property string       $created_at
+ * @property ?string      $updated_at
+ * @property ?string      $deleted_at
  *
- * @property User    $createdBy
- * @property Media[] $files
+ * @property-read User    $createdBy
+ * @property-read Media[] $files
+ * @property-read Task    $task
  */
 class TaskComment extends AR
 {

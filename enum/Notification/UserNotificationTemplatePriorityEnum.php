@@ -16,8 +16,8 @@ class UserNotificationTemplatePriorityEnum extends AbstractEnum
 		return [
 			self::LOW    => 'Низкий',
 			self::NORMAL => 'Обычный',
-			self::HIGH   => 'Высокий',
-			self::URGENT => 'Срочный',
+			self::HIGH   => 'Важно',
+			self::URGENT => 'Срочно',
 		];
 	}
 }
