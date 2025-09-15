@@ -50,7 +50,30 @@ class TaskNotificationFactory
 			$task->id
 		);
 
-		$template = $this->templateRepository->findOneByKind(UserNotificationTemplateKindEnum::ASSIGN_TASK);
+		$template = $this->templateRepository->findOneByKind(UserNotificationTemplateKindEnum::TASK);
+
+		$actions = [
+			$this->makeOpenTaskAction($task)
+		];
+
+		$relations = [
+			NotificationRelation::from($task),
+		];
+
+		return new Notification($subject, $message, $template, $actions, $relations);
+	}
+
+	public function created(Task $task): Notification
+	{
+		$subject = 'Новая задача';
+
+		$message = sprintf(
+			'Вам назначена задача "%s" (%d)',
+			$task->title,
+			$task->id
+		);
+
+		$template = $this->templateRepository->findOneByKind(UserNotificationTemplateKindEnum::TASK);
 
 		$actions = [
 			$this->makeOpenTaskAction($task)
