@@ -51,6 +51,7 @@ use app\listeners\Task\CreateTaskListener;
 use app\listeners\Task\DeleteFileTaskListener;
 use app\listeners\Task\DeleteTaskListener;
 use app\listeners\Task\NotifyAssignedOnAssignTaskListener;
+use app\listeners\Task\NotifyAssignedOnCreateTaskListener;
 use app\listeners\Task\NotifyUsersOnTaskCommentCreatedListener;
 use app\listeners\Task\ObserveTaskListener;
 use app\listeners\Task\PostponeTaskListener;
@@ -77,7 +78,8 @@ return [
 	],
 	CreateTaskEvent::class                => [
 		CreateHistoryTaskListener::class,
-		CreateTaskListener::class
+		CreateTaskListener::class,
+		NotifyAssignedOnCreateTaskListener::class
 	],
 	AssignTaskEvent::class                => [
 		CreateHistoryTaskListener::class,
