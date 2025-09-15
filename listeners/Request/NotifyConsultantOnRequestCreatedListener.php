@@ -37,7 +37,7 @@ class NotifyConsultantOnRequestCreatedListener implements EventListenerInterface
 	{
 		$request = $event->getRequest();
 
-		$this->sendNotification($this->requestNotificationFactory->assigned($request), $request);
+		$this->sendNotification($this->requestNotificationFactory->assigned($request), $request->consultant);
 	}
 
 	/**
