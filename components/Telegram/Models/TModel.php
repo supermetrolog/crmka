@@ -39,6 +39,8 @@ class TModel extends BaseObject
 			}
 		}
 
-		parent::__construct($config);
+		$preparedConfig = ArrayHelper::filter($config, static fn($key) => $this->hasProperty($key));
+
+		parent::__construct($preparedConfig);
 	}
 }

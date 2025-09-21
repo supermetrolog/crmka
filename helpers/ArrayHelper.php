@@ -71,9 +71,9 @@ class ArrayHelper
 	}
 
 
-	public static function filter($array, callable $fn): array
+	public static function filter($array, callable $fn, int $mode = 0): array
 	{
-		return array_filter($array, $fn);
+		return array_filter($array, $fn, $mode);
 	}
 
 	/**
