@@ -32,7 +32,7 @@ return ArrayHelper::merge(
 			'telegram' => [
 				'class'         => TelegramController::class,
 				'webhookSecret' => $params['crm_telegram_bot']['webhook']['secret'],
-				'webhookUrl'    => $params['crm_telegram_bot']['webhook']['url'],
+				'webhookUrl'    => $params['crm_telegram_bot']['webhook']['url']
 			]
 		],
 		'container'           => [

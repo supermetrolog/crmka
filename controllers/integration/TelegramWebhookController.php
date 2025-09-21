@@ -15,7 +15,7 @@ use yii\web\Response;
 
 final class TelegramWebhookController extends AppController
 {
-	protected array               $exceptAuthActions = ['index'];
+	protected array               $exceptAuthActions = ['handle'];
 	public TelegramWebhookService $service;
 	public TelegramBotApiClient   $bot;
 	public string                 $secretHeader;
@@ -31,6 +31,8 @@ final class TelegramWebhookController extends AppController
 	{
 		$this->bot     = $bot;
 		$this->service = $service;
+
+		// TODO: В controllerMap не сетится.. Разобраться
 
 		$this->secretHeader  = Yii::$app->params['crm_telegram_bot']['webhook']['secretHeader'];
 		$this->webhookSecret = Yii::$app->params['crm_telegram_bot']['webhook']['secret'];

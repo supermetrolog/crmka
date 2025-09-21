@@ -14,6 +14,7 @@ use app\components\Whatsapp\WhatsappApiClient;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ActiveQuery\NotificationChannelQuery;
 use app\models\Notification\NotificationChannel;
+use app\services\Link\CrmLinkGenerator;
 use app\usecases\Auth\AuthService;
 use Twig\Loader\FilesystemLoader;
 
@@ -47,7 +48,7 @@ return [
 			'class'      => NotificationChannelQuery::class,
 			'modelClass' => NotificationChannel::class
 		],
-		AuthService::class              => [
+		AuthService::class                        => [
 			'class'            => AuthService::class,
 			'allowedOfficeIps' => $params['allowed_office_ips']
 		],
@@ -59,6 +60,14 @@ return [
 			'appBase' => $params['crm_telegram_bot']['deepLink']['appBase'],
 			'param'   => $params['crm_telegram_bot']['deepLink']['param'],
 			'prefer'  => $params['crm_telegram_bot']['deepLink']['prefer'],
-		]
+		],
+		WhatsappApiClient::class                  => static function () {
+			return new WhatsappApiClient(
+				Yii::$app->params['crm_whatsapp_bot']['apiUrl'],
+				Yii::$app->params['crm_whatsapp_bot']['token'],
+				Yii::$app->params['crm_whatsapp_bot']['profileId']
+			);
+		},
+		CrmLinkGenerator::class                   => static fn() => new CrmLinkGenerator(Yii::$app->params['frontend_host'])
 	]
 ];
