@@ -15,7 +15,7 @@ use yii\web\Response;
 
 final class TelegramWebhookController extends AppController
 {
-	protected array               $exceptAuthActions = ['index'];
+	protected array               $exceptAuthActions = ['handle'];
 	public TelegramWebhookService $service;
 	public TelegramBotApiClient   $bot;
 	public string                 $secretHeader;
