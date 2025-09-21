@@ -3,7 +3,7 @@ $secrets = require YII_PROJECT_ROOT . "/config/secrets.php";
 
 $prod_common_this_host = "https://api.supermetrolog.ru/";
 $staging_common_params = [
-	'synchronizer' => [
+	'synchronizer'     => [
 		'this_project'     => [
 			'source_repo_dir_path' => "/home/user/web/api.pennylane.pro/public_html",
 		],
@@ -14,16 +14,31 @@ $staging_common_params = [
 			'source_repo_dir_path' => "/home/user/web/clients.pennylane.pro/public_html",
 		]
 	],
-	'pythonPath'   => '/bin/python3',
-	'url'          => [
+	'pythonPath'       => '/bin/python3',
+	'url'              => [
 		'this_host'       => $prod_common_this_host,
 		'image_not_found' => "{$prod_common_this_host}images/no-image.jpg",
 		'empty_image'     => "{$prod_common_this_host}images/empty.jpg"
 	],
-	'rabbit'       => [
+	'rabbit'           => [
 		'queueName'    => "dev_timeline_presentation_sender",
 		'exchangeName' => "dev_timeline_presentation_sender_exchange"
-	]
+	],
+	'crm_telegram_bot' => [
+		'name'     => 'crm_raysen_bot',
+		'apiUrl'   => "https://api.telegram.org/bot{$secrets['crm_telegram_bot']['token']}",
+		'webhook'  => [
+			'secretHeader' => 'X-Telegram-Bot-Api-Secret-Token',
+			'secret'       => $secrets['crm_telegram_bot']['webhook']['secret'],
+			'url'          => "{$prod_common_this_host}integration/telegram/webhook",
+		],
+		'deepLink' => [
+			'webBase' => 'https://t.me',
+			'appBase' => 'tg://resolve',
+			'param'   => 'start',
+			'prefer'  => 'web',
+		]
+	],
 ];
 
 return [

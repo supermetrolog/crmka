@@ -452,6 +452,8 @@ return static function (RouterInterface $router) {
 		$route->post('start');
 		$route->post('status');
 		$route->post('revoke');
+
+		$route->post('webhook');
 	});
 
 	$router->controller('integration/telegram-admin')->alias('integration/telegram/admin')->group(static function (RouteInterface $route) {
