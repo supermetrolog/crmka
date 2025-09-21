@@ -16,7 +16,7 @@ final class CrmLinkGenerator
 	}
 
 	private const ROUTES = [
-		'profile.integrations' => '/profile/integrations',
+		'account.integrations' => '/account/integrations',
 	];
 
 	public function generate(string $route, array $params = []): string

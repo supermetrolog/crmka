@@ -102,7 +102,7 @@ final class TelegramWebhookService
 
 			$builder = TelegramMessageAnswerBuilder::create()
 			                                       ->setText(sprintf('✅ Ваш Telegram аккаунт связан с профилем **%s**', $link->user->userProfile->mediumName))
-			                                       ->addInlineKeyboardButton(TelegramInlineKeyboardBuilder::link('↗️ Перейти в CRM', $this->linkGenerator->generate('profile.integrations'))->toArray());
+			                                       ->addInlineKeyboardButton(TelegramInlineKeyboardBuilder::link('↗️ Перейти в CRM', $this->linkGenerator->generate('account.integrations'))->toArray());
 
 			$this->sendAnswer($message, $builder->toArray());
 		} catch (ModelNotFoundException $th) {
@@ -144,7 +144,7 @@ final class TelegramWebhookService
 		} else {
 			$builder = TelegramMessageAnswerBuilder::create()
 			                                       ->setText('❕ Для связывания аккаунта воспользуйтесь личным кабинетом.')
-			                                       ->addInlineKeyboardButton(TelegramInlineKeyboardBuilder::link('↗️ Перейти в CRM', $this->linkGenerator->generate('profile.integrations'))->toArray());
+			                                       ->addInlineKeyboardButton(TelegramInlineKeyboardBuilder::link('↗️ Перейти в CRM', $this->linkGenerator->generate('account.integrations'))->toArray());
 
 			$this->sendAnswer($message, $builder->toArray());
 		}
