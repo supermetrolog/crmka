@@ -8,7 +8,7 @@ use app\dto\User\CreateUserProfileDto;
 use app\enum\UserProfile\UserProfileGenderEnum;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\Form\Form;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 use Exception;
 
 class UserProfileForm extends Form

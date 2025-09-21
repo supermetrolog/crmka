@@ -9,7 +9,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\Company\Company;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 use app\usecases\Request\RequestService;
 use Throwable;
 use yii\base\Event;

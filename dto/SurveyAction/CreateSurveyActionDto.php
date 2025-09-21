@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\dto\SurveyAction;
 
 use app\models\Survey;
-use app\models\User;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 class CreateSurveyActionDto extends BaseObject

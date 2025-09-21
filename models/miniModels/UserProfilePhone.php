@@ -4,7 +4,7 @@ namespace app\models\miniModels;
 
 use app\helpers\StringHelper;
 use app\kernel\common\models\AR\AR;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 use floor12\phone\PhoneFormatter;
 use yii\db\ActiveQuery;
 

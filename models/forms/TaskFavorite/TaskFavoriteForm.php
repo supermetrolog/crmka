@@ -5,7 +5,7 @@ namespace app\models\forms\TaskFavorite;
 use app\dto\TaskFavorite\TaskFavoriteDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 
 /**
  * This is the form class for table "task_favorite".

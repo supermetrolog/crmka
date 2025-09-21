@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace app\resources;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\Task;
-use app\models\User;
 use yii\db\ActiveRecord;
 
 class ActiveRecordResource extends JsonResource

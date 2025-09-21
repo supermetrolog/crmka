@@ -12,7 +12,7 @@ use app\models\Task;
 use app\models\TaskHistory;
 use app\models\TaskObserver;
 use app\models\TaskTag;
-use app\models\User;
+use app\models\User\User;
 use app\models\views\TaskHistoryView;
 use app\repositories\TaskHistoryRepository;
 use yii\base\ErrorException;

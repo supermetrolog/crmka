@@ -7,7 +7,7 @@ namespace app\usecases\User;
 use app\dto\User\UserAccessTokenDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
-use app\models\UserAccessToken;
+use app\models\User\UserAccessToken;
 use Throwable;
 use yii\db\StaleObjectException;
 

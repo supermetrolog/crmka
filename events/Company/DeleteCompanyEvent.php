@@ -6,7 +6,7 @@ namespace app\events\Company;
 use app\dto\Company\DeleteCompanyDto;
 use app\events\AbstractEvent;
 use app\models\Company\Company;
-use app\models\User;
+use app\models\User\User;
 
 class DeleteCompanyEvent extends AbstractEvent
 {

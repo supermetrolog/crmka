@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\components\MessageTemplate\Templates\ResumeCompanyCooperation;
 
 use app\components\MessageTemplate\Templates\AbstractTemplateContext;
-use app\models\User;
+use app\models\User\User;
 
 class ResumeCompanyCooperationEmailContext extends AbstractTemplateContext
 {

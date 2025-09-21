@@ -8,7 +8,7 @@ use app\models\Call;
 use app\models\ChatMember;
 use app\models\Contact;
 use app\models\Survey;
-use app\models\User;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 class CreateSurveyDto extends BaseObject

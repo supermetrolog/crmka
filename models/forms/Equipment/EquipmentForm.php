@@ -10,7 +10,7 @@ use app\kernel\common\models\Form\Form;
 use app\models\Company\Company;
 use app\models\Contact;
 use app\models\Equipment;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class EquipmentForm extends Form

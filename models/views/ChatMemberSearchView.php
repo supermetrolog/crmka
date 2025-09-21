@@ -13,7 +13,7 @@ use app\models\Objects;
 use app\models\OfferMix;
 use app\models\Relation;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 use yii\base\ErrorException;
 
 /**

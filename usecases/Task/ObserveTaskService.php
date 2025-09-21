@@ -10,7 +10,7 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 use app\repositories\TaskObserverRepository;
 use app\usecases\TaskObserver\TaskObserverService;
 use Throwable;

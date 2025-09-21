@@ -9,7 +9,7 @@ use app\enum\EntityMessageLink\EntityMessageLinkKindEnum;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMemberMessage;
-use app\models\User;
+use app\models\User\User;
 
 class CompanyLinkMessageForm extends Form
 {

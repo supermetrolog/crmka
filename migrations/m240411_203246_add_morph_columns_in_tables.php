@@ -4,7 +4,7 @@ use app\kernel\console\Migration;
 use app\models\CommercialOffer;
 use app\models\OfferMix;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 
 /**
  * Class m240411_203246_add_morph_columns_in_tables

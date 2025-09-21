@@ -14,7 +14,7 @@ use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\Company\Company;
 use app\models\Notification\NotificationChannel;
-use app\models\User;
+use app\models\User\User;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 use yii\base\Event;

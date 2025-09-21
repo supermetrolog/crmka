@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\resources\User;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\User;
+use app\models\User\User;
 
 class UserWithContactsResource extends JsonResource
 {

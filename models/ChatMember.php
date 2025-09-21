@@ -10,6 +10,7 @@ use app\models\ActiveQuery\OfferMixQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\Company\Company;
+use app\models\User\User;
 use InvalidArgumentException;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;

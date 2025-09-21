@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\dto\Company;
 
 use app\models\ChatMemberMessage;
-use app\models\User;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 class LinkMessageCompanyDto extends BaseObject

@@ -6,6 +6,7 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\TaskFavoriteQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\User\User;
 
 /**
  * This is the model class for table "task_favorite".

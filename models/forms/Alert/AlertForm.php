@@ -8,7 +8,7 @@ use app\dto\Alert\CreateAlertDto;
 use app\dto\Alert\CreateAlertForUsersDto;
 use app\dto\Alert\UpdateAlertDto;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class AlertForm extends Form

@@ -8,6 +8,7 @@ use app\models\ActiveQuery\TimelineQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\TimelineActionComment;
 use app\models\miniModels\TimelineStep;
+use app\models\User\User;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 

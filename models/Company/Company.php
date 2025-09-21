@@ -45,7 +45,7 @@ use app\models\Request;
 use app\models\Survey;
 use app\models\Task;
 use app\models\TaskRelationEntity;
-use app\models\User;
+use app\models\User\User;
 use Yii;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;

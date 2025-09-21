@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\resources\User;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 
 class UserProfileResource extends JsonResource
 {

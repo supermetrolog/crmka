@@ -6,7 +6,7 @@ namespace app\events\Company;
 use app\dto\Company\DisableCompanyDto;
 use app\events\AbstractEvent;
 use app\models\Company\Company;
-use app\models\User;
+use app\models\User\User;
 
 class DisableCompanyEvent extends AbstractEvent
 {

@@ -9,6 +9,7 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\UserQuery;
 use app\models\letter\Letter;
 use app\models\letter\LetterContact;
+use app\models\User\User;
 use yii\db\ActiveQuery;
 
 /**

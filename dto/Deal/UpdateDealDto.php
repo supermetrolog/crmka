@@ -8,7 +8,7 @@ use app\models\Company\Company;
 use app\models\Complex;
 use app\models\Objects;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 use DateTimeInterface;
 use yii\base\BaseObject;
 

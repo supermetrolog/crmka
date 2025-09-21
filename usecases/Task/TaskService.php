@@ -27,7 +27,7 @@ use app\models\Media;
 use app\models\Task;
 use app\models\TaskObserver;
 use app\models\TaskRelationEntity;
-use app\models\User;
+use app\models\User\User;
 use app\usecases\Media\CreateMediaService;
 use app\usecases\Media\MediaService;
 use app\usecases\Relation\RelationService;

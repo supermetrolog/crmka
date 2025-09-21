@@ -3,7 +3,7 @@
 namespace app\models\miniModels;
 
 use app\kernel\common\models\AR\AR;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 use yii\db\ActiveQuery;
 
 /**

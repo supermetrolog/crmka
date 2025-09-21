@@ -7,7 +7,7 @@ namespace app\models\forms\Contact;
 use app\dto\Contact\TransferContactToCompanyDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Company\Company;
-use app\models\User;
+use app\models\User\User;
 
 class ContactTransferToCompanyForm extends Form
 {

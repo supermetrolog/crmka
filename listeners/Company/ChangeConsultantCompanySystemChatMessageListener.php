@@ -14,7 +14,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\ChatMember;
 use app\models\Company\Company;
-use app\models\User;
+use app\models\User\User;
 use app\services\ChatMemberSystemMessage\ChangeConsultantCompanyChatMemberSystemMessage;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use ErrorException;

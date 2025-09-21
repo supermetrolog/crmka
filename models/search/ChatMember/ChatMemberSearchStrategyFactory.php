@@ -10,7 +10,7 @@ use app\models\search\ChatMember\Strategies\GeneralChatMemberSearchStrategy;
 use app\models\search\ChatMember\Strategies\ObjectChatMemberSearchStrategy;
 use app\models\search\ChatMember\Strategies\RequestChatMemberSearchStrategy;
 use app\models\search\ChatMember\Strategies\UserChatMemberSearchStrategy;
-use app\models\User;
+use app\models\User\User;
 
 class ChatMemberSearchStrategyFactory
 {

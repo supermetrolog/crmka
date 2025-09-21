@@ -23,7 +23,7 @@ use app\models\forms\User\UserForm;
 use app\models\forms\User\UserProfileForm;
 use app\models\search\UserSearch;
 use app\models\UploadFile;
-use app\models\User;
+use app\models\User\User;
 use app\models\views\UserOnlineView;
 use app\repositories\UserAccessTokenRepository;
 use app\repositories\UserRepository;

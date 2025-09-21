@@ -4,7 +4,7 @@ namespace app\usecases\TaskHistory;
 
 use app\models\Media;
 use app\models\TaskTag;
-use app\models\User;
+use app\models\User\User;
 use Yii;
 use yii\caching\CacheInterface;
 

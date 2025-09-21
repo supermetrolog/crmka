@@ -3,7 +3,7 @@
 namespace app\services\ChatMemberSystemMessage;
 
 use app\helpers\HTMLHelper;
-use app\models\User;
+use app\models\User\User;
 use InvalidArgumentException;
 
 class ChangeConsultantCompanyChatMemberSystemMessage extends AbstractChatMemberSystemMessage

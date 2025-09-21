@@ -6,7 +6,7 @@ use app\models\Media;
 use app\models\TaskEvent;
 use app\models\TaskHistory;
 use app\models\TaskTag;
-use app\models\User;
+use app\models\User\User;
 
 /**
  * @property TaskEvent[] $events

@@ -4,7 +4,7 @@ namespace app\behaviors;
 
 use app\exceptions\http\RestrictedIpHttpException;
 use app\helpers\ArrayHelper;
-use app\models\User;
+use app\models\User\User;
 use Yii;
 use yii\base\ActionFilter;
 use yii\web\ForbiddenHttpException;

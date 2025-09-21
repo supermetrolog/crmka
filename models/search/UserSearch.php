@@ -6,8 +6,8 @@ use app\helpers\ArrayHelper;
 use app\helpers\SQLHelper;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
-use app\models\UserProfile;
+use app\models\User\User;
+use app\models\User\UserProfile;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 

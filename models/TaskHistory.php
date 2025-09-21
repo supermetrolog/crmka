@@ -5,6 +5,7 @@ namespace app\models;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\TaskHistoryQuery;
 use app\models\ActiveQuery\TaskQuery;
+use app\models\User\User;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
 

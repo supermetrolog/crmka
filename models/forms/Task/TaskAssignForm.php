@@ -6,7 +6,7 @@ namespace app\models\forms\Task;
 
 use app\dto\Task\TaskAssignDto;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class TaskAssignForm extends Form

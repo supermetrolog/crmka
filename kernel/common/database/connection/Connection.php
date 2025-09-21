@@ -6,7 +6,9 @@ namespace app\kernel\common\database\connection;
 
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\database\interfaces\transaction\TransactionInterface;
+use Exception;
 use LogicException;
+use Throwable;
 
 class Connection extends \yii\db\Connection implements TransactionBeginnerInterface
 {
@@ -19,5 +21,15 @@ class Connection extends \yii\db\Connection implements TransactionBeginnerInterf
 		}
 
 		return new Transaction($tx);
+	}
+
+	/**
+	 * @return mixed
+	 * @throws Throwable
+	 * @throws Exception
+	 */
+	public function run(callable $callback, ?string $isolationLevel = null)
+	{
+		return $this->transaction($callback, $isolationLevel);
 	}
 }

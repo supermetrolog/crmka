@@ -8,7 +8,7 @@ use app\dto\Task\CreateTaskRelationEntityDto;
 use app\dto\TaskRelationEntity\UpdateTaskRelationEntityDto;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\TaskRelationEntity;
-use app\models\User;
+use app\models\User\User;
 use Throwable;
 use yii\db\StaleObjectException;
 

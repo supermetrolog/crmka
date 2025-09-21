@@ -10,7 +10,7 @@ use app\components\Notification\NotificationAction;
 use app\components\Notification\NotificationRelation;
 use app\enum\Notification\UserNotificationTemplateKindEnum;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 use app\repositories\UserNotificationTemplateRepository;
 
 class RequestNotificationFactory

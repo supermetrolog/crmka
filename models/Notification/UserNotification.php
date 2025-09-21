@@ -8,7 +8,7 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\MailingQuery;
 use app\models\ActiveQuery\UserNotificationQuery;
 use app\models\ActiveQuery\UserQuery;
-use app\models\User;
+use app\models\User\User;
 
 /**
  * This is the model class for table "user_notification".

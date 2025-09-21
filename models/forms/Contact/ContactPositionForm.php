@@ -8,7 +8,7 @@ use app\dto\ContactPosition\CreateContactPositionDto;
 use app\dto\ContactPosition\UpdateContactPositionDto;
 use app\kernel\common\models\Form\Form;
 use app\models\ContactPosition;
-use app\models\User;
+use app\models\User\User;
 
 class ContactPositionForm extends Form
 {

@@ -7,7 +7,7 @@ use app\events\Task\CreateTaskEvent;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\listeners\EventListenerInterface;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 use app\usecases\TaskHistory\TaskHistoryService;
 use Throwable;
 use yii\base\ErrorException;
