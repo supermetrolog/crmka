@@ -11,7 +11,7 @@ use app\helpers\validators\AnyValidator;
 use app\kernel\common\models\Form\Form;
 use app\models\Company\Company;
 use app\models\ContactPosition;
-use app\models\User;
+use app\models\User\User;
 
 class ContactForm extends Form
 {

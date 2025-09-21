@@ -6,7 +6,7 @@ use app\helpers\ArrayHelper as AppArrayHelper;
 use app\helpers\StringHelper;
 use app\models\oldDb\ObjectsBlock;
 use app\models\oldDb\OfferMix;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 use Exception;
 use floor12\phone\PhoneFormatter;
 use RuntimeException;

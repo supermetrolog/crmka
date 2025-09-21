@@ -2,7 +2,7 @@
 
 namespace app\models\views;
 
-use app\models\User;
+use app\models\User\User;
 
 class UserOnlineView extends User
 {

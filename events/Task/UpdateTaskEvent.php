@@ -3,7 +3,7 @@
 namespace app\events\Task;
 
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 
 class UpdateTaskEvent extends AbstractTaskEvent
 {

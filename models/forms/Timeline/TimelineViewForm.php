@@ -6,7 +6,7 @@ namespace app\models\forms\Timeline;
 
 use app\kernel\common\models\Form\Form;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 
 class TimelineViewForm extends Form
 {

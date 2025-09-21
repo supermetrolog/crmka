@@ -11,7 +11,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\miniModels\UserProfileEmail;
 use app\models\miniModels\UserProfilePhone;
 use app\models\UploadFile;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 use Throwable;
 
 class UserProfileService

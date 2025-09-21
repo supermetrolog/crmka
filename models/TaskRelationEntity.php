@@ -13,6 +13,7 @@ use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\Company\Company;
+use app\models\User\User;
 use InvalidArgumentException;
 use yii\db\ActiveQuery;
 

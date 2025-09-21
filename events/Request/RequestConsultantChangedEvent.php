@@ -4,7 +4,7 @@ namespace app\events\Request;
 
 use app\events\AbstractEvent;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 
 class RequestConsultantChangedEvent extends AbstractEvent
 {

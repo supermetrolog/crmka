@@ -1,7 +1,7 @@
 <?php
 
 use app\models\oldDb\User as OldUser;
-use app\models\User;
+use app\models\User\User;
 use yii\db\Migration;
 
 /**
@@ -32,7 +32,7 @@ class m240228_184951_add_user_id_old_column_in_user_table extends Migration
 
 		foreach ($oldUsers as $oldUser) {
 			/** @var User $user */
-			$user = User::find()->andWhere(['id' => $oldUser->user_id_new])->one();
+			$user              = User::find()->andWhere(['id' => $oldUser->user_id_new])->one();
 			$user->user_id_old = $oldUser->id;
 			$user->save(false);
 		}

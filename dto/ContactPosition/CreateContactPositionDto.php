@@ -2,7 +2,7 @@
 
 namespace app\dto\ContactPosition;
 
-use app\models\User;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 class CreateContactPositionDto extends BaseObject

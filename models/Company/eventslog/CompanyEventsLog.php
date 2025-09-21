@@ -3,7 +3,7 @@
 namespace app\models\company\eventslog;
 
 use app\models\Company\Company;
-use app\models\User;
+use app\models\User\User;
 use yii\db\ActiveRecord;
 
 /**

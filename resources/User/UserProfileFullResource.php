@@ -6,7 +6,7 @@ namespace app\resources\User;
 
 use app\helpers\ArrayHelper;
 use app\kernel\web\http\resources\JsonResource;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 
 class UserProfileFullResource extends JsonResource
 {

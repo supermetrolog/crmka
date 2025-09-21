@@ -10,6 +10,7 @@ use app\models\ActiveQuery\UserQuery;
 use app\models\Company\Company;
 use app\models\crane\Crane;
 use app\models\location\Location;
+use app\models\User\User;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\resources\ChatMember\ChatMemberModel;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\User;
+use app\models\User\User;
 use app\resources\User\UserProfileResource;
 
 class UserShortResource extends JsonResource

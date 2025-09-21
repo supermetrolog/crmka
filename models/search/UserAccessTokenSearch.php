@@ -4,8 +4,8 @@ namespace app\models\search;
 
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
-use app\models\UserAccessToken;
+use app\models\User\User;
+use app\models\User\UserAccessToken;
 use yii\data\ActiveDataProvider;
 
 class UserAccessTokenSearch extends Form

@@ -10,7 +10,7 @@ use app\dto\Reminder\UpdateReminderDto;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\models\Form\Form;
 use app\models\Reminder;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class ReminderForm extends Form
@@ -27,7 +27,7 @@ class ReminderForm extends Form
 	public $message;
 	public $status;
 	public $notify_at;
-	
+
 	public function rules(): array
 	{
 		return [

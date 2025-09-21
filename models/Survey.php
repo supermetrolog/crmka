@@ -13,6 +13,7 @@ use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\SurveyQuestionAnswerQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskRelationEntityQuery;
+use app\models\User\User;
 use Exception;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;

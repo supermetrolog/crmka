@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\repositories;
 
-use app\models\UserActivity;
+use app\models\User\UserActivity;
 
 class UserActivityRepository
 {

@@ -9,7 +9,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\ChatMemberMessage;
 use app\models\SurveyQuestionAnswer;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use Throwable;
 

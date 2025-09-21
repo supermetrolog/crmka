@@ -4,7 +4,7 @@ namespace app\events\Task;
 
 use app\events\AbstractEvent;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 
 abstract class AbstractTaskEvent extends AbstractEvent
 {

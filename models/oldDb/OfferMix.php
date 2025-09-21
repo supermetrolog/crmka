@@ -15,7 +15,7 @@ use app\models\Contact;
 use app\models\miniModels\TimelineStepObjectComment;
 use app\models\oldDb\User as OldDbUser;
 use app\models\Relation;
-use app\models\User;
+use app\models\User\User;
 use Yii;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;

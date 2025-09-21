@@ -9,7 +9,7 @@ use app\helpers\DateTimeHelper;
 use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
-use app\models\User;
+use app\models\User\User;
 use yii\base\InvalidArgumentException;
 use yii\db\ActiveRecord;
 

@@ -6,7 +6,7 @@ namespace app\resources;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Reminder;
-use app\models\User;
+use app\models\User\User;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
 use app\resources\User\UserResource;
 use UnexpectedValueException;

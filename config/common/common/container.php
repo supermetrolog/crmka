@@ -7,6 +7,10 @@ use app\components\MessageTemplate\Adapters\EmailTwigEnvironmentAdapter;
 use app\components\MessageTemplate\Interfaces\EmailTwigEnvironmentInterface;
 use app\components\Notification\Interfaces\WebsocketPublisherInterface;
 use app\components\Notification\RabbitMqWebsocketPublisher;
+use app\components\Telegram\Interfaces\TelegramDeepLinkGeneratorInterface;
+use app\components\Telegram\TelegramBotApiClient;
+use app\components\Telegram\TelegramDeepLinkGenerator;
+use app\components\Whatsapp\WhatsappApiClient;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ActiveQuery\NotificationChannelQuery;
 use app\models\Notification\NotificationChannel;
@@ -17,6 +21,7 @@ $db     = require __DIR__ . "/db.php";
 $old_db = require __DIR__ . "/db_old.php";
 
 $secrets = require YII_PROJECT_ROOT . "/config/secrets.php";
+$params  = require YII_PROJECT_ROOT . '/config/common/common/params.php';
 
 return [
 	'singletons'  => [
@@ -35,16 +40,25 @@ return [
 				'debug' => YII_DEBUG,
 			]);
 		},
-		WebsocketPublisherInterface::class   => static fn() => new RabbitMqWebsocketPublisher(Yii::$app->notifyQueue)
+		WebsocketPublisherInterface::class   => static fn() => new RabbitMqWebsocketPublisher(Yii::$app->notifyQueue),
 	],
 	'definitions' => [
-		NotificationChannelQuery::class => [
+		NotificationChannelQuery::class           => [
 			'class'      => NotificationChannelQuery::class,
 			'modelClass' => NotificationChannel::class
 		],
 		AuthService::class              => [
 			'class'            => AuthService::class,
-			'allowedOfficeIps' => $secrets['allowed_office_ips']
+			'allowedOfficeIps' => $params['allowed_office_ips']
+		],
+		TelegramBotApiClient::class               => static fn() => new TelegramBotApiClient(Yii::$app->params['crm_telegram_bot']['apiUrl']),
+		TelegramDeepLinkGeneratorInterface::class => [
+			'class'   => TelegramDeepLinkGenerator::class,
+			'botName' => $params['crm_telegram_bot']['name'],
+			'webBase' => $params['crm_telegram_bot']['deepLink']['webBase'],
+			'appBase' => $params['crm_telegram_bot']['deepLink']['appBase'],
+			'param'   => $params['crm_telegram_bot']['deepLink']['param'],
+			'prefer'  => $params['crm_telegram_bot']['deepLink']['prefer'],
 		]
 	]
 ];

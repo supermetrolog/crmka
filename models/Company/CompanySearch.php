@@ -31,7 +31,7 @@ use app\models\Request;
 use app\models\search\expressions\CompanySearchExpressions;
 use app\models\Survey;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 use app\models\views\CompanySearchView;
 use Exception;
 use yii\base\ErrorException;

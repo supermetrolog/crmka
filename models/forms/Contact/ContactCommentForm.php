@@ -8,7 +8,7 @@ use app\dto\ContactComment\CreateContactCommentDto;
 use app\dto\ContactComment\UpdateContactCommentDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Contact;
-use app\models\User;
+use app\models\User\User;
 
 class ContactCommentForm extends Form
 {

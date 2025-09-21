@@ -6,7 +6,7 @@ namespace app\models\forms\Request;
 
 use app\dto\Request\CloneRequestDto;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
+use app\models\User\User;
 
 class RequestCloneForm extends Form
 {

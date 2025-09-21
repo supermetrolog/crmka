@@ -10,7 +10,7 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\CompanyStatusHistoryQuery;
 use app\models\ActiveQuery\UserQuery;
-use app\models\User;
+use app\models\User\User;
 
 /**
  * @property int          $id

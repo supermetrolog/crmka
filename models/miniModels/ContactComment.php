@@ -5,7 +5,7 @@ namespace app\models\miniModels;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\Contact;
-use app\models\User;
+use app\models\User\User;
 use yii\db\ActiveQuery;
 
 /**

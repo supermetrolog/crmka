@@ -5,6 +5,7 @@ namespace app\models;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\UserQuery;
 use app\models\ActiveQuery\UserTourStatusQuery;
+use app\models\User\User;
 
 /**
  * @property int       $id

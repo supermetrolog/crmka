@@ -49,7 +49,7 @@ class __Application extends Application
 // }
 
 /**
- * @property app\models\User $identity
+ * @property \app\models\User\User $identity
  */
 class __WebUser
 {

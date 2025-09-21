@@ -7,7 +7,7 @@ use app\enum\Letter\LetterContactAnswerTypeEnum;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\Form\Form;
 use app\models\letter\LetterContact;
-use app\models\User;
+use app\models\User\User;
 
 class LetterContactAnswerForm extends Form
 {

@@ -10,7 +10,7 @@ use app\dto\Utilities\TransferCompaniesToConsultantUtilitiesDto;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Company\Company;
-use app\models\User;
+use app\models\User\User;
 use app\usecases\Object\ObjectService;
 use app\usecases\Request\RequestService;
 use Throwable;

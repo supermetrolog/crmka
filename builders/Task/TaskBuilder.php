@@ -9,7 +9,7 @@ use app\helpers\DateTimeHelper;
 use app\helpers\StringHelper;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 use app\repositories\UserRepository;
 use DateTimeInterface;
 use InvalidArgumentException;

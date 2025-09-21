@@ -15,7 +15,7 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Task;
 use app\models\TaskEvent;
-use app\models\User;
+use app\models\User\User;
 use DateTimeInterface;
 use Throwable;
 use yii\base\ErrorException;

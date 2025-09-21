@@ -16,6 +16,7 @@ use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\UserNotificationQuery;
 use app\models\Notification\UserNotification;
+use app\models\User\User;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 

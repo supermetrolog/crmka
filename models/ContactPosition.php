@@ -6,6 +6,7 @@ use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\User\User;
 
 /**
  * @property int            $id

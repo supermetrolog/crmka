@@ -7,7 +7,7 @@ namespace app\models\forms\Folder;
 use app\dto\Folder\CreateFolderDto;
 use app\dto\Folder\UpdateFolderDto;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
+use app\models\User\User;
 
 class FolderForm extends Form
 {

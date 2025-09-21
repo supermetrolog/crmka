@@ -15,6 +15,7 @@ use app\models\miniModels\RequestObjectClass;
 use app\models\miniModels\RequestObjectType;
 use app\models\miniModels\RequestObjectTypeGeneral;
 use app\models\miniModels\RequestRegion;
+use app\models\User\User;
 use app\models\views\RequestSearchView;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;

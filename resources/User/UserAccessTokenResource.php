@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\resources\User;
 
 use app\kernel\web\http\resources\JsonResource;
-use app\models\UserAccessToken;
+use app\models\User\UserAccessToken;
 
 class UserAccessTokenResource extends JsonResource
 {

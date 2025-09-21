@@ -4,27 +4,27 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ReminderQuery;
-use Yii;
+use app\models\User\User;
 use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "reminder".
  *
- * @property int                     $id
- * @property int                     $user_id
- * @property string                  $message
- * @property int                     $status
- * @property string                  $created_by_type
- * @property int                     $created_by_id
- * @property string                  $notify_at
- * @property string                  $created_at
- * @property string                  $updated_at
- * @property string|null             $deleted_at
- * @property string                  $morph
+ * @property int         $id
+ * @property int         $user_id
+ * @property string      $message
+ * @property int         $status
+ * @property string      $created_by_type
+ * @property int         $created_by_id
+ * @property string      $notify_at
+ * @property string      $created_at
+ * @property string      $updated_at
+ * @property string|null $deleted_at
+ * @property string      $morph
  *
- * @property User                    $user
- * @property User                    $createdByUser
- * @property User                    $createdBy
+ * @property User        $user
+ * @property User        $createdByUser
+ * @property User        $createdBy
  */
 class Reminder extends AR
 {
@@ -37,38 +37,38 @@ class Reminder extends AR
 	protected bool $useSoftDelete = true;
 	protected bool $useSoftUpdate = true;
 
-    public static function tableName(): string
-    {
-        return 'reminder';
-    }
+	public static function tableName(): string
+	{
+		return 'reminder';
+	}
 
-    public function rules(): array
-    {
-        return [
-            [['user_id', 'message', 'status', 'created_by_type', 'created_by_id', 'notify_at'], 'required'],
-            [['user_id', 'status', 'created_by_id'], 'integer'],
-            [['message'], 'string'],
-            [['notify_at', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
-            [['created_by_type', 'morph'], 'string', 'max' => 255],
+	public function rules(): array
+	{
+		return [
+			[['user_id', 'message', 'status', 'created_by_type', 'created_by_id', 'notify_at'], 'required'],
+			[['user_id', 'status', 'created_by_id'], 'integer'],
+			[['message'], 'string'],
+			[['notify_at', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
+			[['created_by_type', 'morph'], 'string', 'max' => 255],
 			['status', 'in', 'range' => self::getStatuses()],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
-        ];
-    }
+			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+		];
+	}
 
-    public function attributeLabels(): array
-    {
-        return [
-            'id'                 => 'ID',
-            'user_id'            => 'User ID',
-            'message'            => 'Message',
-            'status'             => 'Status',
-            'created_by_type'    => 'Created By Type',
-            'created_by_id'      => 'Created By ID',
-            'notify_at'          => 'Notify At',
-            'created_at'         => 'Created At',
-            'updated_at'         => 'Updated At',
-        ];
-    }
+	public function attributeLabels(): array
+	{
+		return [
+			'id'              => 'ID',
+			'user_id'         => 'User ID',
+			'message'         => 'Message',
+			'status'          => 'Status',
+			'created_by_type' => 'Created By Type',
+			'created_by_id'   => 'Created By ID',
+			'notify_at'       => 'Notify At',
+			'created_at'      => 'Created At',
+			'updated_at'      => 'Updated At',
+		];
+	}
 
 	public static function getStatuses(): array
 	{
@@ -84,10 +84,10 @@ class Reminder extends AR
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-    public function getUser(): \yii\db\ActiveQuery
-    {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
-    }
+	public function getUser(): \yii\db\ActiveQuery
+	{
+		return $this->hasOne(User::className(), ['id' => 'user_id']);
+	}
 
 	/**
 	 * @return ActiveQuery
