@@ -54,7 +54,7 @@ final class TelegramWebhookController extends AppController
 		}
 	}
 
-	public function actionIndex(): Response
+	public function actionHandle(): Response
 	{
 		$payload = Json::decode($this->request->getRawBody()) ?? [];
 
