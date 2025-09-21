@@ -32,6 +32,9 @@ final class TelegramWebhookController extends AppController
 		$this->bot     = $bot;
 		$this->service = $service;
 
+		$this->secretHeader  = Yii::$app->params['crm_telegram_bot']['webhook']['secretHeader'];
+		$this->webhookSecret = Yii::$app->params['crm_telegram_bot']['webhook']['secret'];
+
 		parent::__construct($id, $module, $config);
 	}
 

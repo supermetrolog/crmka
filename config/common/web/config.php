@@ -3,7 +3,6 @@
 use app\components\EventManager;
 use app\components\Media\Media;
 use app\components\PathBuilder\PathBuilderFactory;
-use app\controllers\integration\TelegramWebhookController;
 use yii\di\Container;
 use yii\helpers\ArrayHelper;
 
@@ -12,8 +11,8 @@ $params = require YII_PROJECT_ROOT . '/config/common/common/params.php';
 return ArrayHelper::merge(
 	require __DIR__ . '/../common/config.php',
 	[
-		'id'            => 'basic',
-		'components'    => [
+		'id'         => 'basic',
+		'components' => [
 			'request'      => [
 				'enableCsrfValidation' => false,
 				'cookieValidationKey'  => 'p6xr64xCH9KxL1zQ7zgdZ6BzV6IH2yZl',
@@ -38,7 +37,7 @@ return ArrayHelper::merge(
 				'rules'               => require __DIR__ . "/url_rules.php"
 			],
 		],
-		'container'     => [
+		'container'  => [
 			'singletons' => [
 				Media::class => function (Container $container) {
 					return new Media(
@@ -49,15 +48,8 @@ return ArrayHelper::merge(
 				}
 			]
 		],
-		'bootstrap'     => [
+		'bootstrap'  => [
 			EventManager::class
-		],
-		'controllerMap' => [
-			'telegram-webhook' => [
-				'class'         => TelegramWebhookController::class,
-				'secretHeader'  => $params['crm_telegram_bot']['webhook']['secretHeader'],
-				'webhookSecret' => $params['crm_telegram_bot']['webhook']['secret'],
-			]
-		],
+		]
 	]
 );
