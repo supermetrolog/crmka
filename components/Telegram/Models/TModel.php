@@ -26,7 +26,6 @@ class TModel extends BaseObject
 			}
 
 			if (ArrayHelper::isArray($cast) && ArrayHelper::length($cast) === 1 && ArrayHelper::isArray($value)) {
-
 				$class = $cast[0];
 
 				$list = [];
@@ -39,7 +38,7 @@ class TModel extends BaseObject
 			}
 		}
 
-		$preparedConfig = ArrayHelper::filter($config, static fn($key) => $this->hasProperty($key));
+		$preparedConfig = ArrayHelper::filter($config, fn($key) => $this->hasProperty($key), ARRAY_FILTER_USE_KEY);
 
 		parent::__construct($preparedConfig);
 	}

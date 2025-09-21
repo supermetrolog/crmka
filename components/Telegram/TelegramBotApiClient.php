@@ -19,14 +19,11 @@ final class TelegramBotApiClient
 	/**
 	 * @throws Exception
 	 */
-	public function sendMessage(int $chatId, string $text, array $params = []): array
+	public function send(int $chatId, array $params): array
 	{
 		$payload = ArrayHelper::merge(
 			[
-				'chat_id'                  => $chatId,
-				'text'                     => $text,
-				'parse_mode'               => 'HTML',
-				'disable_web_page_preview' => true,
+				'chat_id' => $chatId,
 			],
 			$params
 		);
@@ -37,15 +34,17 @@ final class TelegramBotApiClient
 	/**
 	 * @throws Exception
 	 */
-	public function setWebhook(string $url, ?string $secretToken = null)
+	public function sendMessage(int $chatId, string $text, array $params = []): array
 	{
-		$payload = [
-			'url' => $url
-		];
+		return $this->send($chatId, ArrayHelper::merge(['text' => $text], $params));
+	}
 
-		if ($secretToken) {
-			$payload['secret_token'] = $secretToken;
-		}
+	/**
+	 * @throws Exception
+	 */
+	public function setWebhook(string $url, array $config = [])
+	{
+		$payload = ArrayHelper::merge(['url' => $url], $config);
 
 		return $this->http->post('setWebhook', $payload)->send()->getData();
 	}

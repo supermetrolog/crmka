@@ -14,6 +14,7 @@ class TelegramController extends ConsoleController
 	public TelegramBotApiClient $bot;
 	public string               $webhookSecret;
 	public string               $webhookUrl;
+	public array                $allowedUpdates = [];
 
 	public function __construct(
 		string $id,
@@ -31,7 +32,12 @@ class TelegramController extends ConsoleController
 	 */
 	public function actionSetWebhook(): void
 	{
-		$response = $this->bot->setWebhook($this->webhookUrl, $this->webhookSecret);
+		$response = $this->bot->setWebhook($this->webhookUrl, [
+			'secret_token'    => $this->webhookSecret,
+			'allowed_updates' => [
+				'message', 'inline_query', 'chosen_inline_result', 'callback_query'
+			]
+		]);
 
 		$this->comment(Json::encode($response));
 	}

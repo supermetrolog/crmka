@@ -124,4 +124,10 @@ return [
 			'prefer'  => 'web',
 		]
 	],
+	'crm_whatsapp_bot'   => [
+		'apiUrl'    => 'https://wappi.pro/api',
+		'token'     => $secrets['crm_whatsapp_bot']['token'],
+		'profileId' => $secrets['crm_whatsapp_bot']['profileId'],
+	],
+	'frontend_host'      => 'https://crm.raysen.ru'
 ];

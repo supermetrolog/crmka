@@ -12,6 +12,7 @@ use app\dto\User\UserTelegramLinkDto;
 use app\dto\User\UserTelegramLinkTicketDto;
 use app\exceptions\services\Telegram\UserTelegramTicketIsConsumedException;
 use app\exceptions\services\Telegram\UserTelegramTicketIsExpiredException;
+use app\helpers\Base64UrlHelper;
 use app\helpers\DateIntervalHelper;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
@@ -89,7 +90,7 @@ final class TelegramLinkService
 	 */
 	public function consumeTicket(string $code, TelegramUserDataDto $dto): UserTelegramLink
 	{
-		$ticket = $this->ticketRepository->findByCodeOrThrow($code);
+		$ticket = $this->ticketRepository->findByCodeOrThrow(Base64UrlHelper::decode($code));
 
 		if ($ticket->isExpired()) {
 			throw new UserTelegramTicketIsExpiredException();

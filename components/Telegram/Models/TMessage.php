@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace app\components\Telegram\Models;
 
+use app\helpers\ArrayHelper;
+
 class TMessage extends TModel
 {
 	protected array $casts = [
-		'from'    => TUser::class,
-		'contact' => TContact::class,
-		'chat'    => TChat::class,
+		'from'     => TUser::class,
+		'contact'  => TContact::class,
+		'chat'     => TChat::class,
+		'entities' => [TMessageEntity::class],
 	];
 
 	public int     $message_id;
@@ -26,12 +29,8 @@ class TMessage extends TModel
 	public ?TContact $contact = null;
 	public TChat     $chat;
 
-	public function setEntities(array $entities): void
+	public function hasEntityType(string $type): bool
 	{
-		$this->entities = [];
-
-		foreach ($entities as $entity) {
-			$this->entities[] = new TMessageEntity($entity);
-		}
+		return ArrayHelper::any($this->entities, static fn($entity) => $entity->type === $type);
 	}
 }
