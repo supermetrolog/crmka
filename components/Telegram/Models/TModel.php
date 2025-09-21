@@ -1,0 +1,44 @@
+<?php
+
+declare(strict_types=1);
+
+namespace app\components\Telegram\Models;
+
+use app\helpers\ArrayHelper;
+use app\helpers\StringHelper;
+use yii\base\BaseObject;
+
+class TModel extends BaseObject
+{
+	protected array $casts = [];
+
+	public function __construct($config = [])
+	{
+		foreach ($this->casts as $attr => $cast) {
+			if (!ArrayHelper::keyExists($config, $attr)) {
+				continue;
+			}
+
+			$value = $config[$attr];
+
+			if (StringHelper::isString($cast) && ArrayHelper::isArray($value)) {
+				$config[$attr] = new $cast($value);
+			}
+
+			if (ArrayHelper::isArray($cast) && ArrayHelper::length($cast) === 1 && ArrayHelper::isArray($value)) {
+
+				$class = $cast[0];
+
+				$list = [];
+
+				foreach ($value as $item) {
+					$list[] = ArrayHelper::isArray($item) ? new $class($item) : $item;
+				}
+
+				$config[$attr] = $list;
+			}
+		}
+
+		parent::__construct($config);
+	}
+}

@@ -447,4 +447,18 @@ return static function (RouterInterface $router) {
 			$route->delete()->action('delete');
 		});
 	});
+
+	$router->controller('integration/telegram')->disablePluralize()->group(static function (RouteInterface $route) {
+		$route->post('start');
+		$route->post('status');
+		$route->post('revoke');
+	});
+
+	$router->controller('integration/telegram-admin')->alias('integration/telegram/admin')->group(static function (RouteInterface $route) {
+		$route->get('list');
+		$route->get('tickets');
+
+		$route->post('revoke-user/<id>')->action('revoke-user');
+		$route->post('revoke-link/<id>')->action('revoke-link');
+	});
 };
