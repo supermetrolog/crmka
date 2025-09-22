@@ -6,6 +6,7 @@ namespace app\commands;
 
 use app\components\Telegram\TelegramBotApiClient;
 use app\kernel\common\controller\ConsoleController;
+use Yii;
 use yii\helpers\Json;
 use yii\httpclient\Exception;
 
@@ -23,6 +24,9 @@ class TelegramController extends ConsoleController
 		$config = [])
 	{
 		$this->bot = $bot;
+
+		$this->webhookSecret = Yii::$app->params['crm_telegram_bot']['webhook']['secret'];
+		$this->webhookUrl    = Yii::$app->params['crm_telegram_bot']['webhook']['url'];
 
 		parent::__construct($id, $module, $config);
 	}
