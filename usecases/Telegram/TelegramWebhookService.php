@@ -106,7 +106,7 @@ final class TelegramWebhookService
 			$link = $this->linkByCode($code, $message);
 
 			$builder = TelegramMessageAnswerBuilder::create()
-			                                       ->setText(sprintf('✅ Ваш Telegram аккаунт связан с профилем **%s**', $link->user->userProfile->mediumName))
+			                                       ->setText(sprintf('✅ Ваш Telegram аккаунт связан с профилем *%s*', $link->user->userProfile->mediumName))
 			                                       ->addInlineKeyboardButton(TelegramInlineKeyboardBuilder::link('↗️ Перейти в CRM', $this->linkGenerator->generate('account.integrations'))->toArray());
 
 			$this->sendAnswer($message, $builder->toArray());
@@ -132,7 +132,7 @@ final class TelegramWebhookService
 		try {
 			$revokedLink = $this->revokeByTelegramId($message->from->id);
 
-			$this->sendTextAnswer($message, sprintf('✅ Профиль **%s** отвязан от вашего Telegram аккаунта', $revokedLink->user->userProfile->mediumName));
+			$this->sendTextAnswer($message, sprintf('✅ Профиль *%s* отвязан от вашего Telegram аккаунта', $revokedLink->user->userProfile->mediumName));
 		} catch (ModelNotFoundException $th) {
 			$this->sendTextAnswer($message, '❕ К вашему аккаунту не привязан профиль в CRM.');
 		} catch (Throwable $th) {
@@ -149,7 +149,7 @@ final class TelegramWebhookService
 		$link = $this->linkRepository->findActiveByTelegramUserId($message->from->id);
 
 		if ($link) {
-			$this->sendTextAnswer($message, sprintf('👤 К вашему аккаунт привязан профиль **%s**.', $link->user->userProfile->mediumName));
+			$this->sendTextAnswer($message, sprintf('👤 К вашему аккаунту привязан профиль *%s*.', $link->user->userProfile->mediumName));
 		} else {
 			$builder = TelegramMessageAnswerBuilder::create()
 			                                       ->setText('❕ Для связывания аккаунта воспользуйтесь личным кабинетом.')
