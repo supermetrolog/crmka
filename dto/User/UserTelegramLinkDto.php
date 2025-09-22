@@ -8,11 +8,11 @@ use yii\base\BaseObject;
 
 class UserTelegramLinkDto extends BaseObject
 {
-	public int    $userId;
-	public int    $telegramUserId;
-	public string $chatId;
-	public string $username;
-	public string $firstName;
-	public string $lastName;
-	public bool   $isEnabled;
+	public int     $userId;
+	public int     $telegramUserId;
+	public string  $chatId;
+	public ?string $username;
+	public ?string $firstName;
+	public ?string $lastName;
+	public bool    $isEnabled;
 }
