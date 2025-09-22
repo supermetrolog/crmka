@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace app\usecases\Telegram;
 
+use app\components\Notification\RabbitMqWebsocketPublisher;
 use app\components\Telegram\Models\TMessage;
 use app\components\Telegram\Models\TUpdate;
 use app\components\Telegram\Models\TUser;
 use app\components\Telegram\TelegramBotApiClient;
 use app\components\Telegram\TelegramInlineKeyboardBuilder;
 use app\components\Telegram\TelegramMessageAnswerBuilder;
+use app\daemons\Message;
 use app\dto\Telegram\TelegramUserDataDto;
 use app\enum\Telegram\TelegramMessageEntityTypeEnum;
 use app\enum\Telegram\TelegramUpdateCommandEnum;
@@ -22,6 +24,7 @@ use app\models\User\UserTelegramLink;
 use app\repositories\UserTelegramLinkRepository;
 use app\services\Link\CrmLinkGenerator;
 use Throwable;
+use Yii;
 use yii\httpclient\Exception;
 
 final class TelegramWebhookService
@@ -32,6 +35,7 @@ final class TelegramWebhookService
 	protected TelegramLinkService          $linker;
 	protected TelegramBotApiClient         $bot;
 	protected CrmLinkGenerator             $linkGenerator;
+	protected RabbitMqWebsocketPublisher   $publisher;
 
 	public function __construct(
 		UserTelegramLinkRepository $linkRepository,
@@ -105,6 +109,8 @@ final class TelegramWebhookService
 			                                       ->addInlineKeyboardButton(TelegramInlineKeyboardBuilder::link('↗️ Перейти в CRM', $this->linkGenerator->generate('account.integrations'))->toArray());
 
 			$this->sendAnswer($message, $builder->toArray());
+
+			$this->publisher->publishToUser($link->user_id, ['link_id' => $link->id], Message::TELEGRAM_LINKED);
 		} catch (ModelNotFoundException $th) {
 			$this->sendTextAnswer($message, '❌ Неправильный код профиля CRM.');
 		} catch (UserTelegramTicketIsExpiredException $th) {
@@ -113,6 +119,7 @@ final class TelegramWebhookService
 			$this->sendTextAnswer($message, '🔄 Код профиля уже использован. Обновите код в личном кабинете.');
 		} catch (Throwable $th) {
 			$this->sendTextAnswer($message, '🔴 Произошла ошибка. Обновите код в личном кабинете или свяжитесь с программистом.');
+			Yii::error($th->getMessage());
 		}
 	}
 
@@ -129,6 +136,7 @@ final class TelegramWebhookService
 			$this->sendTextAnswer($message, '❕ К вашему аккаунту не привязан профиль в CRM.');
 		} catch (Throwable $th) {
 			$this->sendTextAnswer($message, '🔴 Произошла ошибка. Попробуйте позже или свяжитесь с программистом.');
+			Yii::error($th->getMessage());
 		}
 	}
 
