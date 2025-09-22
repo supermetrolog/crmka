@@ -7,7 +7,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\models\letter\Letter;
 use app\models\letter\LetterContact;
 use app\models\Notification;
-use app\models\User;
+use app\models\User\User;
 use app\services\emailsender\EmailSender;
 use RuntimeException;
 use Throwable;

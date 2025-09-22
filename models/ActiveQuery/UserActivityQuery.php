@@ -4,7 +4,7 @@ namespace app\models\ActiveQuery;
 
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
-use app\models\UserActivity;
+use app\models\User\UserActivity;
 
 class UserActivityQuery extends AQ
 {

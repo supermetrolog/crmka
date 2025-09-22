@@ -9,7 +9,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\ChatMemberMessage;
 use app\models\EntityMessageLink;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 

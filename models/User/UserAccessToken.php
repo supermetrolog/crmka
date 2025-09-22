@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\User;
 
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\UserAccessTokenQuery;

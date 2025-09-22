@@ -1,14 +1,18 @@
 <?php
 
-namespace app\models;
+namespace app\models\User;
 
 use app\components\Notification\Interfaces\NotifiableInterface;
+use app\components\Notification\Interfaces\TelegramNotifiableInterface;
 use app\helpers\DateTimeHelper;
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\ContactQuery;
 use app\models\ActiveQuery\UserAccessTokenQuery;
 use app\models\ActiveQuery\UserQuery;
+use app\models\ChatMember;
+use app\models\Contact;
 use Exception;
 use Yii;
 use yii\base\ErrorException;
@@ -37,8 +41,9 @@ use yii\web\IdentityInterface;
  * @property UserProfile            $userProfile
  * @property ChatMember             $chatMember
  * @property-read UserAccessToken[] $userAccessTokens
+ * @property-read ?UserTelegramLink $userTelegramAccount
  */
-class User extends AR implements IdentityInterface, NotifiableInterface
+class User extends AR implements IdentityInterface, NotifiableInterface, TelegramNotifiableInterface
 {
 	public const ACTIVITY_TIMEOUT = 300; // 5 minutes
 
@@ -248,6 +253,19 @@ class User extends AR implements IdentityInterface, NotifiableInterface
 	public function getChatMember(): ChatMemberQuery
 	{
 		return $this->morphHasOne(ChatMember::class);
+	}
+
+	public function getUserTelegramAccount(): AQ
+	{
+		/** @var AQ */
+		return $this->hasOne(UserTelegramLink::class, ['user_id' => 'id']);
+	}
+
+	public function getTelegramChatId(): ?int
+	{
+		$acc = $this->userTelegramAccount;
+
+		return $acc ? $acc->chat_id : null;
 	}
 
 	/**

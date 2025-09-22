@@ -20,6 +20,7 @@ use app\models\miniModels\Email;
 use app\models\miniModels\Phone;
 use app\models\miniModels\WayOfInforming;
 use app\models\miniModels\Website;
+use app\models\User\User;
 use app\resources\Contact\Email\ContactEmailResource;
 use app\resources\Phone\PhoneResource;
 use yii\base\ErrorException;

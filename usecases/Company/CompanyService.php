@@ -40,7 +40,7 @@ use app\models\EntityMessageLink;
 use app\models\Media;
 use app\models\miniModels\CompanyFile;
 use app\models\Productrange;
-use app\models\User;
+use app\models\User\User;
 use app\usecases\ChatMember\ChatMemberMessageService;
 use app\usecases\EntityMessageLink\EntityMessageLinkService;
 use app\usecases\Media\CreateMediaService;

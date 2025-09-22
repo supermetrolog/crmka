@@ -6,7 +6,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\Contact;
 use app\models\Survey;
-use app\models\UserProfile;
+use app\models\User\UserProfile;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 
@@ -62,7 +62,7 @@ class SurveySearch extends Form
 			Survey::field('status')         => $this->status,
 			Survey::field('type')           => $this->type
 		]);
-		
+
 		if ($this->hasFilter($this->statuses)) {
 			$query->andFilterWhere(['in', Survey::field('status'), $this->statuses]);
 		}

@@ -16,7 +16,7 @@ use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterfa
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\UploadFile;
-use app\models\User;
+use app\models\User\User;
 use app\repositories\UserRepository;
 use Throwable;
 use yii\base\Exception;

@@ -6,6 +6,7 @@ use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\MediaQuery;
 use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\TaskCommentQuery;
+use app\models\User\User;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 

@@ -3,7 +3,7 @@
 namespace app\dto\Company;
 
 use app\models\Company\Company;
-use app\models\User;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 class CompanyStatusHistoryDto extends BaseObject

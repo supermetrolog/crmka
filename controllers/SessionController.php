@@ -7,7 +7,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\search\UserAccessTokenSearch;
-use app\models\UserAccessToken;
+use app\models\User\UserAccessToken;
 use app\resources\User\UserAccessTokenResource;
 use app\usecases\User\UserAccessTokenService;
 use Throwable;

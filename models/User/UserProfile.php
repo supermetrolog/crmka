@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\User;
 
 use app\behaviors\CreateManyMiniModelsBehaviors;
 use app\enum\Phone\PhoneCountryCodeEnum;
@@ -12,6 +12,7 @@ use app\helpers\StringHelper;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\UserQuery;
+use app\models\CallList;
 use app\models\miniModels\UserProfileEmail;
 use app\models\miniModels\UserProfilePhone;
 use libphonenumber\PhoneNumberFormat;

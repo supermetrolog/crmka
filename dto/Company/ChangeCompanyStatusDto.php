@@ -3,7 +3,7 @@
 namespace app\dto\Company;
 
 use app\enum\Company\CompanyStatusSourceEnum;
-use app\models\User;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 class ChangeCompanyStatusDto extends BaseObject

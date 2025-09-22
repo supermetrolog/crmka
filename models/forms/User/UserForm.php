@@ -7,7 +7,7 @@ namespace app\models\forms\User;
 use app\dto\User\CreateUserDto;
 use app\dto\User\UpdateUserDto;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class UserForm extends Form

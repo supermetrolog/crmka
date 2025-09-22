@@ -34,7 +34,7 @@ use app\models\Relation;
 use app\models\Reminder;
 use app\models\Survey;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 use app\repositories\ChatMemberMessageRepository;
 use app\repositories\ChatMemberRepository;
 use app\usecases\Alert\CreateAlertService;

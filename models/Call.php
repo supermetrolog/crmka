@@ -10,6 +10,7 @@ use app\models\ActiveQuery\RelationQuery;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\miniModels\Phone;
+use app\models\User\User;
 use yii\base\ErrorException;
 
 /**

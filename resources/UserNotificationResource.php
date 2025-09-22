@@ -6,11 +6,7 @@ namespace app\resources;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\Notification\UserNotification;
-use app\models\Reminder;
-use app\models\User;
 use app\resources\ChatMember\ChatMemberModel\UserShortResource;
-use app\resources\User\UserResource;
-use UnexpectedValueException;
 
 class UserNotificationResource extends JsonResource
 {

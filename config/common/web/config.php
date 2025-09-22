@@ -6,6 +6,8 @@ use app\components\PathBuilder\PathBuilderFactory;
 use yii\di\Container;
 use yii\helpers\ArrayHelper;
 
+$params = require YII_PROJECT_ROOT . '/config/common/common/params.php';
+
 return ArrayHelper::merge(
 	require __DIR__ . '/../common/config.php',
 	[
@@ -21,7 +23,7 @@ return ArrayHelper::merge(
 				'baseUrl'              => ''
 			],
 			'user'         => [
-				'identityClass'   => 'app\models\User',
+				'identityClass'   => 'app\models\User\User',
 				'enableAutoLogin' => true,
 				'enableSession'   => false,
 			],

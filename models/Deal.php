@@ -12,6 +12,7 @@ use app\models\ActiveQuery\UserQuery;
 use app\models\Company\Company;
 use app\models\oldDb\Complex;
 use app\models\oldDb\OfferMix;
+use app\models\User\User;
 use Yii;
 
 /**

@@ -7,7 +7,7 @@ namespace app\models\forms\Timeline;
 use app\dto\Timeline\CreateTimelineDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class TimelineForm extends Form

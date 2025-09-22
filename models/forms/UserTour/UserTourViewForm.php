@@ -6,7 +6,7 @@ namespace app\models\forms\UserTour;
 
 use app\dto\UserTour\UserTourViewDto;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class UserTourViewForm extends Form

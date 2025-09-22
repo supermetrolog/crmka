@@ -6,7 +6,7 @@ use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AQ\SoftDeleteTrait;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
-use app\models\UserAccessToken;
+use app\models\User\UserAccessToken;
 use yii\db\ActiveRecord;
 
 class UserAccessTokenQuery extends AQ

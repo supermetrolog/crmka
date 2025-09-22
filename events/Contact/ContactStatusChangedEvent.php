@@ -5,7 +5,7 @@ namespace app\events\Contact;
 
 use app\events\AbstractEvent;
 use app\models\Contact;
-use app\models\User;
+use app\models\User\User;
 
 class ContactStatusChangedEvent extends AbstractEvent
 {

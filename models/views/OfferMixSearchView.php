@@ -11,7 +11,7 @@ use app\models\Objects;
 use app\models\OfferMix;
 use app\models\Relation;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 
 /**
  * This is the model class for table "chat_member".

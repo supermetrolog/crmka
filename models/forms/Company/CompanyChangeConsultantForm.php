@@ -6,7 +6,7 @@ namespace app\models\forms\Company;
 
 use app\dto\Company\ChangeCompanyConsultantDto;
 use app\kernel\common\models\Form\Form;
-use app\models\User;
+use app\models\User\User;
 
 class CompanyChangeConsultantForm extends Form
 {

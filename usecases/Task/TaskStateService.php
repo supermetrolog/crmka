@@ -9,7 +9,7 @@ use app\events\Task\DeleteTaskEvent;
 use app\events\Task\RestoreTaskEvent;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\Task;
-use app\models\User;
+use app\models\User\User;
 use Throwable;
 use yii\db\StaleObjectException;
 

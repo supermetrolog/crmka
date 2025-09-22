@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\TaskObserverQuery;
+use app\models\User\User;
 use yii\db\ActiveQuery;
 
 /**

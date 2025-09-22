@@ -3,7 +3,7 @@
 namespace app\dto\LetterContactAnswer;
 
 use app\models\letter\LetterContact;
-use app\models\User;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 class CreateLetterContactAnswerDto extends BaseObject

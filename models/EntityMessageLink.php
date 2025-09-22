@@ -11,6 +11,7 @@ use app\models\ActiveQuery\EntityMessageLinkQuery;
 use app\models\ActiveQuery\RequestQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\Company\Company;
+use app\models\User\User;
 use InvalidArgumentException;
 use yii\db\ActiveQuery;
 

@@ -16,7 +16,7 @@ use app\models\forms\ChatMember\UnpinChatMemberMessageForm;
 use app\models\search\ChatMember\ChatMemberSearch;
 use app\models\search\ChatMember\ChatMemberSearchStrategyFactory;
 use app\models\search\ChatMemberMediaSearch;
-use app\models\User;
+use app\models\User\User;
 use app\models\views\ChatMemberSearchView;
 use app\repositories\ChatMemberRepository;
 use app\resources\Call\CallResource;

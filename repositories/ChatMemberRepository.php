@@ -21,7 +21,7 @@ use app\models\Objects;
 use app\models\Relation;
 use app\models\Task;
 use app\models\TaskObserver;
-use app\models\User;
+use app\models\User\User;
 use app\models\views\ChatMemberStatisticView;
 use yii\base\ErrorException;
 use yii\db\Expression;

@@ -6,6 +6,7 @@ use app\helpers\JsonFieldNormalizer;
 use app\models\ActiveQuery\ComplexQuery;
 use app\models\location\Location;
 use app\models\oldDb\User as OldDbUser;
+use app\models\User\User;
 use yii\db\ActiveQuery;
 use yii\helpers\Json;
 

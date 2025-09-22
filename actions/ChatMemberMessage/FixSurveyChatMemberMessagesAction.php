@@ -9,7 +9,7 @@ use app\kernel\common\actions\Action;
 use app\models\ActiveQuery\SurveyQuery;
 use app\models\ChatMemberMessage;
 use app\models\EntityMessageLink;
-use app\models\User;
+use app\models\User\User;
 
 class FixSurveyChatMemberMessagesAction extends Action
 {

@@ -7,7 +7,7 @@ use app\models\ActiveQuery\CompanyQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\Company\Company;
 use app\models\LetterContactAnswer;
-use app\models\User;
+use app\models\User\User;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 

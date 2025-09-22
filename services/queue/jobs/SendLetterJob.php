@@ -8,7 +8,7 @@ use app\helpers\ArrayHelper;
 use app\models\letter\Letter;
 use app\models\Notification;
 use app\models\SendPresentation;
-use app\models\User;
+use app\models\User\User;
 use app\services\emailsender\EmailSender;
 use RuntimeException;
 use Throwable;

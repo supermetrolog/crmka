@@ -7,7 +7,7 @@ namespace app\models\forms\Notification;
 use app\dto\Notification\CreateNotificationDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Notification\NotificationChannel;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class NotificationForm extends Form

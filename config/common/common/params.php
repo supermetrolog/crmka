@@ -108,5 +108,26 @@ return [
 		'cacheFilePath'    => YII_PROJECT_ROOT . '/config/common/web/url_rules.php',
 		'routerConfigPath' => YII_PROJECT_ROOT . '/config/common/web/routes.php',
 	],
-	'allowed_office_ips' => $secrets['allowed_office_ips']
+	'allowed_office_ips' => $secrets['allowed_office_ips'],
+	'crm_telegram_bot'   => [
+		'name'     => 'crm_raysen_bot',
+		'apiUrl'   => "https://api.telegram.org/bot{$secrets['crm_telegram_bot']['token']}",
+		'webhook'  => [
+			'secretHeader' => 'X-Telegram-Bot-Api-Secret-Token',
+			'secret'       => $secrets['crm_telegram_bot']['webhook']['secret'],
+			'url'          => "{$common_thisHost}/integration/telegram/webhook",
+		],
+		'deepLink' => [
+			'webBase' => 'https://t.me',
+			'appBase' => 'tg://resolve',
+			'param'   => 'start',
+			'prefer'  => 'web',
+		]
+	],
+	'crm_whatsapp_bot'   => [
+		'apiUrl'    => 'https://wappi.pro/api',
+		'token'     => $secrets['crm_whatsapp_bot']['token'],
+		'profileId' => $secrets['crm_whatsapp_bot']['profileId'],
+	],
+	'frontend_host'      => 'https://crm.raysen.ru'
 ];

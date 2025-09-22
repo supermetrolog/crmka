@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace app\dto\Alert;
 
-use app\models\User;
-use DateTimeInterface;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 class CreateAlertForUsersDto extends BaseObject

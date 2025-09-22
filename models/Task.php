@@ -12,6 +12,7 @@ use app\models\ActiveQuery\TaskHistoryQuery;
 use app\models\ActiveQuery\TaskQuery;
 use app\models\ActiveQuery\TaskRelationEntityQuery;
 use app\models\ActiveQuery\TaskTaskTagQuery;
+use app\models\User\User;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 

@@ -10,7 +10,7 @@ use app\kernel\common\models\Form\Form;
 use app\models\Call;
 use app\models\Contact;
 use app\models\miniModels\Phone;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class CallForm extends Form

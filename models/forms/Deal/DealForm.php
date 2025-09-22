@@ -9,7 +9,7 @@ use app\models\Company\Company;
 use app\models\Objects;
 use app\models\oldDb\Complex;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 
 class DealForm extends Form
 {

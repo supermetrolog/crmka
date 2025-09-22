@@ -7,6 +7,7 @@ use app\models\ActiveQuery\ChatMemberQuery;
 use app\models\ActiveQuery\CommercialOfferQuery;
 use app\models\Company\Company;
 use app\models\oldDb\Offers;
+use app\models\User\User;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
 

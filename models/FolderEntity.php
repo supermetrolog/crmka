@@ -7,6 +7,7 @@ use app\models\ActiveQuery\FolderEntityQuery;
 use app\models\ActiveQuery\FolderQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\Company\Company;
+use app\models\User\User;
 
 /**
  * @property int         $id

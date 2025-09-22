@@ -27,7 +27,7 @@ use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Notification;
 use app\models\Request;
 use app\models\Timeline;
-use app\models\User;
+use app\models\User\User;
 use app\usecases\Request\Relations\RequestDirectionRelationService;
 use app\usecases\Request\Relations\RequestDistrictRelationService;
 use app\usecases\Request\Relations\RequestGateTypeRelationService;
@@ -269,7 +269,7 @@ class RequestService
 				// TODO: Вынести в Listener
 
 				$this->actualizeMainTimeline($request);
-				
+
 				$this->eventManager->trigger(new RequestConsultantChangedEvent($request, $oldConsultant, User::findOne($dto->consultant_id)));
 			}
 

@@ -12,7 +12,7 @@ use app\kernel\common\models\Form\Form;
 use app\models\Media;
 use app\models\Task;
 use app\models\TaskTag;
-use app\models\User;
+use app\models\User\User;
 use Exception;
 
 class TaskForm extends Form

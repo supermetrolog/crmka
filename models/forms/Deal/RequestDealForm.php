@@ -8,7 +8,7 @@ use app\kernel\common\models\Form\Form;
 use app\models\Company\Company;
 use app\models\Objects;
 use app\models\oldDb\Complex;
-use app\models\User;
+use app\models\User\User;
 
 class RequestDealForm extends Form
 {

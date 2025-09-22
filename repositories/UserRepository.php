@@ -6,7 +6,7 @@ namespace app\repositories;
 
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\repository\AbstractRepository;
-use app\models\User;
+use app\models\User\User;
 
 class UserRepository extends AbstractRepository
 {

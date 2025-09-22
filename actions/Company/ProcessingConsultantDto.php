@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\actions\Company;
 
-use app\models\User;
+use app\models\User\User;
 use yii\base\BaseObject;
 
 

@@ -14,7 +14,7 @@ use app\models\Objects;
 use app\models\OfferMix;
 use app\models\Relation;
 use app\models\Request;
-use app\models\User;
+use app\models\User\User;
 use sapp\kernel\common\models\AR\AR;
 use yii\base\ErrorException;
 use yii\db\ActiveQuery;
