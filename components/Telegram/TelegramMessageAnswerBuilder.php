@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\components\Telegram;
 
+use yii\helpers\Json;
+
 class TelegramMessageAnswerBuilder
 {
 	private string $text;
@@ -66,7 +68,7 @@ class TelegramMessageAnswerBuilder
 			'parse_mode'             => $this->parse_mode,
 			'entities'               => $this->entities,
 			'disabled_notifications' => $this->disable_notification,
-			'reply_markup'           => $this->reply_markup
+			'reply_markup'           => Json::encode($this->reply_markup)
 		];
 	}
 }
