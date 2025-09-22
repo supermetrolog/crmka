@@ -42,7 +42,8 @@ final class TelegramWebhookService
 		TelegramLinkService $linker,
 		TransactionBeginnerInterface $transactionBeginner,
 		TelegramBotApiClient $bot,
-		CrmLinkGenerator $linkGenerator
+		CrmLinkGenerator $linkGenerator,
+		RabbitMqWebsocketPublisher $publisher
 	)
 	{
 		$this->linkRepository          = $linkRepository;
@@ -51,6 +52,7 @@ final class TelegramWebhookService
 		$this->transactionBeginner     = $transactionBeginner;
 		$this->bot                     = $bot;
 		$this->linkGenerator           = $linkGenerator;
+		$this->publisher               = $publisher;
 	}
 
 	/**
