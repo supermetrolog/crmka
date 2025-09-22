@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace app\usecases\User;
 
+use app\components\EventManager;
 use app\dto\User\ChangeUserPasswordDto;
 use app\dto\User\CreateUserDto;
 use app\dto\User\CreateUserProfileDto;
 use app\dto\User\UpdateUserDto;
 use app\dto\User\UserActivityDto;
+use app\events\User\UserArchivedEvent;
+use app\events\User\UserDeletedEvent;
 use app\exceptions\InvalidPasswordException;
 use app\exceptions\ValidationErrorHttpException;
 use app\helpers\DateTimeHelper;
@@ -21,7 +24,6 @@ use app\repositories\UserRepository;
 use Throwable;
 use yii\base\Exception;
 use yii\base\Security;
-use yii\db\ActiveRecord;
 use yii\db\StaleObjectException;
 
 class UserService
@@ -32,6 +34,7 @@ class UserService
 	private UserActivityService          $userActivityService;
 	private Security                     $security;
 	private UserRepository               $repository;
+	private EventManager                 $eventManager;
 
 	public function __construct(
 		TransactionBeginnerInterface $transactionBeginner,
@@ -39,7 +42,8 @@ class UserService
 		UserAccessTokenService $accessTokenService,
 		UserActivityService $userActivityService,
 		Security $security,
-		UserRepository $repository
+		UserRepository $repository,
+		EventManager $eventManager
 	)
 	{
 		$this->security            = $security;
@@ -48,6 +52,7 @@ class UserService
 		$this->accessTokenService  = $accessTokenService;
 		$this->userActivityService = $userActivityService;
 		$this->repository          = $repository;
+		$this->eventManager        = $eventManager;
 	}
 
 	/**
@@ -59,11 +64,7 @@ class UserService
 	}
 
 	/**
-	 * @param CreateUserDto        $createUserDto
-	 * @param CreateUserProfileDto $userProfileDto
-	 * @param UploadFile           $uploadMedia
-	 *
-	 * @return User|array|ActiveRecord|null
+	 * @throws Exception
 	 * @throws SaveModelException
 	 * @throws Throwable
 	 * @throws ValidationErrorHttpException
@@ -96,19 +97,13 @@ class UserService
 		}
 	}
 
-	/** Updates a user.
-	 *
-	 * @param User                 $model          The model to update.
-	 * @param UpdateUserDto        $dto            The data to update the model with.
-	 * @param CreateUserProfileDto $userProfileDto The data to update the user profile with.
-	 * @param UploadFile           $uploadMedia    The uploaded media.
-	 *
-	 * @return User|ActiveRecord|null The updated model.
-	 * @throws SaveModelException If the model cannot be saved.
-	 * @throws Throwable If the transaction cannot be committed.
-	 * @throws ValidationErrorHttpException If the model cannot be validated.
+	/**
+	 * @throws Exception
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidationErrorHttpException
 	 */
-	public function update(User $model, UpdateUserDto $dto, CreateUserProfileDto $userProfileDto, UploadFile $uploadMedia)
+	public function update(User $model, UpdateUserDto $dto, CreateUserProfileDto $userProfileDto, UploadFile $uploadMedia): User
 	{
 		$tx = $this->transactionBeginner->begin();
 
@@ -158,6 +153,8 @@ class UserService
 
 			$model->saveOrThrow();
 
+			$this->eventManager->trigger(new UserDeletedEvent($model));
+
 			$tx->commit();
 		} catch (Throwable $th) {
 			$tx->rollBack();
@@ -176,9 +173,12 @@ class UserService
 
 		try {
 			$model->status = User::STATUS_INACTIVE;
+
 			$this->accessTokenService->deleteAllByUserId($model->id);
 
 			$model->saveOrThrow();
+
+			$this->eventManager->trigger(new UserArchivedEvent($model));
 
 			$tx->commit();
 		} catch (Throwable $th) {

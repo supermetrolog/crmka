@@ -27,6 +27,8 @@ use app\events\Task\RestoreTaskEvent;
 use app\events\Task\TaskCommentCreatedEvent;
 use app\events\Task\UpdateTaskEvent;
 use app\events\Timeline\UpdateTimelineStepEvent;
+use app\events\User\UserArchivedEvent;
+use app\events\User\UserDeletedEvent;
 use app\listeners\Company\ChangeCompanyRequestsConsultantListener;
 use app\listeners\Company\ChangeConsultantCompanySystemChatMessageListener;
 use app\listeners\Company\ConsultantCompanyAssignedListener;
@@ -60,6 +62,7 @@ use app\listeners\Task\UpdateTaskListener;
 use app\listeners\Timeline\SyncTimelineOnRequestActivationListener;
 use app\listeners\Timeline\SyncTimelineOnRequestDeactivationListener;
 use app\listeners\Timeline\UpdateRequestRelationTimestampListener;
+use app\listeners\User\RevokeIntegrationsOnUserInactivedListener;
 
 return [
 	CompleteSurveyEvent::class            => [
@@ -161,5 +164,11 @@ return [
 	],
 	TaskCommentCreatedEvent::class        => [
 		NotifyUsersOnTaskCommentCreatedListener::class
+	],
+	UserArchivedEvent::class              => [
+		RevokeIntegrationsOnUserInactivedListener::class
+	],
+	UserDeletedEvent::class               => [
+		RevokeIntegrationsOnUserInactivedListener::class
 	]
 ];

@@ -101,6 +101,6 @@ final class WhatsappApiClient
 	 */
 	public function sendMessage(string $phone, string $message): void
 	{
-		$this->post('/sync/message/send', ['recipient' => $phone, 'body' => $message])->send();
+		$this->post('/async/message/send', ['recipient' => $phone, 'body' => $message])->send();
 	}
 }

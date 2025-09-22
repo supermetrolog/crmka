@@ -11,10 +11,13 @@ use app\exceptions\services\Whatsapp\WhatsappPhoneNotExistsException;
 use app\helpers\PhoneHelper;
 use app\helpers\TypeConverterHelper;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\User\User;
 use app\models\User\UserWhatsappLink;
 use app\repositories\UserWhatsappLinkRepository;
+use Exception;
+use yii\base\InvalidConfigException;
 use yii\base\Security;
 
 final class WhatsappLinkService
@@ -83,15 +86,19 @@ final class WhatsappLinkService
 		]);
 	}
 
+	/**
+	 * @throws SaveModelException
+	 * @throws ModelNotFoundException
+	 * @throws InvalidConfigException
+	 * @throws Exception
+	 */
 	public function revokeByUser(User $user): void
 	{
-		$this->transactionBeginner->run(function () use ($user) {
-			$link = $this->repository->findActiveByUserIdOrThrow($user->id);
+		$link = $this->repository->findActiveByUserIdOrThrow($user->id);
 
-			$this->linkService->revoke($link);
+		$this->linkService->revoke($link);
 
-			$this->whatsappApi->sendMessage($link->phone, sprintf('☑ Ваш аккаунт отвязан от CRM профиля "%s".', $link->user->userProfile->mediumName));
-		});
+		$this->whatsappApi->sendMessage($link->phone, sprintf('☑ Ваш аккаунт отвязан от CRM профиля "%s".', $link->user->userProfile->mediumName));
 	}
 
 	/**

@@ -89,24 +89,20 @@ class UserController extends AppController
 		return UserWithContactsResource::fromDataProvider($dataProvider);
 	}
 
+
 	/**
-	 * @param $id
-	 *
-	 * @return array|null
-	 * @throws NotFoundHttpException
+	 * @throws ModelNotFoundException
 	 */
-	public function actionView($id): array
+	public function actionView($id): UserWithContactsResource
 	{
-		return UserWithContactsResource::make($this->findModel($id))->toArray();
+		return new UserWithContactsResource($this->findModel($id));
 	}
 
-	/** Creates a new user.
-	 *
-	 * @return array The created user.
-	 * @throws SaveModelException If the user cannot be saved.
-	 * @throws Throwable If the transaction cannot be committed.
-	 * @throws ValidationErrorHttpException If the user form cannot be validated.
-	 * @throws Exception If the user form cannot be validated.
+	/**
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws ValidationErrorHttpException
 	 */
 	public function actionCreate(): array
 	{
@@ -135,13 +131,13 @@ class UserController extends AppController
 		return UserResource::tryMakeArray($user);
 	}
 
-	/** Updates an existing user.
-	 *
-	 * @throws SaveModelException If the user cannot be saved.
-	 * @throws Throwable If the transaction cannot be committed.
-	 * @throws ValidateException If the user form cannot be validated.
-	 * @throws ValidationErrorHttpException If the user form cannot be validated.
-	 * @throws NotFoundHttpException If the user cannot be found.
+	/**
+	 * @throws ForbiddenHttpException
+	 * @throws ModelNotFoundException
+	 * @throws SaveModelException
+	 * @throws Throwable
+	 * @throws ValidateException
+	 * @throws ValidationErrorHttpException
 	 */
 	public function actionUpdate($id): array
 	{
@@ -235,13 +231,10 @@ class UserController extends AppController
 	}
 
 	/**
-	 * Logs out the current user.
-	 *
-	 * @return SuccessResponse The response message.
-	 * @throws StaleObjectException If the user cannot be logged out
 	 * @throws InvalidBearerTokenException
-	 * @throws NotFoundHttpException
-	 * @throws Throwable If the user cannot be logged out.
+	 * @throws ModelNotFoundException
+	 * @throws StaleObjectException
+	 * @throws Throwable
 	 */
 	public function actionLogout(): SuccessResponse
 	{
@@ -252,9 +245,6 @@ class UserController extends AppController
 	}
 
 	/**
-	 * @param $id
-	 *
-	 * @return array
 	 * @throws ForbiddenHttpException
 	 * @throws ModelNotFoundException
 	 */
@@ -274,9 +264,6 @@ class UserController extends AppController
 	}
 
 	/**
-	 * @param $id
-	 *
-	 * @return SuccessResponse
 	 * @throws ForbiddenHttpException
 	 * @throws InvalidBearerTokenException
 	 * @throws ModelNotFoundException
@@ -399,12 +386,6 @@ class UserController extends AppController
 	}
 
 	/**
-	 * Finds the User model based on its primary key value.
-	 * If the model is not found, a 404 HTTP exception will be thrown.
-	 *
-	 * @param int $id The user ID.
-	 *
-	 * @return User The loaded model.
 	 * @throws ModelNotFoundException
 	 */
 	protected function findModel(int $id): User
