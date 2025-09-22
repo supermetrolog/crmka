@@ -6,5 +6,5 @@ namespace app\components\Notification\Interfaces;
 
 interface WebsocketPublisherInterface
 {
-	public function publishToUser(int $userId, array $payload): void;
+	public function publishToUser(int $userId, array $payload, string $action): void;
 }
