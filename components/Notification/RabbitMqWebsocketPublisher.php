@@ -17,13 +17,13 @@ final class RabbitMqWebsocketPublisher implements WebsocketPublisherInterface
 		$this->queue = $queue;
 	}
 
-	public function publishToUser(int $userId, array $payload): void
+	public function publishToUser(int $userId, array $payload, string $action = Message::ACTION_NEW_USER_NOTIFICATION): void
 	{
 		$this->queue->publish([
 			'consultant_id' => $userId,
 			'payload'       => $payload,
 			'ts'            => time(),
-			'action'        => Message::ACTION_NEW_USER_NOTIFICATION,
+			'action'        => $action,
 		]);
 	}
 }
