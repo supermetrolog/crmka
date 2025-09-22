@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace app\usecases\Telegram;
 
-use app\components\Notification\RabbitMqWebsocketPublisher;
+use app\components\Notification\Interfaces\WebsocketPublisherInterface;
 use app\components\Telegram\Models\TMessage;
 use app\components\Telegram\Models\TUpdate;
 use app\components\Telegram\TelegramBotApiClient;
@@ -34,7 +34,7 @@ final class TelegramWebhookService
 	protected TelegramLinkService          $linker;
 	protected TelegramBotApiClient         $bot;
 	protected CrmLinkGenerator             $linkGenerator;
-	protected RabbitMqWebsocketPublisher   $publisher;
+	protected WebsocketPublisherInterface  $publisher;
 
 	public function __construct(
 		UserTelegramLinkRepository $linkRepository,
@@ -43,7 +43,7 @@ final class TelegramWebhookService
 		TransactionBeginnerInterface $transactionBeginner,
 		TelegramBotApiClient $bot,
 		CrmLinkGenerator $linkGenerator,
-		RabbitMqWebsocketPublisher $publisher
+		WebsocketPublisherInterface $publisher
 	)
 	{
 		$this->linkRepository          = $linkRepository;
