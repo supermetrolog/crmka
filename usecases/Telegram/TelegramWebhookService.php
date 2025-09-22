@@ -7,8 +7,6 @@ use app\components\Notification\Interfaces\WebsocketPublisherInterface;
 use app\components\Telegram\Models\TMessage;
 use app\components\Telegram\Models\TUpdate;
 use app\components\Telegram\TelegramBotApiClient;
-use app\components\Telegram\TelegramInlineKeyboardBuilder;
-use app\components\Telegram\TelegramMessageAnswerBuilder;
 use app\daemons\Message;
 use app\dto\Telegram\TelegramUserDataDto;
 use app\enum\Telegram\TelegramMessageEntityTypeEnum;
@@ -105,11 +103,7 @@ final class TelegramWebhookService
 		try {
 			$link = $this->linkByCode($code, $message);
 
-			$builder = TelegramMessageAnswerBuilder::create()
-			                                       ->setText(sprintf('✅ Ваш Telegram аккаунт связан с профилем *%s*', $link->user->userProfile->mediumName))
-			                                       ->addInlineKeyboardButton(TelegramInlineKeyboardBuilder::link('↗️ Перейти в CRM', $this->linkGenerator->generate('account.integrations'))->toArray());
-
-			$this->sendAnswer($message, $builder->toArray());
+			$this->sendTextAnswer($message, sprintf('✅ Ваш Telegram аккаунт связан с профилем *%s*', $link->user->userProfile->mediumName));
 
 			$this->publisher->publishToUser($link->user_id, ['link_id' => $link->id], Message::TELEGRAM_LINKED);
 		} catch (ModelNotFoundException $th) {
@@ -149,13 +143,9 @@ final class TelegramWebhookService
 		$link = $this->linkRepository->findActiveByTelegramUserId($message->from->id);
 
 		if ($link) {
-			$this->sendTextAnswer($message, sprintf('👤 К вашему аккаунту привязан профиль *%s*.', $link->user->userProfile->mediumName));
+			$this->sendTextAnswer($message, sprintf('👤 К вашему аккаунту привязан профиль %s.', $link->user->userProfile->mediumName));
 		} else {
-			$builder = TelegramMessageAnswerBuilder::create()
-			                                       ->setText('❕ Для связывания аккаунта воспользуйтесь личным кабинетом.')
-			                                       ->addInlineKeyboardButton(TelegramInlineKeyboardBuilder::link('↗️ Перейти в CRM', $this->linkGenerator->generate('account.integrations'))->toArray());
-
-			$this->sendAnswer($message, $builder->toArray());
+			$this->sendTextAnswer($message, '❕ Для связывания аккаунта воспользуйтесь личным кабинетом.');
 		}
 	}
 
