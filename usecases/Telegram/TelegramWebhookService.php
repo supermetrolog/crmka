@@ -6,7 +6,6 @@ namespace app\usecases\Telegram;
 use app\components\Notification\RabbitMqWebsocketPublisher;
 use app\components\Telegram\Models\TMessage;
 use app\components\Telegram\Models\TUpdate;
-use app\components\Telegram\Models\TUser;
 use app\components\Telegram\TelegramBotApiClient;
 use app\components\Telegram\TelegramInlineKeyboardBuilder;
 use app\components\Telegram\TelegramMessageAnswerBuilder;
@@ -102,7 +101,7 @@ final class TelegramWebhookService
 		}
 
 		try {
-			$link = $this->linkByCode($code, $message->from);
+			$link = $this->linkByCode($code, $message);
 
 			$builder = TelegramMessageAnswerBuilder::create()
 			                                       ->setText(sprintf('✅ Ваш Telegram аккаунт связан с профилем **%s**', $link->user->userProfile->mediumName))
@@ -161,13 +160,14 @@ final class TelegramWebhookService
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	private function linkByCode(string $code, TUser $user): UserTelegramLink
+	private function linkByCode(string $code, TMessage $message): UserTelegramLink
 	{
 		$dto = new TelegramUserDataDto([
-			'telegramUserId' => $user->id,
-			'firstName'      => $user->first_name,
-			'lastName'       => $user->last_name,
-			'username'       => $user->username,
+			'telegramUserId' => $message->from->id,
+			'telegramChatId' => $message->chat->id,
+			'firstName'      => $message->from->first_name,
+			'lastName'       => $message->from->last_name,
+			'username'       => $message->from->username,
 		]);
 
 		return $this->linker->consumeTicket($code, $dto);
