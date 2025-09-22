@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\commands;
 
-use app\components\Telegram\TelegramBotApiClient;
+use app\components\Integrations\Telegram\TelegramBotApiClient;
 use app\kernel\common\controller\ConsoleController;
 use Yii;
 use yii\helpers\Json;
