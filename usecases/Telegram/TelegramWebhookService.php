@@ -191,7 +191,7 @@ final class TelegramWebhookService
 	 */
 	private function sendAnswer(TMessage $message, array $config): void
 	{
-		$this->bot->sendMessage($message->chat->id, $config['text'], $config['params']);
+		$this->bot->send($message->chat->id, $config);
 	}
 
 	/**
