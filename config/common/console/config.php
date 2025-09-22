@@ -1,6 +1,5 @@
 <?php
 
-use app\commands\TelegramController;
 use app\components\Media\Media;
 use app\components\PathBuilder\PathBuilderFactory;
 use yii\di\Container;
@@ -18,7 +17,7 @@ return ArrayHelper::merge(
 		],
 		'controllerNamespace' => 'app\commands',
 		'controllerMap'       => [
-			'migrate'  => [
+			'migrate' => [
 				'class'                  => 'yii\console\controllers\MigrateController',
 				'templateFile'           => '@app/kernel/console/views/migration.php',
 				'generatorTemplateFiles' => [
@@ -28,11 +27,6 @@ return ArrayHelper::merge(
 					'drop_column'     => '@yii/views/dropColumnMigration.php',
 					'create_junction' => '@yii/views/createTableMigration.php',
 				]
-			],
-			'telegram' => [
-				'class'         => TelegramController::class,
-				'webhookSecret' => $params['crm_telegram_bot']['webhook']['secret'],
-				'webhookUrl'    => $params['crm_telegram_bot']['webhook']['url']
 			]
 		],
 		'container'           => [
