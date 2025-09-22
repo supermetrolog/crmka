@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 use app\components\EventManager;
+use app\components\Integrations\Telegram\Interfaces\TelegramDeepLinkGeneratorInterface;
+use app\components\Integrations\Telegram\TelegramBotApiClient;
+use app\components\Integrations\Telegram\TelegramDeepLinkGenerator;
+use app\components\Integrations\Whatsapp\WhatsappApiClient;
 use app\components\MessageTemplate\Adapters\EmailTwigEnvironmentAdapter;
 use app\components\MessageTemplate\Interfaces\EmailTwigEnvironmentInterface;
 use app\components\Notification\Interfaces\WebsocketPublisherInterface;
 use app\components\Notification\RabbitMqWebsocketPublisher;
-use app\components\Telegram\Interfaces\TelegramDeepLinkGeneratorInterface;
-use app\components\Telegram\TelegramBotApiClient;
-use app\components\Telegram\TelegramDeepLinkGenerator;
-use app\components\Whatsapp\WhatsappApiClient;
 use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\models\ActiveQuery\NotificationChannelQuery;
 use app\models\Notification\NotificationChannel;

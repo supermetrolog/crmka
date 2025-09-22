@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace app\usecases\Telegram;
 
+use app\components\Integrations\Telegram\Models\IntegrationMessage;
+use app\components\Integrations\Telegram\Models\IntegrationUpdate;
+use app\components\Integrations\Telegram\TelegramBotApiClient;
 use app\components\Notification\Interfaces\WebsocketPublisherInterface;
-use app\components\Telegram\Models\TMessage;
-use app\components\Telegram\Models\TUpdate;
-use app\components\Telegram\TelegramBotApiClient;
 use app\daemons\Message;
 use app\dto\Telegram\TelegramUserDataDto;
 use app\enum\Telegram\TelegramMessageEntityTypeEnum;
@@ -56,7 +56,7 @@ final class TelegramWebhookService
 	/**
 	 * @throws \Exception
 	 */
-	public function handleUpdate(TUpdate $update): void
+	public function handleUpdate(IntegrationUpdate $update): void
 	{
 		$message = $update->message ?? $update->callback_query->message;
 
@@ -90,7 +90,7 @@ final class TelegramWebhookService
 	/**
 	 * @throws Exception
 	 */
-	private function handleStart(TMessage $message): void
+	private function handleStart(IntegrationMessage $message): void
 	{
 		$code = StringHelper::substr($message->text, StringHelper::length(TelegramUpdateCommandEnum::START) + 1);
 
@@ -121,7 +121,7 @@ final class TelegramWebhookService
 	/**
 	 * @throws Exception
 	 */
-	private function handleRevoke(TMessage $message): void
+	private function handleRevoke(IntegrationMessage $message): void
 	{
 		try {
 			$revokedLink = $this->revokeByTelegramId($message->from->id);
@@ -138,7 +138,7 @@ final class TelegramWebhookService
 	/**
 	 * @throws Exception
 	 */
-	private function handleStatus(TMessage $message): void
+	private function handleStatus(IntegrationMessage $message): void
 	{
 		$link = $this->linkRepository->findActiveByTelegramUserId($message->from->id);
 
@@ -152,7 +152,7 @@ final class TelegramWebhookService
 	/**
 	 * @throws ModelNotFoundException
 	 */
-	private function linkByCode(string $code, TMessage $message): UserTelegramLink
+	private function linkByCode(string $code, IntegrationMessage $message): UserTelegramLink
 	{
 		$dto = new TelegramUserDataDto([
 			'telegramUserId' => $message->from->id,
@@ -181,7 +181,7 @@ final class TelegramWebhookService
 	/**
 	 * @throws Exception
 	 */
-	private function sendAnswer(TMessage $message, array $config): void
+	private function sendAnswer(IntegrationMessage $message, array $config): void
 	{
 		$this->bot->send($message->chat->id, $config);
 	}
@@ -189,7 +189,7 @@ final class TelegramWebhookService
 	/**
 	 * @throws Exception
 	 */
-	private function sendTextAnswer(TMessage $message, string $text, array $params = []): void
+	private function sendTextAnswer(IntegrationMessage $message, string $text, array $params = []): void
 	{
 		$this->bot->sendMessage($message->chat->id, $text, $params);
 	}

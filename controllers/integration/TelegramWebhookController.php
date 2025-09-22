@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace app\controllers\integration;
 
-use app\components\Telegram\Models\TUpdate;
-use app\components\Telegram\TelegramBotApiClient;
+use app\components\Integrations\Telegram\Models\IntegrationUpdate;
+use app\components\Integrations\Telegram\TelegramBotApiClient;
 use app\kernel\common\controller\AppController;
 use app\usecases\Telegram\TelegramWebhookService;
 use Throwable;
@@ -64,7 +64,7 @@ final class TelegramWebhookController extends AppController
 		$payload = Json::decode($this->request->getRawBody()) ?? [];
 
 		try {
-			$this->service->handleUpdate(new TUpdate($payload));
+			$this->service->handleUpdate(new IntegrationUpdate($payload));
 		} catch (Throwable $e) {
 			Yii::error(['message' => $e->getMessage(), 'payload' => $payload], 'telegram.webhook');
 		}

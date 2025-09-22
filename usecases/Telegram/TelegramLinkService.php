@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace app\usecases\Telegram;
 
-use app\components\Telegram\Interfaces\TelegramDeepLinkGeneratorInterface;
-use app\components\Telegram\TelegramBotApiClient;
+use app\components\Integrations\Telegram\Interfaces\TelegramDeepLinkGeneratorInterface;
+use app\components\Integrations\Telegram\TelegramBotApiClient;
 use app\dto\Telegram\StartLinkTelegramDto;
 use app\dto\Telegram\StatusLinkTelegramDto;
 use app\dto\Telegram\TelegramUserDataDto;
