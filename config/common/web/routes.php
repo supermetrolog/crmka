@@ -465,4 +465,17 @@ return static function (RouterInterface $router) {
 	$router->controller('integration/telegram-webhook')->alias('integration/telegram/webhook')->group(static function (RouteInterface $route) {
 		$route->post()->action('handle');
 	});
+
+	$router->controller('integration/whatsapp')->disablePluralize()->group(static function (RouteInterface $route) {
+		$route->post('link');
+		$route->post('status');
+		$route->post('revoke');
+	});
+
+	$router->controller('integration/whatsapp-admin')->alias('integration/whatsapp/admin')->group(static function (RouteInterface $route) {
+		$route->get('list');
+
+		$route->post('revoke-user/<id>')->action('revoke-user');
+		$route->post('revoke-link/<id>')->action('revoke-link');
+	});
 };

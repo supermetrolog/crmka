@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace app\controllers\integration;
 
 use app\kernel\common\controller\AppController;
+use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\resources\Telegram\StartTelegramLinkResource;
 use app\resources\Telegram\StatusTelegramLinkResource;
 use app\usecases\Telegram\TelegramLinkService;
-use yii\base\Exception;
 
 final class TelegramController extends AppController
 {
@@ -29,7 +29,6 @@ final class TelegramController extends AppController
 
 	/**
 	 * @throws SaveModelException
-	 * @throws Exception
 	 */
 	public function actionStart(): StartTelegramLinkResource
 	{
@@ -50,8 +49,12 @@ final class TelegramController extends AppController
 	 */
 	public function actionRevoke(): SuccessResponse
 	{
-		$this->linkService->revokeByUser($this->user->identity);
+		try {
+			$this->linkService->revokeByUser($this->user->identity);
 
-		return $this->success('Телеграмм аккаунт отвязан');
+			return $this->success('Телеграмм аккаунт отвязан');
+		} catch (ModelNotFoundException $th) {
+			return $this->success('К вашему аккаунту не привязан телеграмм аккаунт');
+		}
 	}
 }
