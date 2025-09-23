@@ -3,12 +3,14 @@
 namespace app\controllers;
 
 use app\dto\UserNotification\ProcessUserNotificationActionDto;
+use app\dto\UserNotification\UserNotificationActionDto;
 use app\helpers\DateTimeHelper;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\SuccessResponse;
+use app\models\forms\User\UserNotificationActionSendForm;
 use app\models\forms\User\UserNotificationSendForm;
 use app\models\search\UserNotificationSearch;
 use app\repositories\UserNotificationActionRepository;
@@ -167,8 +169,29 @@ class UserNotificationController extends AppController
 			$dtos[] = $dto;
 		}
 
-		$this->sendService->sendAll($dtos);
+		$actionDtos = [];
+
+		foreach ($this->request->post('actions', []) as $action) {
+			$actionDtos[] = $this->makeActionDto($action);
+		}
+
+		$this->sendService->sendAll($dtos, $actionDtos);
 
 		return $this->success('Уведомление отправлено');
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws Exception
+	 */
+	private function makeActionDto(array $payload): UserNotificationActionDto
+	{
+		$form = new UserNotificationActionSendForm();
+
+		$form->load($payload);
+
+		$form->validateOrThrow();
+
+		return $form->getDto();
 	}
 }
