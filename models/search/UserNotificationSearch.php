@@ -3,10 +3,12 @@
 namespace app\models\search;
 
 use app\helpers\DateTimeHelper;
+use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\Notification\NotificationChannel;
 use app\models\Notification\UserNotification;
+use app\models\Notification\UserNotificationTemplate;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 
@@ -19,6 +21,8 @@ class UserNotificationSearch extends Form
 	public $acted;
 	public $expired;
 	public $processed;
+	public $viewed;
+	public $priority;
 
 	public ?int $id_less_then = null;
 
@@ -30,9 +34,9 @@ class UserNotificationSearch extends Form
 	{
 		return [
 			[['id', 'user_id', 'limit', 'id_less_then'], 'integer'],
-			[['channel'], 'string'],
+			[['channel', 'priority'], 'string'],
 			[['since'], 'safe'],
-			[['acted', 'expired', 'processed', 'paginated'], 'boolean']
+			[['acted', 'expired', 'processed', 'paginated', 'viewed'], 'boolean']
 		];
 	}
 
@@ -45,7 +49,7 @@ class UserNotificationSearch extends Form
 		$query = UserNotification::find()
 		                         ->distinct()
 		                         ->innerJoinWith(['mailing'])
-		                         ->with(['mailing.createdByUser.userProfile']);
+		                         ->with(['mailing.createdByUser.userProfile', 'userNotificationTemplate']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
@@ -91,6 +95,14 @@ class UserNotificationSearch extends Form
 			$query->andWhereNull(UserNotification::field('acted_at'));
 		}
 
+		if ($this->isFilterTrue($this->viewed)) {
+			$query->andWhereNotNull(UserNotification::field('viewed_at'));
+		}
+
+		if ($this->isFilterFalse($this->viewed)) {
+			$query->andWhereNull(UserNotification::field('viewed_at'));
+		}
+
 		if ($this->isFilterTrue($this->expired)) {
 			$query->andWhereNotNull(UserNotification::field('expired_at'))
 			      ->andWhere(['<', UserNotification::field('expired_at'), DateTimeHelper::nowf()]);
@@ -114,6 +126,12 @@ class UserNotificationSearch extends Form
 					['<', UserNotification::field('expires_at'), DateTimeHelper::nowf()],
 				]
 			]);
+		}
+
+		if ($this->hasFilter($this->priority)) {
+			$query->innerJoinWith(['userNotificationTemplate' => function (AQ $query) {
+				$query->andWhere([UserNotificationTemplate::field('priority') => $this->priority]);
+			}], false);
 		}
 
 		return $dataProvider;
