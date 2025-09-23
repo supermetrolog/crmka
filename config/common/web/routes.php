@@ -416,7 +416,9 @@ return static function (RouterInterface $router) {
 
 	$router->controller('user-notification')->group(static function (RouteInterface $route) {
 		$route->get()->action('index');
-		$route->get('count');
+		$route->get('user/count')->action('count');
+		$route->post('user/acted-all')->action('acted-all');
+		$route->post('send');
 
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
