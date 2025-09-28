@@ -40,7 +40,7 @@ class RequestNotificationFactory
 	{
 		return NotificationActionBuilder::navigateToRoute(
 			'company.view',
-			['id' => $request->consultant_id],
+			['id' => $request->company_id],
 			['selected_request_id' => $request->id],
 			"/companies/$request->company_id"
 		)
