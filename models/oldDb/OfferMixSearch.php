@@ -8,16 +8,21 @@ use app\helpers\ArrayHelper;
 use app\helpers\SQLHelper;
 use app\helpers\StringHelper;
 use app\models\ActiveQuery\ChatMemberMessageQuery;
+use app\models\ActiveQuery\ChatMemberQuery;
+use app\models\ActiveQuery\SurveyQuery;
+use app\models\ChatMember;
 use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\models\Company\Company;
 use app\models\FolderEntity;
 use app\models\oldDb\location\Region;
 use app\models\Search;
+use app\models\Survey;
 use app\models\views\OfferMixSearchView;
 use yii\base\ErrorException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\data\Sort;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\Json;
@@ -1337,7 +1342,6 @@ class OfferMixSearch extends Search
 			                           $this->getSelect(),
 			                           [
 				                           'last_call_rel_id'      => 'last_call_rel.id',
-				                           // 'unread_message_count' => 'COUNT(DISTINCT cmm.id)',
 				                           'complex_objects_count' => 'COUNT(DISTINCT cobj.id)',
 			                           ]
 		                           ))
@@ -1345,77 +1349,19 @@ class OfferMixSearch extends Search
 		                           ->joinWith(['chatMember cm'])
 		                           ->joinWith(['object.complexObjects cobj'], false)
 		                           ->leftJoinLastCallRelation()
-//		                           ->leftJoin(['cmm' => $this->makeMessageQuery()],
-//			                           'cmm.to_chat_member_id' . '=' . 'cm.id'
-//		                           )
-                                   ->with([
-				'object.objectFloors',
-				'consultant.userProfile',
-				'object.offers',
-				'lastCall'
-			])
+		                           ->with(['object.objectFloors', 'consultant.userProfile', 'object.offers', 'lastCall'])
 		                           ->groupBy($this->getField('id'));
 
 		$this->load($params, '');
 		$this->normalizeProps();
+
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
 			'pagination' => [
 				'defaultPageSize' => 50,
 				'pageSizeLimit'   => [0, 50],
 			],
-			'sort'       => [
-				'enableMultiSort' => true,
-				'defaultOrder'    => [
-					'default' => SORT_DESC
-				],
-				'attributes'      => [
-					$this->getField('last_update'),
-					'from_mkad',
-					'price'        => [
-						'asc'  => [
-							new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END ASC")
-						],
-						'desc' => [
-							new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END DESC")
-						]
-					],
-					'area'         => [
-						'asc'  => [
-							'area_max' => SORT_ASC
-						],
-						'desc' => [
-							'area_max' => SORT_DESC
-						]
-					],
-					'status'       => [
-						'asc'  => ['c_industry_offers_mix.status' => SORT_ASC],
-						'desc' => ['c_industry_offers_mix.status' => SORT_DESC]
-					],
-					'original_ids' => [
-						'asc'  => [
-							new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) ASC"),
-							$this->getField('last_update') => SORT_ASC,
-							'c_industry_offers_mix.status' => SORT_ASC
-						],
-						'desc' => [
-							new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) DESC"),
-							$this->getField('last_update') => SORT_DESC,
-							'c_industry_offers_mix.status' => SORT_DESC
-						],
-					],
-					'default'      => [
-						'asc'  => [
-							"COALESCE(last_call_rel.created_at, {$this->getField('last_update')})" => SORT_ASC,
-							'c_industry_offers_mix.status'                                         => SORT_ASC,
-						],
-						'desc' => [
-							"COALESCE(last_call_rel.created_at, {$this->getField('last_update')})" => SORT_DESC,
-							'c_industry_offers_mix.status'                                         => SORT_DESC,
-						],
-					]
-				]
-			]
+			'sort'       => $this->createSort($query)
 		]);
 
 
@@ -1432,6 +1378,150 @@ class OfferMixSearch extends Search
 		/**
 		 * Вообщето есть
 		 */
+	}
+
+	private function createSort($query): Sort
+	{
+		$sort = new Sort([
+			'enableMultiSort' => true,
+			'defaultOrder'    => [
+				'default' => SORT_DESC
+			],
+			'attributes'      => $this->getSortAttributes()
+		]);
+
+		$this->applySortJoins($query, $sort);
+		$this->prepareSort($query, $sort);
+
+		return $sort;
+	}
+
+	private function getSortAttributes(): array
+	{
+		return [
+			$this->getField('last_update'),
+			'from_mkad',
+			'price'                  => [
+				'asc'  => [
+					new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END ASC")
+				],
+				'desc' => [
+					new Expression("CASE WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . " OR c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_RENT . "  THEN GREATEST(c_industry_offers_mix.price_mezzanine_min, c_industry_offers_mix.price_mezzanine_max, c_industry_offers_mix.price_floor_min, c_industry_offers_mix.price_floor_max ) WHEN c_industry_offers_mix.deal_type = " . OfferMix::DEAL_TYPE_SALE . " THEN c_industry_offers_mix.price_sale_max ELSE c_industry_offers_mix.price_safe_pallet_max END DESC")
+				]
+			],
+			'area'                   => [
+				'asc'  => [
+					'area_max' => SORT_ASC
+				],
+				'desc' => [
+					'area_max' => SORT_DESC
+				]
+			],
+			'status'                 => [
+				'asc'  => ['c_industry_offers_mix.status' => SORT_ASC],
+				'desc' => ['c_industry_offers_mix.status' => SORT_DESC]
+			],
+			'original_ids'           => [
+				'asc'  => [
+					new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) ASC"),
+					$this->getField('last_update') => SORT_ASC,
+					'c_industry_offers_mix.status' => SORT_ASC
+				],
+				'desc' => [
+					new Expression("FIELD(c_industry_offers_mix.original_id, {$this->sort_original_id}) DESC"),
+					$this->getField('last_update') => SORT_DESC,
+					'c_industry_offers_mix.status' => SORT_DESC
+				],
+			],
+			'default'                => [
+				'asc'  => [
+					"COALESCE(last_call_rel.created_at, {$this->getField('last_update')})" => SORT_ASC,
+					'c_industry_offers_mix.status'                                         => SORT_ASC,
+				],
+				'desc' => [
+					"COALESCE(last_call_rel.created_at, {$this->getField('last_update')})" => SORT_DESC,
+					'c_industry_offers_mix.status'                                         => SORT_DESC,
+				],
+			],
+			'last_survey_created_at' => [
+				'asc'  => [
+					new Expression('ls.last_survey_completed_at IS NOT NULL DESC'),
+					"COALESCE(ls.last_survey_completed_at, ls.last_survey_created_at)" => SORT_ASC,
+					$this->getField('last_update')                                     => SORT_ASC,
+					'c_industry_offers_mix.status'                                     => SORT_ASC,
+				],
+				'desc' => [
+					"COALESCE(ls.last_survey_completed_at, ls.last_survey_created_at)" => SORT_DESC,
+					$this->getField('last_update')                                     => SORT_DESC,
+					'c_industry_offers_mix.status'                                     => SORT_DESC,
+				]
+			]
+		];
+	}
+
+	private function getJoinMap(): array
+	{
+		return [
+			'last_survey_created_at' => fn($query) => $query->leftJoin(['ccm' => $this->makeCompanyChatMemberQuery()], 'ccm.model_id = c_industry_offers_mix.company_id')
+			                                                ->leftJoin(['ls' => $this->makeLastSurveyQuery()], 'ls.chat_member_id = ccm.id')
+		];
+	}
+
+	private function applySortJoins($query, Sort $sort): void
+	{
+		$fieldsToSort = ArrayHelper::keys($sort->getAttributeOrders());
+		$joinMap      = $this->getJoinMap();
+
+		foreach ($fieldsToSort as $field) {
+			if (isset($joinMap[$field])) {
+				$joinMap[$field]($query);
+			}
+		}
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	private function makeLastSurveyQuery(): SurveyQuery
+	{
+		return Survey::find()
+		             ->from(Survey::getTable())
+		             ->select([
+			             'id',
+			             'chat_member_id',
+			             'last_survey_created_at'   => 'MAX(created_at)',
+			             'last_survey_completed_at' => 'MAX(completed_at)',
+		             ])
+		             ->andWhere(['not in', Survey::field('status'), [Survey::STATUS_DRAFT, Survey::STATUS_DELAYED]])
+		             ->groupBy('chat_member_id');
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	private function makeCompanyChatMemberQuery(): ChatMemberQuery
+	{
+		return ChatMember::find()
+		                 ->from(ChatMember::getTable())
+		                 ->select(['id', 'model_id', 'model_type'])
+		                 ->byModelType(Company::getMorphClass());
+	}
+
+	private function getPrepareMap(): array
+	{
+		return [];
+	}
+
+	private function prepareSort($query, Sort $sort): void
+	{
+		$fieldsToSort = ArrayHelper::keys($sort->getAttributeOrders());
+		$prepareMap   = $this->getPrepareMap();
+
+		foreach ($fieldsToSort as $field) {
+			if (isset($prepareMap[$field])) {
+				$prepareMap[$field]($query);
+			}
+		}
 	}
 
 	/**
