@@ -48,8 +48,8 @@ class ChatMemberRepository
 		                                          ->select([
 			                                          'chat_member_id'            => ChatMemberStatisticView::field('id'),
 			                                          'consultant_id'             => 'user.id',
-			                                          'unread_task_count'         => 'COUNT(DISTINCT tasks.id)',
-			                                          'unread_notification_count' => 'COUNT(DISTINCT notifications.id)',
+			                                          'unread_task_count'         => 'tasks.unread_task_count',
+			                                          'unread_notification_count' => 'notifications.unread_notification_count',
 			                                          'unread_message_count'      => 'COUNT(DISTINCT messages.id) - COUNT(DISTINCT message_views.id)',
 			                                          'outdated_call_count'       => 'COUNT(DISTINCT cls.id)'
 		                                          ])
@@ -98,10 +98,8 @@ class ChatMemberRepository
 	{
 		return Task::find()
 		           ->select([
-			           'id'          => Task::field('id'),
-			           'user_id'     => Task::field('user_id'),
-			           'viewed_at'   => 'to.viewed_at',
-			           'observer_id' => 'to.user_id'
+			           'observer_id'       => 'to.user_id',
+			           'unread_task_count' => new Expression('COUNT(*)')
 		           ])
 		           ->leftJoin(Relation::getTable(), [
 			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -120,10 +118,10 @@ class ChatMemberRepository
 		           ->andWhereNotNull(ChatMemberMessage::field('id'))
 		           ->andWhere([
 			           'to.viewed_at'           => null,
-			           'to.task_id'             => Task::xfield('id'),
 			           'chat_member.model_type' => $model_types
 		           ])
-		           ->notDeleted();
+		           ->notDeleted()
+		           ->groupBy('to.user_id');
 	}
 
 	/**
@@ -136,8 +134,8 @@ class ChatMemberRepository
 	{
 		return UserNotification::find()
 		                       ->select([
-			                       'id'      => UserNotification::field('id'),
-			                       'user_id' => UserNotification::field('user_id'),
+			                       'user_id'                   => UserNotification::field('user_id'),
+			                       'unread_notification_count' => new Expression('COUNT(*)'),
 		                       ])
 		                       ->leftJoin(Relation::getTable(), [
 			                       Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -154,7 +152,8 @@ class ChatMemberRepository
 		                       ->andWhereNotNull(ChatMemberMessage::field('id'))
 		                       ->andWhere([
 			                       'chat_member.model_type' => $model_types
-		                       ]);
+		                       ])
+		                       ->groupBy(UserNotification::field('user_id'));
 	}
 
 	/**
@@ -177,7 +176,8 @@ class ChatMemberRepository
 		                 ->leftJoinLastCallRelation()
 		                 ->byModelTypes($model_types)
 		                 ->joinWith(['objectChatMember.object', 'company'])
-		                 ->needCalling();
+		                 ->needCalling()
+		                 ->groupBy(['consultant_id', 'consultant_id_old']);
 	}
 
 	/**
