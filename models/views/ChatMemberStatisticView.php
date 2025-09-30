@@ -52,7 +52,6 @@ class ChatMemberStatisticView extends ChatMember
 	public ?int $unread_notification_count = null;
 	public ?int $unread_message_count      = null;
 	public ?int $outdated_call_count       = null;
-	public ?int $outdated_call_count_all   = null;
 
 	/**
 	 * @return RelationQuery|ActiveQuery

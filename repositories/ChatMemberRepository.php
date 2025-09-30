@@ -77,15 +77,7 @@ class ChatMemberRepository
 		                                          ->andWhere([ChatMemberStatisticView::field('id') => $dto->chat_member_ids])
 		                                          ->groupBy(ChatMemberStatisticView::field('id'));
 
-		/** @var ChatMemberStatisticView[] $statistics */
-		$statistics          = $chatMemberQuery->all();
-		$allNeedingCallCount = (int)$needCallingQuery->count();
-
-		foreach ($statistics as $statistic) {
-			$statistic->outdated_call_count_all = $allNeedingCallCount;
-		}
-
-		return $statistics;
+		return $chatMemberQuery->all();
 	}
 
 	/**
