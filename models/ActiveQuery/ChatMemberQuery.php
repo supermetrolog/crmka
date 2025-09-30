@@ -2,6 +2,7 @@
 
 namespace app\models\ActiveQuery;
 
+use app\enum\Company\CompanyStatusEnum;
 use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
@@ -87,6 +88,7 @@ class ChatMemberQuery extends AQ
 					'and',
 					['last_call_rel.created_at' => null],
 					['model_type' => Company::getMorphClass()],
+					[Company::field('status') => CompanyStatusEnum::ACTIVE],
 					['<', Company::field('created_at'), $interval]
 				],
 			]
