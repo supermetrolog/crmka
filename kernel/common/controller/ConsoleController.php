@@ -37,6 +37,11 @@ class ConsoleController extends Controller
 		$this->print($message, BaseConsole::FG_BLUE);
 	}
 
+	public function commentf(string $message, ...$values): void
+	{
+		$this->comment(sprintf($message, ...$values));
+	}
+
 	public function success(string $message): void
 	{
 		$this->print($message, BaseConsole::FG_GREEN);
