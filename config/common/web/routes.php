@@ -252,6 +252,8 @@ return static function (RouterInterface $router) {
 		$route->post()->action('create');
 		$route->get('pending-by-chat-member/<id>', 'view-pending-by-chat-member-id');
 
+		$route->get('statistics');
+
 		$route->prefix('<id>', static function (RouteInterface $route) {
 			$route->get()->action('view');
 			$route->get('with-questions', 'view-with-questions');
