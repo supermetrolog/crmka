@@ -8,6 +8,8 @@ use app\exceptions\services\SurveyAlreadyDelayedException;
 use app\exceptions\services\SurveyDraftAlreadyExistsException;
 use app\exceptions\services\SurveyMissingContactException;
 use app\helpers\ArrayHelper;
+use app\helpers\DateIntervalHelper;
+use app\helpers\DateTimeHelper;
 use app\helpers\TypeConverterHelper;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
@@ -29,6 +31,7 @@ use app\resources\Survey\SurveyActionResource;
 use app\resources\Survey\SurveyResource;
 use app\resources\Survey\SurveyShortResource;
 use app\resources\Survey\SurveyWithQuestionsResource;
+use app\resources\User\UserSurveyStatisticViewResource;
 use app\usecases\Survey\SurveyService;
 use Exception;
 use Throwable;
@@ -338,6 +341,17 @@ class SurveyController extends AppController
 		$action = $this->service->createAction($survey, $dto);
 
 		return new SurveyActionResource($action);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function actionStatistics(): UserSurveyStatisticViewResource
+	{
+		$after  = DateTimeHelper::make($this->request->get('after') ?? DateTimeHelper::now()->sub(DateIntervalHelper::days(30)));
+		$before = DateTimeHelper::make($this->request->get('before') ?? DateTimeHelper::nowf());
+
+		return new UserSurveyStatisticViewResource($this->repository->getStatistic($after, $before), $after, $before);
 	}
 
 	/**
