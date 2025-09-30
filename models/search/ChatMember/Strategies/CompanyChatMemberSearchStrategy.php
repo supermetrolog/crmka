@@ -3,6 +3,7 @@
 namespace app\models\search\ChatMember\Strategies;
 
 use app\components\ExpressionBuilder\IfExpressionBuilder;
+use app\enum\Company\CompanyStatusEnum;
 use app\helpers\ArrayHelper;
 use app\helpers\SQLHelper;
 use app\helpers\StringHelper;
@@ -63,13 +64,15 @@ class CompanyChatMemberSearchStrategy extends BaseChatMemberSearchStrategy
 		if ($this->isFilterTrue($this->need_calling)) {
 			$interval = new Expression(SQLHelper::dateSub('NOW()', '3 MONTH'));
 
+			$query->andWhere([Company::field('status') => CompanyStatusEnum::ACTIVE]);
+
 			$query->andWhere([
 				'or',
 				['<', 'last_call_rel.created_at', $interval],
 				[
 					'and',
 					['last_call_rel.created_at' => null],
-					['<', Company::field('updated_at'), $interval]
+					['<', Company::field('created_at'), $interval]
 				],
 				[]
 			]);
