@@ -176,8 +176,7 @@ class ChatMemberRepository
 		                 ->leftJoinLastCallRelation()
 		                 ->byModelTypes($model_types)
 		                 ->joinWith(['objectChatMember.object', 'company'])
-		                 ->needCalling()
-		                 ->groupBy(['consultant_id', 'consultant_id_old']);
+		                 ->needCalling();
 	}
 
 	/**
