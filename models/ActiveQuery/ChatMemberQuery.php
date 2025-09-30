@@ -2,12 +2,12 @@
 
 namespace app\models\ActiveQuery;
 
+use app\enum\Company\CompanyStatusEnum;
 use app\helpers\SQLHelper;
 use app\kernel\common\models\AQ\AQ;
 use app\models\Call;
 use app\models\ChatMember;
 use app\models\Company\Company;
-use app\models\Objects;
 use app\models\Relation;
 use app\models\views\ChatMemberSearchView;
 use yii\base\ErrorException;
@@ -87,11 +87,9 @@ class ChatMemberQuery extends AQ
 				[
 					'and',
 					['last_call_rel.created_at' => null],
-					[
-						'or',
-						['<', SQLHelper::fromUnixTime(Objects::field('last_update')), $interval],
-						['<', Company::field('updated_at'), $interval],
-					]
+					['model_type' => Company::getMorphClass()],
+					[Company::field('status') => CompanyStatusEnum::ACTIVE],
+					['<', Company::field('created_at'), $interval]
 				],
 			]
 		);

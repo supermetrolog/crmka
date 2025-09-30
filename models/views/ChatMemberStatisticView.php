@@ -47,12 +47,11 @@ use yii\db\ActiveQuery;
 class ChatMemberStatisticView extends ChatMember
 {
 	public int  $chat_member_id;
-	public ?int $last_call_rel_id          = null;
-	public ?int $unread_task_count         = null;
-	public ?int $unread_notification_count = null;
-	public ?int $unread_message_count      = null;
-	public ?int $outdated_call_count       = null;
-	public ?int $outdated_call_count_all   = null;
+	public ?int $last_call_rel_id            = null;
+	public ?int $unread_task_count           = null;
+	public ?int $unread_notification_count   = null;
+	public ?int $unread_message_count        = null;
+	public ?int $outdated_company_call_count = null;
 
 	/**
 	 * @return RelationQuery|ActiveQuery

@@ -25,7 +25,8 @@ use yii\web\User;
 class AppController extends Controller
 {
 	protected User  $user;
-	protected array $exceptAuthActions = [];
+	protected array $exceptAuthActions              = [];
+	protected array $exceptContentNegotiatorActions = [];
 
 	public function __construct($id, $module, $config = [])
 	{
@@ -46,6 +47,7 @@ class AppController extends Controller
 					'application/json' => Response::FORMAT_JSON,
 					'application/xml'  => Response::FORMAT_XML,
 				],
+				'except'  => $this->exceptContentNegotiatorActions
 			],
 			'verbFilter'        => [
 				'class'   => VerbFilter::class,

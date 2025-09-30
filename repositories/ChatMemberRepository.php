@@ -17,7 +17,6 @@ use app\models\ChatMemberMessage;
 use app\models\ChatMemberMessageView;
 use app\models\Company\Company;
 use app\models\Notification\UserNotification;
-use app\models\Objects;
 use app\models\Relation;
 use app\models\Task;
 use app\models\TaskObserver;
@@ -46,12 +45,12 @@ class ChatMemberRepository
 
 		$chatMemberQuery = ChatMemberStatisticView::find()
 		                                          ->select([
-			                                          'chat_member_id'            => ChatMemberStatisticView::field('id'),
-			                                          'consultant_id'             => 'user.id',
-			                                          'unread_task_count'         => 'COUNT(DISTINCT tasks.id)',
-			                                          'unread_notification_count' => 'COUNT(DISTINCT notifications.id)',
-			                                          'unread_message_count'      => 'COUNT(DISTINCT messages.id) - COUNT(DISTINCT message_views.id)',
-			                                          'outdated_call_count'       => 'COUNT(DISTINCT cls.id)'
+			                                          'chat_member_id'              => ChatMemberStatisticView::field('id'),
+			                                          'consultant_id'               => 'user.id',
+			                                          'unread_task_count'           => 'tasks.unread_task_count',
+			                                          'unread_notification_count'   => 'notifications.unread_notification_count',
+			                                          'unread_message_count'        => 'COUNT(DISTINCT messages.id) - COUNT(DISTINCT message_views.id)',
+			                                          'outdated_company_call_count' => 'cls.outdated_calls_count'
 		                                          ])
 		                                          ->byModelType(User::getMorphClass())
 		                                          ->joinWith(['user'])
@@ -73,19 +72,11 @@ class ChatMemberRepository
 				                                          ['message_views.chat_member_id' => null],
 			                                          ]
 		                                          ])
-		                                          ->leftJoin(['cls' => $needCallingQuery], ['or', 'cls.consultant_id = user.id', 'cls.consultant_id_old = user.user_id_old'])
+		                                          ->leftJoin(['cls' => $needCallingQuery], 'cls.consultant_id = user.id')
 		                                          ->andWhere([ChatMemberStatisticView::field('id') => $dto->chat_member_ids])
 		                                          ->groupBy(ChatMemberStatisticView::field('id'));
 
-		/** @var ChatMemberStatisticView[] $statistics */
-		$statistics          = $chatMemberQuery->all();
-		$allNeedingCallCount = (int)$needCallingQuery->count();
-
-		foreach ($statistics as $statistic) {
-			$statistic->outdated_call_count_all = $allNeedingCallCount;
-		}
-
-		return $statistics;
+		return $chatMemberQuery->all();
 	}
 
 	/**
@@ -98,10 +89,8 @@ class ChatMemberRepository
 	{
 		return Task::find()
 		           ->select([
-			           'id'          => Task::field('id'),
-			           'user_id'     => Task::field('user_id'),
-			           'viewed_at'   => 'to.viewed_at',
-			           'observer_id' => 'to.user_id'
+			           'observer_id'       => 'to.user_id',
+			           'unread_task_count' => new Expression('COUNT(*)')
 		           ])
 		           ->leftJoin(Relation::getTable(), [
 			           Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -120,10 +109,10 @@ class ChatMemberRepository
 		           ->andWhereNotNull(ChatMemberMessage::field('id'))
 		           ->andWhere([
 			           'to.viewed_at'           => null,
-			           'to.task_id'             => Task::xfield('id'),
 			           'chat_member.model_type' => $model_types
 		           ])
-		           ->notDeleted();
+		           ->notDeleted()
+		           ->groupBy('to.user_id');
 	}
 
 	/**
@@ -136,8 +125,8 @@ class ChatMemberRepository
 	{
 		return UserNotification::find()
 		                       ->select([
-			                       'id'      => UserNotification::field('id'),
-			                       'user_id' => UserNotification::field('user_id'),
+			                       'user_id'                   => UserNotification::field('user_id'),
+			                       'unread_notification_count' => new Expression('COUNT(*)'),
 		                       ])
 		                       ->leftJoin(Relation::getTable(), [
 			                       Relation::field('first_type')  => ChatMemberMessage::getMorphClass(),
@@ -154,7 +143,8 @@ class ChatMemberRepository
 		                       ->andWhereNotNull(ChatMemberMessage::field('id'))
 		                       ->andWhere([
 			                       'chat_member.model_type' => $model_types
-		                       ]);
+		                       ])
+		                       ->groupBy(UserNotification::field('user_id'));
 	}
 
 	/**
@@ -168,16 +158,15 @@ class ChatMemberRepository
 		return ChatMember::find()
 		                 ->select(
 			                 [
-				                 'id'                => ChatMember::field('id'),
-				                 'model_type'        => ChatMember::field('model_type'),
-				                 'consultant_id'     => 'COALESCE(company.consultant_id, null)',
-				                 'consultant_id_old' => Objects::field('agent_id')
+				                 'consultant_id'        => 'company.consultant_id',
+				                 'outdated_calls_count' => new Expression('COUNT(*)')
 			                 ]
 		                 )
 		                 ->leftJoinLastCallRelation()
 		                 ->byModelTypes($model_types)
-		                 ->joinWith(['objectChatMember.object', 'company'])
-		                 ->needCalling();
+		                 ->joinWith(['company'], false)
+		                 ->needCalling()
+		                 ->groupBy('company.consultant_id');
 	}
 
 	/**

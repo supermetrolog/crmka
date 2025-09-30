@@ -138,8 +138,8 @@ class SurveyRepository
 		                          ->select(['user_id', 'completed_tasks_count' => new Expression('COUNT(*)')])
 		                          ->notDeleted()
 		                          ->byStatus(Task::STATUS_DONE)
-		                          ->andWhere(['>=', 'created_at', $afterDate])
-		                          ->andWhere(['<=', 'created_at', $beforeDate])
+		                          ->andWhere(['>=', 'updated_at', $afterDate])
+		                          ->andWhere(['<=', 'updated_at', $beforeDate])
 		                          ->groupBy('user_id');
 
 		$query->leftJoin(['ctsk' => $completedTaskQuery], 'ctsk.user_id = user.id');

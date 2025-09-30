@@ -13,7 +13,8 @@ use yii\web\Response;
 
 class LetterTrackingController extends AppController
 {
-	protected array $exceptAuthActions = ['open'];
+	protected array $exceptAuthActions              = ['open'];
+	protected array $exceptContentNegotiatorActions = ['open'];
 
 	private LetterContactEventService $letterContactEventService;
 	private LetterContactRepository   $letterContactRepository;
@@ -56,7 +57,11 @@ class LetterTrackingController extends AppController
 			);
 		}
 
-		return $this->response->sendContentAsFile(
+		$response = $this->response;
+
+		$response->getHeaders()->set('Content-Type', 'image/png');
+
+		return $response->sendContentAsFile(
 			base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAgMBApTjT9sAAAAASUVORK5CYII='),
 			'raysarma.png',
 			['mimeType' => 'image/png']
