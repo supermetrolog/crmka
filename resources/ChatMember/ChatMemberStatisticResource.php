@@ -19,11 +19,11 @@ class ChatMemberStatisticResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
-			'chat_member_id'            => $this->resource->chat_member_id,
-			'unread_task_count'         => $this->resource->unread_task_count,
-			'unread_notification_count' => $this->resource->unread_notification_count,
-			'unread_message_count'      => $this->resource->unread_message_count,
-			'outdated_call_count'       => $this->resource->outdated_call_count
+			'chat_member_id'              => $this->resource->chat_member_id,
+			'unread_task_count'           => $this->resource->unread_task_count,
+			'unread_notification_count'   => $this->resource->unread_notification_count,
+			'unread_message_count'        => $this->resource->unread_message_count,
+			'outdated_company_call_count' => $this->resource->outdated_company_call_count
 		];
 	}
 }
