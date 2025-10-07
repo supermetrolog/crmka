@@ -10,6 +10,8 @@ use yii\data\ActiveDataProvider;
 
 class NotificationController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	public function actionIndex(): ActiveDataProvider
 	{
 		$searchModel = new NotificationSearch();

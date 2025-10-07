@@ -31,6 +31,8 @@ use yii\web\ForbiddenHttpException;
  */
 class RequestController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'company-requests', 'view'];
+
 	private RequestRepository $requestRepository;
 	private RequestService    $requestService;
 

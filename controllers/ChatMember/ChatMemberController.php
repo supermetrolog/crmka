@@ -34,6 +34,8 @@ use yii\web\NotFoundHttpException;
 
 class ChatMemberController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'view', 'statistic', 'pinned-message', 'media'];
+
 	private ChatMemberService               $service;
 	private ChatMemberRepository            $repository;
 	private ChatMemberSearchStrategyFactory $searchStrategyFactory;

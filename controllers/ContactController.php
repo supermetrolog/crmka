@@ -32,6 +32,8 @@ use yii\web\NotFoundHttpException;
 
 class ContactController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'company-contacts', 'view', 'view-phones'];
+
 	protected array               $exceptAuthActions = ['view', 'index'];
 	private ContactService        $contactService;
 	private ContactCommentService $contactCommentService;

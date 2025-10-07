@@ -42,6 +42,8 @@ use yii\web\UploadedFile;
 
 class SurveyController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'view', 'view-with-questions', 'view-pending-by-chat-member-id', 'create', 'update', 'update-with-survey-question-answer', 'delete', 'create-action'];
+
 	private SurveyService      $service;
 	private SurveyRepository   $repository;
 	private QuestionRepository $questionRepository;

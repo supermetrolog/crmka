@@ -15,6 +15,8 @@ use Exception;
 
 class SurveyActionController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['update'];
+
 	private SurveyActionService    $service;
 	private SurveyActionRepository $repository;
 
