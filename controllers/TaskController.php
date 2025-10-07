@@ -55,6 +55,8 @@ use yii\web\UploadedFile;
 
 class TaskController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'view', 'statistic', 'counts', 'relations-statistics', 'comments', 'read', 'history', 'files', 'relations'];
+
 	private CreateTaskService            $createTaskService;
 	private UpdateTaskService            $updateTaskService;
 	private TaskStateService             $taskStateService;

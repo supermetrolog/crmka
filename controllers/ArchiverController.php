@@ -16,6 +16,8 @@ use yii\web\RangeNotSatisfiableHttpException;
 
 class ArchiverController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	protected array $exceptAuthActions = ['download'];
 
 	private ArchiverFactory $archiverFactory;

@@ -3,6 +3,7 @@
 namespace app\kernel\common\controller;
 
 use app\behaviors\IpRestrictionFilter;
+use app\helpers\ArrayHelper;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
@@ -18,6 +19,7 @@ use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\User;
@@ -27,6 +29,8 @@ class AppController extends Controller
 	protected User  $user;
 	protected array $exceptAuthActions              = [];
 	protected array $exceptContentNegotiatorActions = [];
+
+	protected array $viewOnlyAllowedActions = ['index', 'view'];
 
 	public function __construct($id, $module, $config = [])
 	{
@@ -110,6 +114,7 @@ class AppController extends Controller
 	 * @param $action
 	 *
 	 * @return bool
+	 * @throws ForbiddenHttpException
 	 * @throws BadRequestHttpException
 	 */
 	public function beforeAction($action): bool
@@ -118,7 +123,35 @@ class AppController extends Controller
 			$this->response->headers->remove('link');
 		});
 
-		return parent::beforeAction($action);
+		if (!parent::beforeAction($action)) {
+			return false;
+		}
+
+		$user = $this->user;
+
+		if ($user->isGuest) {
+			return true;
+		}
+
+		$identity = $user->identity;
+
+		if (!$identity) {
+			return true;
+		}
+
+		if ($identity->isViewOnly()) {
+			if (ArrayHelper::includes($this->viewOnlyAllowedActions, $action->id)) {
+				return true;
+			}
+
+			if (ArrayHelper::length($this->viewOnlyAllowedActions) === 1 && $this->viewOnlyAllowedActions[0] === '*') {
+				return true;
+			}
+
+			throw new ForbiddenHttpException('Доступ запрещен');
+		}
+
+		return true;
 	}
 
 

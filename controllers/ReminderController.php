@@ -23,6 +23,8 @@ use yii\web\NotFoundHttpException;
 
 class ReminderController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'view', 'statistic'];
+
 	private ReminderService       $service;
 	private CreateReminderService $createReminderService;
 	private ReminderRepository    $repository;

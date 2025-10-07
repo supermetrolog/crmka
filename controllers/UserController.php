@@ -47,6 +47,8 @@ use yii\web\UploadedFile;
 
 class UserController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'view', 'update', 'login', 'logout', 'sessions', 'delete-sessions', 'activity', 'online', 'change-password'];
+
 	private AuthService               $authService;
 	private UserService               $userService;
 	private UserAccessTokenRepository $accessTokenRepository;

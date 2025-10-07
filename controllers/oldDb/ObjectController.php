@@ -18,6 +18,8 @@ use yii\data\ActiveDataProvider;
 
 class ObjectController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	private OfferMixService $offerMixService;
 
 	public function __construct(

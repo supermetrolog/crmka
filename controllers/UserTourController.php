@@ -19,6 +19,8 @@ use yii\data\ActiveDataProvider;
 
 class UserTourController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	private UserTourStatusRepository $tourStatusRepository;
 	private UserTourService          $userTourService;
 

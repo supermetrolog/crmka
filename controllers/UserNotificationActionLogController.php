@@ -11,6 +11,8 @@ use yii\data\ActiveDataProvider;
 
 class UserNotificationActionLogController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	public function __construct(
 		$id,
 		$module,

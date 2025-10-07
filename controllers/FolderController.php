@@ -26,6 +26,8 @@ use yii\web\ForbiddenHttpException;
 
 class FolderController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	private FolderService    $folderService;
 	private FolderRepository $folderRepository;
 

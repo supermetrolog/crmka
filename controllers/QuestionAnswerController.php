@@ -22,6 +22,8 @@ use yii\web\NotFoundHttpException;
 
 class QuestionAnswerController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'view', 'with-questions'];
+
 	private QuestionAnswerService    $service;
 	private QuestionAnswerRepository $repository;
 
