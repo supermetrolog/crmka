@@ -381,7 +381,7 @@ class OfferMixSearch extends Search
 		$polygonsLength = ArrayHelper::length($polygon);
 
 		for ($i = 0; $i < $polygonsLength; $i += 2) {
-			$coordinates[] = "$polygon[$i] {$polygon[$i + 1]}";
+			$coordinates[] = "{$polygon[$i + 1]} $polygon[$i]";
 		}
 
 		// Add the first point to close the polygon
