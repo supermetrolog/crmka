@@ -312,6 +312,11 @@ class User extends AR implements IdentityInterface, NotifiableInterface, Telegra
 		return $this->role >= self::ROLE_MODERATOR;
 	}
 
+	public function isViewOnly(): bool
+	{
+		return $this->role === self::ROLE_DEFAULT;
+	}
+
 	/**
 	 * @throws Exception
 	 */
@@ -343,4 +348,5 @@ class User extends AR implements IdentityInterface, NotifiableInterface, Telegra
 	{
 		return $this->restrict_ip_login;
 	}
+
 }

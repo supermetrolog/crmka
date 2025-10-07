@@ -40,6 +40,8 @@ use yii\web\UploadedFile;
 
 class CompanyController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'view', 'status-history', 'product-range-list', 'in-the-bank-list'];
+
 	protected array                          $exceptAuthActions = ['index'];
 	private CompanyWithGeneralContactService $companyWithGeneralContactService;
 

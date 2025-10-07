@@ -20,6 +20,8 @@ use yii\db\StaleObjectException;
 
 class TaskFavoriteController extends AppController
 {
+
+	protected array             $viewOnlyAllowedActions = ['*'];
 	private TaskFavoriteService $service;
 
 	public function __construct(

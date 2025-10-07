@@ -37,6 +37,8 @@ use yii\web\UploadedFile;
 
 class ChatMemberMessageController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['index', 'view', 'view-message', 'search'];
+
 	private ChatMemberMessageService $service;
 
 	public function __construct(

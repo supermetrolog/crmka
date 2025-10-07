@@ -27,6 +27,8 @@ use yii\web\ForbiddenHttpException;
 
 class UserNotificationController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	protected UserNotificationRepository       $repository;
 	protected UserNotificationService          $service;
 	protected UserNotificationActionService    $actionService;

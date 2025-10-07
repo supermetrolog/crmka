@@ -17,6 +17,8 @@ use yii\di\NotInstantiableException;
 
 class MessageTemplateController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	private MessageTemplateService $service;
 	private TemplateFactory        $messageTemplateFactory;
 

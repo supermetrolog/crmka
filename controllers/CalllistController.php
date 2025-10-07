@@ -10,6 +10,8 @@ use yii\data\ActiveDataProvider;
 
 class CalllistController extends AppController
 {
+	protected array $viewOnlyAllowedActions = ['*'];
+
 	public function actionIndex(): ActiveDataProvider
 	{
 		$searchModel = new CallListSearch();
