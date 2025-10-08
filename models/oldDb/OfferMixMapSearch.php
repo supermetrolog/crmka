@@ -19,14 +19,17 @@ class OfferMixMapSearch extends OfferMixSearch
 			$this->getField('latitude'),
 			$this->getField('longitude'),
 			$this->getField('address'),
-			$this->getField('complex_id'),
 			$this->getField('object_id'),
 			$this->getField('type_id'),
 			$this->getField('original_id'),
 			$this->getField('status'),
 			$this->getField('id'),
-			$this->getField('photos'),
-			$this->getField('area_floor_full')
+			$this->getField('is_land'),
+			$this->getField('area_building'),
+			$this->getField('object_type'),
+			$this->getField('visual_id'),
+			$this->getField('test_only'),
+			$this->getField('class'),
 		];
 
 		return \app\models\OfferMix::find()
