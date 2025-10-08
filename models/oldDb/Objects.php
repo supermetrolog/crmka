@@ -643,6 +643,10 @@ class Objects extends AR
 			return $this->company;
 		};
 
+		$extraFields['miniOffers'] = function ($extraFields) {
+			return $this->miniOffers;
+		};
+
 		return $extraFields;
 	}
 
@@ -701,6 +705,18 @@ class Objects extends AR
 		/** @var OfferMixQuery $query */
 		$query = $this->hasMany(OfferMix::class, ['object_id' => 'id']);
 		$query->andWhere([OfferMix::field('type_id') => OfferMixOld::GENERAL_TYPE_ID]);
+
+		return $query;
+	}
+
+	/**
+	 * @throws ErrorException
+	 */
+	public function getMiniOffers(): OfferMixQuery
+	{
+		/** @var OfferMixQuery $query */
+		$query = $this->hasMany(OfferMix::class, ['object_id' => 'id']);
+		$query->andWhere([OfferMix::field('type_id') => OfferMixOld::MINI_TYPE_ID]);
 
 		return $query;
 	}
