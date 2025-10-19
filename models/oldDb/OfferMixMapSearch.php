@@ -40,8 +40,7 @@ class OfferMixMapSearch extends OfferMixSearch
 				"ELSE 0 END) as offer_state",
 				$this->getField('type_id'), $this->getField('status'),
 				$this->getField('type_id')
-			)),
-			new Expression(sprintf('CASE WHEN %s = 2 THEN 1 ELSE 0 END as has_ti_2', $this->getField('type_id')))
+			))
 		];
 
 		return OfferMixMapSearchView::find()
