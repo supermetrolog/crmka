@@ -61,6 +61,11 @@ class m251020_213631_create_attribute_value_tables extends Migration
 		$attributeValueTable      = '{{%attribute_value}}';
 		$attributeValueMediaTable = '{{%attribute_value_media}}';
 
+		$this->foreignKeyDrop($attributeValueMediaTable, ['attribute_id']);
+		$this->foreignKeyDrop($attributeValueMediaTable, ['media_id']);
+
+		$this->dropTable($attributeValueMediaTable);
+
 		$this->foreignKeyDrop($attributeRuleTable, ['attribute_id']);
 		$this->foreignKeyDrop($attributeRuleTable, ['attribute_group_id']);
 
@@ -69,10 +74,5 @@ class m251020_213631_create_attribute_value_tables extends Migration
 		$this->foreignKeyDrop($attributeValueTable, ['attribute_id']);
 
 		$this->dropTable($attributeValueTable);
-
-		$this->foreignKeyDrop($attributeValueMediaTable, ['attribute_id']);
-		$this->foreignKeyDrop($attributeValueMediaTable, ['media_id']);
-
-		$this->dropTable($attributeValueMediaTable);
 	}
 }

@@ -28,7 +28,7 @@ class m251020_212522_create_attribute_tables extends Migration
 			'id'           => $this->primaryKey(),
 			'attribute_id' => $this->integer()->notNull(),
 			'label'        => $this->string(128)->null(),
-			'value'        => $this->string(128)->null(),
+			'value'        => $this->string(128)->notNull(),
 			'sort_order'   => $this->integer()->notNull()->defaultValue(10)
 		], $this->timestamps(), $this->softDelete());
 
@@ -43,11 +43,11 @@ class m251020_212522_create_attribute_tables extends Migration
 		$attributeGroupTable  = '{{%attribute_group}}';
 		$attributeOptionTable = '{{%attribute_option}}';
 
-		$this->dropTable($attributeTable);
-		$this->dropTable($attributeGroupTable);
-
 		$this->foreignKeyDrop($attributeOptionTable, ['attribute_id']);
 
 		$this->dropTable($attributeOptionTable);
+
+		$this->dropTable($attributeGroupTable);
+		$this->dropTable($attributeTable);
 	}
 }
