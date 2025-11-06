@@ -163,7 +163,7 @@ class OffersPdf extends Model
 		$prefix = "presentation";
 
 		if ($this->data->town_name) {
-			$prefix = $this->getTownNameWithoutSpecialSymbols();
+			$prefix = StringHelper::toLower($this->getTownNameWithoutSpecialSymbols());
 		}
 
 		$ext = ".pdf";
