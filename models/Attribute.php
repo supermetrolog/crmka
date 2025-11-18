@@ -5,8 +5,8 @@ namespace app\models;
 use app\enum\Attribute\AttributeInputTypeEnum;
 use app\enum\Attribute\AttributeValueTypeEnum;
 use app\helpers\validators\EnumValidator;
-use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\AttributeQuery;
 
 /**
  * @property int     $id
@@ -21,6 +21,10 @@ use app\kernel\common\models\AR\AR;
  */
 class Attribute extends AR
 {
+	protected bool $useSoftDelete = true;
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
+
 	public static function tableName(): string
 	{
 		return 'attribute';
@@ -39,8 +43,8 @@ class Attribute extends AR
 		];
 	}
 
-	public static function find(): AQ
+	public static function find(): AttributeQuery
 	{
-		return new AQ(static::class);
+		return new AttributeQuery(self::class);
 	}
 }

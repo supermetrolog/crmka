@@ -2,8 +2,9 @@
 
 namespace app\models;
 
-use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\AttributeOptionQuery;
+use app\models\ActiveQuery\AttributeQuery;
 
 /**
  * @property int            $id
@@ -19,6 +20,12 @@ use app\kernel\common\models\AR\AR;
  */
 class AttributeOption extends AR
 {
+	public const DEFAULT_SORT_ORDER = 100;
+
+	protected bool $useSoftCreate = true;
+	protected bool $useSoftUpdate = true;
+	protected bool $useSoftDelete = true;
+
 	public static function tableName(): string
 	{
 		return 'attribute_option';
@@ -29,19 +36,20 @@ class AttributeOption extends AR
 		return [
 			[['attribute_id', 'value'], 'required'],
 			[['attribute_id', 'sort_order'], 'integer'],
+			['attribute_id', 'exist', Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
 			[['value', 'label'], 'string', 'max' => 128],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 		];
 	}
 
-	public static function find(): AQ
+	public static function find(): AttributeOptionQuery
 	{
-		return new AQ(static::class);
+		return new AttributeOptionQuery(self::class);
 	}
 
-	public function getAttributeRel(): AQ
+	public function getAttributeRel(): AttributeQuery
 	{
-		/** @var AQ */
+		/** @var AttributeQuery */
 		return $this->hasOne(Attribute::class, ['id' => 'attribute_id']);
 	}
 }

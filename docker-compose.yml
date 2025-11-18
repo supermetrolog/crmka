@@ -56,5 +56,14 @@ services:
       - db
     networks:
       backend:
+
+#  In case import tables via phpmyadmin
+#  php_myadmin:
+#    image: phpmyadmin
+#    ports:
+#      - "8080:80"
+#    networks:
+#      - backend
+
 networks:
   backend:
