@@ -2,8 +2,10 @@
 
 namespace app\models;
 
-use app\kernel\common\models\AQ\AQ;
+use app\helpers\validators\MorphExistValidator;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\AttributeQuery;
+use app\models\ActiveQuery\AttributeValueQuery;
 
 /**
  * @property int            $id
@@ -19,6 +21,10 @@ use app\kernel\common\models\AR\AR;
  */
 class AttributeValue extends AR
 {
+	protected bool $useSoftDelete = true;
+	protected bool $useSoftUpdate = true;
+	protected bool $useSoftCreate = true;
+
 	public static function tableName(): string
 	{
 		return 'attribute_value';
@@ -29,20 +35,22 @@ class AttributeValue extends AR
 		return [
 			[['attribute_id', 'entity_id', 'entity_type'], 'required'],
 			[['attribute_id', 'entity_id'], 'integer'],
+			['attribute_id', 'exist', Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
+			['entity_id', MorphExistValidator::class, 'targetClassMap' => AttributeRelationEntity::getEntityMorphMap()],
 			[['entity_type'], 'string', 'max' => 64],
 			[['value'], 'string'],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 		];
 	}
 
-	public static function find(): AQ
+	public static function find(): AttributeValueQuery
 	{
-		return new AQ(static::class);
+		return new AttributeValueQuery(self::class);
 	}
 
-	public function getAttributeRel(): AQ
+	public function getAttributeRel(): AttributeQuery
 	{
-		/** @var AQ */
+		/** @var AttributeQuery */
 		return $this->hasOne(Attribute::class, ['id' => 'attribute_id']);
 	}
 }
