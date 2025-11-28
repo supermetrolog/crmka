@@ -1,10 +1,9 @@
 <?php
 
-namespace app\resources\AttributeOption;
+namespace app\resources\Attribute;
 
 use app\kernel\web\http\resources\JsonResource;
 use app\models\AttributeOption;
-use app\resources\Attribute\AttributeResource;
 
 class AttributeOptionResource extends JsonResource
 {
@@ -18,6 +17,7 @@ class AttributeOptionResource extends JsonResource
 	public function toArray(): array
 	{
 		return [
+			'id'         => $this->resource->id,
 			'attribute'  => AttributeResource::tryMakeArray($this->resource->attributeRel),
 			'value'      => $this->resource->value,
 			'label'      => $this->resource->label,

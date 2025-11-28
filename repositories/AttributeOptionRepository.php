@@ -10,5 +10,5 @@ use app\models\AttributeOption;
  */
 class AttributeOptionRepository extends ModelRepository
 {
-	protected $className = AttributeOption::class;
+	protected string $className = AttributeOption::class;
 }

@@ -10,7 +10,7 @@ use app\models\Attribute;
  */
 class AttributeRepository extends ModelRepository
 {
-	protected $className = Attribute::class;
+	protected string $className = Attribute::class;
 
 	public function existsByLabel(string $label): bool
 	{

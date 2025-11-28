@@ -12,7 +12,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 abstract class ModelRepository
 {
 	/** @var class-string<Model> */
-	protected $className;
+	protected string $className;
 
 	protected array $with;
 
@@ -29,7 +29,7 @@ abstract class ModelRepository
 	/**
 	 * @return Model|null
 	 */
-	public function findOne(int $id, $notDeleted = true)
+	public function findOne(int $id, $notDeleted = true): ?AR
 	{
 		if ($notDeleted) {
 			return $this->className::find()->notDeleted()->byId($id)->one();
@@ -42,7 +42,7 @@ abstract class ModelRepository
 	 * @return Model
 	 * @throws ModelNotFoundException
 	 */
-	public function findOneOrThrow(int $id, $notDeleted = true)
+	public function findOneOrThrow(int $id, $notDeleted = true): AR
 	{
 		if ($notDeleted) {
 			return $this->className::find()->notDeleted()->byId($id)->oneOrThrow();
@@ -54,7 +54,7 @@ abstract class ModelRepository
 	/**
 	 * @return Model[]
 	 */
-	public function findAll()
+	public function findAll(): array
 	{
 		return $this->className::find()->all();
 	}

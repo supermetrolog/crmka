@@ -68,15 +68,15 @@ class AttributeForm extends Form
 					'kind'        => $this->kind,
 					'label'       => $this->label,
 					'description' => $this->description,
-					'value_type'  => $this->value_type,
-					'input_type'  => $this->input_type,
+					'valueType'   => $this->value_type,
+					'inputType'   => $this->input_type,
 				]);
 			default:
 				return new UpdateAttributeDto([
 					'label'       => $this->label,
 					'description' => $this->description,
-					'value_type'  => $this->value_type,
-					'input_type'  => $this->input_type,
+					'valueType'   => $this->value_type,
+					'inputType'   => $this->input_type,
 				]);
 		}
 	}

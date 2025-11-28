@@ -2,8 +2,8 @@
 
 namespace app\models\forms\AttributeOption;
 
-use app\dto\AttributeOption\CreateAttributeOptionDto;
-use app\dto\AttributeOption\UpdateAttributeOptionDto;
+use app\dto\Attribute\CreateAttributeOptionDto;
+use app\dto\Attribute\UpdateAttributeOptionDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Attribute;
 
@@ -59,16 +59,16 @@ class AttributeOptionForm extends Form
 		switch ($this->getScenario()) {
 			case self::SCENARIO_CREATE:
 				return new CreateAttributeOptionDto([
-					'attribute_id' => $this->attribute_id,
-					'value'        => $this->value,
-					'label'        => $this->label,
-					'sort_order'   => $this->sort_order,
+					'attributeId' => $this->attribute_id,
+					'value'       => $this->value,
+					'label'       => $this->label,
+					'sortOrder'   => $this->sort_order,
 				]);
 			default:
 				return new UpdateAttributeOptionDto([
-					'value'      => $this->value,
-					'label'      => $this->label,
-					'sort_order' => $this->sort_order,
+					'value'     => $this->value,
+					'label'     => $this->label,
+					'sortOrder' => $this->sort_order,
 				]);
 		}
 	}

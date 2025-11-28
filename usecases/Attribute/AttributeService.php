@@ -36,8 +36,8 @@ class AttributeService
 				'kind'        => $dto->kind,
 				'label'       => $dto->label,
 				'description' => $dto->description,
-				'value_type'  => $dto->value_type,
-				'input_type'  => $dto->input_type,
+				'value_type'  => $dto->valueType,
+				'input_type'  => $dto->inputType,
 			]
 		);
 
@@ -57,8 +57,8 @@ class AttributeService
 		$model->load([
 			'label'       => $dto->label,
 			'description' => $dto->description,
-			'value_type'  => $dto->value_type,
-			'input_type'  => $dto->input_type,
+			'value_type'  => $dto->valueType,
+			'input_type'  => $dto->inputType,
 		]);
 
 		$model->saveOrThrow();

@@ -1,9 +1,9 @@
 <?php
 
-namespace app\usecases\AttributeOption;
+namespace app\usecases\Attribute;
 
-use app\dto\AttributeOption\CreateAttributeOptionDto;
-use app\dto\AttributeOption\UpdateAttributeOptionDto;
+use app\dto\Attribute\CreateAttributeOptionDto;
+use app\dto\Attribute\UpdateAttributeOptionDto;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\AttributeOption;
@@ -25,10 +25,10 @@ class AttributeOptionService
 	public function create(CreateAttributeOptionDto $dto): AttributeOption
 	{
 		$model = new AttributeOption([
-			'attribute_id' => $dto->attribute_id,
+			'attribute_id' => $dto->attributeId,
 			'value'        => $dto->value,
 			'label'        => $dto->label,
-			'sort_order'   => $dto->sort_order ?? AttributeOption::DEFAULT_SORT_ORDER,
+			'sort_order'   => $dto->sortOrder ?? AttributeOption::DEFAULT_SORT_ORDER,
 		]);
 
 		$model->saveOrThrow();
@@ -47,7 +47,7 @@ class AttributeOptionService
 		$model->load([
 			'value'      => $dto->value,
 			'label'      => $dto->value,
-			'sort_order' => $dto->sort_order ?? AttributeOption::DEFAULT_SORT_ORDER,
+			'sort_order' => $dto->sortOrder ?? AttributeOption::DEFAULT_SORT_ORDER,
 		]);
 
 		$model->saveOrThrow();
