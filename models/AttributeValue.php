@@ -35,7 +35,7 @@ class AttributeValue extends AR
 		return [
 			[['attribute_id', 'entity_id', 'entity_type'], 'required'],
 			[['attribute_id', 'entity_id'], 'integer'],
-			['attribute_id', 'exist', Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
+			['attribute_id', 'exist', 'targetClass' => Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
 			['entity_id', MorphExistValidator::class, 'targetClassMap' => AttributeRelationEntity::getEntityMorphMap()],
 			[['entity_type'], 'string', 'max' => 64],
 			[['value'], 'string'],

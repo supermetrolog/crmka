@@ -23,7 +23,7 @@ class AttributeResource extends JsonResource
 			'description' => $this->resource->description,
 			'value_type'  => $this->resource->value_type,
 			'input_type'  => $this->resource->input_type,
-			'created_at'  => $this->resource->created_at
+			'created_at'  => $this->resource->created_at,
 		];
 	}
 }

@@ -71,7 +71,7 @@ class AttributeValueController extends AppController
 	 * @throws StaleObjectException
 	 * @throws \Throwable
 	 */
-	public function delete(int $id)
+	public function actionDelete(int $id)
 	{
 		try {
 			$this->service->delete($id);

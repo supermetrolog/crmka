@@ -36,7 +36,7 @@ class AttributeOption extends AR
 		return [
 			[['attribute_id', 'value'], 'required'],
 			[['attribute_id', 'sort_order'], 'integer'],
-			['attribute_id', 'exist', Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
+			['attribute_id', 'exist', 'targetClass' => Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
 			[['value', 'label'], 'string', 'max' => 128],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 		];

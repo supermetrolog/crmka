@@ -30,7 +30,7 @@ class AttributeValueService
 			'attribute_id' => $dto->attributeId,
 			'entity_id'    => $dto->entityId,
 			'entity_type'  => $dto->entityType,
-			'value'        => $dto->value ?? null,
+			'value'        => $dto->value,
 		]);
 
 		$model->saveOrThrow();
@@ -60,7 +60,7 @@ class AttributeValueService
 	 * @throws \Throwable
 	 * @throws StaleObjectException
 	 */
-	public function delete(int $id)
+	public function delete(int $id): void
 	{
 		$model = $this->repository->findOneOrThrow($id);
 

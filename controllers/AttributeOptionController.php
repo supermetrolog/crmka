@@ -66,7 +66,7 @@ class AttributeOptionController extends AppController
 	 * @throws \Throwable
 	 * @throws StaleObjectException
 	 */
-	public function delete(int $id)
+	public function actionDelete(int $id)
 	{
 		$this->service->delete($id);
 	}

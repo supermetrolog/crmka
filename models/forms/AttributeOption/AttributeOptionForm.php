@@ -22,7 +22,7 @@ class AttributeOptionForm extends Form
 		return [
 			[['attribute_id', 'value'], 'required'],
 			[['attribute_id', 'sort_order'], 'integer'],
-			['attribute_id', 'exist', Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
+			['attribute_id', 'exist', 'targetClass' => Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
 			[['value', 'label'], 'string', 'max' => 128],
 		];
 	}
@@ -37,7 +37,7 @@ class AttributeOptionForm extends Form
 
 		return [
 			self::SCENARIO_CREATE => [...$common, 'attribute_id'],
-			self::SCENARIO_UPDATE => [$common]
+			self::SCENARIO_UPDATE => $common
 		];
 	}
 

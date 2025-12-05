@@ -46,7 +46,7 @@ class AttributeOptionService
 
 		$model->load([
 			'value'      => $dto->value,
-			'label'      => $dto->value,
+			'label'      => $dto->label,
 			'sort_order' => $dto->sortOrder ?? AttributeOption::DEFAULT_SORT_ORDER,
 		]);
 
@@ -60,7 +60,7 @@ class AttributeOptionService
 	 * @throws ModelNotFoundException
 	 * @throws \Throwable
 	 */
-	public function delete(int $id)
+	public function delete(int $id): void
 	{
 		$model = $this->repository->findOneOrThrow($id);
 
