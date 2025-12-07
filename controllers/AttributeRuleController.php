@@ -7,19 +7,19 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
-use app\models\forms\Attribute\AttributeValueForm;
-use app\resources\Attribute\AttributeValueResource;
-use app\usecases\Attribute\AttributeValueService;
+use app\models\forms\Attribute\AttributeRuleForm;
+use app\resources\Attribute\AttributeRuleResource;
+use app\usecases\Attribute\AttributeRuleService;
 use yii\db\StaleObjectException;
 
-class AttributeValueController extends AppController
+class AttributeRuleController extends AppController
 {
-	private AttributeValueService $service;
+	private AttributeRuleService $service;
 
 	public function __construct(
 		$id,
 		$module,
-		AttributeValueService $service,
+		AttributeRuleService $service,
 		$config = [])
 	{
 		$this->service = $service;
@@ -31,28 +31,28 @@ class AttributeValueController extends AppController
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
-	public function actionCreate(): AttributeValueResource
+	public function actionCreate(): AttributeRuleResource
 	{
-		$form = new AttributeValueForm();
-		$form->setScenario(AttributeValueForm::SCENARIO_CREATE);
+		$form = new AttributeRuleForm();
+		$form->setScenario(AttributeRuleForm::SCENARIO_CREATE);
 		$form->load($this->request->post());
 
 		$form->validateOrThrow();
 
 		$model = $this->service->create($form->getDto());
 
-		return new AttributeValueResource($model);
+		return new AttributeRuleResource($model);
 	}
 
 	/**
-	 * @return AttributeValueResource|ErrorResponse
+	 * @return AttributeRuleResource|ErrorResponse
 	 * @throws SaveModelException
 	 * @throws ValidateException
 	 */
 	public function actionUpdate(int $id)
 	{
-		$form = new AttributeValueForm();
-		$form->setScenario(AttributeValueForm::SCENARIO_UPDATE);
+		$form = new AttributeRuleForm();
+		$form->setScenario(AttributeRuleForm::SCENARIO_UPDATE);
 		$form->load($this->request->post());
 
 		$form->validateOrThrow();
@@ -60,23 +60,23 @@ class AttributeValueController extends AppController
 		try {
 			$model = $this->service->update($id, $form->getDto());
 		} catch (ModelNotFoundException $e) {
-			return $this->error('Значение атрибута не найдено.');
+			return $this->error('Правило атрибута не найдено.');
 		}
 
-		return new AttributeValueResource($model);
+		return new AttributeRuleResource($model);
 	}
 
 	/**
 	 * @return ErrorResponse|void
-	 * @throws StaleObjectException
 	 * @throws \Throwable
+	 * @throws StaleObjectException
 	 */
 	public function actionDelete(int $id)
 	{
 		try {
 			$this->service->delete($id);
 		} catch (ModelNotFoundException $e) {
-			return $this->error('Значение атрибута не найдено.');
+			return $this->error('Правило атрибута не найдено.');
 		}
 	}
 }

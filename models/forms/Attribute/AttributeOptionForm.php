@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models\forms\AttributeOption;
+namespace app\models\forms\Attribute;
 
 use app\dto\Attribute\CreateAttributeOptionDto;
 use app\dto\Attribute\UpdateAttributeOptionDto;

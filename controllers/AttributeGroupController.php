@@ -7,19 +7,19 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
-use app\models\forms\Attribute\AttributeValueForm;
-use app\resources\Attribute\AttributeValueResource;
-use app\usecases\Attribute\AttributeValueService;
+use app\models\forms\Attribute\AttributeGroupForm;
+use app\resources\Attribute\AttributeGroupResource;
+use app\usecases\Attribute\AttributeGroupService;
 use yii\db\StaleObjectException;
 
-class AttributeValueController extends AppController
+class AttributeGroupController extends AppController
 {
-	private AttributeValueService $service;
+	private AttributeGroupService $service;
 
 	public function __construct(
 		$id,
 		$module,
-		AttributeValueService $service,
+		AttributeGroupService $service,
 		$config = [])
 	{
 		$this->service = $service;
@@ -31,28 +31,26 @@ class AttributeValueController extends AppController
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
-	public function actionCreate(): AttributeValueResource
+	public function actionCreate(): AttributeGroupResource
 	{
-		$form = new AttributeValueForm();
-		$form->setScenario(AttributeValueForm::SCENARIO_CREATE);
+		$form = new AttributeGroupForm();
 		$form->load($this->request->post());
 
 		$form->validateOrThrow();
 
 		$model = $this->service->create($form->getDto());
 
-		return new AttributeValueResource($model);
+		return new AttributeGroupResource($model);
 	}
 
 	/**
-	 * @return AttributeValueResource|ErrorResponse
-	 * @throws SaveModelException
+	 * @return AttributeGroupResource|ErrorResponse
 	 * @throws ValidateException
+	 * @throws SaveModelException
 	 */
 	public function actionUpdate(int $id)
 	{
-		$form = new AttributeValueForm();
-		$form->setScenario(AttributeValueForm::SCENARIO_UPDATE);
+		$form = new AttributeGroupForm();
 		$form->load($this->request->post());
 
 		$form->validateOrThrow();
@@ -60,23 +58,23 @@ class AttributeValueController extends AppController
 		try {
 			$model = $this->service->update($id, $form->getDto());
 		} catch (ModelNotFoundException $e) {
-			return $this->error('Значение атрибута не найдено.');
+			return $this->error('Группа аттрибутов не найдена.');
 		}
 
-		return new AttributeValueResource($model);
+		return new AttributeGroupResource($model);
 	}
 
 	/**
 	 * @return ErrorResponse|void
-	 * @throws StaleObjectException
 	 * @throws \Throwable
+	 * @throws StaleObjectException
 	 */
 	public function actionDelete(int $id)
 	{
 		try {
 			$this->service->delete($id);
 		} catch (ModelNotFoundException $e) {
-			return $this->error('Значение атрибута не найдено.');
+			return $this->error('Группа аттрибутов не найдена.');
 		}
 	}
 }

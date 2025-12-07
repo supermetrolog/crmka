@@ -6,7 +6,7 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
-use app\models\forms\AttributeOption\AttributeOptionForm;
+use app\models\forms\Attribute\AttributeOptionForm;
 use app\resources\Attribute\AttributeOptionResource;
 use app\usecases\Attribute\AttributeOptionService;
 use yii\db\StaleObjectException;

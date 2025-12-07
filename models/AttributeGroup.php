@@ -2,8 +2,8 @@
 
 namespace app\models;
 
-use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\AttributeGroupQuery;
 
 /**
  * @property int     $id
@@ -28,8 +28,8 @@ class AttributeGroup extends AR
 		];
 	}
 
-	public static function find(): AQ
+	public static function find(): AttributeGroupQuery
 	{
-		return new AQ(static::class);
+		return new AttributeGroupQuery(self::class);
 	}
 }
