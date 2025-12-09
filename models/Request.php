@@ -44,8 +44,8 @@ use yii\db\ActiveQuery;
  * @property int|null                   $distanceFromMKADnotApplicable [флаг] Неприменимо
  * @property int                        $minArea                       Минимальная площадь пола
  * @property int                        $maxArea                       Максимальная площадь пола
- * @property int                        $minCeilingHeight              Минимальная высота потолков
- * @property int                        $maxCeilingHeight              максимальная высота потолков
+ * @property int|null                   $minCeilingHeight              Минимальная высота потолков
+ * @property int|null                   $maxCeilingHeight              максимальная высота потолков
  * @property int|null                   $firstFloorOnly                [флаг] Только 1 этаж
  * @property int                        $heated                        [флаг] Отапливаемый
  * @property int|null                   $antiDustOnly                  [флаг] Только антипыль
@@ -126,7 +126,7 @@ class Request extends AR
 		return [
 			[['name', 'passive_why_comment'], 'string', 'max' => 255],
 			[['description'], 'string'],
-			[['company_id', 'consultant_id', 'dealType', 'minCeilingHeight', 'minArea', 'maxArea'], 'required'],
+			[['company_id', 'consultant_id', 'dealType', 'minArea', 'maxArea'], 'required'],
 			[
 				[
 					'outside_mkad', 'region_neardy', 'distanceFromMKADnotApplicable',

@@ -75,7 +75,7 @@ class RequestForm extends Form
 			[['company_id'], 'exist', 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
 			[['contact_id'], 'exist', 'targetClass' => Contact::class, 'targetAttribute' => ['contact_id' => 'id']],
 			[['consultant_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['consultant_id' => 'id']],
-			[['company_id', 'consultant_id', 'dealType', 'minCeilingHeight', 'minArea', 'maxArea'], 'required'],
+			[['company_id', 'consultant_id', 'dealType', 'minArea', 'maxArea'], 'required'],
 			[
 				[
 					'outside_mkad', 'region_neardy', 'distanceFromMKADnotApplicable',

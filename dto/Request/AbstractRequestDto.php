@@ -14,7 +14,7 @@ abstract class AbstractRequestDto extends BaseObject
 	public int  $dealType;
 	public int  $minArea;
 	public int  $maxArea;
-	public int  $minCeilingHeight;
+	public ?int $minCeilingHeight;
 	public ?int $maxCeilingHeight;
 	public ?int $distanceFromMKAD;
 	public ?int $pricePerFloor;
