@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use app\kernel\common\models\AQ\AQ;
 use app\kernel\common\models\AR\AR;
 use app\models\ActiveQuery\AttributeGroupQuery;
 use app\models\ActiveQuery\AttributeQuery;
@@ -54,8 +53,7 @@ class AttributeRule extends AR
 
 	public static function find(): AttributeRuleQuery
 	{
-		/** @var AttributeRuleQuery */
-		return new AQ(self::class);
+		return new AttributeRuleQuery(self::class);
 	}
 
 	public function getAttributeRel(): AttributeQuery

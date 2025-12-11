@@ -7,7 +7,7 @@ use yii\base\Exception;
 
 class AlreadyExistsException extends Exception
 {
-	public function __construct($whatExists = "Value", $message = " already exists", $code = 0, Throwable $previous = null)
+	public function __construct(string $whatExists = "Value", string $message = " already exists", $code = 0, Throwable $previous = null)
 	{
 		$message = $whatExists . $message;
 

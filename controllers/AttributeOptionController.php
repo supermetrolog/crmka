@@ -6,6 +6,7 @@ use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
+use app\kernel\web\http\responses\ErrorResponse;
 use app\models\forms\Attribute\AttributeOptionForm;
 use app\resources\Attribute\AttributeOptionResource;
 use app\usecases\Attribute\AttributeOptionService;
@@ -24,6 +25,20 @@ class AttributeOptionController extends AppController
 		$this->service = $service;
 
 		parent::__construct($id, $module, $config);
+	}
+
+	/**
+	 * @return AttributeOptionResource|ErrorResponse
+	 */
+	public function actionView(int $id)
+	{
+		try {
+			$model = $this->service->getModel($id, $this->user);
+
+			return new AttributeOptionResource($model);
+		} catch (ModelNotFoundException $e) {
+			return $this->error('Атрибут не найден.');
+		}
 	}
 
 	/**
@@ -70,6 +85,4 @@ class AttributeOptionController extends AppController
 	{
 		$this->service->delete($id);
 	}
-
-	// TODO: attribute
 }

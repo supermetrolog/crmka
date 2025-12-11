@@ -2,16 +2,19 @@
 
 namespace app\controllers;
 
-use app\exceptions\services\common\AlreadyExistsException;
+use app\exceptions\services\AttributeAlreadyExistsException;
 use app\kernel\common\controller\AppController;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
 use app\models\forms\Attribute\AttributeForm;
+use app\models\search\AttributeSearch;
 use app\resources\Attribute\AttributeResource;
 use app\usecases\Attribute\AttributeService;
 use Throwable;
+use yii\base\ErrorException;
+use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 
 class AttributeController extends AppController
@@ -32,7 +35,34 @@ class AttributeController extends AppController
 
 	/**
 	 * @throws ValidateException
-	 * @throws AlreadyExistsException
+	 * @throws ErrorException
+	 */
+	public function actionIndex(): ActiveDataProvider
+	{
+		$searchModel = new AttributeSearch();
+
+		$dataProvider = $searchModel->search($this->request->get());
+
+		return AttributeResource::fromDataProvider($dataProvider);
+	}
+
+	/**
+	 * @return AttributeResource|ErrorResponse
+	 */
+	public function actionView(int $id)
+	{
+		try {
+			$model = $this->service->getModel($id, $this->user);
+
+			return new AttributeResource($model);
+		} catch (ModelNotFoundException $e) {
+			return $this->error('Атрибут не найден.');
+		}
+	}
+
+	/**
+	 * @throws ValidateException
+	 * @throws AttributeAlreadyExistsException
 	 * @throws SaveModelException
 	 */
 	public function actionCreate(): AttributeResource
@@ -84,6 +114,4 @@ class AttributeController extends AppController
 			return $this->error('Атрибут не найден.');
 		}
 	}
-
-	// TODO: attribute
 }

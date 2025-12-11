@@ -2,11 +2,13 @@
 
 namespace app\usecases\Attribute;
 
+use __WebUser;
 use app\dto\Attribute\CreateAttributeOptionDto;
 use app\dto\Attribute\UpdateAttributeOptionDto;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\AttributeOption;
+use app\models\User\User;
 use app\repositories\AttributeOptionRepository;
 use yii\db\StaleObjectException;
 
@@ -65,5 +67,19 @@ class AttributeOptionService
 		$model = $this->repository->findOneOrThrow($id);
 
 		$model->delete();
+	}
+
+	/**
+	 * @param User|__WebUser $user
+	 *
+	 * @throws ModelNotFoundException
+	 */
+	public function getModel(int $id, $user = null): AttributeOption
+	{
+		if ($user && $user->identity->isAdministrator()) {
+			return $this->repository->findOneOrThrow($id, false);
+		} else {
+			return $this->repository->findOneOrThrow($id);
+		}
 	}
 }

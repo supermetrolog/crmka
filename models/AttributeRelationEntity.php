@@ -54,13 +54,13 @@ class AttributeRelationEntity extends AR
 		return [
 			[['attribute_id', 'entity_id', 'entity_type'], 'required'],
 			[['attribute_id', 'entity_id'], 'integer'],
-			['attribute_id', 'exist', Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
+			['attribute_id', 'exist', 'targetClass' => Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
 			[['entity_type'], 'string'],
 			[['created_at', 'updated_at', 'deleted_at'], 'safe'],
 		];
 	}
 
-	public function getAttributeRel($name): AttributeQuery
+	public function getAttributeRel(): AttributeQuery
 	{
 		/** @var AttributeQuery */
 		return $this->hasOne(Attribute::class, ['id' => 'attribute_id']);

@@ -16,20 +16,12 @@ abstract class ModelRepository
 
 	protected array $with;
 
-	/**
-	 * @param class-string<Model> $className
-	 */
-	public function __construct(string $className)
-	{
-		$this->className = $className;
-	}
-
 	// Repository methods
 
 	/**
 	 * @return Model|null
 	 */
-	public function findOne(int $id, $notDeleted = true): ?AR
+	public function findOne(int $id, bool $notDeleted = true): ?AR
 	{
 		if ($notDeleted) {
 			return $this->className::find()->notDeleted()->byId($id)->one();
@@ -42,7 +34,7 @@ abstract class ModelRepository
 	 * @return Model
 	 * @throws ModelNotFoundException
 	 */
-	public function findOneOrThrow(int $id, $notDeleted = true): AR
+	public function findOneOrThrow(int $id, bool $notDeleted = true): AR
 	{
 		if ($notDeleted) {
 			return $this->className::find()->notDeleted()->byId($id)->oneOrThrow();

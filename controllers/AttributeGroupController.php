@@ -58,7 +58,7 @@ class AttributeGroupController extends AppController
 		try {
 			$model = $this->service->update($id, $form->getDto());
 		} catch (ModelNotFoundException $e) {
-			return $this->error('Группа аттрибутов не найдена.');
+			return $this->error('Группа атрибутов не найдена.');
 		}
 
 		return new AttributeGroupResource($model);
@@ -74,7 +74,7 @@ class AttributeGroupController extends AppController
 		try {
 			$this->service->delete($id);
 		} catch (ModelNotFoundException $e) {
-			return $this->error('Группа аттрибутов не найдена.');
+			return $this->error('Группа атрибутов не найдена.');
 		}
 	}
 }

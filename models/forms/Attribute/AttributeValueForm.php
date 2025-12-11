@@ -41,7 +41,7 @@ class AttributeValueForm extends Form
 	public function attributeLabels(): array
 	{
 		return [
-			'attribute_id' => 'Аттрибут',
+			'attribute_id' => 'Атрибут',
 			'entity_id'    => 'Сущность',
 			'entity_type'  => 'Тип сущности',
 			'value'        => 'Значение',

@@ -8,6 +8,7 @@ use app\enum\Attribute\AttributeInputTypeEnum;
 use app\enum\Attribute\AttributeValueTypeEnum;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\Form\Form;
+use app\models\User\User;
 
 class AttributeForm extends Form
 {
@@ -19,15 +20,17 @@ class AttributeForm extends Form
 	public $description;
 	public $value_type;
 	public $input_type;
+	public $created_by_id;
 
 	public function rules(): array
 	{
 		return [
-			[['kind', 'label', 'value_type', 'input_type'], 'required'],
+			[['kind', 'label', 'value_type', 'input_type', 'created_by_id'], 'required'],
 			[['kind', 'label'], 'string', 'max' => 64],
 			[['description'], 'string', 'max' => 255],
 			[['value_type'], EnumValidator::class, 'enumClass' => AttributeValueTypeEnum::class],
 			[['input_type'], EnumValidator::class, 'enumClass' => AttributeInputTypeEnum::class],
+			[['created_by_id'], 'exist', 'targetClass' => User::class, 'targetAttribute' => ['created_by_id' => 'id']],
 		];
 	}
 
@@ -41,7 +44,7 @@ class AttributeForm extends Form
 		];
 
 		return [
-			self::SCENARIO_CREATE => [...$common, 'kind'],
+			self::SCENARIO_CREATE => [...$common, 'kind', 'created_by_id'],
 			self::SCENARIO_UPDATE => $common,
 		];
 	}
@@ -49,11 +52,12 @@ class AttributeForm extends Form
 	public function attributeLabels(): array
 	{
 		return [
-			'kind'        => 'Идентификатор',
-			'label'       => 'Название',
-			'description' => 'Описание',
-			'value_type'  => 'Тип значения',
-			'input_type'  => 'Тип ввода'
+			'kind'          => 'Идентификатор',
+			'label'         => 'Название',
+			'description'   => 'Описание',
+			'value_type'    => 'Тип значения',
+			'input_type'    => 'Тип ввода',
+			'created_by_id' => 'Пользователь',
 		];
 	}
 
@@ -70,6 +74,7 @@ class AttributeForm extends Form
 					'description' => $this->description,
 					'valueType'   => $this->value_type,
 					'inputType'   => $this->input_type,
+					'createdById' => $this->created_by_id
 				]);
 			default:
 				return new UpdateAttributeDto([

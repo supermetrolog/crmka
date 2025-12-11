@@ -2,19 +2,21 @@
 
 namespace app\usecases\Attribute;
 
+use __WebUser;
 use app\dto\Attribute\CreateAttributeDto;
 use app\dto\Attribute\UpdateAttributeDto;
-use app\exceptions\services\common\AlreadyExistsException;
+use app\exceptions\services\AttributeAlreadyExistsException;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Attribute;
+use app\models\User\User;
 use app\repositories\AttributeRepository;
 use Throwable;
 use yii\db\StaleObjectException;
 
 class AttributeService
 {
-	private AttributeRepository $repository;
+	protected AttributeRepository $repository;
 
 	public function __construct(AttributeRepository $repository)
 	{
@@ -22,22 +24,23 @@ class AttributeService
 	}
 
 	/**
-	 * @throws AlreadyExistsException
+	 * @throws AttributeAlreadyExistsException
 	 * @throws SaveModelException
 	 */
 	public function create(CreateAttributeDto $dto): Attribute
 	{
 		if ($this->repository->existsByKind($dto->kind)) {
-			throw new AlreadyExistsException("Attribute with the kind {$dto->kind}");
+			throw new AttributeAlreadyExistsException("Attribute with kind {$dto->kind}");
 		}
 
 		$model = new Attribute(
 			[
-				'kind'        => $dto->kind,
-				'label'       => $dto->label,
-				'description' => $dto->description,
-				'value_type'  => $dto->valueType,
-				'input_type'  => $dto->inputType,
+				'kind'          => $dto->kind,
+				'label'         => $dto->label,
+				'description'   => $dto->description,
+				'value_type'    => $dto->valueType,
+				'input_type'    => $dto->inputType,
+				'created_by_id' => $dto->createdById,
 			]
 		);
 
@@ -76,5 +79,19 @@ class AttributeService
 		$model = $this->repository->findOneOrThrow($id);
 
 		$model->delete();
+	}
+
+	/**
+	 * @param User|__WebUser $user
+	 *
+	 * @throws ModelNotFoundException
+	 */
+	public function getModel(int $id, $user = null): Attribute
+	{
+		if ($user && $user->identity->isAdministrator()) {
+			return $this->repository->findOneOrThrow($id, false);
+		} else {
+			return $this->repository->findOneOrThrow($id);
+		}
 	}
 }

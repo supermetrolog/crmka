@@ -56,8 +56,8 @@ class AttributeRuleForm extends Form
 	public function attributeLabels(): array
 	{
 		return [
-			'attribute_id'       => 'Аттрибут',
-			'attribute_group_id' => 'Группа аттрибутов',
+			'attribute_id'       => 'Атрибут',
+			'attribute_group_id' => 'Группа атрибутов',
 			'entity_type'        => 'Тип сущности',
 			'status'             => 'Статус',
 			'sort_order'         => 'Порядок сортировки',
