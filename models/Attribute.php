@@ -22,7 +22,7 @@ use app\models\User\User;
  * @property string  $updated_at
  * @property ?string $deleted_at
  *
- * @property User    $created_by
+ * @property User    $createdBy
  */
 class Attribute extends AR
 {
@@ -49,7 +49,7 @@ class Attribute extends AR
 		];
 	}
 
-	public function getUser(): UserQuery
+	public function getCreatedBy(): UserQuery
 	{
 		/** @var UserQuery */
 		return $this->hasOne(User::class, ['id' => 'created_by_id']);

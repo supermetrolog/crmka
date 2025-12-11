@@ -24,7 +24,7 @@ class AttributeResource extends JsonResource
 			'description'   => $this->resource->description,
 			'value_type'    => $this->resource->value_type,
 			'input_type'    => $this->resource->input_type,
-			'created_by_id' => UserResource::tryMakeArray($this->resource->created_by),
+			'created_by_id' => UserResource::tryMakeArray($this->resource->createdBy),
 			'created_at'    => $this->resource->created_at,
 			'deleted_at'    => $this->resource->deleted_at,
 		];

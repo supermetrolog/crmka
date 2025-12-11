@@ -71,6 +71,8 @@ class AttributeController extends AppController
 		$form->setScenario(AttributeForm::SCENARIO_CREATE);
 		$form->load($this->request->post());
 
+		$form->created_by_id = $this->user->identity->id;
+
 		$form->validateOrThrow();
 
 		$model = $this->service->create($form->getDto());
