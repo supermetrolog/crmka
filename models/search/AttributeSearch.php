@@ -94,8 +94,8 @@ class AttributeSearch extends Form
 		if (!empty($this->search)) {
 			$query->andFilterWhere([
 				'or',
-				['like', Attribute::field('kind') => $this->search],
-				['like', Attribute::field('description') => $this->search],
+				['like', Attribute::field('kind'), $this->search],
+				['like', Attribute::field('description'), $this->search],
 			]);
 		}
 
