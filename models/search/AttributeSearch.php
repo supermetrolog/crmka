@@ -19,7 +19,9 @@ class AttributeSearch extends Form
 	public $label;
 	public $search;
 	public $value_type;
+	public $value_types;
 	public $input_type;
+	public $input_types;
 	public $current_user_id;
 	public $created_at;
 	public $updated_at;
@@ -31,6 +33,7 @@ class AttributeSearch extends Form
 		return [
 			['id', 'integer'],
 			[['kind', 'label', 'search', 'value_type', 'input_type'], 'string'],
+			[['input_types', 'value_types'], 'each', 'rule' => ['string']],
 			[['value_type'], EnumValidator::class, 'enumClass' => AttributeValueTypeEnum::class],
 			[['input_type'], EnumValidator::class, 'enumClass' => AttributeInputTypeEnum::class],
 			[['current_user_id'], 'integer'],
@@ -83,13 +86,19 @@ class AttributeSearch extends Form
 
 		$this->validateOrThrow();
 
-		$query->andFilterWhere([
-			Attribute::field('id')         => $this->id,
-			Attribute::field('kind')       => $this->kind,
-			Attribute::field('value_type') => $this->value_type,
-			Attribute::field('input_type') => $this->input_type,
-		])->andFilterWhere(['>=', Attribute::field('updated_at'), $this->after])
-		      ->andFilterWhere(['<=', Attribute::field('updated_at'), $this->before]);
+		$query
+			->andFilterWhere([
+				Attribute::field('id')         => $this->id,
+				Attribute::field('kind')       => $this->kind,
+				Attribute::field('value_type') => $this->value_type,
+				Attribute::field('input_type') => $this->input_type,
+			])
+			->andFilterWhere([
+				Attribute::field('value_type') => $this->value_types,
+				Attribute::field('input_type') => $this->input_types,
+			])
+			->andFilterWhere(['>=', Attribute::field('updated_at'), $this->after])
+			->andFilterWhere(['<=', Attribute::field('updated_at'), $this->before]);
 
 		if (!empty($this->search)) {
 			$query->andFilterWhere([
