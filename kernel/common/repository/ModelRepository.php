@@ -3,31 +3,37 @@
 namespace app\kernel\common\repository;
 
 use app\helpers\ArrayHelper;
+use app\kernel\common\models\AQ\ModelAQ;
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 
 /**
  * @template-covariant Model of AR
  */
-abstract class ModelRepository
+abstract class ModelRepository implements RepositoryInterface
 {
 	/** @var class-string<Model> */
 	protected string $className;
 
 	protected array $with;
 
-	// Repository methods
+	private function find(): ModelAQ
+	{
+		return $this->className::find();
+	}
 
 	/**
 	 * @return Model|null
 	 */
 	public function findOne(int $id, bool $notDeleted = true): ?AR
 	{
+		$query = $this->find()->byId($id);
+
 		if ($notDeleted) {
-			return $this->className::find()->notDeleted()->byId($id)->one();
-		} else {
-			return $this->className::find()->byId($id)->one();
+			$query->notDeleted();
 		}
+
+		return $query->one();
 	}
 
 	/**
@@ -36,11 +42,13 @@ abstract class ModelRepository
 	 */
 	public function findOneOrThrow(int $id, bool $notDeleted = true): AR
 	{
+		$query = $this->find()->byId($id);
+
 		if ($notDeleted) {
-			return $this->className::find()->notDeleted()->byId($id)->oneOrThrow();
-		} else {
-			return $this->className::find()->byId($id)->oneOrThrow();
+			$query->notDeleted();
 		}
+
+		return $query->oneOrThrow();
 	}
 
 	/**

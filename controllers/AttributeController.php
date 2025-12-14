@@ -128,7 +128,7 @@ class AttributeController extends AppController
 	 */
 	public function actionOptions(int $id): array
 	{
-		$attribute = $this->repository->findOneOrThrow($id);
+		$attribute = $this->repository->findOneOrThrow($id, false);
 
 		return AttributeOptionResource::collection($attribute->attributeOptions);
 	}
