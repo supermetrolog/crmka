@@ -2,14 +2,11 @@
 
 namespace app\usecases\Attribute;
 
-use __WebUser;
 use app\dto\Attribute\CreateAttributeDto;
 use app\dto\Attribute\UpdateAttributeDto;
 use app\exceptions\services\AttributeAlreadyExistsException;
-use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Attribute;
-use app\models\User\User;
 use app\repositories\AttributeRepository;
 use Throwable;
 use yii\db\StaleObjectException;
@@ -50,13 +47,10 @@ class AttributeService
 	}
 
 	/**
-	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 */
-	public function update(int $id, UpdateAttributeDto $dto): Attribute
+	public function update(Attribute $model, UpdateAttributeDto $dto): Attribute
 	{
-		$model = $this->repository->findOneOrThrow($id);
-
 		$model->load([
 			'label'       => $dto->label,
 			'description' => $dto->description,
@@ -71,27 +65,10 @@ class AttributeService
 
 	/**
 	 * @throws StaleObjectException
-	 * @throws ModelNotFoundException
 	 * @throws Throwable
 	 */
-	public function delete(int $id): void
+	public function delete(Attribute $attribute): void
 	{
-		$model = $this->repository->findOneOrThrow($id);
-
-		$model->delete();
-	}
-
-	/**
-	 * @param User|__WebUser $user
-	 *
-	 * @throws ModelNotFoundException
-	 */
-	public function getModel(int $id, $user = null): Attribute
-	{
-		if ($user && $user->identity->isAdministrator()) {
-			return $this->repository->findOneOrThrow($id, false);
-		} else {
-			return $this->repository->findOneOrThrow($id);
-		}
+		$attribute->delete();
 	}
 }

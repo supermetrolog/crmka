@@ -8,6 +8,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
+use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Attribute\AttributeForm;
 use app\models\search\AttributeSearch;
 use app\repositories\AttributeRepository;
@@ -52,17 +53,13 @@ class AttributeController extends AppController
 	}
 
 	/**
-	 * @return AttributeResource|ErrorResponse
+	 * @throws ModelNotFoundException
 	 */
-	public function actionView(int $id)
+	public function actionView(int $id): AttributeResource
 	{
-		try {
-			$model = $this->service->getModel($id, $this->user);
+		$model = $this->repository->findOneOrThrow($id);
 
-			return new AttributeResource($model);
-		} catch (ModelNotFoundException $e) {
-			return $this->error('Атрибут не найден.');
-		}
+		return new AttributeResource($model);
 	}
 
 	/**
@@ -86,29 +83,27 @@ class AttributeController extends AppController
 	}
 
 	/**
-	 * @return AttributeResource|ErrorResponse
+	 * @throws ModelNotFoundException
 	 * @throws ValidateException
 	 * @throws SaveModelException
 	 */
-	public function actionUpdate(int $id)
+	public function actionUpdate(int $id): AttributeResource
 	{
+		$attribute = $this->repository->findOneOrThrow($id);
+
 		$form = new AttributeForm();
 		$form->setScenario(AttributeForm::SCENARIO_UPDATE);
 		$form->load($this->request->post());
 
 		$form->validateOrThrow();
 
-		try {
-			$model = $this->service->update($id, $form->getDto());
-		} catch (ModelNotFoundException $e) {
-			return $this->error('Атрибут не найден.');
-		}
+		$model = $this->service->update($attribute, $form->getDto());
 
 		return new AttributeResource($model);
 	}
 
 	/**
-	 * @return ErrorResponse|void
+	 * @return ErrorResponse|SuccessResponse
 	 * @throws Throwable
 	 * @throws ModelNotFoundException
 	 * @throws StaleObjectException
@@ -116,7 +111,11 @@ class AttributeController extends AppController
 	public function actionDelete(int $id)
 	{
 		try {
-			$this->service->delete($id);
+			$attribute = $this->repository->findOneOrThrow($id);
+
+			$this->service->delete($attribute);
+
+			return $this->success('Атрибут успешно удален.');
 		} catch (ModelNotFoundException $e) {
 			return $this->error('Атрибут не найден.');
 		}
