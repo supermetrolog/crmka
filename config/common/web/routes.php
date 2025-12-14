@@ -485,6 +485,8 @@ return static function (RouterInterface $router) {
 
 	$router->controller('attribute')->crud()->group(static function (RouteInterface $route) {
 		$route->get('<id>/options', 'options');
+
+		$route->post('with-options', 'create-with-options');
 	});
 
 	$router->controller('attribute-option')->crud();

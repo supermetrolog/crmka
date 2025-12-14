@@ -2,7 +2,7 @@
 
 namespace app\usecases\Attribute;
 
-use app\dto\Attribute\AttributeGroupDto;
+use app\dto\AttributeGroup\AttributeGroupDto;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\AttributeGroup;

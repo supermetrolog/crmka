@@ -1,6 +1,6 @@
 <?php
 
-namespace app\dto\Attribute;
+namespace app\dto\AttributeValue;
 
 use yii\base\BaseObject;
 

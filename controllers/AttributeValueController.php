@@ -7,7 +7,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
-use app\models\forms\Attribute\AttributeValueForm;
+use app\models\forms\AttributeValue\AttributeValueForm;
 use app\resources\Attribute\AttributeValueResource;
 use app\usecases\Attribute\AttributeValueService;
 use yii\db\StaleObjectException;

@@ -1,9 +1,9 @@
 <?php
 
-namespace app\models\forms\Attribute;
+namespace app\models\forms\AttributeValue;
 
-use app\dto\Attribute\CreateAttributeValueDto;
-use app\dto\Attribute\UpdateAttributeValueDto;
+use app\dto\AttributeValue\CreateAttributeValueDto;
+use app\dto\AttributeValue\UpdateAttributeValueDto;
 use app\kernel\common\models\Form\Form;
 
 class AttributeValueForm extends Form

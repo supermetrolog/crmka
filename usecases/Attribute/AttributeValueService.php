@@ -2,8 +2,8 @@
 
 namespace app\usecases\Attribute;
 
-use app\dto\Attribute\CreateAttributeValueDto;
-use app\dto\Attribute\UpdateAttributeValueDto;
+use app\dto\AttributeValue\CreateAttributeValueDto;
+use app\dto\AttributeValue\UpdateAttributeValueDto;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\AttributeValue;

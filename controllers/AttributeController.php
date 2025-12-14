@@ -10,6 +10,7 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
 use app\kernel\web\http\responses\SuccessResponse;
 use app\models\forms\Attribute\AttributeForm;
+use app\models\forms\Attribute\AttributeOptionForm;
 use app\models\search\AttributeSearch;
 use app\repositories\AttributeRepository;
 use app\resources\Attribute\AttributeOptionResource;
@@ -84,6 +85,31 @@ class AttributeController extends AppController
 	}
 
 	/**
+	 * @throws ValidateException
+	 */
+	public function actionCreateWithOptions(): AttributeResource
+	{
+		$form = new AttributeForm();
+
+		$form->setScenario(AttributeForm::SCENARIO_CREATE);
+		$form->load($this->request->post());
+
+		$form->created_by_id = $this->user->identity->id;
+
+		$optionDtos = [];
+
+		foreach ($this->request->post('options', []) as $payload) {
+			$optionDtos[] = $this->makeAttributeOptionForm($payload)->getDto();
+		}
+
+		$form->validateOrThrow();
+
+		$model = $this->service->createWithOptions($form->getDto(), $optionDtos);
+
+		return new AttributeResource($model);
+	}
+
+	/**
 	 * @throws ModelNotFoundException
 	 * @throws ValidateException
 	 * @throws SaveModelException
@@ -131,5 +157,19 @@ class AttributeController extends AppController
 		$attribute = $this->repository->findOneOrThrow($id, false);
 
 		return AttributeOptionResource::collection($attribute->attributeOptions);
+	}
+
+	/**
+	 * @throws ValidateException
+	 */
+	public function makeAttributeOptionForm(array $payload): AttributeOptionForm
+	{
+		$form = new AttributeOptionForm();
+
+		$form->load($payload);
+
+		$form->validateOrThrow();
+
+		return $form;
 	}
 }

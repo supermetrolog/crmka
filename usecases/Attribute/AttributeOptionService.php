@@ -3,8 +3,8 @@
 namespace app\usecases\Attribute;
 
 use __WebUser;
-use app\dto\Attribute\CreateAttributeOptionDto;
-use app\dto\Attribute\UpdateAttributeOptionDto;
+use app\dto\AttributeOption\CreateAttributeOptionDto;
+use app\dto\AttributeOption\UpdateAttributeOptionDto;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\AttributeOption;

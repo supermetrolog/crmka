@@ -3,8 +3,10 @@
 namespace app\usecases\Attribute;
 
 use app\dto\Attribute\CreateAttributeDto;
+use app\dto\Attribute\CreateAttributeOptionDto;
 use app\dto\Attribute\UpdateAttributeDto;
 use app\exceptions\services\AttributeAlreadyExistsException;
+use app\kernel\common\database\interfaces\transaction\TransactionBeginnerInterface;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\Attribute;
 use app\repositories\AttributeRepository;
@@ -13,11 +15,15 @@ use yii\db\StaleObjectException;
 
 class AttributeService
 {
-	protected AttributeRepository $repository;
+	protected AttributeRepository          $repository;
+	protected AttributeOptionService       $optionService;
+	protected TransactionBeginnerInterface $transactionBeginner;
 
-	public function __construct(AttributeRepository $repository)
+	public function __construct(AttributeRepository $repository, AttributeOptionService $optionService, TransactionBeginnerInterface $transactionBeginner)
 	{
-		$this->repository = $repository;
+		$this->repository          = $repository;
+		$this->optionService       = $optionService;
+		$this->transactionBeginner = $transactionBeginner;
 	}
 
 	/**
@@ -44,6 +50,27 @@ class AttributeService
 		$model->saveOrThrow();
 
 		return $model;
+	}
+
+	/**
+	 * @param CreateAttributeOptionDto[] $optionDtos
+	 */
+	public function createWithOptions(CreateAttributeDto $dto, array $optionDtos): Attribute
+	{
+		return $this->transactionBeginner->run(function () use ($dto, $optionDtos) {
+			$model = $this->create($dto);
+
+			foreach ($optionDtos as $optionDto) {
+				$this->optionService->create(new \app\dto\AttributeOption\CreateAttributeOptionDto([
+					'attributeId' => $model->id,
+					'value'       => $optionDto->value,
+					'label'       => $optionDto->label,
+					'sortOrder'   => $optionDto->sortOrder,
+				]));
+			}
+
+			return $model;
+		});
 	}
 
 	/**

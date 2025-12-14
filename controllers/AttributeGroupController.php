@@ -7,7 +7,7 @@ use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
-use app\models\forms\Attribute\AttributeGroupForm;
+use app\models\forms\AttributeGroup\AttributeGroupForm;
 use app\resources\Attribute\AttributeGroupResource;
 use app\usecases\Attribute\AttributeGroupService;
 use yii\db\StaleObjectException;

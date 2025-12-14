@@ -2,8 +2,8 @@
 
 namespace app\usecases\Attribute;
 
-use app\dto\Attribute\CreateAttributeRuleDto;
-use app\dto\Attribute\UpdateAttributeRuleDto;
+use app\dto\AttributeRule\CreateAttributeRuleDto;
+use app\dto\AttributeRule\UpdateAttributeRuleDto;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\AttributeRule;

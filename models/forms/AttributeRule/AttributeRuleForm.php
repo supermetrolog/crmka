@@ -1,9 +1,9 @@
 <?php
 
-namespace app\models\forms\Attribute;
+namespace app\models\forms\AttributeRule;
 
-use app\dto\Attribute\CreateAttributeRuleDto;
-use app\dto\Attribute\UpdateAttributeRuleDto;
+use app\dto\AttributeRule\CreateAttributeRuleDto;
+use app\dto\AttributeRule\UpdateAttributeRuleDto;
 use app\kernel\common\models\Form\Form;
 use app\models\Attribute;
 use app\models\AttributeGroup;

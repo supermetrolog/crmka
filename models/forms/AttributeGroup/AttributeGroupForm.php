@@ -1,8 +1,8 @@
 <?php
 
-namespace app\models\forms\Attribute;
+namespace app\models\forms\AttributeGroup;
 
-use app\dto\Attribute\AttributeGroupDto;
+use app\dto\AttributeGroup\AttributeGroupDto;
 use app\kernel\common\models\Form\Form;
 
 class AttributeGroupForm extends Form
