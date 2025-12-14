@@ -65,6 +65,6 @@ class Attribute extends AR
 
 	public static function find(): AttributeQuery
 	{
-		return new AttributeQuery(self::class);
+		return new AttributeQuery(static::class);
 	}
 }

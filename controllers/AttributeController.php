@@ -14,6 +14,7 @@ use app\models\search\AttributeSearch;
 use app\repositories\AttributeRepository;
 use app\resources\Attribute\AttributeOptionResource;
 use app\resources\Attribute\AttributeResource;
+use app\resources\Attribute\AttributeSearchResource;
 use app\usecases\Attribute\AttributeService;
 use Throwable;
 use yii\base\ErrorException;
@@ -49,7 +50,7 @@ class AttributeController extends AppController
 
 		$dataProvider = $searchModel->search($this->request->get());
 
-		return AttributeResource::fromDataProvider($dataProvider);
+		return AttributeSearchResource::fromDataProvider($dataProvider);
 	}
 
 	/**

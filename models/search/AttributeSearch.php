@@ -8,6 +8,8 @@ use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\common\models\Form\Form;
 use app\models\Attribute;
+use app\models\AttributeOption;
+use app\models\views\AttributeSearchView;
 use yii\base\ErrorException;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -47,8 +49,14 @@ class AttributeSearch extends Form
 	 */
 	public function search(array $params): ActiveDataProvider
 	{
-		$query = Attribute::find()
-		                  ->with(['createdBy.userProfile']);
+		$query = AttributeSearchView::find()
+		                            ->select([
+			                            '*',
+			                            'options_count' => AttributeOption::find()
+			                                                              ->select('COUNT(*)')
+			                                                              ->where('attribute_option.attribute_id = attribute.id')
+		                            ])
+		                            ->with(['createdBy.userProfile']);
 
 		$dataProvider = new ActiveDataProvider([
 			'query'      => $query,
