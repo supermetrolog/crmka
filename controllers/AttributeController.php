@@ -10,6 +10,8 @@ use app\kernel\common\models\exceptions\ValidateException;
 use app\kernel\web\http\responses\ErrorResponse;
 use app\models\forms\Attribute\AttributeForm;
 use app\models\search\AttributeSearch;
+use app\repositories\AttributeRepository;
+use app\resources\Attribute\AttributeOptionResource;
 use app\resources\Attribute\AttributeResource;
 use app\usecases\Attribute\AttributeService;
 use Throwable;
@@ -19,16 +21,19 @@ use yii\db\StaleObjectException;
 
 class AttributeController extends AppController
 {
-	private AttributeService $service;
+	private AttributeService    $service;
+	private AttributeRepository $repository;
 
 	public function __construct(
 		$id,
 		$module,
 		AttributeService $service,
+		AttributeRepository $repository,
 		$config = []
 	)
 	{
-		$this->service = $service;
+		$this->service    = $service;
+		$this->repository = $repository;
 
 		parent::__construct($id, $module, $config);
 	}
@@ -115,5 +120,16 @@ class AttributeController extends AppController
 		} catch (ModelNotFoundException $e) {
 			return $this->error('Атрибут не найден.');
 		}
+	}
+
+	/**
+	 * @return AttributeOptionResource[]
+	 * @throws ModelNotFoundException
+	 */
+	public function actionOptions(int $id): array
+	{
+		$attribute = $this->repository->findOneOrThrow($id);
+
+		return AttributeOptionResource::collection($attribute->attributeOptions);
 	}
 }

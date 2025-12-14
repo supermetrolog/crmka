@@ -6,23 +6,25 @@ use app\enum\Attribute\AttributeInputTypeEnum;
 use app\enum\Attribute\AttributeValueTypeEnum;
 use app\helpers\validators\EnumValidator;
 use app\kernel\common\models\AR\AR;
+use app\models\ActiveQuery\AttributeOptionQuery;
 use app\models\ActiveQuery\AttributeQuery;
 use app\models\ActiveQuery\UserQuery;
 use app\models\User\User;
 
 /**
- * @property int     $id
- * @property string  $kind
- * @property string  $label
- * @property ?string $description
- * @property string  $value_type
- * @property string  $input_type
- * @property int     $created_by_id
- * @property string  $created_at
- * @property string  $updated_at
- * @property ?string $deleted_at
+ * @property int               $id
+ * @property string            $kind
+ * @property string            $label
+ * @property ?string           $description
+ * @property string            $value_type
+ * @property string            $input_type
+ * @property int               $created_by_id
+ * @property string            $created_at
+ * @property string            $updated_at
+ * @property ?string           $deleted_at
  *
- * @property User    $createdBy
+ * @property User              $createdBy
+ * @property AttributeOption[] $attributeOptions
  */
 class Attribute extends AR
 {
@@ -53,6 +55,12 @@ class Attribute extends AR
 	{
 		/** @var UserQuery */
 		return $this->hasOne(User::class, ['id' => 'created_by_id']);
+	}
+
+	public function getAttributeOptions(): AttributeOptionQuery
+	{
+		/** @var AttributeOptionQuery */
+		return $this->hasMany(AttributeOption::class, ['attribute_id' => 'id']);
 	}
 
 	public static function find(): AttributeQuery
