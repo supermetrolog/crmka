@@ -4,21 +4,12 @@ namespace app\usecases\Attribute;
 
 use app\dto\AttributeRule\CreateAttributeRuleDto;
 use app\dto\AttributeRule\UpdateAttributeRuleDto;
-use app\kernel\common\models\exceptions\ModelNotFoundException;
 use app\kernel\common\models\exceptions\SaveModelException;
 use app\models\AttributeRule;
-use app\repositories\AttributeRuleRepository;
 use yii\db\StaleObjectException;
 
 class AttributeRuleService
 {
-	private AttributeRuleRepository $repository;
-
-	public function __construct(AttributeRuleRepository $repository)
-	{
-		$this->repository = $repository;
-	}
-
 	/**
 	 * @throws SaveModelException
 	 */
@@ -41,13 +32,10 @@ class AttributeRuleService
 	}
 
 	/**
-	 * @throws ModelNotFoundException
 	 * @throws SaveModelException
 	 */
-	public function update(int $id, UpdateAttributeRuleDto $dto): AttributeRule
+	public function update(AttributeRule $model, UpdateAttributeRuleDto $dto): AttributeRule
 	{
-		$model = $this->repository->findOneOrThrow($id);
-
 		$model->load([
 			'attribute_group_id' => $dto->attributeGroupId,
 			'entity_type'        => $dto->entityType,
@@ -66,12 +54,9 @@ class AttributeRuleService
 	/**
 	 * @throws \Throwable
 	 * @throws StaleObjectException
-	 * @throws ModelNotFoundException
 	 */
-	public function delete(int $id): void
+	public function delete(AttributeRule $model): void
 	{
-		$model = $this->repository->findOneOrThrow($id);
-
 		$model->delete();
 	}
 }

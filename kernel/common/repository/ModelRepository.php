@@ -2,8 +2,6 @@
 
 namespace app\kernel\common\repository;
 
-use app\helpers\ArrayHelper;
-use app\kernel\common\models\AQ\ModelAQ;
 use app\kernel\common\models\AR\AR;
 use app\kernel\common\models\exceptions\ModelNotFoundException;
 
@@ -14,13 +12,6 @@ abstract class ModelRepository implements RepositoryInterface
 {
 	/** @var class-string<Model> */
 	protected string $className;
-
-	protected array $with;
-
-	private function find(): ModelAQ
-	{
-		return $this->className::find();
-	}
 
 	/**
 	 * @return Model|null
@@ -59,12 +50,8 @@ abstract class ModelRepository implements RepositoryInterface
 		return $this->className::find()->all();
 	}
 
-	public function with(array $relations): self
+	private function find()
 	{
-		$cloned = clone $this;
-
-		$cloned->with = ArrayHelper::merge($cloned->with, $relations);
-
-		return $cloned;
+		return $this->className::find();
 	}
 }
