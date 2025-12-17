@@ -482,4 +482,12 @@ return static function (RouterInterface $router) {
 		$route->post('revoke-user/<id>')->action('revoke-user');
 		$route->post('revoke-link/<id>')->action('revoke-link');
 	});
+
+	$router->controller('attribute')->crud()->group(static function (RouteInterface $route) {
+		$route->get('<id>/options', 'options');
+
+		$route->post('with-options', 'create-with-options');
+	});
+
+	$router->controller('attribute-option')->crud();
 };

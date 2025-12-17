@@ -14,6 +14,4 @@ interface RepositoryInterface
 	 * @return AR[]
 	 */
 	public function findAll(): array;
-
-	public function with(array $relations): self;
 }
